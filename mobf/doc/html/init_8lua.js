@@ -10,5 +10,6 @@ var init_8lua =
     [ "mobf_modpath", "init_8lua.html#a52d5dfaebff3e1ea207aa10f07ed5d28", null ],
     [ "mobf_movement_patterns", "init_8lua.html#a32d24f1ad1b3064d8a86b2ca82649a7a", null ],
     [ "mobf_registred_mob", "init_8lua.html#a7bb1e2e739d5b1f907b7e97c15779fc8", null ],
+    [ "mobf_registred_mob_data", "init_8lua.html#a01ed78051a584e6e6b0091c9df3989cf", null ],
     [ "mobf_version", "init_8lua.html#a090b50edcaba8ed31b12e071eca9c7bb", null ]
 ];

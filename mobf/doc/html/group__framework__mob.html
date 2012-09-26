@@ -105,40 +105,26 @@ Classes</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Template for creating mobs.  <a href="structmob__template.html#details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__mob.html#ga4a9a8e880e232de73215a86a0225df16">entity_at_loaded_pos</a> (parameter pos)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">check if entity is activated at already loaded pos  <a href="#ga4a9a8e880e232de73215a86a0225df16"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__mob.html#ga32f5d16f8f9be2e7d3a0816cfcaee0c4">mobf_register_on_death_callback</a> (parameter <a class="el" href="classharvesting.html#a28774ec75d391e125386755d2dbc1fae">callback</a>)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">get version of mob framework  <a href="#ga32f5d16f8f9be2e7d3a0816cfcaee0c4"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__mob.html#gae44da5c1ddf01ba5be7c6234c09d042e">mobf_get_mob_definition</a> (parameter mobname)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">get COPY of mob definition  <a href="#gae44da5c1ddf01ba5be7c6234c09d042e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__mob.html#gac5d20064b4ae253336016547f311fa1e">mobf_get_version</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">get version of mob framework  <a href="#gac5d20064b4ae253336016547f311fa1e"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__mob.html#gad762f3c1cbf54f9ace9d8e2d9c900684">mobf_add_mob</a> (parameter mob)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">register a mob within mob framework  <a href="#gad762f3c1cbf54f9ace9d8e2d9c900684"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__mob.html#gab46340ee84d66cc1d507f7687140cde8">mobf_is_known_mob</a> (parameter <a class="el" href="classmgen__follow.html#a649c7574e6698e68b26ecc5960a3a7b5">name</a>)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">check if mob of name is known  <a href="#gab46340ee84d66cc1d507f7687140cde8"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__mob.html#gac057dac494999aea2bb7d316a53c905e">mobf_register_environment</a> (parameter <a class="el" href="classmgen__follow.html#a649c7574e6698e68b26ecc5960a3a7b5">name</a>, parameter <a class="el" href="classenvironment.html">environment</a>)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">register an environment to mob framework  <a href="#gac057dac494999aea2bb7d316a53c905e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__mob.html#ga9251025fde84044eff4047db9fe1194c">mobf_probab_movgen_register_pattern</a> (parameter pattern)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">register an movement pattern for probabilistic movement gen  <a href="#ga9251025fde84044eff4047db9fe1194c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__mob.html#ga0d5d27d20a0599dca197e53cc5aa9ff4">registerMovementGen</a> (parameter <a class="el" href="classmgen__follow.html#a649c7574e6698e68b26ecc5960a3a7b5">name</a>, parameter <a class="el" href="classmovement__gen.html#a1d0b584bf809d0a278856e34ee5fd9fd">generator</a>)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">register a movement generator to mob framework  <a href="#ga0d5d27d20a0599dca197e53cc5aa9ff4"></a><br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>this functions are used to add a mob to mob framework </p>
 <hr/><h2>Function Documentation</h2>
-<a class="anchor" id="ga4a9a8e880e232de73215a86a0225df16"></a><!-- doxytag: member="management_functions.lua::entity_at_loaded_pos" ref="ga4a9a8e880e232de73215a86a0225df16" args="(parameter pos)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">function <a class="el" href="group__framework__mob.html#ga4a9a8e880e232de73215a86a0225df16">entity_at_loaded_pos</a> </td>
-          <td>(</td>
-          <td class="paramtype">parameter&#160;</td>
-          <td class="paramname"><em>pos</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>check if entity is activated at already loaded pos </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">pos</td><td>to check </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>true/false </dd></dl>
-
-</div>
-</div>
 <a class="anchor" id="gad762f3c1cbf54f9ace9d8e2d9c900684"></a><!-- doxytag: member="management_functions.lua::mobf_add_mob" ref="gad762f3c1cbf54f9ace9d8e2d9c900684" args="(parameter mob)" -->
 <div class="memitem">
 <div class="memproto">
@@ -164,6 +150,197 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="gae44da5c1ddf01ba5be7c6234c09d042e"></a><!-- doxytag: member="management_functions.lua::mobf_get_mob_definition" ref="gae44da5c1ddf01ba5be7c6234c09d042e" args="(parameter mobname)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function <a class="el" href="group__framework__mob.html#gae44da5c1ddf01ba5be7c6234c09d042e">mobf_get_mob_definition</a> </td>
+          <td>(</td>
+          <td class="paramtype">parameter&#160;</td>
+          <td class="paramname"><em>mobname</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>get COPY of mob definition </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>mobf version </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gac5d20064b4ae253336016547f311fa1e"></a><!-- doxytag: member="management_functions.lua::mobf_get_version" ref="gac5d20064b4ae253336016547f311fa1e" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function <a class="el" href="group__framework__mob.html#gac5d20064b4ae253336016547f311fa1e">mobf_get_version</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>get version of mob framework </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>mobf version </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gab46340ee84d66cc1d507f7687140cde8"></a><!-- doxytag: member="management_functions.lua::mobf_is_known_mob" ref="gab46340ee84d66cc1d507f7687140cde8" args="(parameter name)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function <a class="el" href="group__framework__mob.html#gab46340ee84d66cc1d507f7687140cde8">mobf_is_known_mob</a> </td>
+          <td>(</td>
+          <td class="paramtype">parameter&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>check if mob of name is known </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>name to check if it's a mob </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>true/false </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga9251025fde84044eff4047db9fe1194c"></a><!-- doxytag: member="management_functions.lua::mobf_probab_movgen_register_pattern" ref="ga9251025fde84044eff4047db9fe1194c" args="(parameter pattern)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function <a class="el" href="group__framework__mob.html#ga9251025fde84044eff4047db9fe1194c">mobf_probab_movgen_register_pattern</a> </td>
+          <td>(</td>
+          <td class="paramtype">parameter&#160;</td>
+          <td class="paramname"><em>pattern</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>register an movement pattern for probabilistic movement gen </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pattern</td><td>to register (see pattern specification) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>true/false </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gac057dac494999aea2bb7d316a53c905e"></a><!-- doxytag: member="management_functions.lua::mobf_register_environment" ref="gac057dac494999aea2bb7d316a53c905e" args="(parameter name, parameter environment)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function <a class="el" href="group__framework__mob.html#gac057dac494999aea2bb7d316a53c905e">mobf_register_environment</a> </td>
+          <td>(</td>
+          <td class="paramtype">parameter&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">parameter&#160;</td>
+          <td class="paramname"><em>environment</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>register an environment to mob framework </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>of environment </td></tr>
+    <tr><td class="paramname">environment</td><td>specification </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>true/false </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga32f5d16f8f9be2e7d3a0816cfcaee0c4"></a><!-- doxytag: member="management_functions.lua::mobf_register_on_death_callback" ref="ga32f5d16f8f9be2e7d3a0816cfcaee0c4" args="(parameter callback)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function <a class="el" href="group__framework__mob.html#ga32f5d16f8f9be2e7d3a0816cfcaee0c4">mobf_register_on_death_callback</a> </td>
+          <td>(</td>
+          <td class="paramtype">parameter&#160;</td>
+          <td class="paramname"><em>callback</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>get version of mob framework </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callback</td><td>callback to register </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>true/false </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga0d5d27d20a0599dca197e53cc5aa9ff4"></a><!-- doxytag: member="movement_gen_registry.lua::registerMovementGen" ref="ga0d5d27d20a0599dca197e53cc5aa9ff4" args="(parameter name, parameter generator)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function <a class="el" href="group__framework__mob.html#ga0d5d27d20a0599dca197e53cc5aa9ff4">registerMovementGen</a> </td>
+          <td>(</td>
+          <td class="paramtype">parameter&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">parameter&#160;</td>
+          <td class="paramname"><em>generator</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>register a movement generator to mob framework </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>id to use for movement generator </td></tr>
+    <tr><td class="paramname">generator</td><td>pointer to movement generator </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>true/false successfully added generator </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -183,7 +360,7 @@ Functions</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Tue Sep 18 2012 23:03:06 for Mob Framework Minetest Mod by
+    <li class="footer">Generated on Wed Sep 26 2012 21:28:06 for Mob Framework Minetest Mod by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

@@ -1,14 +1,14 @@
-local version = "0.0.4"
+local version = "0.0.6"
 
 local modpath = minetest.get_modpath("barn")
 
 barn_breedpairs_big = {
 	{ "animal_sheep:sheep","animal_sheep:sheep","animal_sheep:lamb","animal_sheep:lamb"},
-	{ "animal_cow:cow","animal_cow:steer","animal_cow:cow","animal_cow:rooster"},
+	{ "animal_cow:cow","animal_cow:steer","animal_cow:baby_calf_m","animal_cow:baby_calf_f"},
 	}
 	
 barn_breedpairs_small = {
-	{ "animal_chicken:chicken","animal_chicken:rooster","animal_chicken:chicken","animal_chicken:rooster"},
+	{ "animal_chicken:chicken","animal_chicken:rooster","animal_chicken:chick_m","animal_chicken:chick_f"},
 }
 
 --include debug trace functions

@@ -151,190 +151,46 @@ Modules</h2></td></tr>
 <br/></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__int.html#gae5a5548ebfa352e9e86359b8312f8f23">mobf_get_time_ms</a> ()</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">get current time in ms  <a href="#gae5a5548ebfa352e9e86359b8312f8f23"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__int.html#gad4a616154fbc308996e71386c7db8021">mobf_contains</a> (parameter cur_table, parameter element)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">check if element is in table  <a href="#gad4a616154fbc308996e71386c7db8021"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__int.html#ga493587ea538add844168742a5b57bb5a">MIN</a> (parameter a, parameter b)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">minimum of two numbers  <a href="#ga493587ea538add844168742a5b57bb5a"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__int.html#ga78ab849c4dd1dd1d9ab07338239abcec">MAX</a> (parameter a, parameter b)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">maximum of two numbers  <a href="#ga78ab849c4dd1dd1d9ab07338239abcec"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__int.html#ga0d5d27d20a0599dca197e53cc5aa9ff4">registerMovementGen</a> (parameter <a class="el" href="classmgen__follow.html#a649c7574e6698e68b26ecc5960a3a7b5">name</a>, parameter <a class="el" href="classmovement__gen.html#a1d0b584bf809d0a278856e34ee5fd9fd">generator</a>)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">register a movement generator to mob framework  <a href="#ga0d5d27d20a0599dca197e53cc5aa9ff4"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">function <a class="el" href="classspawning.html">spawning</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__int.html#ga59153aafa3ff4135b62270dea8f44278">spawning::lifecycle</a> (parameter entity, parameter now)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">check mob lifecycle  <a href="#ga59153aafa3ff4135b62270dea8f44278"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">function <a class="el" href="classspawning.html">spawning</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__int.html#gad7d5c8b050b786cedec6d28162331d1a">spawning::register_spawn_algorithm</a> (parameter <a class="el" href="classmgen__follow.html#a649c7574e6698e68b26ecc5960a3a7b5">name</a>, parameter algorithm)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">print current spawn statistics  <a href="#gad7d5c8b050b786cedec6d28162331d1a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__int.html#gadbe5f7685cf5d0bd8449193b1930dbef">mobf_register_mob_item</a> (parameter <a class="el" href="classmgen__follow.html#a649c7574e6698e68b26ecc5960a3a7b5">name</a>, parameter modname, parameter description)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">add mob item for catchable mobs  <a href="#gadbe5f7685cf5d0bd8449193b1930dbef"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__framework__int.html#ga41188e89b4cf3bf87486f873bffc7f99">getMovementGen</a> (parameter id)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">get movement generator specified by id  <a href="#ga41188e89b4cf3bf87486f873bffc7f99"></a><br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>this functions are used to provide additional features to mob framework e.g. add additional spawn algorithms, movement generators, environments ... </p>
 <hr/><h2>Function Documentation</h2>
-<a class="anchor" id="ga59153aafa3ff4135b62270dea8f44278"></a><!-- doxytag: member="spawning::lifecycle" ref="ga59153aafa3ff4135b62270dea8f44278" args="(parameter entity, parameter now)" -->
+<a class="anchor" id="ga41188e89b4cf3bf87486f873bffc7f99"></a><!-- doxytag: member="movement_gen_registry.lua::getMovementGen" ref="ga41188e89b4cf3bf87486f873bffc7f99" args="(parameter id)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">function <a class="el" href="classspawning.html">spawning</a> <a class="el" href="group__framework__int.html#ga59153aafa3ff4135b62270dea8f44278">lifecycle</a> </td>
+          <td class="memname">function <a class="el" href="group__framework__int.html#ga41188e89b4cf3bf87486f873bffc7f99">getMovementGen</a> </td>
           <td>(</td>
           <td class="paramtype">parameter&#160;</td>
-          <td class="paramname"><em>entity</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>id</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">parameter&#160;</td>
-          <td class="paramname"><em>now</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>check mob lifecycle </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>true/false still alive dead </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga78ab849c4dd1dd1d9ab07338239abcec"></a><!-- doxytag: member="generic_functions.lua::MAX" ref="ga78ab849c4dd1dd1d9ab07338239abcec" args="(parameter a, parameter b)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">function <a class="el" href="group__framework__int.html#ga78ab849c4dd1dd1d9ab07338239abcec">MAX</a> </td>
-          <td>(</td>
-          <td class="paramtype">parameter&#160;</td>
-          <td class="paramname"><em>a</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">parameter&#160;</td>
-          <td class="paramname"><em>b</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>maximum of two numbers </p>
+<p>get movement generator specified by id </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">a</td><td>number 1 </td></tr>
-    <tr><td class="paramname">b</td><td>number 2 </td></tr>
+    <tr><td class="paramname">id</td><td>id of movementgenerator </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>maximum </dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>module pointer for movementgenerator </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="ga493587ea538add844168742a5b57bb5a"></a><!-- doxytag: member="generic_functions.lua::MIN" ref="ga493587ea538add844168742a5b57bb5a" args="(parameter a, parameter b)" -->
+<a class="anchor" id="gadbe5f7685cf5d0bd8449193b1930dbef"></a><!-- doxytag: member="management_functions.lua::mobf_register_mob_item" ref="gadbe5f7685cf5d0bd8449193b1930dbef" args="(parameter name, parameter modname, parameter description)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">function <a class="el" href="group__framework__int.html#ga493587ea538add844168742a5b57bb5a">MIN</a> </td>
-          <td>(</td>
-          <td class="paramtype">parameter&#160;</td>
-          <td class="paramname"><em>a</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">parameter&#160;</td>
-          <td class="paramname"><em>b</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>minimum of two numbers </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">a</td><td>number 1 </td></tr>
-    <tr><td class="paramname">b</td><td>number 2 </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>minimum </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="gad4a616154fbc308996e71386c7db8021"></a><!-- doxytag: member="generic_functions.lua::mobf_contains" ref="gad4a616154fbc308996e71386c7db8021" args="(parameter cur_table, parameter element)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">function <a class="el" href="group__framework__int.html#gad4a616154fbc308996e71386c7db8021">mobf_contains</a> </td>
-          <td>(</td>
-          <td class="paramtype">parameter&#160;</td>
-          <td class="paramname"><em>cur_table</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">parameter&#160;</td>
-          <td class="paramname"><em>element</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>check if element is in table </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">cur_table</td><td>table to look in </td></tr>
-    <tr><td class="paramname">element</td><td>element to look for </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>true/false </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="gae5a5548ebfa352e9e86359b8312f8f23"></a><!-- doxytag: member="generic_functions.lua::mobf_get_time_ms" ref="gae5a5548ebfa352e9e86359b8312f8f23" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">function <a class="el" href="group__framework__int.html#gae5a5548ebfa352e9e86359b8312f8f23">mobf_get_time_ms</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>get current time in ms </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>current time in ms </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="gad7d5c8b050b786cedec6d28162331d1a"></a><!-- doxytag: member="spawning::register_spawn_algorithm" ref="gad7d5c8b050b786cedec6d28162331d1a" args="(parameter name, parameter algorithm)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">function <a class="el" href="classspawning.html">spawning</a> <a class="el" href="group__framework__int.html#gad7d5c8b050b786cedec6d28162331d1a">register_spawn_algorithm</a> </td>
+          <td class="memname">function <a class="el" href="group__framework__int.html#gadbe5f7685cf5d0bd8449193b1930dbef">mobf_register_mob_item</a> </td>
           <td>(</td>
           <td class="paramtype">parameter&#160;</td>
           <td class="paramname"><em>name</em>, </td>
@@ -343,37 +199,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">parameter&#160;</td>
-          <td class="paramname"><em>algorithm</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>print current spawn statistics </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>true/false successfully added spawn algorithm </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga0d5d27d20a0599dca197e53cc5aa9ff4"></a><!-- doxytag: member="movement_gen_registry.lua::registerMovementGen" ref="ga0d5d27d20a0599dca197e53cc5aa9ff4" args="(parameter name, parameter generator)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">function <a class="el" href="group__framework__int.html#ga0d5d27d20a0599dca197e53cc5aa9ff4">registerMovementGen</a> </td>
-          <td>(</td>
-          <td class="paramtype">parameter&#160;</td>
-          <td class="paramname"><em>name</em>, </td>
+          <td class="paramname"><em>modname</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">parameter&#160;</td>
-          <td class="paramname"><em>generator</em>&#160;</td>
+          <td class="paramname"><em>description</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -384,15 +216,15 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>register a movement generator to mob framework </p>
+<p>add mob item for catchable mobs </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">name</td><td>id to use for movement generator </td></tr>
-    <tr><td class="paramname">generator</td><td>pointer to movement generator </td></tr>
+    <tr><td class="paramname">name</td><td>name of mob </td></tr>
+    <tr><td class="paramname">modname</td><td>name of mod mob is defined in </td></tr>
+    <tr><td class="paramname">description</td><td>description to use for mob </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>true/false successfully added generator </dd></dl>
 
 </div>
 </div>
@@ -415,7 +247,7 @@ Functions</h2></td></tr>
   <div id="nav-path" class="navpath">
     <ul>
 
-    <li class="footer">Generated on Tue Sep 18 2012 23:03:06 for Mob Framework Minetest Mod by
+    <li class="footer">Generated on Wed Sep 26 2012 21:28:06 for Mob Framework Minetest Mod by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.6.1 </li>
    </ul>

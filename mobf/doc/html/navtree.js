@@ -1,7 +1,7 @@
 var NAVTREE =
 [
   [ "Mob Framework Minetest Mod", "index.html", [
-    [ "Mob Framework Mod 1.4.1", "index.html", null ],
+    [ "Mob Framework Mod 1.4.6", "index.html", null ],
     [ "Modules", "modules.html", "modules" ],
     [ "Classes", null, [
       [ "Class List", "annotated.html", "annotated" ],

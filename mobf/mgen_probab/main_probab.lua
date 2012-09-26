@@ -454,9 +454,7 @@ end
 function movement_gen.fix_current_pos(entity,movement_state)
 
 	--check if current pos is ok
-	local current_state = environment.pos_is_ok(movement_state.basepos,entity)
-
-	
+	local current_state = environment.pos_is_ok(movement_state.basepos,entity)	
 
 	movement_state.accel_to_set = { x=0,
 									y=movement_state.default_y_accel,

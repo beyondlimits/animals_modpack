@@ -17,6 +17,7 @@ var searchData=
   ['distance',['distance',['../structmob__template_1_1sound_1_1distance.html',1,'mob_template::sound']]],
   ['distance',['distance',['../structmob__template_1_1combat_1_1distance.html',1,'mob_template::combat']]],
   ['distance_5fattack_5fhandler',['distance_attack_handler',['../classfighting.html#a28cd6f3f20b7b935d3df14aa989acf3c',1,'fighting']]],
+  ['do_5fon_5fdeath_5fcallback',['do_on_death_callback',['../classfighting.html#a585eebc16ff4bb947049d0650ab66242',1,'fighting']]],
   ['dont_5fmove_2elua',['dont_move.lua',['../dont__move_8lua.html',1,'']]],
   ['dont_5fmove_5fprototype',['dont_move_prototype',['../structdont__move__prototype.html',1,'']]]
 ];

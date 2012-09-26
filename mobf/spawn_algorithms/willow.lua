@@ -40,7 +40,7 @@ function mobf_spawn_on_willow(mob_name,mob_transform,spawning_data,environment)
 	minetest.register_abm({
 			nodenames = { "default:dirt_with_grass" },
 			neighbors = media,
-			interval = 60,
+			interval = 7200,
 			chance = math.floor(1/spawning_data.rate),
 			action = function(pos, node, active_object_count, active_object_count_wider)
 				local starttime = mobf_get_time_ms()

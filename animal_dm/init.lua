@@ -1,4 +1,14 @@
-local version = "0.0.8"
+local version = "0.0.9"
+
+local dm_groups = {
+                        not_in_creative_inventory=1
+                    }
+
+local selectionbox_dm = {-0.75, -1, -0.75, 0.75, 1, 0.75}
+
+local modpath = minetest.get_modpath("animal_dm")
+
+dofile (modpath .. "/model.lua")
 
 dm_prototype = {   
 		name="dm",
@@ -30,7 +40,13 @@ dm_prototype = {
 					sprite_scale={x=4,y=4},
 					sprite_div = {x=6,y=1},
 					visible_height = 2,
-					},		
+					},
+       graphics_3d = {
+            visual = "wielditem",
+            textures = {"animal_dm:box_dm"},
+            collisionbox = selectionbox_dm,
+            visual_size= {x=1.5,y=1.5,z=1.5},
+            },
 		combat = {
 					mgen="follow_mov_gen",
 					angryness=0.99,

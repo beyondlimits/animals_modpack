@@ -1,11 +1,21 @@
-local version = "0.0.5"
+local version = "0.0.6"
+
+local creeper_groups = {
+                        not_in_creative_inventory=1
+                    }
+local selectionbox_creeper = {-1, -1, -1, 1, 1, 1}
+
+local modpath = minetest.get_modpath("animal_creeper")
+
+--include debug trace functions
+dofile (modpath .. "/model.lua")
 
 creeper_prototype = {
 		name="creeper",
 		modname="animal_creeper", 
 	
 		generic = {
-					description="Creeper",
+					description="BoomBomb",
 					base_health=5,
 					kill_result="",
 					armor_groups= {
@@ -29,7 +39,13 @@ creeper_prototype = {
 					sprite_scale={x=4,y=4},
 					sprite_div = {x=6,y=1},
 					visible_height = 1.5,
-					},		
+					},
+        graphics_3d = {
+            visual = "wielditem",
+            textures = {"animal_creeper:box_creeper"},
+            collisionbox = selectionbox_creeper,
+            visual_size= {x=1.33,y=1.33,z=1.33},
+            },
 		combat = {
 					mgen="follow_mov_gen",
 					angryness=0.95,

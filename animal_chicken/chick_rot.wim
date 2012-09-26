@@ -1,0 +1,7 @@
+Chick;/home/sapier/workspace_20120207/animal_chicken/textures/animal_chicken_chick_left.png;/home/sapier/workspace_20120207/animal_chicken/textures/animal_chicken_chick_right.png;/home/sapier/workspace_20120207/animal_chicken/textures/animal_chicken_chick_top.png;/home/sapier/workspace_20120207/animal_chicken/textures/animal_chicken_chick_top.png;/home/sapier/workspace_20120207/animal_chicken/textures/animal_chicken_chick_back.png;/home/sapier/workspace_20120207/animal_chicken/textures/animal_chicken_chick_front.png;160
+
+body_1;-9.3750000000;3.1250000000;-6.2500000000;9.3750000000;12.5000000000;6.2500000000
+body_2;-1.5620000362;12.5000000000;-3.1250000000;10.9370002747;21.8750000000;3.1250000000
+schnabel;10.9370002747;14.0649995804;-1.5620000362;14.0620002747;17.1870002747;1.5620000362
+leg1;-1.2500000000;0.0000000000;-3.7500000000;1.2500000000;3.1250000000;-1.2500000000
+leg2;-1.2500000000;0.0000000000;1.2500000000;1.2500000000;3.1250000000;3.7500000000

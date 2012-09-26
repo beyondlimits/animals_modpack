@@ -1,4 +1,11 @@
-local version = "0.0.4"
+local version = "0.0.5"
+
+local selectionbox_clownfish = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
+
+local modpath = minetest.get_modpath("animal_clownfish")
+
+--include debug trace functions
+dofile (modpath .. "/model.lua")
 
 clownfish_prototype = {   
 		name="clownfish",
@@ -33,7 +40,13 @@ clownfish_prototype = {
 					sprite_div = {x=6,y=1},
 					visible_height = 1,
 					visible_width = 1,
-					},		
+					},
+      graphics_3d = {
+            visual = "wielditem",
+            textures = {"animal_clownfish:box_clownfish"},
+            collisionbox = selectionbox_clownfish,
+            visual_size= {x=0.666,y=0.666,z=0.666},
+            },
 		combat         = nil,
 		
 		spawning = {		

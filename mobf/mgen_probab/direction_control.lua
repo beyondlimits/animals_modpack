@@ -202,10 +202,21 @@ function direction_control.precheck_movement(entity,movement_state,pos_predicted
 				minetest.log(LOGLEVEL_WARNING,"MOBF: BUG!!! didn't find a way to stop mob at"..printpos(movement_state.basepos)..
 								" from running into water or dropping")
 				
-				--apply random acceleration to avoid permanent stuck mobs maybe mobs should be deleted instead
-				movement_state.accel_to_set = direction_control.get_random_acceleration(entity.data.movement.min_accel,
-														entity.data.movement.max_accel,entity.object:getyaw(),0)
-				movement_state.changed = true
+				local current_state = environment.pos_is_ok(movement_state.basepos,entity)
+				
+				--animal is safe atm stop it to avoid doing silly things
+				if current_state == "ok" then
+					entity.object:setvelocity({x=0,y=0,z=0})
+					movement_state.accel_to_set = {x=0,y=nil,z=0}
+					movement_state.changed = true
+					dbg_mobf.pmovement_lvl2("MOBF: couldn't find acceleration but mob is safe where it is") 
+				else
+					--apply random acceleration to avoid permanent stuck mobs maybe mobs should be deleted instead
+					movement_state.accel_to_set = direction_control.get_random_acceleration(entity.data.movement.min_accel,
+															entity.data.movement.max_accel,entity.object:getyaw(),0)
+					movement_state.changed = true
+					dbg_mobf.pmovement_lvl2("MOBF: couldn't find acceleration mob ain't safe either, just move on with random movement") 
+				end
 			end
 		end
 

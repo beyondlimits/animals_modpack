@@ -127,9 +127,25 @@ mobf_blacklist = <serialized table of animal names>
 -->disable all animals in table e.g.
     mobf_blacklist = return {animal_sheep:sheep}
     Have a look at mobf_settings auxiliary mod too this adds a gui to do this
+    
+mobf_animal_spawning_secondary = true/false
+-->enable/disable secondary spawning mechanism 
+    NOTE secondary mechanism may cause serious lag issues sometimes
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.4.6
+-added 3d dm
+-added 3d big red
+-added calfs
+-added chicks
+-added 3d Boombomb (was Creeper)
+-added 3d clownfish
+-added support for secondary spawning mechanisms
+-change animal behaviour in case of unable to find safe new accel
+-added on death callback support
+-added function to get mob description
+
 Changes 1.4.5
 -added mobf registration of steer
 -added get version api

@@ -5,8 +5,8 @@
 -- copyright notice. 
 -- And of course you are NOT allow to pretend you have written it.
 --
---! @file shadows.lua
---! @brief spawn algorithm for in shadow spawning
+--! @file deep_large_caves.lua
+--! @brief spawn algorithm to spawn in deep large caves
 --! @copyright Sapier
 --! @author Sapier
 --! @date 2012-08-09

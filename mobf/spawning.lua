@@ -225,7 +225,6 @@ end
 --
 --! @brief check mob lifecycle
 --! @memberof spawning
---! @ingroup framework_int
 --
 --! @return true/false still alive dead
 -------------------------------------------------------------------------------
@@ -260,7 +259,6 @@ end
 --
 --! @brief print current spawn statistics
 --! @memberof spawning
---! @ingroup framework_int
 --
 --! @return true/false successfully added spawn algorithm
 -------------------------------------------------------------------------------

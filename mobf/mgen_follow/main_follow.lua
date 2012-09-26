@@ -46,11 +46,23 @@ function mgen_follow.callback(entity,now)
 	--check max speed limit
 	mgen_follow.checkspeed(entity)
 	
+	local basepos  = entity.getbasepos(entity)
+	local current_node = minetest.env:get_node(basepos)
+	
+	--check environment
+	if not environment.is_media_element(current_node.name,entity.environment.media) then
+		if entity.dynamic_data.movement.last_pos_in_env ~= nil then
+			entity.object:moveto(entity.dynamic_data.movement.last_pos_in_env)
+		end
+	else
+		entity.dynamic_data.movement.last_pos_in_env = entity.object:getpos()
+	end
+	
 	if entity.dynamic_data.movement.target ~= nil or
 		entity.dynamic_data.movement.guardspawnpoint then
 		dbg_mobf.fmovement_lvl3("MOBF:   Target available")
 		--calculate distance to target
-		local basepos  = entity.getbasepos(entity)
+		
 		
 		local targetpos = entity.dynamic_data.spawning.spawnpoint	
 		if entity.dynamic_data.movement.guardspawnpoint ~= true then

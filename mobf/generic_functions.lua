@@ -27,7 +27,6 @@ end
 -- name: mobf_get_time_ms()
 --
 --! @brief get current time in ms
---! @ingroup framework_int
 --
 --! @return current time in ms
 -------------------------------------------------------------------------------
@@ -43,7 +42,6 @@ end
 -- name: mobf_contains(cur_table,element)
 --
 --! @brief check if element is in table
---! @ingroup framework_int
 --
 --! @param cur_table table to look in
 --! @param element element to look for
@@ -68,7 +66,6 @@ end
 -- name: MIN(a,b)
 --
 --! @brief minimum of two numbers
---! @ingroup framework_int
 --
 --! @param a number 1
 --! @param b number 2
@@ -86,7 +83,6 @@ end
 -- name: MAX(a,b)
 --
 --! @brief maximum of two numbers
---! @ingroup framework_int
 --
 --! @param a number 1
 --! @param b number 2
@@ -608,6 +604,30 @@ function mobf_get_surface(x,z, min_y, max_y)
     end
 
     return nil
+end
+
+-------------------------------------------------------------------------------
+-- name: entity_at_loaded_pos(entity)
+--
+--! @brief check if entity is activated at already loaded pos
+--
+--! @param pos to check
+--! @return true/false
+-------------------------------------------------------------------------------
+function entity_at_loaded_pos(pos)
+
+	local current_node = minetest.env:get_node(pos)
+
+	if current_node ~= nil then
+		if current_node.name == "ignore" then
+			minetest.log(LOGLEVEL_WARNING,"MOBF: spawned at unloaded pos!")
+			return false
+		else
+			return true
+		end
+	end
+	minetest.log(LOGLEVEL_WARNING,"MOBF: spawned at invalid pos!")
+	return true
 end
 
 --!@}

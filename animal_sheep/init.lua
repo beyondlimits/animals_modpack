@@ -67,6 +67,7 @@ sheep_prototype = {
 					rate=0.002,
 					density=50,
 					algorithm="willow_mapgen",
+					algorithm_secondary="willow",
 					height=2
 					},
 		sound = {

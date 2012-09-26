@@ -1,6 +1,7 @@
 var searchData=
 [
   ['on_5factivate',['on_activate',['../struct_m_o_b_f___f_i_r_e_b_a_l_l___e_n_t_i_t_y.html#ae0ee247abd3cec32a5935c22ad80acd3',1,'MOBF_FIREBALL_ENTITY::on_activate()'],['../struct_m_o_b_f___p_l_a_s_m_a_b_a_l_l___e_n_t_i_t_y.html#a71f68a0ed5897fc724d163acf2c752dc',1,'MOBF_PLASMABALL_ENTITY::on_activate()'],['../remove__animals_8lua.html#a6937e81b4c2834d61d6e06b70cccfc19',1,'on_activate():&#160;remove_animals.lua']]],
+  ['on_5fdeath_5fcallbacks',['on_death_callbacks',['../group__fighting.html#gad9f593fb61f50f2f803c039abe65da59',1,'fighting.lua']]],
   ['on_5fground_5f1_2elua',['on_ground_1.lua',['../on__ground__1_8lua.html',1,'']]],
   ['on_5fground_5f2_2elua',['on_ground_2.lua',['../on__ground__2_8lua.html',1,'']]],
   ['on_5fhit_5fcallback',['on_hit_callback',['../structmob__template_1_1generic.html#ab10cf6a24adc1e1fbb5d0721a0da91ce',1,'mob_template::generic']]],

@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
---! @mainpage Mob Framework Mod 1.4.1
+--! @mainpage Mob Framework Mod 1.4.6
 --! 
 --! This documentation uses doxygen created from lua code. As some of you 
 --! probably know doxygen doesn't support lua on it's own so some of the

@@ -27,6 +27,9 @@ mobf_movement_patterns = {}
 --!registry of mobs
 mobf_registred_mob = {}
 
+--!registred mobs_data
+mobf_registred_mob_data = {}
+
 --!path of mod
 mobf_modpath = minetest.get_modpath("mobf")
 

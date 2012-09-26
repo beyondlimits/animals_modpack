@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['management_5ffunctions_5fspacer',['management_functions_spacer',['../management__functions_8lua.html#a0a6e507a6067853f9a274ccc6ca9537b',1,'management_functions.lua']]],
   ['max_5faccel',['max_accel',['../structmob__template_1_1movement.html#a13b694561f4b49868272b5e5cec1ee0d',1,'mob_template::movement']]],
   ['max_5fhear_5fdistance',['max_hear_distance',['../structmob__template_1_1sound_1_1random.html#aa7babf7c64567b92c33d0090099b728a',1,'mob_template::sound::random::max_hear_distance()'],['../structmob__template_1_1sound_1_1self__destruct.html#ac495fb966da5b6bf6606f2f5169d6377',1,'mob_template::sound::self_destruct::max_hear_distance()'],['../structmob__template_1_1sound_1_1harvest.html#a60ec6d2b68adbee0047e2a5074544ed9',1,'mob_template::sound::harvest::max_hear_distance()'],['../structmob__template_1_1sound_1_1distance.html#a1d35d0df0b91e728b2cd8224767915b5',1,'mob_template::sound::distance::max_hear_distance()'],['../structmob__template_1_1sound_1_1die.html#a1f3580d9e0e974de63fd5bb5591ff39f',1,'mob_template::sound::die::max_hear_distance()'],['../structmob__template_1_1sound_1_1melee.html#a5c76091d3f635a490af9a4e087c246d3',1,'mob_template::sound::melee::max_hear_distance()']]],
   ['max_5fheight_5fabove_5fground',['max_height_above_ground',['../structenv__flight__1.html#a7b9518edfe2549bffbf61d5e7d1efb0b',1,'env_flight_1']]],
@@ -19,6 +18,7 @@ var searchData=
   ['mobf_5fmodpath',['mobf_modpath',['../init_8lua.html#a52d5dfaebff3e1ea207aa10f07ed5d28',1,'init.lua']]],
   ['mobf_5fmovement_5fpatterns',['mobf_movement_patterns',['../init_8lua.html#a32d24f1ad1b3064d8a86b2ca82649a7a',1,'init.lua']]],
   ['mobf_5fregistred_5fmob',['mobf_registred_mob',['../init_8lua.html#a7bb1e2e739d5b1f907b7e97c15779fc8',1,'init.lua']]],
+  ['mobf_5fregistred_5fmob_5fdata',['mobf_registred_mob_data',['../init_8lua.html#a01ed78051a584e6e6b0091c9df3989cf',1,'init.lua']]],
   ['mobf_5fspawn_5falgorithms',['mobf_spawn_algorithms',['../classspawning.html#aa80a1b58ffb0b613c24bbebfb8be8eeb',1,'spawning']]],
   ['mobf_5fversion',['mobf_version',['../init_8lua.html#a090b50edcaba8ed31b12e071eca9c7bb',1,'init.lua']]],
   ['modname',['modname',['../structmob__template.html#a9dd660f0af70aa6e57ba2a35f106e08c',1,'mob_template']]],

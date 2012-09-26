@@ -21,11 +21,50 @@
 --! @class fighting
 --! @brief melee and distance attack features
 fighting = {}
+fighting.on_death_callbacks = {}
 
 --!@}
 
 --! @brief factor added to mob melee combat range to get its maximum agression radius
 MOBF_AGRESSION_FACTOR = 5
+
+
+-------------------------------------------------------------------------------
+-- name: register_on_death_callback(callback)
+--
+--! @brief register an additional callback to be called on death of a mob
+--! @memberof fighting
+--
+--! @param callback function to call
+--! @return true/false
+-------------------------------------------------------------------------------
+function fighting.register_on_death_callback(callback)
+
+	if type(callback) == "function" then
+	
+		table.insert(fighting.on_death_callbacks,callback)
+		return true
+	end
+	return false
+end
+
+-------------------------------------------------------------------------------
+-- name: do_on_death_callback(entity,hitter)
+--
+--! @brief call all registred on_death callbacks
+--! @memberof fighting
+--
+--! @param entity to do callback for
+--! @param hitter object doing last punch
+-------------------------------------------------------------------------------
+function fighting.do_on_death_callback(entity,hitter)
+
+	for i,v in ipairs(fighting.on_death_callbacks) do
+		v(entity.data.name,entity.getbasepos(),hitter)
+	end
+end
+
+
 
 -------------------------------------------------------------------------------
 -- name: hit(entity,player)

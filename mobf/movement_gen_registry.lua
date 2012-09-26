@@ -21,6 +21,7 @@ movement_generators = {}
 -- name: getMovementGen(id)
 --
 --! @brief get movement generator specified by id
+--! @ingroup framework_int
 --
 --! @param id id of movementgenerator
 --! @return module pointer for movementgenerator
@@ -36,7 +37,7 @@ end
 -- name: registerMovementGen(name,generator)
 --
 --! @brief register a movement generator to mob framework
---! @ingroup framework_int
+--! @ingroup framework_mob
 --
 --! @param name id to use for movement generator
 --! @param generator pointer to movement generator
