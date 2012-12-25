@@ -1,4 +1,4 @@
-local version = "0.0.13"
+local version = "0.0.14"
 
 local sheep_groups = {
 						sheerable=1,
@@ -84,6 +84,34 @@ sheep_prototype = {
 								max_hear_distance = 5
 								},
 					},
+		states = {
+				{ 
+				name = "sleeping",
+				custom_preconhandler = nil,
+				movgen = "none",
+				typical_state_time = 180,
+				chance = 0.20,
+				graphics_3d = {
+					visual = "wielditem",
+					textures = {"animal_sheep:box_wool_sleeping"},
+					collisionbox = selectionbox_sheep,
+					visual_size= {x=1,y=1,z=1},
+					}
+				},
+				{ 
+				name = "eating",
+				custom_preconhandler = nil,
+				movgen = "none",
+				typical_state_time = 20,
+				chance = 0.25,
+				graphics_3d = {
+					visual = "wielditem",
+					textures = {"animal_sheep:box_wool_eating"},
+					collisionbox = selectionbox_sheep,
+					visual_size= {x=1,y=1,z=1},
+					}
+				},
+			}
 		}
 		
 lamb_prototype = {
@@ -206,6 +234,34 @@ sheep_naked_prototype = {
 								max_hear_distance = 10,
 								},
 					},
+		states = {
+				{ 
+				name = "sleeping",
+				custom_preconhandler = nil,
+				movgen = "none",
+				typical_state_time = 180,
+				chance = 0.20,
+				graphics_3d = {
+					visual = "wielditem",
+					textures = {"animal_sheep:box_naked_sleeping"},
+					collisionbox = selectionbox_sheep,
+					visual_size= {x=1,y=1,z=1},
+					}
+				},
+				{ 
+				name = "eating",
+				custom_preconhandler = nil,
+				movgen = "none",
+				typical_state_time = 20,
+				chance = 0.25,
+				graphics_3d = {
+					visual = "wielditem",
+					textures = {"animal_sheep:box_naked_eating"},
+					collisionbox = selectionbox_sheep,
+					visual_size= {x=1,y=1,z=1},
+					}
+				},
+			}
 		}	
 
 

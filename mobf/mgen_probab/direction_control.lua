@@ -199,7 +199,7 @@ function direction_control.precheck_movement(entity,movement_state,pos_predicted
 				movement_state.accel_to_set = movement_generic.get_accel_to(new_pos,entity)
 				movement_state.changed = true
 			else
-				minetest.log(LOGLEVEL_WARNING,"MOBF: BUG!!! didn't find a way to stop mob at"..printpos(movement_state.basepos)..
+				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG!!! didn't find a way to stop mob at"..printpos(movement_state.basepos)..
 								" from running into water or dropping")
 				
 				local current_state = environment.pos_is_ok(movement_state.basepos,entity)

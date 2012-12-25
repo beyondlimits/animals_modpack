@@ -48,8 +48,10 @@ dofile (mobf_modpath .. "/fighting.lua")
 dofile (mobf_modpath .. "/random_drop.lua")
 dofile (mobf_modpath .. "/sound.lua")
 dofile (mobf_modpath .. "/permanent_data.lua")
+dofile (mobf_modpath .. "/mobf.lua")
 dofile (mobf_modpath .. "/management_functions.lua")
 dofile (mobf_modpath .. "/debug.lua")
+dofile (mobf_modpath .. "/mob_state.lua")
 
 --include spawning support
 dofile (mobf_modpath .. "/spawning.lua")
@@ -60,7 +62,7 @@ dofile (mobf_modpath .. "/mgen_follow/main_follow.lua")
 dofile (mobf_modpath .. "/mgen_rasterized/mgen_raster.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "1.4.5"
+mobf_version = "1.9.0"
 
 LOGLEVEL_INFO     = "verbose"
 LOGLEVEL_NOTICE   = "info"
@@ -103,7 +105,7 @@ end
 
 
 --! @brief main initialization function
-function mobf_init_module()
+function mobf_init_framework()
 	print("Initializing mob framework")
 	mobf_init_basic_tools()
 	
@@ -113,21 +115,166 @@ function mobf_init_module()
 	if mobf_mob_blacklist_string ~= nil then
 		mobf_registred_mob = minetest.deserialize(mobf_mob_blacklist_string)
 	end
-		
+	
 	print("Initializing probabilistic movement generator")
 	movement_gen.initialize()
-
+	
 	print("Initializing weaponry..")
 	mobf_init_weapons()
 
 	print("Initializing debug hooks..")
 	mobf_init_debug()
 	
+	print("Initialize mobf supplied modules..")
+	mobf_init_modules()
+	
 	--luatrace = require("luatrace")
 
 	print("mob framework mod "..mobf_version.." loaded starttime is:" .. mobf_get_time_ms())
 end
 
-mobf_init_module()
+function mobf_init_modules()
+
+	--state change callback
+	mobf.register_on_step_callback({
+			name = "state_change",
+			handler = mob_state.callback,
+			init = mob_state.initialize,
+			configcheck = function(entity)
+				if entity.data.states ~= nil then
+					return true
+				end
+				return false
+			end
+			})
+
+	--auto transform hook
+	mobf.register_on_step_callback({
+			name = "transform",
+			handler = transform,
+			init = nil,
+			configcheck = function(entity)
+					if entity.data.auto_transform ~= nil then
+						return true
+					end
+					return false
+				end
+				})
+	
+	--combat hook
+	mobf.register_on_step_callback({
+			name = "combat",
+			handler = fighting.combat,
+			init = fighting.init_dynamic_data,
+			configcheck = function(entity)
+					if entity.data.combat ~= nil then
+						return true
+					end
+					return false
+				end
+				})
+				
+	--attack hook
+	mobf.register_on_step_callback({
+			name = "aggression",
+			handler = fighting.aggression,
+			init = nil, -- already done by fighting.combat
+			configcheck = function(entity)
+					if entity.data.combat ~= nil then
+						return true
+					end
+					return false
+				end
+				})
+		
+
+
+	--workaround for shortcomings in spawn algorithm
+	mobf.register_on_step_callback({
+			name = "check_pop_dense",
+			handler = spawning.check_population_density,
+			init = spawning.init_dynamic_data,
+			configcheck = function(entity)
+					return true
+				end
+				})
+
+	--random drop hook
+	mobf.register_on_step_callback({
+			name = "random_drop",
+			handler = random_drop.callback,
+			init = random_drop.init_dynamic_data,
+			configcheck = function(entity)
+					if entity.data.random_drop ~= nil then
+						return true
+					end
+					return false
+				end
+				})
+
+	--random sound hook
+	mobf.register_on_step_callback({
+			name = "sound",
+			handler = sound.play_random,
+			init = sound.init_dynamic_data,
+			configcheck = function(entity)
+						if entity.data.sound ~= nil and
+							entity.data.sound.random ~= nil then
+						return true
+					end
+					return false
+				end
+				})
+
+	--visual change hook
+	mobf.register_on_step_callback({
+			name = "update_orientation",
+			handler = graphics.update_orientation,
+			init = nil,
+			configcheck = function(entity)
+					return true
+				end
+				})
+
+
+	--custom hook
+	mobf.register_on_step_callback({
+			name = "custom_hooks",
+			handler = function(entity,now,dtime)
+					if type(entity.data.generic.custom_on_step_handler) == "function" then
+						table.insert(entity.on_step_hooks,entity.data.generic.custom_on_step_handler)
+					end
+				end,
+			configcheck = function(entity)
+					return true
+				end
+				})
+				
+
+	--on punch callbacks
+	mobf.register_on_punch_callback({
+			name = "harvesting",
+			handler = harvesting.callback,
+			init = harvesting.init_dynamic_data,
+			configcheck = function(entity)
+					if (entity.data.catching ~= nil and
+							entity.data.catching.tool ~= "" ) or
+							entity.data.harvest ~= nil then
+							return true
+					end
+					return false
+				end
+				})
+	
+	mobf.register_on_punch_callback({
+			name = "on_punch",
+			handler = fighting.hit,
+			configcheck = function(entity)
+					return true
+				end
+				})
+end
+
+mobf_init_framework()
 
 dofile (mobf_modpath .. "/compatibility.lua")

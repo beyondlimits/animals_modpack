@@ -1,4 +1,4 @@
-local version = "0.0.8"
+local version = "0.0.9"
 
 local vombie_groups = {
 						not_in_creative_inventory=1
@@ -76,7 +76,7 @@ vombie_prototype = {
 					},
 					envid="on_ground_1",
 					custom_on_step_handler = vombie_on_step_handler,
-                    custom_on_activate_handler = vombie_on_activate_handler,
+					custom_on_activate_handler = vombie_on_activate_handler,
 				},
 		movement =  {
 					default_gen="probab_mov_gen",
@@ -103,7 +103,6 @@ vombie_prototype = {
 					visible_width = 1,
 					},
 		combat = {
-					mgen="follow_mov_gen",
 					angryness=1,
 					starts_attack=true,
 					sun_sensitive=true,

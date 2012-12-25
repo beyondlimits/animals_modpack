@@ -178,21 +178,31 @@ end
 --
 --! @param entity mob to replace
 --! @param name of the mob to add
+--! @param preserve preserve original spawntime
 --! @return entity added or nil on error
 -------------------------------------------------------------------------------
-function spawning.replace_entity(entity,name)
+function spawning.replace_entity(entity,name,preserve)
 	dbg_mobf.spawning_lvl3("MOBF: --> replace_entity(".. entity.data.name .. "|" .. name .. ")")
+	
+	if minetest.registered_entities[name] == nil then
+		minetest.log(LOGLEVEL_ERROR,"MOBF: replace_entity 1 : Bug no "..name.." is registred")
+		return
+	end
+	
 
 	-- get data to be transfered to new entity
-	local pos             = entity.object:getpos()
+	local pos             = mobf.get_basepos(entity)
 	local health          = entity.object:get_hp()
-	local playerspawned   = entity.dynamic_data.spawning.player_spawned
-	local spawnpoint      = { 
-								x=entity.dynamic_data.spawning.spawnpoint.x,
-								y=entity.dynamic_data.spawning.spawnpoint.y,
-								z=entity.dynamic_data.spawning.spawnpoint.z, 
-							}
-	local oldname         = entity.data.name
+	local temporary_dynamic_data = entity.dynamic_data
+	local entity_orientation = entity.object:getyaw()
+	
+	if preserve == nil or preserve == false then
+		temporary_dynamic_data.spawning.original_spawntime = mobf_get_current_time()
+	end
+	
+	--calculate new y pos
+	pos.y = pos.y - minetest.registered_entities[name].collisionbox[2]
+	
 
 	--delete current mob
 	dbg_mobf.spawning_lvl2("MOBF: replace_entity 2 : removing " ..  entity.data.name)
@@ -203,15 +213,10 @@ function spawning.replace_entity(entity,name)
 
 	if newentity ~= nil then
 		dbg_mobf.spawning_lvl2("MOBF: replace_entity 3 : " ..  name .. 
-						" added at " .. printpos(newentity.dynamic_data.spawning.spawnpoint) .. 
-						" resetting spawnpoint to " ..printpos(spawnpoint))
-		newentity.dynamic_data.spawning.player_spawned = playerspawned
-
-		--replace spawnpoint by old mobs one
-		newentity.dynamic_data.spawning.spawnpoint = spawnpoint
-		dbg_mobf.spawning_lvl2("MOBF: replace_entity 4 : adding " .. printpos(spawnpoint))
-		
-		newentity.object:set_hp(health)		
+						" added at " .. printpos(newentity.dynamic_data.spawning.spawnpoint))
+		newentity.dynamic_data = temporary_dynamic_data
+		newentity.object:set_hp(health)
+		newentity.object:setyaw(entity_orientation)
 	else
 		minetest.log(LOGLEVEL_ERROR,"MOBF: replace_entity 4 : Bug no "..name.." has been created")
 	end

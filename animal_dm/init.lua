@@ -107,5 +107,7 @@ dofile (modpath .. "/vault.lua")
 
 --register with animals mod
 print ("Adding animal "..dm_prototype.name)
-animals_add_animal(dm_prototype)
+if mobf_add_mob(dm_prototype) then
+	dofile (modpath .. "/vault.lua")
+end
 print ("animal_dm mod version " .. version .. " loaded")

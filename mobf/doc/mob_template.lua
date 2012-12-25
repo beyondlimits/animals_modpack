@@ -86,7 +86,7 @@ local mob_template = {
 		max_speed=0,
 		
 		--! @brief [OPTIONAL] minimum speed a mob shall move (if moving at all)
-		min_speed=0
+		min_speed=0,
 		
 		--! @brief [MOV_GEN_DEPENDENT | MANDATORY] pattern based movement gen -> pattern to use for movement
 		pattern="some pattern id",
@@ -172,7 +172,7 @@ local mob_template = {
 		textures = {"some node declatation"},
 		
 		--! @brief [MANDATORY] collisionbox to use
-		collisionbox = { <selectionbox declatation> },
+		collisionbox = { "<selectionbox declatation>" },
 		
 		--! @brief [MANDATORY] xyz scale factors for the model
 		visual_size = {x=1,y=1,z=1},
@@ -295,6 +295,26 @@ local mob_template = {
 			gain = 1,
 			--! @brief [MANDATORY] maximum distance sound is heared
 			max_hear_distance = 100,
+			},
+		},
+	--! @brief [OPTIONAL] used to specify different movement/model states, 
+	--! you may specify as many states as you like
+	states = {
+			{
+				--! @brief [MANDATORY] name of state
+				name = "example",
+				--! @brief [MANDATORY] typical duration of this state
+				typical_state_time = 180,
+				--! @brief [MANDATORY] chance of state to be selected (SUM may not be > 1)
+				chance = 0.5,
+				--! @brief [OPTIONAL] a function to check before switching to this state
+				custom_preconhandler = nil,
+				--! @brief [OPTIONAL] a special movement handler for this state
+				movgen = "none",
+				--! @brief [OPTIONAL] a special model to be used for this state
+				graphics_3d = "<graphic definition as previous described>",
+				--! @brief [OPTIONAL] a special sprite to be used for this state
+				graphics_2d = "<graphic definition as previous described>",
 			},
 		},
 	} 

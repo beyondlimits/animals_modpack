@@ -73,4 +73,8 @@ dbg_mobf = {
 	random_drop_lvl1		= function () end,
 	random_drop_lvl2		= function () end,
 	random_drop_lvl3		= function () end,
+	
+	mob_state_lvl1			= function () end,
+	mob_state_lvl2			= function () end,
+	mob_state_lvl3			= function () end,
 }

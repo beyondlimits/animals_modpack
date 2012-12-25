@@ -34,23 +34,25 @@ harvesting = {}
 --! @param now current time
 -------------------------------------------------------------------------------
 function harvesting.init_dynamic_data(entity,now)
- 	local data =  {
+	dbg_mobf.harvesting_lvl1("MOBF: " .. entity.data.name .. " initializing harvesting dynamic data")
+	local data =  {
 		ts_last 				= now,
 	}
 	entity.dynamic_data.harvesting = data
 end
 
 -------------------------------------------------------------------------------
--- name: callback(entity,player)
+-- name: callback(entity,player,now)
 --
 --! @brief callback handler for harvest by player
 --! @memberof harvesting
 --
 --! @param entity mob being harvested
 --! @param player player harvesting
+--! @param now the current time
 --! @return true/false if handled by harvesting or not
 -------------------------------------------------------------------------------
-function harvesting.callback(entity,player) 
+function harvesting.callback(entity,player,now) 
 
 	dbg_mobf.harvesting_lvl1("MOBF: harvest function called")
 
@@ -76,7 +78,7 @@ function harvesting.callback(entity,player)
 						dbg_mobf.harvesting_lvl2("MOBF: removing: " .. entity.data.catching.tool.." 1")
 						player:get_inventory():remove_item("main",entity.data.catching.tool.." 1")
 					else
-						minetest.log(LOGLEVEL_ERROR,"MOBF: BUG!!! player is wearing a item he doesn't have in inventory!!!")
+						mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! player is wearing a item he doesn't have in inventory!!!")
 						--handled but not ok so don't attack
 						return true
 					end
@@ -84,7 +86,7 @@ function harvesting.callback(entity,player)
 			if entity.data.generic.addoncatch ~= nil then
 				player:get_inventory():add_item("main", entity.data.generic.addoncatch.." 1")
 			else
-				player:get_inventory():add_item("main", entity.data.modname ..":"..entity.data.name.." 1")				
+				player:get_inventory():add_item("main", entity.data.modname ..":"..entity.data.name.." 1")
 			end
 			spawning.remove(entity)
 			return true
@@ -99,8 +101,8 @@ function harvesting.callback(entity,player)
 		if (entity.data.harvest.tool ~= "") then
 			local tool = player:get_wielded_item()
 			if tool ~= nil then
-				dbg_mobf.harvesting_lvl1("MOBF: Player is wearing " .. tool:get_name() .. 
-						" required is ".. entity.data.harvest.tool .. " wear: " .. tool:get_wear())
+				dbg_mobf.harvesting_lvl1("MOBF: Player is wearing >" .. tool:get_name() .. 
+						"< required is >".. entity.data.harvest.tool .. "< wear: " .. tool:get_wear())
 			
 				if (tool:get_name() ~=  entity.data.harvest.tool) then	
 					--player is wearing wrong tool do an attack
@@ -109,6 +111,7 @@ function harvesting.callback(entity,player)
 					--tool is completely consumed
 					if entity.data.harvest.tool_consumed == true then
 						if player:get_inventory():contains_item("main",entity.data.harvest.tool.." 1") == false then
+							dbg_mobf.harvesting_lvl1("MOBF: Player doesn't have at least 1 of ".. entity.data.harvest.tool)
 							--handled but not ok so don't attack
 							return true
 						end
@@ -153,6 +156,8 @@ function harvesting.callback(entity,player)
 				dbg_mobf.harvesting_lvl2("MOBF: removing "..entity.data.harvest.tool.." 1")
 				player:get_inventory():remove_item("main",entity.data.harvest.tool.." 1")
 			end
+		else
+			dbg_mobf.harvesting_lvl1("MOBF: " .. entity.data.name .. " not ready to be harvested")
 		end
 		
 		-- check if mob is transformed by harvest

@@ -28,7 +28,13 @@ movement_generators = {}
 -------------------------------------------------------------------------------
 function getMovementGen(id)
 	if movement_generators[id] == nil then
+		local name = ""
+		if id ~= nil then
+			name = id
+		end
+		print("GOT: " .. dump(id))
 		minetest.log(LOGLEVEL_ERROR,"MOBF: movement generator " .. id .. " not found!")
+		return nil
 	end
 	return movement_generators[id]
 end

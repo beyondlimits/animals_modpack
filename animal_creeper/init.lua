@@ -1,4 +1,4 @@
-local version = "0.0.6"
+local version = "0.0.7"
 
 local creeper_groups = {
                         not_in_creative_inventory=1
@@ -40,14 +40,13 @@ creeper_prototype = {
 					sprite_div = {x=6,y=1},
 					visible_height = 1.5,
 					},
-        graphics_3d = {
-            visual = "wielditem",
-            textures = {"animal_creeper:box_creeper"},
-            collisionbox = selectionbox_creeper,
-            visual_size= {x=1.33,y=1.33,z=1.33},
-            },
+		graphics_3d = {
+			visual = "wielditem",
+			textures = {"animal_creeper:box_creeper"},
+			collisionbox = selectionbox_creeper,
+			visual_size= {x=1.33,y=1.33,z=1.33},
+			},
 		combat = {
-					mgen="follow_mov_gen",
 					angryness=0.95,
 					starts_attack=true,
 					sun_sensitive=true,

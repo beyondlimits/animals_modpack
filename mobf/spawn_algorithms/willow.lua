@@ -66,7 +66,7 @@ function mobf_spawn_on_willow(mob_name,mob_transform,spawning_data,environment)
 				local node_above = minetest.env:get_node(pos_above)
 
 				if mob_name == nil then
-					minetest.log(LOGLEVEL_ERROR,"MOBF: BUG!!! mob name not available")
+					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! mob name not available")
 				else
 					--print("Try to spawn mob: "..mob_name)
 					if node_above.name == "air" then
@@ -77,7 +77,7 @@ function mobf_spawn_on_willow(mob_name,mob_transform,spawning_data,environment)
 							local newentity = mobf_find_entity(newobject)
 							
 							if newentity == nil then
-								minetest.log(LOGLEVEL_ERROR,"MOBF: BUG!!! no "..mob_name.." has been created!")
+								mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! no "..mob_name.." has been created!")
 							end
 							minetest.log(LOGLEVEL_INFO,"MOBF: Spawning "..mob_name.." on willow at position "..printpos(pos))
 						end
@@ -145,14 +145,14 @@ function mobf_spawn_on_willow_mapgen(mob_name,mob_transform,spawning_data,enviro
 						
 						if newentity == nil then
 							dbg_mobf.spawning_lvl3("BUG!!! no "..mob_name.." has been created!")
-							minetest.log(LOGLEVEL_ERROR,"MOBF: BUG!!! no "..mob_name.." has been created!")
+							mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! no "..mob_name.." has been created!")
 						else
 							dbg_mobf.spawning_lvl3("Spawning "..mob_name.." on willow at position "..printpos(spawnpos))
 							minetest.log(LOGLEVEL_INFO,"MOBF: Spawning "..mob_name.." on willow at position "..printpos(spawnpos))
 						end
 					else
 						dbg_mobf.spawning_lvl3("BUG!!! no "..mob_name.." object has been created!")
-						minetest.log(LOGLEVEL_ERROR,"MOBF: BUG!!! no "..mob_name.." object has been created!")
+						mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! no "..mob_name.." object has been created!")
 					end
 					
 					break

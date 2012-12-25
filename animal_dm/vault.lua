@@ -386,8 +386,13 @@ end
 
 minetest.register_on_generated(function(minp, maxp, seed)
 
+	--abort in case of dm disabled
+	if minetest.registered_entities["animal_dm:dm"] == nil then
+		return
+	end
+
     --abort in case of above sea level
-    if minp.y > 3 then
+    if minp.y > -3 then
         return
     end
     

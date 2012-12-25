@@ -165,7 +165,7 @@ function environment.is_media_element( nodename, media )
 
 	--security check
 	if media == false then
-	    minetest.log(LOGLEVEL_ERROR,"MOBF: BUG!!!! no environment specified!")
+	    mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! no environment specified!")
 		return false
 	end
 	
@@ -334,14 +334,14 @@ function environment.pos_is_ok(pos,entity)
 	dbg_mobf.environment_lvl1("Checking pos "..printpos(pos))
 
 	if pos == nil then
-		minetest.log(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking pos with nil value this won't work")
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking pos with nil value this won't work")
 		return "invalid"	
 	end
 	
 	local node = minetest.env:get_node(pos)
 
 	if node == nil then
-		minetest.log(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking position with invalid node")
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking position with invalid node")
 		return "invalid"
 	end
 
@@ -378,7 +378,7 @@ function environment.pos_is_ok(pos,entity)
 	local node_above = minetest.env:get_node(pos_above)
 
 	if node_above == nil then
-		minetest.log(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking position with invalid node above")
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking position with invalid node above")
 		return "invalid"
 	end
 

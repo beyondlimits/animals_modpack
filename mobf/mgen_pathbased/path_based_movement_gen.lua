@@ -148,7 +148,7 @@ function p_mov_gen.update_movement(entity,now)
 			if dynamic_data.p_movement.destination ~= nil then
 				p_mov_gen.set_speed(entity,dynamic_data.p_movement.destination)
 			else
-				minetest.log(LOGLEVEL_ERROR,"MOBF: BUG !!! unable to find a destination for an mob!")
+				mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG !!! unable to find a destination for an mob!")
 			end
 		end			
 	end

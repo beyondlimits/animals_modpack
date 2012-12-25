@@ -1,4 +1,4 @@
-local version = "0.0.8"
+local version = "0.0.9"
 
 local big_red_groups = {
                         not_in_creative_inventory=1
@@ -43,12 +43,12 @@ big_red_prototype = {
 		catching       = nil,
 		random_drop    = nil,
 		auto_transform = nil,
-       graphics_3d = {
-            visual = "wielditem",
-            textures = {"animal_big_red:box_big_red"},
-            collisionbox = selectionbox_big_red,
-            visual_size= {x=1.5,y=2.5,z=1.5},
-            },
+		graphics_3d = {
+			visual = "wielditem",
+			textures = {"animal_big_red:box_big_red"},
+			collisionbox = selectionbox_big_red,
+			visual_size= {x=1.5,y=2.5,z=1.5},
+			},
 		graphics = {
 					sprite_scale={x=6,y=6},
 					sprite_div = {x=1,y=1},
@@ -56,7 +56,6 @@ big_red_prototype = {
 					visible_width = 1,
 					},
 		combat = {
-					mgen="follow_mov_gen",
 					angryness=0,--0.95,
 					starts_attack=true,
 					sun_sensitive=true,

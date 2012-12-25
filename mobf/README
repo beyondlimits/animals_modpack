@@ -14,7 +14,7 @@ suggestions too!
 No what is in?
 -------------------------------------------------------------------------------
 
-Vampires
+Vombies
 Hostile mobs spawning at night in unlighted areas. They can't withstand the 
 sun and will burn as sun rises
 
@@ -41,7 +41,7 @@ Just dungenmasters throwing fireballs they spawn in dark stony areas too.
 Rat 
 Just a small animal jumping around
 
-Creeper
+Boombomb
 Don't get near they will explode
 
 Blue White Fish
@@ -68,7 +68,7 @@ Clownfish -> drops golden scale on kill
 Wolf -> tame it!
 
 
-How to catch mobss? Take a lasso or net to catch them, create a farm. No they 
+How to catch mobs? Take a lasso or net to catch them, create a farm. No they 
 won't breed except sheep if there's a filled barn nearby
 
 
@@ -134,6 +134,15 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.9.0
+-preserve orientation on replacement of entity
+-add state support
+-don't generate vaults if dm is disabled
+-fix bug vaults generated above sea level
+-added support for mesh 3d models
+-use vessels drinking glass -> cow depends on vessels now!
+-add support for removing disabled animals unknown objects
+
 Changes 1.4.6
 -added 3d dm
 -added 3d big red
@@ -397,4 +406,35 @@ Changes 0.1.0:
 -prepared for:
 *animals harvestable when wearing special tool
 *animals harvestable by consuming special tool
+
+Links:
+http://www.mediafire.com/?axsikpooji7hq16 Version 0.1.1 (there will be sheep)
+http://www.mediafire.com/?yo6b8cyq0rt6b51 Version 0.2.0 (diversity growing)
+http://www.mediafire.com/?v45fue5z6hidkjw Version 0.2.1 (no tiny animals)
+http://www.mediafire.com/?1l4cfj35kadjf1l Version 0.2.2 (let em jump)
+http://www.mediafire.com/?leyjbj5831gc6zm Version 0.3.0 (don't make them angry)
+http://www.mediafire.com/?ilslao0gi2ulwev Version 0.4.1 (big red is hiding)
+http://www.mediafire.com/?tkamh7a5r6mlsze Version 0.4.2 (let there be tools)
+http://www.mediafire.com/?ib5ax24vp54h938 Version 0.4.3 (catch em all)
+http://www.mediafire.com/?m9dfrqq6fdoamnz Version 0.4.5 (catch em all)
+http://www.mediafire.com/?22ex6fn8d49deoy Version 0.5.0 (none disappearing)
+http://www.mediafire.com/?a0g894d4b90acax Version 0.6.0 (be carefull)
+http://www.mediafire.com/?mym9dyjbnb98cmo Version 0.7.0 ( do you fear the night?)
+http://www.mediafire.com/?3lw27vuzxn7cyy8 Version 0.7.3 (still fear the night?)
+http://www.mediafire.com/?3ah17kl2uhg0437 Version 0.8.1 (stay distant!)
+http://www.mediafire.com/?j447z7q3rfim8iv Version 0.8.2 (stay distant!)
+http://www.mediafire.com/?1b9rcez7dbdnbuu Version 0.8.3 (stay distant!)
+http://www.mediafire.com/?r4jke39dfv218yj Version 0.8.9 (have a swim)
+http://www.mediafire.com/?5w9a5vc55az2dqq Version 0.9.0 (left "hand" harvesting)
+http://www.mediafire.com/?y8k42doeebo2c5o Version 0.9.9 (cleanup)
+http://www.mediafire.com/?hl37vzqb5kzra05 Version 0.9.11 (cleanup)
+http://www.mediafire.com/?zty2qzn9hjtxl1s Version 1.0.0 (let them breed)
+http://www.mediafire.com/?xax85pwsno1incc Version 1.1.0 (speed it up)
+http://www.mediafire.com/?ze274bvlxtjsk1c Version 1.1.1 (speed it up)
+http://www.mediafire.com/?gn0f1e005wtmsom Version 1.2.0 (make some noise)
+http://www.mediafire.com/?zkf54fckd7w2g3f Version 1.2.1 (hit them)
+http://www.mediafire.com/?7hm2xm51aoytbua Version 1.2.90 (loose weight)
+http://www.mediafire.com/?lnw1bcs5gq6au83 Version 1.2.91 (fix it)
+http://www.mediafire.com/?axuhv41wc2ch7yl Version 1.2.92 (enter the 3rd dimension)
+http://www.mediafire.com/?vldqym8hrasjbuk Version 1.2.93 (finding the right direction)
 

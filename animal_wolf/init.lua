@@ -1,4 +1,4 @@
-local version = "0.0.3"
+local version = "0.0.4"
 
 local modpath = minetest.get_modpath("animal_wolf")
 
@@ -44,7 +44,6 @@ wolf_prototype = {
 					visual_size = {x=1,y=1,z=1},
 					},		
 		combat = {
-					mgen="follow_mov_gen",
 					angryness=1,
 					starts_attack=true,
 					sun_sensitive=false,

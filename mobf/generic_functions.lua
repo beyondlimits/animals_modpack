@@ -23,6 +23,13 @@ if minetest.setting_getbool("mobf_enable_socket_trace") then
     require "socket"
 end
 
+
+function mobf_bug_warning(level,text)
+	if minetest.setting_getbool("mobf_log_bug_warnings") then
+		minetest.log(level,text)
+	end
+end
+
 -------------------------------------------------------------------------------
 -- name: mobf_get_time_ms()
 --

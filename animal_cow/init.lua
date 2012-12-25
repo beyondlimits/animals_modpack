@@ -1,4 +1,4 @@
-local version = "0.0.12"
+local version = "0.0.13"
 
 
 local cow_groups = {
@@ -38,7 +38,7 @@ cow_prototype = {
 					canfly=false,
 					},		
 		harvest = {	
-					tool="animalmaterials:glass",
+					tool="vessels:drinking_glass",
 					tool_consumed=true,
 					result="animalmaterials:milk", 
 					transforms_to="",
@@ -265,14 +265,6 @@ baby_calf_m_prototype = {
                                 },
                     },  
         }
-
-minetest.register_craft({
-	output = "animalmaterials:glass 5",
-	recipe = {
-		{'', "default:glass",''},
-		{'', "default:glass",''}
-	}
-})
 
 --register with animals mod
 print ("Adding animal "..baby_calf_f_prototype.name)

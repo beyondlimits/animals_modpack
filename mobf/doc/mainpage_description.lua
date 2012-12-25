@@ -9,12 +9,12 @@
 --! @brief just a doc page
 --! @copyright Sapier
 --! @author Sapier
---! @date 2012-08-11
+--! @date 2012-12-25
 
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
---! @mainpage Mob Framework Mod 1.4.6
+--! @mainpage Mob Framework Mod 1.9.0
 --! 
 --! This documentation uses doxygen created from lua code. As some of you 
 --! probably know doxygen doesn't support lua on it's own so some of the

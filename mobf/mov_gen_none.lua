@@ -68,7 +68,7 @@ end
 function mgen_none.init_dynamic_data(entity,now)
 
     local data = {
-            moving = true,
+            moving = false,
             }
     
     entity.dynamic_data.movement = data

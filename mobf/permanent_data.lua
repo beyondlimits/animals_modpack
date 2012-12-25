@@ -39,7 +39,7 @@ function mobf_deserialize_permanent_entity_data(staticdata)
 --	end
 
 	--old style serialized static data
-	local retval = {spawnpoint={x=0,y=0,z=0},playerspawned=false,original_spawntime=-1}
+	local retval = {spawnpoint={x=0,y=0,z=0},playerspawned=false,original_spawntime=-1,state="default"}
 
 	if staticdata ~= nil and
 		staticdata ~= "" then
@@ -107,6 +107,19 @@ function mobf_deserialize_permanent_entity_data(staticdata)
 		else
 			return retval
 		end
+		
+		start_pos = end_pos +1
+		end_pos = string.find(staticdata,";",start_pos)
+		
+		if end_pos ~= nil then
+			dbg_mobf.permanent_store_lvl1("MOBF: Found: ".. string.sub(staticdata,start_pos,end_pos-1).. " as sevemth element")
+			retval.state = string.sub(staticdata,start_pos,end_pos-1)
+			if retval.state == "" then
+				retval.state = nil
+			end
+		else
+			return retval
+		end
 	end
 
 	return retval
@@ -137,10 +150,18 @@ function mobf_serialize_permanent_entity_data(entity)
 			spawner = entity.dynamic_data.spawning.spawner
 		end
 		
+		local state = "default"
+		if entity.dynamic_data.state ~= nil and 
+			entity.dynamic_data.state.current ~= nil then
+			state = entity.dynamic_data.state.current
+		end
+		
 		if entity.dynamic_data.spawning.original_spawntime == nil then
 			entity.dynamic_data.spawning.original_spawntime = mobf_get_current_time()
 			minetest.log(LOGLEVEL_WARNING, "MOBF: deactivating entity without spawntime setting current time")
 		end
+		
+		
 		
 		local serialized = playerspawned ..
 		";" ..entity.dynamic_data.spawning.spawnpoint.x ..
@@ -148,6 +169,7 @@ function mobf_serialize_permanent_entity_data(entity)
 		";" ..entity.dynamic_data.spawning.spawnpoint.z ..
 		";" ..entity.dynamic_data.spawning.original_spawntime ..
 		";" ..spawner ..
+		";" ..state ..
 		";"
 		
 		

@@ -84,7 +84,7 @@ function movement_gen.initialize()
 end
 
 -------------------------------------------------------------------------------
--- name: generator(entity)
+-- name: callback(entity)
 --
 --! @brief main movement generation function
 --! @memberof movement_gen
@@ -92,7 +92,7 @@ end
 --
 --! @param entity mob to generate movement for
 -------------------------------------------------------------------------------
-function movement_gen.generator(entity)
+function movement_gen.callback(entity)
 
 	if entity == nil then
 		return
@@ -261,75 +261,6 @@ function movement_gen.apply_movement_changes(entity,movement_state)
 end
 
 -------------------------------------------------------------------------------
--- name: callback(entity,now)
---
---! @brief generate a movement pattern with mixed stop and go phases
---! @memberof movement_gen
---
---! @param entity mob to generate movement
---! @param now current time
--------------------------------------------------------------------------------
-function movement_gen.callback(entity,now)
-	if entity.dynamic_data.movement.started then
-
-		local delta_t = now - entity.dynamic_data.movement.ts_state_changed
-		
-		--case we are not moving
-		if entity.dynamic_data.movement.moving == false then			
-			
-			local start_chance = entity.dynamic_data.movement.mpattern.start_movement + 
-									( 	delta_t * 
-										entity.dynamic_data.movement.mpattern.start_stop_delta_time_factor * 
-										entity.dynamic_data.movement.mpattern.start_movement
-										)
-
-			if math.random() < (start_chance * PER_SECOND_CORRECTION_FACTOR) then
-				dbg_mobf.pmovement_lvl2("MOBF: mob starts to move, chance was:" .. start_chance .. 
-											" deltatime was: " .. delta_t .. 
-											" entity:", entity)
-				
-				--give movement gen chance to start movement
-				movement_gen.generator(entity)
-				entity.dynamic_data.movement.moving = true
-				entity.dynamic_data.movement.ts_state_changed = now
-			end
-		else
-
-			local stop_chance = entity.dynamic_data.movement.mpattern.stop_movement + 
-									( 	delta_t * 
-										entity.dynamic_data.movement.mpattern.start_stop_delta_time_factor * 
-										entity.dynamic_data.movement.mpattern.stop_movement)
-
-			--random chance of stopping
-			if math.random() < (stop_chance * PER_SECOND_CORRECTION_FACTOR)then
-				dbg_mobf.pmovement_lvl2("MOBF: mob stops to move, chance was:" .. stop_chance .. 
-											" deltatime was: " .. delta_t .. 
-											" entity:", entity)
-											
-				entity.dynamic_data.movement.acceleration = {x=0,
-												y=environment.get_default_gravity(entity.object:getpos(),
-														entity.environment.media,
-														entity.data.movement.canfly),
-												z=0}
-				entity.object:setacceleration(entity.dynamic_data.movement.acceleration)
-				entity.object:setvelocity({x=0,y=0,z=0})
-				entity.dynamic_data.movement.moving = false
-				entity.dynamic_data.movement.ts_state_changed = now
-			else
-				dbg_mobf.pmovement_lvl2("MOBF: " .. entity.data.name .. " calling movement callback")
-				movement_gen.generator(entity)
-			end
-		end
-
-
-	else
-		entity.object:setacceleration(entity.dynamic_data.movement.acceleration)
-		entity.dynamic_data.movement.started = true
-	end
-
-end
-
--------------------------------------------------------------------------------
 -- name: init_dynamic_data(entity,now)
 --
 --! @brief initialize dynamic data required by movement generator
@@ -351,12 +282,11 @@ function movement_gen.init_dynamic_data(entity,now)
 	local data = {
 			started				= false,
 			acceleration		= accel_to_set,
-			moving				= false,
 			changing_levels     = false,
-			ts_state_changed	= now,
 			ts_random_jump		= now,
 			ts_orientation_upd  = now,
 			mpattern            = mobf_movement_patterns[entity.data.movement.pattern],
+			moving              = true,
 			}
 	
 	entity.dynamic_data.movement = data
@@ -491,7 +421,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 								entity.environment.media,
 								entity.data.movement.canfly)
 			else
-				minetest.log(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way out of water, for mob at: " .. printpos(movement_state.basepos) .. " drowning mob")
+				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way out of water, for mob at: " .. printpos(movement_state.basepos) .. " drowning mob")
 				abort_processing = true
 				spawning.remove(entity)
 			end
@@ -520,7 +450,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 								
 				movement_state.basepos = targetpos
 			else
-				minetest.log(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way from water, mob is most likely to drown soon")
+				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way from water, mob is most likely to drown soon")
 			end
 		end      
 	end

@@ -157,14 +157,14 @@ function mobf_spawn_in_forrest_mapgen(mob_name,mob_transform,spawning_data,envir
 							
 							if newentity == nil then
 								dbg_mobf.spawning_lvl3("BUG!!! no "..mob_name.." has been created!")
-								minetest.log(LOGLEVEL_ERROR,"MOBF: BUG!!! no "..mob_name.." has been created!")
+								mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! no "..mob_name.." has been created!")
 							else
 								dbg_mobf.spawning_lvl3("Spawning "..mob_name.." on willow at position "..printpos(spawnpos))
 								minetest.log(LOGLEVEL_INFO,"MOBF: Spawning "..mob_name.." on willow at position "..printpos(spawnpos))
 							end
 						else
 							dbg_mobf.spawning_lvl3("BUG!!! no "..mob_name.." object has been created!")
-							minetest.log(LOGLEVEL_ERROR,"MOBF: BUG!!! no "..mob_name.." object has been created!")
+							mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! no "..mob_name.." object has been created!")
 						end
 						
 						break

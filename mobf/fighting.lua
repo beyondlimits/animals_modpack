@@ -100,8 +100,8 @@ function fighting.hit(entity,player)
 	local dir = mobf_get_direction(playerpos,mob_basepos)
 	
 	
-	if entity.data.sound ~= nil then		
-		sound.play(mob_pos,entity.data.sound.hit);		
+	if entity.data.sound ~= nil then
+		sound.play(mob_pos,entity.data.sound.hit);
 	end
 	
 	--push back mob	
@@ -170,17 +170,69 @@ function fighting.hit(entity,player)
 					dbg_mobf.fighting_lvl2("MOBF: fighting back player "..playername)
 					entity.dynamic_data.combat.target = playername
 					
-					fighting.enable_combat_movement(entity,mobf_get_current_time(),player)
-								
+					fighting.switch_to_combat_state(entity,mobf_get_current_time(),player)
 			end	
 		end
 
 	end
 
 end
+-------------------------------------------------------------------------------
+-- name: switch_to_combat_state(entity,now,target) 
+--
+--! @brief switch to combat state
+--! @memberof fighting
+--! @private
+--
+--! @param entity mob to switch state
+--! @param now current time in seconds
+--! @param target the target to attack
+-------------------------------------------------------------------------------
+function fighting.switch_to_combat_state(entity,now,target)
+	local combat_state = mob_state.get_state_by_name(entity,"combat")
+	
+	if target == nil then
+		dbg_mobf.fighting_lvl2("MOBF: no target for combat state change specified")
+		return
+	end
+	
+	if combat_state == nil then
+		dbg_mobf.fighting_lvl2("MOBF: no special combat state")
+		return
+	end
+	
+	dbg_mobf.fighting_lvl2("MOBF: switching to combat state")
+	
+	--make sure state is locked
+	mob_state.lock(entity,true)
+
+	--backup dynamic movement data
+	local backup = entity.dynamic_data.movement
+	backup.current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
+	
+	--switch state
+	local newentity = mob_state.change_state(entity,combat_state)
+	
+	if newentity ~= nil then
+		entity = newentity
+	end
+	
+	--save old movement data to use on switching back
+	entity.dynamic_data.movement.backup = backup
+		
+	--set target
+	entity.dynamic_data.movement.target = target
+	
+	--make sure a fighting mob ain't teleporting to target
+	entity.dynamic_data.movement.teleportsupport = false
+	
+	--make sure we do follow our target
+	entity.dynamic_data.movement.guardspawnpoint = false
+	
+end
 
 -------------------------------------------------------------------------------
--- name: restore_default_movement(entity,now) 
+-- name: restore_previous_state(entity,now) 
 --
 --! @brief restore default movement generator of mob
 --! @memberof fighting
@@ -189,69 +241,37 @@ end
 --! @param entity mob to restore movement generator
 --! @param now current time in seconds
 -------------------------------------------------------------------------------
-function fighting.restore_default_movement(entity,now)
+function fighting.restore_previous_state(entity,now)
 
-	if entity.data.combat.mgen ~= nil then
-		--switch movement generator to default
-		entity.dynamic_data.current_movement_gen = getMovementGen(entity.data.movement.default_gen)
+	--check if ther is anything we can restore
+	if entity.dynamic_data.movement.backup ~= nil then
+		local backup = entity.dynamic_data.movement.backup
 		
-		--restore old dynamic data
-		
-		if entity.dynamic_data.backup ~= nil then
-			entity.dynamic_data.movement = entity.dynamic_data.backup
+		local newentity = nil
+		if backup.current_state ~= nil then
+			newentity = mob_state.change_state(entity,backup.current_state)
 		else
-			minetest.log(LOGLEVEL_WARNING,"MOBF: unable to restore old dynamic_data.movement, reinitilizing")
-			entity.dynamic_data.current_movement_gen.init_dynamic_data(entity,now)
-		end		
-	end		
-
-end
-
-
--------------------------------------------------------------------------------
--- name: enable_combat_movement(entity,now) 
---
---! @brief switch to combat movement gen (if specified)
---! @memberof fighting
---! @private
---
---! @param entity mob to change movement gen
---! @param now current time
---! @param target target to attack
--------------------------------------------------------------------------------
-function fighting.enable_combat_movement(entity,now,target)
-
-	if target == nil then
-		dbg_mobf.fighting_lvl2("MOBF: no target for movement gen specified")
-		return
+			minetest.log(LOGLEVEL_WARNING,"MOBF: unable to restore previous state switching to default")
+			newentity = mob_state.change_state(entity,nil)
+		end
+			
+			
+		if newentity ~= nil then
+			entity = newentity
+		end
+		
+		--restore old movement data
+		entity.dynamic_data.movement = backup
+		
+		--make sure all remaining data is deleted
+		entity.dynamic_data.movement.backup = nil
+		entity.dynamic_data.movement.current_state = nil
 	end
-
-	if entity.data.combat.mgen ~= nil then
-		dbg_mobf.fighting_lvl2("MOBF: switching to combat movement generator")
-		--switch movement generator to combat specified movement generator
-		entity.dynamic_data.current_movement_gen = getMovementGen(entity.data.combat.mgen)
-		entity.dynamic_data.current_movement_gen.init_dynamic_data(entity,now)
-		
-		local new_dynamic_data = {}
-		
-		--backup dynamic data
-		new_dynamic_data.backup = entity.dynamic_data.movement
-		
-		--switch to new dynamic_data
-		entity.dynamic_data.movement = new_dynamic_data
-		
-		--set target
-		entity.dynamic_data.movement.target = target
-		
-		--make sure a fighting mob ain't teleporting to target
-		entity.dynamic_data.movement.teleportsupport = false
-		--make sure we do follow our target
-		entity.dynamic_data.movement.guardspawnpoint = false
-	else
-		dbg_mobf.fighting_lvl2("MOBF: no combat movement generator specified not changing movement")
-	end			
-
+	
+	--make sure state is unlocked
+	mob_state.lock(entity,false)
 end
+
 -------------------------------------------------------------------------------
 -- name: combat(entity,now) 
 --
@@ -268,7 +288,8 @@ function fighting.combat(entity,now)
 		return
 	end	
 
-	if entity.dynamic_data.combat.target ~= "" then		
+	if entity.dynamic_data.combat ~= nil and
+		entity.dynamic_data.combat.target ~= "" then		
 
 		dbg_mobf.fighting_lvl1("MOBF: attacking player: "..entity.dynamic_data.combat.target)
 
@@ -278,10 +299,12 @@ function fighting.combat(entity,now)
 		--check if target is still valid
 		if player == nil then
 			dbg_mobf.fighting_lvl3("MOBF: not a valid player")
+			
+			-- switch back to default movement gen
+			fighting.restore_previous_state(entity,now)
+			
 			--there is no player by that name, stop attack
 			entity.dynamic_data.combat.target = ""
-			-- switch back to default movement gen
-			fighting.restore_default_movement(entity,now)
 			return
 		end
 		
@@ -296,11 +319,12 @@ function fighting.combat(entity,now)
 		if distance > entity.data.combat.melee.range * MOBF_AGRESSION_FACTOR then
 			dbg_mobf.fighting_lvl2("MOBF: " .. entity.data.name .. " player >" .. entity.dynamic_data.combat.target .. "< to far away " 
 			.. distance .. " > " .. (entity.data.combat.melee.range * MOBF_AGRESSION_FACTOR ) .. " stopping attack")
-			--there is no player by that name, stop attack
-			entity.dynamic_data.combat.target = ""
 			
 			--switch back to default movement gen
-			fighting.restore_default_movement(entity,now)
+			fighting.restore_previous_state(entity,now)
+			
+			--there is no player by that name, stop attack
+			entity.dynamic_data.combat.target = ""
 			return
 		end
 
@@ -456,7 +480,7 @@ function fighting.aggression(entity,now)
 
 						entity.dynamic_data.combat.target = targetname		
 						
-						fighting.enable_combat_movement(entity,now,target)			
+						fighting.switch_to_combat_state(entity,now,target)			
 						
 						dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name .. " " .. now .. " starting attack at player: " ..targetname)
 						minetest.log(LOGLEVEL_INFO,"MOBF: starting attack at player "..targetname)
