@@ -161,7 +161,10 @@ function mobf_serialize_permanent_entity_data(entity)
 			minetest.log(LOGLEVEL_WARNING, "MOBF: deactivating entity without spawntime setting current time")
 		end
 		
-		
+		if entity.dynamic_data.spawning.spawnpoint == nil then
+			entity.dynamic_data.spawning.spawnpoint = {x=0,y=0,z=0}
+			minetest.log(LOGLEVEL_WARNING, "MOBF: deactivating entity " .. dump(entity.data.name) .. " without spawnpoint setting 0,0,0")
+		end
 		
 		local serialized = playerspawned ..
 		";" ..entity.dynamic_data.spawning.spawnpoint.x ..
