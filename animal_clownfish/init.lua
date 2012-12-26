@@ -1,4 +1,4 @@
-local version = "0.0.5"
+local version = "0.0.6"
 
 local selectionbox_clownfish = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
 
@@ -7,6 +7,14 @@ local modpath = minetest.get_modpath("animal_clownfish")
 --include debug trace functions
 dofile (modpath .. "/model.lua")
 
+function clownfish_drop()
+	local result = {}
+	table.insert(result,"animalmaterials:scale_golden 1")
+	table.insert(result,"animalmaterials:fish_clownfish 1")
+	
+	return result
+end
+
 clownfish_prototype = {   
 		name="clownfish",
 		modname="animal_clownfish",
@@ -14,7 +22,7 @@ clownfish_prototype = {
 		generic = {
 					description="Clownfish",
 					base_health=5,
-					kill_result="animalmaterials:scale_golden",
+					kill_result=clownfish_drop,
 					armor_groups= {
 						fleshy=3,
 					},

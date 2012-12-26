@@ -1,4 +1,4 @@
-local version = "0.0.14"
+local version = "0.0.15"
 
 local sheep_groups = {
 						sheerable=1,
@@ -20,7 +20,7 @@ sheep_prototype = {
 		generic = {
 					description="Sheep",
 					base_health=10,
-					kill_result="animalmaterials:meat_raw 1",
+					kill_result="animalmaterials:meat_lamb 2",
 					armor_groups= {
 						fleshy=3,
 					},
@@ -121,7 +121,7 @@ lamb_prototype = {
 		generic = {
 					description="Lamp",
 					base_health=3,
-					kill_result="animalmaterials:meat_raw 1",
+					kill_result="animalmaterials:meat_lamb 1",
 					armor_groups= {
 						fleshy=3,
 					},
@@ -182,7 +182,7 @@ sheep_naked_prototype = {
 		generic = {
 					description="Naked sheep",
 					base_health=10,
-					kill_result="animalmaterials:meat_raw 1",
+					kill_result="animalmaterials:meat_lamb 2",
 					armor_groups= {
 						fleshy=3,
 					},

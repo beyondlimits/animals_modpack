@@ -1,4 +1,4 @@
-local version = "0.0.9"
+local version = "0.0.10"
 
 local big_red_groups = {
                         not_in_creative_inventory=1
@@ -13,11 +13,11 @@ dofile (modpath .. "/model.lua")
 big_red_prototype = {   
 		name="big_red",
 		modname="animal_big_red",
-	
+		
 		generic = {
 					description="Big Red",
 					base_health=30,
-					kill_result="",
+					kill_result="animalmaterials:meat_toxic 3",
 					armor_groups= {
 						fleshy=1,
 						cracky=1,

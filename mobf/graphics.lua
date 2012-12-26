@@ -81,8 +81,8 @@ function graphics.update_orientation(entity,now,dtime)
 		local delta_z = current_velocity.z
 
 		--legacy 2d mode
-	if (entity.data.graphics_3d == nil) or
-		minetest.setting_getbool("mobf_disable_3d_mode") then
+		if (entity.data.graphics_3d == nil) or
+			minetest.setting_getbool("mobf_disable_3d_mode") then
 			graphics.update_orientation_simple(entity,{x=delta_x, z=delta_z})
 		-- 3d mode
 		else
@@ -140,5 +140,29 @@ function graphics.set_draw_mode(entity,id)
 	else
 	
 	
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: set_animation(entity,name)
+--
+--! @brief set the drawmode for an mob entity
+--! @memberof graphics
+--
+--! @param entity mob to set drawmode for
+--! @param name name of animation
+-------------------------------------------------------------------------------
+function graphics.set_animation(entity,name)
+
+	--TODO change frame rate due to movement speed
+	dbg_mobf.graphics_lvl3("MOBF: Updating animation")
+	if entity.data.animation ~= nil and
+		name ~= nil and
+		entity.data.animation[name] ~= nil and
+		entity.dynamic_data.animation ~= name then
+		
+		print("Setting animation to " .. name .. " start: " .. entity.data.animation[name].start_frame .. " end: " .. entity.data.animation[name].end_frame)
+		entity.object:set_animation({x=entity.data.animation[name].start_frame,y=entity.data.animation[name].end_frame}, nil, nil)
+		entity.dynamic_data.animation = name
 	end
 end

@@ -1,4 +1,4 @@
-local version = "0.0.4"
+local version = "0.0.5"
 
 local modpath = minetest.get_modpath("animal_wolf")
 
@@ -58,7 +58,7 @@ wolf_prototype = {
 		
 		spawning = {		
 					rate=0.002,
-					density=1500,
+					density=800,
 					algorithm="forrest_mapgen",
 					height=2
 					},

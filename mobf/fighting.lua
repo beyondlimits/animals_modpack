@@ -139,9 +139,18 @@ function fighting.hit(entity,player)
 				sound.play(mob_pos,entity.data.sound.die);
 			end
 			
-			if player:is_player() and 
-				player:get_inventory():room_for_item("main", result) then
-				player:get_inventory():add_item("main", result)
+			if player:is_player() then 
+				if type(result) == "table" then
+					for i=1,#result, 1 do
+						if player:get_inventory():room_for_item("main", result[i]) then
+							player:get_inventory():add_item("main", result[i])
+						end
+					end
+				else
+					if player:get_inventory():room_for_item("main", result) then
+						player:get_inventory():add_item("main", result)
+					end
+				end
 			else
 				--todo check if spawning a stack is possible
 				minetest.env:add_item(mob_pos,result)

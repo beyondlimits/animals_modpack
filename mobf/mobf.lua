@@ -242,13 +242,31 @@ function mobf.activate_handler(self,staticdata)
 			self.dynamic_data.state ~= nil then
 			minetest.log(LOGLEVEL_INFO,"MOBF: setting current state to: " .. retval.state)
 			self.dynamic_data.state.current = retval.state
+			
+
 		end
 	end
 	
-	--initialize current movement generator
-	self.dynamic_data.current_movement_gen = getMovementGen(self.data.movement.default_gen)
-	self.dynamic_data.current_movement_gen.init_dynamic_data(self,now)
 	
+	local current_state = mob_state.get_state_by_name(self,self.dynamic_data.state.current)
+	
+	if self.dynamic_data.state.current ~= "default" and 
+		current_state.movgen ~= nil then
+		--initialize this state move gen
+		print("setting movegen to: " .. current_state.movgen)
+		self.dynamic_data.current_movement_gen = getMovementGen(current_state.movgen)
+		
+		if current_state.animation ~= nil then
+			print("setting animation to: " .. current_state.animation)
+			graphics.set_animation(self,current_state.animation)
+		end
+	else
+		--initialize current movement generator
+		self.dynamic_data.current_movement_gen = getMovementGen(self.data.movement.default_gen)
+		graphics.set_animation(self,"stand")
+	end
+	
+	self.dynamic_data.current_movement_gen.init_dynamic_data(self,now)
 	
 	--initialize armor groups
 	if self.data.generic.armor_groups ~= nil then
@@ -315,7 +333,7 @@ function mobf.prepare_graphic_info(graphics2d,graphics3d,modname,animalid)
 		
 	else
 		if graphics3d.visual == "mesh" then
-			setgraphics.mesh = minetest.get_modpath("animal_sheep") .. "/models/" .. graphics3d.mesh
+			setgraphics.mesh = minetest.get_modpath(modname) .. "/models/" .. graphics3d.mesh
 		end
 		
 		setgraphics.collisionbox    = graphics3d.collisionbox --todo is this required for mesh?
@@ -419,6 +437,7 @@ function mobf.register_entity(name, graphics, mob)
 				local lifetime = mobf_get_current_time() - self.dynamic_data.spawning.original_spawntime
 				print(self.data.name .. " is alive for " .. lifetime .. " seconds")
 				print("Current state: " .. self.dynamic_data.state.current )
+				print("Current movgen: " .. self.dynamic_data.current_movement_gen.name )
 				print("Time to state change: " .. self.dynamic_data.state.time_to_next_change .. " seconds")
 				
 				print("Current accel: " .. printpos(self.object:getacceleration()) .. " Current speed: " .. printpos(self.object:getvelocity()))

@@ -14,11 +14,16 @@ dofile (modpath .. "/flame.lua")
 
 
 function vombie_drop()
+	local result = {}
 	if math.random() < 0.05 then
-		return "animalmaterials:bone 2"
+		table.insert(result,"animalmaterials:bone 2")
 	else
-		return "animalmaterials:bone 1"
+		table.insert(result,"animalmaterials:bone 1")
 	end
+	
+	table.insert(result,"animalmaterials:meat_undead 1")
+	
+	return result
 end
 
 function vombie_on_step_handler(entity,now,dtime)

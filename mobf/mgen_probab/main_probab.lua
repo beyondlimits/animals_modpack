@@ -95,6 +95,7 @@ end
 function movement_gen.callback(entity)
 
 	if entity == nil then
+		print("MOBF BUG!!!: called movement gen without entity!")
 		return
 	end
 	
@@ -102,12 +103,12 @@ function movement_gen.callback(entity)
 	local movement_state = {
 		basepos         = entity.getbasepos(entity),
 		default_y_accel = nil,
-		centerpos       = nil,		
+		centerpos       = nil,
 		acceleration    = nil,
 		velocity        = nil,
 		now             = nil,
 		
-		override_height_change_chance = 0,		
+		override_height_change_chance = 0,
 		accel_to_set    = nil,
 		force_change    = false,
 		changed         = false,

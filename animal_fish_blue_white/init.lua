@@ -1,4 +1,4 @@
-local version = "0.0.6"
+local version = "0.0.7"
 
 local selectionbox_fish_blue_white = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
 
@@ -7,6 +7,22 @@ local modpath = minetest.get_modpath("animal_fish_blue_white")
 --include debug trace functions
 dofile (modpath .. "/model.lua")
 
+function fish_blue_white_drop()
+	local result = {}
+	
+	if math.random() < 0.01 then
+		table.insert(result,"animalmaterials:scale_blue 1")
+	end
+	
+	if math.random() < 0.01 then
+		table.insert(result,"animalmaterials:scale_white 1")
+	end
+	
+	table.insert(result,"animalmaterials:fish_bluewhite 3")
+	
+	return result
+end
+
 fish_blue_white_prototype = {   
 		name="fish_blue_white",
 		modname="animal_fish_blue_white",
@@ -14,7 +30,7 @@ fish_blue_white_prototype = {
 		generic = {
 					description="Blue white fish",
 					base_health=5,
-					kill_result="",
+					kill_result=fish_blue_white_drop,
 					armor_groups= {
 						fleshy=3,
 					},

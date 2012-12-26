@@ -1,4 +1,4 @@
-local version = "0.0.6"
+local version = "0.0.7"
 
 local chicken_deer = {
 						not_in_creative_inventory=1
@@ -17,12 +17,12 @@ deer_prototype = {
 		generic = {
 					description="Deer",
 					base_health=25,
-					kill_result="animalmaterials:meat_raw 2",
+					kill_result="animalmaterials:meat_venison 2",
 					armor_groups= {
 						fleshy=3,
 					},
 					envid="meadow",
-				},				
+				},
 		movement =  { 
 					default_gen="probab_mov_gen",
 					min_accel=0.2,
@@ -35,9 +35,9 @@ deer_prototype = {
 		catching = {
 					tool="animalmaterials:lasso",
 					consumed=true,
-					},				  	
-		random_drop    = nil,		
-		auto_transform = nil,					
+					},
+		random_drop    = nil,
+		auto_transform = nil,
 		graphics = {
 					sprite_scale={x=4,y=4},
 					sprite_div = {x=6,y=1},

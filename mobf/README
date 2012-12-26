@@ -134,6 +134,14 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.9.1
+-increased spawn rates of wolf
+-drop correct meat
+-add support for multiple drops
+-fix lots of bugs in state change handling
+-add animation support
+-added experimental mob npc to demonstrate animation handling
+
 Changes 1.9.0
 -preserve orientation on replacement of entity
 -add state support

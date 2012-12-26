@@ -184,22 +184,19 @@ local mob_template = {
 		starts_attack=true,
 		
 		--! @brief [MANDATORY] chance mob will attack (if starting attack on its own or beeing attacked)
-		angryness=0.95,	
+		angryness=0.95,
 		
 		--! @brief [OPTIONAL] is mob sensitive to sun?
-		sun_sensitive=true,	
-		
-		--! @brief [OPTIONAL] switch to this movement gen while in combat
-		mgen="follow_mov_gen",
+		sun_sensitive=true,
 		
 		--! @brief [OPTIONAL] configuration of meele attack				
 		melee = {
 			--! @brief [MANDATORY] maximum damage mob does per hit
 			maxdamage=4,
 			--! @brief [MANDATORY] range mob will hit
-			range=2,			
+			range=2,
 			--! @brief [MANDATORY] minimum time between two hits
-			speed=2,						
+			speed=2,
 			},
 		--! @brief [OPTIONAL] configuration of distance attack
 		distance = {
@@ -315,6 +312,18 @@ local mob_template = {
 				graphics_3d = "<graphic definition as previous described>",
 				--! @brief [OPTIONAL] a special sprite to be used for this state
 				graphics_2d = "<graphic definition as previous described>",
+				--! @brief [OPTIONAL] a animation to be played while this state is active
+				animation = "name",
+			},
+		},
+	--! @brief [OPTIONAL] description of animations
+	animation = {
+		--! @brief [OPTIONAL] one or many animation descriptions
+		animationname = {
+			--! @brief [MANDATORY] start frame of animation
+			start_frame = 1,
+			--! @brief [MANDATORY] end frame of animation
+			end_frame   = 2,
 			},
 		},
 	} 

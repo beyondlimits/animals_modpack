@@ -186,7 +186,13 @@ function spawning.replace_entity(entity,name,preserve)
 	
 	if minetest.registered_entities[name] == nil then
 		minetest.log(LOGLEVEL_ERROR,"MOBF: replace_entity 1 : Bug no "..name.." is registred")
-		return
+		return nil
+	end
+	
+	-- avoid switching to same entity
+	if entity.name == name then
+		minetest.log(LOGLEVEL_INFO,"MOBF: not replacing " .. name .. " by entity of same type!")
+		return nil
 	end
 	
 
@@ -206,6 +212,12 @@ function spawning.replace_entity(entity,name,preserve)
 
 	--delete current mob
 	dbg_mobf.spawning_lvl2("MOBF: replace_entity 2 : removing " ..  entity.data.name)
+	
+	--unlink dynamic data
+	entity.dynamic_data = {}
+	entity.dynamic_data.spawning = {}
+	
+	--removin is done after exiting lua!
 	spawning.remove(entity)
 
 	local newobject = minetest.env:add_entity(pos,name)

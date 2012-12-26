@@ -1,4 +1,4 @@
-local version = "0.0.9"
+local version = "0.0.10"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
@@ -11,6 +11,19 @@ local modpath = minetest.get_modpath("animal_chicken")
 
 dofile (modpath .. "/model.lua")
 
+function chicken_drop()
+	local result = {}
+	if math.random() < 0.05 then
+		table.insert(result,"animalmaterials:feather 2")
+	else
+		table.insert(result,"animalmaterials:feather 1")
+	end
+	
+	table.insert(result,"animalmaterials:meat_chicken 1")
+	
+	return result
+end
+
 chicken_prototype = {   
 		name="chicken",
 		modname="animal_chicken",
@@ -18,7 +31,7 @@ chicken_prototype = {
 		generic = {
 					description="Chicken",
 					base_health=5,
-					kill_result="animalmaterials:feather 1",
+					kill_result=chicken_drop,
 					armor_groups= {
 						fleshy=3,
 					},
@@ -72,7 +85,7 @@ rooster_prototype = {
         generic = {
                     description="Rooster",
                     base_health=5,
-                    kill_result="animalmaterials:feather 1",
+                    kill_result=chicken_drop,
                     armor_groups= {
                         fleshy=3,
                     },

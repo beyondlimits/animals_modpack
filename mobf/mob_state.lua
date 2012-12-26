@@ -38,7 +38,7 @@ function mob_state.initialize(entity,now)
 	
 	local state = {
 		current = "default",
-		time_to_next_change = 0,
+		time_to_next_change = 30,
 		locked = false,
 		enabled = false,
 	}
@@ -152,6 +152,7 @@ function mob_state.callback(entity,now,dstep)
 	--abort state change if current state is locked
 	if entity.dynamic_data.state.locked or 
 		entity.dynamic_data.state.enabled == false then
+		dbg_mobf.mob_state_lvl3("MOBF: " .. entity.data.name .. " state locked or no custom states definded ")
 		return
 	end
 	
@@ -159,6 +160,9 @@ function mob_state.callback(entity,now,dstep)
 	
 	--do only change if last state timed out
 	if entity.dynamic_data.state.time_to_next_change < 0 then
+	
+		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " time to change state ")
+	
 		local rand = math.random()
 		
 		local maxvalue = 0
@@ -195,6 +199,8 @@ function mob_state.callback(entity,now,dstep)
 		
 		--switch to default state
 		mob_state.change_state(entity,nil)
+	else
+		dbg_mobf.mob_state_lvl3("MOBF: " .. entity.data.name .. " is not ready for state change ")
 	end
 end
 
@@ -211,21 +217,21 @@ end
 -------------------------------------------------------------------------------
 function mob_state.switch_entity(entity,state)
 	--switch entity
-	local replace = false
+	local state_has_model = false
 	
 	if minetest.setting_getbool("mobf_disable_3d_mode") then
 		if state.graphics ~= nil then
-			replace = true
+			state_has_model = true
 		end
 	else
 		if state.graphics_3d ~= nil then
-			replace = true
+			state_has_model = true
 		end
 	end
 	
 	local newentity = nil
 	
-	if replace then
+	if state_has_model then
 		newentity = spawning.replace_entity(entity,mob_state.get_entity_name(entity.data,state),true)
 	else
 		newentity = spawning.replace_entity(entity,entity.data.modname .. ":"..entity.data.name,true)
@@ -281,6 +287,7 @@ end
 -------------------------------------------------------------------------------
 function mob_state.change_state(entity,state)
 
+	dbg_mobf.mob_state_lvl3("MOBF: " .. entity.data.name .. " state change called " .. dump(state))
 	--check if time precondition handler tells us to stop state change
 	--if not mob_state.precon_time(state) then
 	--	return
@@ -290,20 +297,29 @@ function mob_state.change_state(entity,state)
 	if state ~= nil and
 		type(state.custom_preconhandler) == "function" then
 		if not state.custom_preconhandler(entity,state) then
+			dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " custom precondition handler didn't meet ")
 			return nil
 		end
 	end
 	
 	--switch to default state if no state given
 	if state == nil then
-		dbg_mobf.mob_state_lvl1("MOBF: " .. entity.data.name .. " invalid state switch, switching to default instead of: " .. dump(state))
+		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " invalid state switch, switching to default instead of: " .. dump(state))
 		if entity.dynamic_data.state.current ~= "default" then
+			local newentity = spawning.replace_entity(entity,entity.data.modname .. ":"..entity.data.name,true)
+			
+			if newentity ~= nil then
+				entity = newentity
+			end
+			
 			entity.dynamic_data.current_movement_gen = getMovementGen(entity.data.movement.default_gen)
 			entity.dynamic_data.current_movement_gen.init_dynamic_data(entity,mobf_get_current_time())
-			entity = spawning.replace_entity(entity,entity.data.modname .. ":"..entity.data.name,true)
+			
+			entity.dynamic_data.state.current = "default"
 		end
 		
 		entity.dynamic_data.state.time_to_next_change = 30
+		graphics.set_animation(entity,"stand")
 		return nil
 	end
 	
@@ -312,19 +328,23 @@ function mob_state.change_state(entity,state)
 	dbg_mobf.mob_state_lvl3("MOBF: " .. entityname .. " switching state to " .. statename)
 	
 	if entity.dynamic_data.state == nil then
-		print("error no state dynamic data")
+		mobf_bug_warning(LOGLEVEL_WARNING,"MOBF BUG!!! mob_state no state dynamic data")
 		return nil
 	end
 
 	if entity.dynamic_data.state.current ~= state.name then
-	
+		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " different states now really changeing")
 		entity = mob_state.switch_entity(entity,state)
 		mob_state.switch_movgen(entity,state)
 		
 		entity.dynamic_data.state.time_to_next_change = mob_state.getTimeToNextState(state.typical_state_time)
 		entity.dynamic_data.state.current = state.name
 		
+		graphics.set_animation(entity,state.animation)
 		return entity
+	else
+		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " switching to same state as before")
+		entity.dynamic_data.state.time_to_next_change = mob_state.getTimeToNextState(state.typical_state_time)
 	end
 	
 	return nil

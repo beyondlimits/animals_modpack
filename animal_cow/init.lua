@@ -1,4 +1,4 @@
-local version = "0.0.13"
+local version = "0.0.14"
 
 
 local cow_groups = {
@@ -21,7 +21,7 @@ cow_prototype = {
 		generic = {
 					description="Cow",
 					base_health=40,
-					kill_result="animalmaterials:meat_raw 5",
+					kill_result="animalmaterials:meat_beef 5",
 					armor_groups= {
 						fleshy=2,
 					},
@@ -87,7 +87,7 @@ steer_prototype = {
         generic = {
                     description="Steer",
                     base_health=40,
-                    kill_result="animalmaterials:meat_raw 5",
+                    kill_result="animalmaterials:meat_beef 5",
                     armor_groups= {
                         fleshy=2,
                     },
@@ -147,7 +147,7 @@ baby_calf_f_prototype = {
         generic = {
                     description="Baby Calf female",
                     base_health=40,
-                    kill_result="animalmaterials:meat_raw 2",
+                    kill_result="animalmaterials:meat_beef 2",
                     armor_groups= {
                         fleshy=2,
                     },
@@ -210,7 +210,7 @@ baby_calf_m_prototype = {
         generic = {
                     description="Baby Calf male",
                     base_health=40,
-                    kill_result="animalmaterials:meat_raw 2",
+                    kill_result="animalmaterials:meat_beef 2",
                     armor_groups= {
                         fleshy=2,
                     },
