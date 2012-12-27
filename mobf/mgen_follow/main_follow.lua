@@ -43,6 +43,17 @@ function mgen_follow.callback(entity,now)
 
 	dbg_mobf.fmovement_lvl3("MOBF: Follow mgen callback called")	
 	
+	if entity == nil then
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: called movement gen without entity!")
+		return
+	end
+	
+	if entity.dynamic_data == nil or
+		entity.dynamic_data.movement == nil then
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: >" ..entity.data.name .. "< removed=" .. dump(entity.removed) .. " entity=" .. tostring(entity) .. " probab movement callback")
+		return
+	end
+	
 	--check max speed limit
 	mgen_follow.checkspeed(entity)
 	

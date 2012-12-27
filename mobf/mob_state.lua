@@ -161,7 +161,7 @@ function mob_state.callback(entity,now,dstep)
 	--do only change if last state timed out
 	if entity.dynamic_data.state.time_to_next_change < 0 then
 	
-		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " time to change state ")
+		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " time to change state: " .. entity.dynamic_data.state.time_to_next_change .. " , " .. dstep .. " entity=" .. tostring(entity))
 	
 		local rand = math.random()
 		
@@ -194,11 +194,13 @@ function mob_state.callback(entity,now,dstep)
 			if math.random() < current_chance then
 				if mob_state.change_state(entity,state_table[rand_state]) ~= nil then
 					return false
+				else
+					return true
 				end
 			end
 		end
 		
-		--switch to default state
+		--switch to default state (only reached if no change has been done
 		if mob_state.change_state(entity,nil) ~= nil then
 			return false
 		end
@@ -238,16 +240,19 @@ function mob_state.switch_entity(entity,state)
 	local newentity = nil
 	
 	if state_has_model then
+		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " switching to state model ")
 		newentity = spawning.replace_entity(entity,mob_state.get_entity_name(entity.data,state),true)
 	else
+		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " switching to default model ")
 		newentity = spawning.replace_entity(entity,entity.data.modname .. ":"..entity.data.name,true)
 	end	
 	
 	if newentity ~= nil then
-		entity = newentity
-	end
-
-	return entity
+		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " replaced entity=" .. tostring(entity) .. " by newentity=" .. tostring(newentity))
+		return newentity
+	else
+		return entity
+	end	
 end
 
 -------------------------------------------------------------------------------
@@ -293,7 +298,7 @@ end
 -------------------------------------------------------------------------------
 function mob_state.change_state(entity,state)
 
-	dbg_mobf.mob_state_lvl3("MOBF: " .. entity.data.name .. " state change called " .. dump(state))
+	dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " state change called entity=" .. tostring(entity) .. " state:" .. dump(state))
 	--check if time precondition handler tells us to stop state change
 	--if not mob_state.precon_time(state) then
 	--	return
@@ -303,7 +308,7 @@ function mob_state.change_state(entity,state)
 	if state ~= nil and
 		type(state.custom_preconhandler) == "function" then
 		if not state.custom_preconhandler(entity,state) then
-			dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " custom precondition handler didn't meet ")
+			dbg_mobf.mob_state_lvl1("MOBF: " .. entity.data.name .. " custom precondition handler didn't meet ")
 			return nil
 		end
 	end
@@ -315,23 +320,31 @@ function mob_state.change_state(entity,state)
 			local newentity = spawning.replace_entity(entity,entity.data.modname .. ":"..entity.data.name,true)
 			
 			if newentity ~= nil then
-				entity = newentity
+				dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " default state replaced entity=" .. tostring(entity) .. " by newentity=" .. tostring(newentity))
+			
+				newentity.dynamic_data.current_movement_gen = getMovementGen(newentity.data.movement.default_gen)
+				newentity.dynamic_data.current_movement_gen.init_dynamic_data(newentity,mobf_get_current_time())
+				
+				newentity.dynamic_data.state.current = "default"
+				
+				newentity.dynamic_data.state.time_to_next_change = 30
+				graphics.set_animation(newentity,"stand")
+				
+				dbg_mobf.mob_state_lvl2("MOBF: time to next change = " .. newentity.dynamic_data.state.time_to_next_change)
+				return newentity
 			end
-			
-			entity.dynamic_data.current_movement_gen = getMovementGen(entity.data.movement.default_gen)
-			entity.dynamic_data.current_movement_gen.init_dynamic_data(entity,mobf_get_current_time())
-			
-			entity.dynamic_data.state.current = "default"
 		end
 		
 		entity.dynamic_data.state.time_to_next_change = 30
 		graphics.set_animation(entity,"stand")
+		
+		dbg_mobf.mob_state_lvl2("MOBF:  time to next change = " .. entity.dynamic_data.state.time_to_next_change)
 		return nil
 	end
 	
 	local entityname = entity.data.name
 	local statename = state.name
-	dbg_mobf.mob_state_lvl3("MOBF: " .. entityname .. " switching state to " .. statename)
+	dbg_mobf.mob_state_lvl2("MOBF: " .. entityname .. " switching state to " .. statename)
 	
 	if entity.dynamic_data.state == nil then
 		mobf_bug_warning(LOGLEVEL_WARNING,"MOBF BUG!!! mob_state no state dynamic data")
@@ -340,17 +353,22 @@ function mob_state.change_state(entity,state)
 
 	if entity.dynamic_data.state.current ~= state.name then
 		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " different states now really changeing")
-		entity = mob_state.switch_entity(entity,state)
-		mob_state.switch_movgen(entity,state)
+		local switchedentity = mob_state.switch_entity(entity,state)
+		mob_state.switch_movgen(switchedentity,state)
 		
-		entity.dynamic_data.state.time_to_next_change = mob_state.getTimeToNextState(state.typical_state_time)
-		entity.dynamic_data.state.current = state.name
+		switchedentity.dynamic_data.state.time_to_next_change = mob_state.getTimeToNextState(state.typical_state_time)
+		switchedentity.dynamic_data.state.current = state.name
 		
-		graphics.set_animation(entity,state.animation)
-		return entity
+		graphics.set_animation(switchedentity,state.animation)
+		dbg_mobf.mob_state_lvl2("MOBF:  time to next change = " .. switchedentity.dynamic_data.state.time_to_next_change)
+		
+		if switchedentity ~= entity then
+			return switchedentity
+		end
 	else
 		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " switching to same state as before")
 		entity.dynamic_data.state.time_to_next_change = mob_state.getTimeToNextState(state.typical_state_time)
+		dbg_mobf.mob_state_lvl2("MOBF:  time to next change = " .. entity.dynamic_data.state.time_to_next_change)
 	end
 	
 	return nil
@@ -391,10 +409,18 @@ function mob_state.getTimeToNextState(typical_state_time)
 
 	local p = math.sqrt( (-2*math.log(q))/q )
 	
+	local retval = 2
 	--calculate normalized state time with maximum error or half typical time up and down
 	if math.random() < 0.5 then
-		return typical_state_time + ( u1*p * (typical_state_time/2))
+		retval = typical_state_time + ( u1*p * (typical_state_time/2))
 	else
-		return typical_state_time + ( u2*p * (typical_state_time/2))
+		retval = typical_state_time + ( u2*p * (typical_state_time/2))
+	end
+	
+	--! ensure minimum state time of 2 seconds
+	if retval > 2 then
+		return retval
+	else
+		return 2
 	end
 end

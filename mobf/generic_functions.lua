@@ -24,6 +24,14 @@ if minetest.setting_getbool("mobf_enable_socket_trace") then
 end
 
 
+-------------------------------------------------------------------------------
+-- name: mobf_bug_warning()
+--
+--! @brief make bug warnings configurable
+--
+--! @param level bug severity level to use for minetest.log
+--! @param text data to print to log
+-------------------------------------------------------------------------------
 function mobf_bug_warning(level,text)
 	if minetest.setting_getbool("mobf_log_bug_warnings") then
 		minetest.log(level,text)
@@ -295,7 +303,7 @@ function mobf_mob_around(mob_name,mob_transform,pos,range,ignore_playerspawned)
 			entity.dynamic_data ~= nil and
 			entity.dynamic_data.spawning ~= nil then
 
-			if entity.dynamic_data.spawning.removed == false then
+			if entity.removed == false then
 	
 				if entity.data.modname..":"..entity.data.name == mob_name or
 					entity.data.modname..":"..entity.data.name == mob_transform then

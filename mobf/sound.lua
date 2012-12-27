@@ -62,6 +62,12 @@ end
 -------------------------------------------------------------------------------
 function sound.play_random(entity,now)
 
+	if entity.dynamic_data == nil or
+		entity.dynamic_data.sound == nil then
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: >" ..entity.data.name .. "< removed=" .. dump(entity.removed) .. " entity=" .. tostring(entity) .. " sound callback without dynamic data")
+		return
+	end
+
 	if entity.data.sound ~= nil and
 		entity.data.sound.random ~= nil then
 		

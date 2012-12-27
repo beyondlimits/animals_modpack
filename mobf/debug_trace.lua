@@ -77,4 +77,12 @@ dbg_mobf = {
 	mob_state_lvl1			= function () end,
 	mob_state_lvl2			= function () end,
 	mob_state_lvl3			= function () end,
+	
+	mobf_core_lvl1			= function () end,
+	mobf_core_lvl2			= function () end,
+	mobf_core_lvl3			= function () end,
+	
+	mobf_core_helper_lvl1	= function () end,
+	mobf_core_helper_lvl2	= function () end,
+	mobf_core_helper_lvl3	= function () end,
 }

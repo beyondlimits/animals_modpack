@@ -95,7 +95,13 @@ end
 function movement_gen.callback(entity)
 
 	if entity == nil then
-		print("MOBF BUG!!!: called movement gen without entity!")
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: called movement gen without entity!")
+		return
+	end
+	
+	if entity.dynamic_data == nil or
+		entity.dynamic_data.movement == nil then
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: >" ..entity.data.name .. "< removed=" .. dump(entity.removed) .. " entity=" .. tostring(entity) .. " probab movement callback")
 		return
 	end
 	
@@ -418,20 +424,27 @@ function movement_gen.fix_current_pos(entity,movement_state)
 																			1,
 																			entity)
 
-			if targetpos == nil then
+			if targetpos == nil and
+				entity.dynamic_data.movement.last_pos_in_env then
 				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way out of water, for mob at: " .. printpos(movement_state.basepos) .. " using last known good position")
 				targetpos = { x=entity.dynamic_data.movement.last_pos_in_env.x,
 									y=entity.dynamic_data.movement.last_pos_in_env.y+1,
 									z=entity.dynamic_data.movement.last_pos_in_env.z }
-			end
-			
-			minetest.log(LOGLEVEL_WARNING,"MOBF: Your mob dropt into water moving to "..
+				
+				minetest.log(LOGLEVEL_WARNING,"MOBF: Your mob dropt into water moving to "..
 						printpos(targetpos).." state: "..
 						environment.pos_is_ok(targetpos,entity))
-			entity.object:moveto(targetpos)
-			movement_state.accel_to_set.y = environment.get_default_gravity(targetpos,
+				entity.object:moveto(targetpos)
+				movement_state.accel_to_set.y = environment.get_default_gravity(targetpos,
 							entity.environment.media,
 							entity.data.movement.canfly)
+			else
+				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way out of water, for mob at: " .. printpos(movement_state.basepos) .. " drowning")
+				abort_processing = true
+				spawning.remove(entity)
+			end
+			
+
 		end
 
 		if current_state == "in_air" then
@@ -512,7 +525,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 			end
 			
 			if targetpos ~= nil then
-				minetest.log(LOGLEVEL_WARNING,"MOBF: Your mob is within solid block moving to"..
+				minetest.log(LOGLEVEL_WARNING,"MOBF: Your mob " ..entity.data.name .. " is within solid block moving to"..
 							printpos(targetpos).." state: "..
 							environment.pos_is_ok(targetpos,entity))
 					

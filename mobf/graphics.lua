@@ -57,6 +57,12 @@ end
 -------------------------------------------------------------------------------
 function graphics.update_orientation(entity,now,dtime)
 
+	if entity.dynamic_data == nil or
+		entity.dynamic_data.movement == nil then
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: >" ..entity.data.name .. "< removed=" .. dump(entity.removed) .. " entity=" .. tostring(entity) .. " graphics callback without dynamic data")
+		return
+	end
+
 	local new_orientation = 0
 
 --	if entity.dynamic_data.movement.ts_orientation_upd + 1 < now and

@@ -54,10 +54,11 @@ function spawning.remove_uninitialized(entity, staticdata)
 			entity.dynamic_data = {}
 			entity.dynamic_data.spawning = {}
 			entity.dynamic_data.spawning.spawnpoint = permanent_data.spawnpoint
-			
+
 			spawning.remove(entity)
 		end
 	else
+		dbg_mobf.spawning_lvl1("MOBF: remove uninitialized entity=" .. tostring(entity))
 		--directly remove it can't be known to spawnlist
 		entity.object:remove()
 	end	
@@ -75,7 +76,8 @@ end
 function spawning.remove(entity)
 	dbg_mobf.spawning_lvl3("MOBF: --> remove " .. printpos(entity.object:getpos()))
 	if entity ~= nil then
-		entity.dynamic_data.spawning.removed = true
+		entity.removed = true
+		dbg_mobf.spawning_lvl1("MOBF: remove entity=" .. tostring(entity))
 		entity.object:remove()
 	else
 		minetest.log(LOGLEVEL_ERROR,"Trying to delete an an non existant mob")
@@ -98,11 +100,12 @@ function spawning.init_dynamic_data(entity,now)
 
 	local data = {
 		player_spawned = false,
-		removed = false,
 		ts_dense_check = now,
 		spawnpoint = entity.object:getpos(),
 		original_spawntime = now,
 	}
+	
+	entity.removed = false
 	
 	entity.dynamic_data.spawning = data
 end
@@ -120,6 +123,14 @@ end
 --! @param now current time
 -------------------------------------------------------------------------------
 function spawning.check_population_density(entity,now)
+	
+	if entity == nil or
+		entity.dynamic_data == nil or
+		entity.dynamic_data.spawning == nil then
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!! " .. entity.data.name .. " pop dense check called for entity with missing spawn data entity=" .. tostring(entity))
+		return
+	end
+
 
 	-- don't check if mob is player spawned
 	if entity.dynamic_data.spawning.player_spawned == true then
@@ -160,11 +171,11 @@ function spawning.check_population_density(entity,now)
 										entity.data.spawning.density,
 										true)
 	if  mob_count > 3 then
-		entity.dynamic_data.spawning.removed = true
+		entity.removed = true
 		minetest.log(LOGLEVEL_NOTICE,"MOBF: Too many "..entity.data.name.." at one place dying",entity.dynamic_data.spawning.player_spawned)
 		spawning.remove(entity)
 	else
-		dbg_mobf.spawning_lvl1("Density ok only "..mob_count.." mobs around")
+		dbg_mobf.spawning_lvl3("Density ok only "..mob_count.." mobs around")
 	end
 end
 
@@ -214,8 +225,7 @@ function spawning.replace_entity(entity,name,preserve)
 	dbg_mobf.spawning_lvl2("MOBF: replace_entity 2 : removing " ..  entity.data.name)
 	
 	--unlink dynamic data (this should work but doesn't due to other bugs)
-	--entity.dynamic_data = {}
-	--entity.dynamic_data.spawning = {}
+	entity.dynamic_data = nil
 	
 	--removin is done after exiting lua!
 	spawning.remove(entity)

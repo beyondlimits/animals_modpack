@@ -62,19 +62,19 @@ end
 function mobf.init_on_step_callbacks(entity,now)
 	entity.on_step_hooks = {}
 
-	dbg_mobf.generic_lvl3("initializing " .. #mobf.on_step_callbacks ..  " on_step callbacks for " .. entity.data.name)
+	dbg_mobf.mobf_core_lvl2("MOBF: initializing " .. #mobf.on_step_callbacks ..  " on_step callbacks for " .. entity.data.name .. " entity=" .. tostring(entity))
 	for i = 1, #mobf.on_step_callbacks , 1 do
 		if mobf.on_step_callbacks[i].configcheck(entity) then
-			dbg_mobf.generic_lvl3("enabling callback " .. mobf.on_step_callbacks[i].name)
+			dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") enabling callback " .. mobf.on_step_callbacks[i].name)
 			table.insert(entity.on_step_hooks,mobf.on_step_callbacks[i].handler)
 			if type(mobf.on_step_callbacks[i].init) == "function" then
-				dbg_mobf.generic_lvl3("	executing init function for " .. mobf.on_step_callbacks[i].name)
+				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") executing init function for " .. mobf.on_step_callbacks[i].name)
 				mobf.on_step_callbacks[i].init(entity,now)
 			else
-				dbg_mobf.generic_lvl3("No init function defined")
+				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") no init function defined")
 			end
 		else
-			dbg_mobf.generic_lvl3("callback " .. mobf.on_step_callbacks[i].name .. " disabled due to config check")
+			dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") callback " .. mobf.on_step_callbacks[i].name .. " disabled due to config check")
 		end
 	end
 
@@ -116,21 +116,21 @@ end
 function mobf.init_on_punch_callbacks(entity,now)
 	entity.on_punch_hooks = {}
 
-	dbg_mobf.generic_lvl3("initializing " .. #mobf.on_punch_callbacks ..  " on_punch callbacks for " .. entity.data.name)
+	dbg_mobf.mobf_core_lvl2("MOBF: initializing " .. #mobf.on_punch_callbacks ..  " on_punch callbacks for " .. entity.data.name .. " entity=" .. tostring(entity))
 	for i = 1, #mobf.on_punch_callbacks , 1 do
 		if mobf.on_punch_callbacks[i].configcheck(entity) and
 			type(mobf.on_punch_callbacks[i].handler) == "function" then
-			dbg_mobf.generic_lvl3("enabling callback " .. mobf.on_punch_callbacks[i].name)
+			dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") enabling callback " .. mobf.on_punch_callbacks[i].name)
 			table.insert(entity.on_punch_hooks,mobf.on_punch_callbacks[i].handler)
 			
 			if type(mobf.on_punch_callbacks[i].init) == "function" then
-				dbg_mobf.generic_lvl3("	executing init function for " .. mobf.on_punch_callbacks[i].name)
+				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") executing init function for " .. mobf.on_punch_callbacks[i].name)
 				mobf.on_punch_callbacks[i].init(entity,now)
 			else
-				dbg_mobf.generic_lvl3("	no init function defined")
+				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") no init function defined")
 			end
 		else
-			dbg_mobf.generic_lvl3("callback " .. mobf.on_punch_callbacks[i].name .. " disabled due to config check")
+			dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") callback " .. mobf.on_punch_callbacks[i].name .. " disabled due to config check")
 		end
 	end
 end
@@ -148,7 +148,7 @@ function mobf.get_basepos(entity)
 	local pos = entity.object:getpos()
 	local nodeatpos = minetest.env:get_node(pos)
 	
-	dbg_mobf.generic_lvl2("MOBF: " .. entity.data.name .. " Center Position: " .. printpos(pos) .. " is: " .. nodeatpos.name)
+	dbg_mobf.mobf_core_helper_lvl3("MOBF: " .. entity.data.name .. " Center Position: " .. printpos(pos) .. " is: " .. nodeatpos.name)
 
 	-- if visual height is more than one block the center of base block is 
 	-- below the entities center
@@ -161,12 +161,12 @@ function mobf.get_basepos(entity)
 	else
 		if (entity.data.graphics_3d.collisionbox[2] < -0.5) then
 			pos.y = pos.y + (entity.data.graphics_3d.collisionbox[2] + 0.5)
-			dbg_mobf.generic_lvl2("MOBF: collision box lower end: " .. entity.data.graphics_3d.collisionbox[2])
+			dbg_mobf.mobf_core_helper_lvl3("MOBF: collision box lower end: " .. entity.data.graphics_3d.collisionbox[2])
 			
 		end
 	end
 	nodeatpos = minetest.env:get_node(pos)
-	dbg_mobf.generic_lvl2("MOBF: Base Position: " .. printpos(pos) .. " is: " .. nodeatpos.name)
+	dbg_mobf.mobf_core_helper_lvl3("MOBF: Base Position: " .. printpos(pos) .. " is: " .. nodeatpos.name)
 
 	return pos
 end
@@ -253,11 +253,11 @@ function mobf.activate_handler(self,staticdata)
 	if self.dynamic_data.state.current ~= "default" and 
 		current_state.movgen ~= nil then
 		--initialize this state move gen
-		print("setting movegen to: " .. current_state.movgen)
+		dbg_mobf.mobf_core_lvl1("MOBF: setting movegen to: " .. current_state.movgen)
 		self.dynamic_data.current_movement_gen = getMovementGen(current_state.movgen)
 		
 		if current_state.animation ~= nil then
-			print("setting animation to: " .. current_state.animation)
+			dbg_mobf.mobf_core_lvl1("MOBF: setting animation to: " .. current_state.animation)
 			graphics.set_animation(self,current_state.animation)
 		end
 	else
@@ -357,7 +357,7 @@ end
 --! @param mob data to use
 -------------------------------------------------------------------------------
 function mobf.register_entity(name, graphics, mob)
-	print("registering new entity: " .. name)
+	dbg_mobf.mobf_core_lvl1("MOBF: registering new entity: " .. name)
 	minetest.register_entity(name,
 			 {
 				physical        = true,
@@ -380,6 +380,11 @@ function mobf.register_entity(name, graphics, mob)
 			on_step = function(self, dtime)
 			
 				local starttime = mobf_get_time_ms()
+				
+				if self.removed ~= false then
+					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: on_step: " .. self.data.name .. " on_step for removed entity????")
+					return
+				end
 			
 				if (self.dynamic_data.initialized == false) then
 					if entity_at_loaded_pos(self.object:getpos()) then
@@ -414,6 +419,7 @@ function mobf.register_entity(name, graphics, mob)
 				for i = 1, #self.on_step_hooks, 1 do
 					--check return value if on_step hook tells us to stop any other processing
 					if self.on_step_hooks[i](self,now,self.current_dtime) == false then
+						dbg_mobf.mobf_core_lvl1("MOBF: on_step: " .. self.data.name .. " aborting callback processing entity=" .. tostring(self))
 						break
 					end
 					mobf_warn_long_fct(starttime,"callback nr " .. i)
@@ -470,10 +476,6 @@ function mobf.register_entity(name, graphics, mob)
 				
 		--prepare permanent data
 			get_staticdata = function(self)
-				if self.dynamic_data.spawning.removed then
-					print("tring to save removed entity")
-					return ""
-				end
 				return mobf_serialize_permanent_entity_data(self)
 				end,
 

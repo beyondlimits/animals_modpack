@@ -135,7 +135,8 @@ end
 --! @return string containing entitys permanent data
 -------------------------------------------------------------------------------
 function mobf_serialize_permanent_entity_data(entity)
-	if entity.dynamic_data ~= nil and
+	if entity.removed == false and
+		entity.dynamic_data ~= nil and
 		entity.dynamic_data.spawning ~= nil then
 		
 		local playerspawned = "false"
@@ -161,11 +162,6 @@ function mobf_serialize_permanent_entity_data(entity)
 			minetest.log(LOGLEVEL_WARNING, "MOBF: deactivating entity without spawntime setting current time")
 		end
 		
-		if entity.dynamic_data.spawning.spawnpoint == nil then
-			entity.dynamic_data.spawning.spawnpoint = {x=0,y=0,z=0}
-			minetest.log(LOGLEVEL_WARNING, "MOBF: deactivating entity " .. dump(entity.data.name) .. " without spawnpoint setting 0,0,0")
-		end
-		
 		local serialized = playerspawned ..
 		";" ..entity.dynamic_data.spawning.spawnpoint.x ..
 		";" ..entity.dynamic_data.spawning.spawnpoint.y ..
@@ -187,7 +183,7 @@ function mobf_serialize_permanent_entity_data(entity)
 		--print("DEBUG: serialized -> " .. serialized)
 		return serialized
 	else
-		minetest.log(LOGLEVEL_ERROR,"MOBF: No spawning information available on saving mob")
+		minetest.log(LOGLEVEL_ERROR,"MOBF: >" .. dump(entity.data.name) .. "< removed=" ..dump(entity.removed) .. " entity=" .. tostring(entity) .. " No spawning information available on saving mob or mob already deleted")
 	end
 end
 
