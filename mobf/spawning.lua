@@ -213,9 +213,9 @@ function spawning.replace_entity(entity,name,preserve)
 	--delete current mob
 	dbg_mobf.spawning_lvl2("MOBF: replace_entity 2 : removing " ..  entity.data.name)
 	
-	--unlink dynamic data
-	entity.dynamic_data = {}
-	entity.dynamic_data.spawning = {}
+	--unlink dynamic data (this should work but doesn't due to other bugs)
+	--entity.dynamic_data = {}
+	--entity.dynamic_data.spawning = {}
 	
 	--removin is done after exiting lua!
 	spawning.remove(entity)

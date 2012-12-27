@@ -1,4 +1,4 @@
-local version = "0.0.14"
+local version = "0.0.15"
 
 
 local cow_groups = {
@@ -29,7 +29,7 @@ cow_prototype = {
 					envid = "meadow"
 				},				
 		movement =  {
-					default_gen="probab_mov_gen",
+					default_gen="none",
 					min_accel=0.05,
 					max_accel=0.1,
 					max_speed=0.3,
@@ -56,10 +56,11 @@ cow_prototype = {
 					visible_height = 2,
 					},
 		graphics_3d = {
-					visual = "wielditem",
-					textures = {"animal_cow:box_cow"},
+					visual = "mesh",
+					mesh = "cow.x",
+					textures = {"cow_mesh.png"},
 					collisionbox = selectionbox_cow,
-					visual_size= {x=2,y=2,z=2},
+					visual_size= {x=1,y=1,z=1},
 					},
 		combat         = nil,
 	
@@ -77,7 +78,37 @@ cow_prototype = {
 								gain = 1,
 								max_hear_distance = 10,
 								},
-					},	
+					},
+		states = {
+				{ 
+				name = "walking",
+				movgen = "probab_mov_gen",
+				typical_state_time = 180,
+				chance = 0.50,
+				animation = "walk",
+				},
+				{
+				name = "eating",
+				movgen = "none",
+				typical_state_time = 45,
+				chance = 0.25,
+				animation = "eat",
+				},
+			},
+		animation = {
+				walk = {
+					start_frame = 170,
+					end_frame   = 250,
+					},
+				stand = {
+					start_frame = 0,
+					end_frame   = 80,
+					},
+				eat = {
+					start_frame = 81,
+					end_frame   = 169,
+					},
+			}
 		}
 		
 steer_prototype = {   
@@ -115,12 +146,13 @@ steer_prototype = {
                     sprite_div = {x=6,y=1},
                     visible_height = 2,
                     },
-        graphics_3d = {
-                    visual = "wielditem",
-                    textures = {"animal_cow:box_steer"},
-                    collisionbox = selectionbox_steer,
-                    visual_size= {x=2.2,y=2.2,z=2.2},
-                    },
+		graphics_3d = {
+					visual = "mesh",
+					mesh = "steer.x",
+					textures = {"steer_mesh.png"},
+					collisionbox = selectionbox_cow,
+					visual_size= {x=1,y=1,z=1},
+					},
         combat         = nil,
     
         spawning = {
@@ -137,7 +169,37 @@ steer_prototype = {
                                 gain = 1,
                                 max_hear_distance = 10,
                                 },
-                    },  
+                    },
+        states = {
+				{ 
+				name = "walking",
+				movgen = "probab_mov_gen",
+				typical_state_time = 180,
+				chance = 0.50,
+				animation = "walk",
+				},
+				{
+				name = "eating",
+				movgen = "none",
+				typical_state_time = 45,
+				chance = 0.25,
+				animation = "eat",
+				},
+			},
+		animation = {
+				walk = {
+					start_frame = 170,
+					end_frame   = 250,
+					},
+				stand = {
+					start_frame = 0,
+					end_frame   = 80,
+					},
+				eat = {
+					start_frame = 81,
+					end_frame   = 169,
+					},
+			}
         }
         
 baby_calf_f_prototype = {   

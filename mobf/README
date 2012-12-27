@@ -134,6 +134,11 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.9.2
+-added workaround for lost dynamic data on saving of permanent data
+-don't drown mobs but move to last known good position
+-added animated 3d mesh cow and steer
+
 Changes 1.9.1
 -increased spawn rates of wolf
 -drop correct meat

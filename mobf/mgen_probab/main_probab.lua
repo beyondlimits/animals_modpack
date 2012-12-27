@@ -392,6 +392,12 @@ function movement_gen.fix_current_pos(entity,movement_state)
 									z=0 }
 
 	local abort_processing = false
+	
+	if current_state == "ok" or
+		current_state == "possible_surface" then
+		
+		entity.dynamic_data.movement.last_pos_in_env = movement_state.basepos
+	end
 
 	--states ok drop and wrong_surface don't require an imediate action
 	if current_state ~= "ok" and
@@ -412,20 +418,20 @@ function movement_gen.fix_current_pos(entity,movement_state)
 																			1,
 																			entity)
 
-			if targetpos ~= nil then
-				minetest.log(LOGLEVEL_WARNING,"MOBF: Your mob dropt into water moving to "..
+			if targetpos == nil then
+				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way out of water, for mob at: " .. printpos(movement_state.basepos) .. " using last known good position")
+				targetpos = { x=entity.dynamic_data.movement.last_pos_in_env.x,
+									y=entity.dynamic_data.movement.last_pos_in_env.y+1,
+									z=entity.dynamic_data.movement.last_pos_in_env.z }
+			end
+			
+			minetest.log(LOGLEVEL_WARNING,"MOBF: Your mob dropt into water moving to "..
 						printpos(targetpos).." state: "..
 						environment.pos_is_ok(targetpos,entity))
-				
-				entity.object:moveto(targetpos)
-				movement_state.accel_to_set.y = environment.get_default_gravity(targetpos,
-								entity.environment.media,
-								entity.data.movement.canfly)
-			else
-				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way out of water, for mob at: " .. printpos(movement_state.basepos) .. " drowning mob")
-				abort_processing = true
-				spawning.remove(entity)
-			end
+			entity.object:moveto(targetpos)
+			movement_state.accel_to_set.y = environment.get_default_gravity(targetpos,
+							entity.environment.media,
+							entity.data.movement.canfly)
 		end
 
 		if current_state == "in_air" then

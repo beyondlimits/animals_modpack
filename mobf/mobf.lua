@@ -412,7 +412,10 @@ function mobf.register_entity(name, graphics, mob)
 				
 				--dynamic modules
 				for i = 1, #self.on_step_hooks, 1 do
-					self.on_step_hooks[i](self,now,self.current_dtime)
+					--check return value if on_step hook tells us to stop any other processing
+					if self.on_step_hooks[i](self,now,self.current_dtime) == false then
+						break
+					end
 					mobf_warn_long_fct(starttime,"callback nr " .. i)
 				end
 				
@@ -467,6 +470,10 @@ function mobf.register_entity(name, graphics, mob)
 				
 		--prepare permanent data
 			get_staticdata = function(self)
+				if self.dynamic_data.spawning.removed then
+					print("tring to save removed entity")
+					return ""
+				end
 				return mobf_serialize_permanent_entity_data(self)
 				end,
 

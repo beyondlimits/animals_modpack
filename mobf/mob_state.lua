@@ -147,13 +147,13 @@ function mob_state.callback(entity,now,dstep)
 		entity.dynamic_data.current_movement_gen = getMovementGen(entity.data.movement.default_gen)
 		entity.dynamic_data.current_movement_gen.init_dynamic_data(entity,mobf_get_current_time())
 		entity = spawning.replace_entity(entity,entity.data.modname .. ":"..entity.data.name,true)
-		return 
+		return true
 	end
 	--abort state change if current state is locked
 	if entity.dynamic_data.state.locked or 
 		entity.dynamic_data.state.enabled == false then
 		dbg_mobf.mob_state_lvl3("MOBF: " .. entity.data.name .. " state locked or no custom states definded ")
-		return
+		return true
 	end
 	
 	entity.dynamic_data.state.time_to_next_change = entity.dynamic_data.state.time_to_next_change -dstep
@@ -192,16 +192,22 @@ function mob_state.callback(entity,now,dstep)
 			end
 			
 			if math.random() < current_chance then
-				mob_state.change_state(entity,state_table[rand_state])
-				return
+				if mob_state.change_state(entity,state_table[rand_state]) ~= nil then
+					return false
+				end
 			end
 		end
 		
 		--switch to default state
-		mob_state.change_state(entity,nil)
+		if mob_state.change_state(entity,nil) ~= nil then
+			return false
+		end
 	else
 		dbg_mobf.mob_state_lvl3("MOBF: " .. entity.data.name .. " is not ready for state change ")
+		return true
 	end
+	
+	return true
 end
 
 -------------------------------------------------------------------------------
