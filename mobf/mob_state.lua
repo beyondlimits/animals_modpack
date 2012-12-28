@@ -424,3 +424,54 @@ function mob_state.getTimeToNextState(typical_state_time)
 		return 2
 	end
 end
+
+-------------------------------------------------------------------------------
+-- name: prepare_states(mob)
+--
+--! @brief register a mob within mob framework
+--! @ingroup framework_mob
+--
+--! @param mob a mob declaration
+-------------------------------------------------------------------------------
+function mob_state.prepare_states(mob)
+	local custom_combat_state_defined = false
+
+	--add graphics for any mob state
+	if mob.states ~= nil then
+		for s = 1, #mob.states , 1 do
+			graphic_to_set = mobf.prepare_graphic_info(mob.states[s].graphics,
+										mob.states[s].graphics_3d,
+										mob.modname,"_"..mob.name .. "_" .. mob.states[s].name)
+	
+			if graphic_to_set ~= nil then
+				mobf.register_entity(":" .. mob_state.get_entity_name(mob,mob.states[s]), graphic_to_set, mob)
+			end
+			
+			if mob.states[s].name == "combat" then
+				custom_combat_state_defined = true
+			end
+			
+			if mob.states[s].name == "default" then
+				custom_generic_state_defined = true
+			end
+			
+
+		end
+	else
+		mob.states = {}
+	end
+	
+	--add a default combat state if no custom state is defined
+	if mob.combat ~= nil then
+		if custom_combat_state_defined == false then
+				table.insert(mob.states,
+						{
+						name = "combat",
+						custom_preconhandler = nil,
+						movgen = "follow_mov_gen",
+						typical_state_time = -1,
+						chance = 0,
+						})
+		end
+	end
+end

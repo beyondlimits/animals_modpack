@@ -1,4 +1,4 @@
-local version = "0.0.15"
+local version = "0.0.16"
 
 local sheep_groups = {
 						sheerable=1,
@@ -79,7 +79,7 @@ sheep_prototype = {
 								max_hear_distance = 10,
 								},
 					harvest = {
-								name="harvest",
+								name="animal_sheep_harvest",
 								gain = 0.8,
 								max_hear_distance = 5
 								},

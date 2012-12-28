@@ -1,4 +1,4 @@
-local version = "0.0.7"
+local version = "0.0.8"
 
 local creeper_groups = {
                         not_in_creative_inventory=1
@@ -6,9 +6,6 @@ local creeper_groups = {
 local selectionbox_creeper = {-1, -1, -1, 1, 1, 1}
 
 local modpath = minetest.get_modpath("animal_creeper")
-
---include debug trace functions
-dofile (modpath .. "/model.lua")
 
 creeper_prototype = {
 		name="creeper",
@@ -41,11 +38,12 @@ creeper_prototype = {
 					visible_height = 1.5,
 					},
 		graphics_3d = {
-			visual = "wielditem",
-			textures = {"animal_creeper:box_creeper"},
-			collisionbox = selectionbox_creeper,
-			visual_size= {x=1.33,y=1.33,z=1.33},
-			},
+					visual = "mesh",
+					mesh = "boombomb.x",
+					textures = {"boombomb_mesh.png"},
+					collisionbox = selectionbox_creeper,
+					visual_size= {x=1,y=1,z=1},
+					},
 		combat = {
 					angryness=0.95,
 					starts_attack=true,
@@ -72,7 +70,7 @@ creeper_prototype = {
 					},
 		sound = {
 					random = {
-								name="random_1",
+								name="animal_creeper_random_1",
 								min_delta = 10,
 								chance = 0.5,
 								gain = 1,

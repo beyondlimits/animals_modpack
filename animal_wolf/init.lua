@@ -1,4 +1,4 @@
-local version = "0.0.5"
+local version = "0.0.6"
 
 local modpath = minetest.get_modpath("animal_wolf")
 
@@ -88,10 +88,13 @@ tamed_wolf_prototype = {
 						end
 					end,
 					custom_on_activate_handler = function(entity)
-						print("ANIMAL Wolf: custom on activate handler called")
+						print("ANIMAL tamed wolf: custom on activate handler called")
 						if (entity.dynamic_data.spawning.spawner ~= nil) then
-							print("ANIMAL WOLF: setting target to: " .. entity.dynamic_data.spawning.spawner )
+							print("ANIMAL tamed wolf: setting target to: " .. entity.dynamic_data.spawning.spawner )
 							entity.dynamic_data.movement.target = minetest.env:get_player_by_name(entity.dynamic_data.spawning.spawner)
+						else
+							print("ANIMAL tamed wolf: tamed wolf without owner removing")
+							spawning.remove(entity)
 						end
 					end
 				},

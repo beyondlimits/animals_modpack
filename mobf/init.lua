@@ -49,7 +49,7 @@ dofile (mobf_modpath .. "/random_drop.lua")
 dofile (mobf_modpath .. "/sound.lua")
 dofile (mobf_modpath .. "/permanent_data.lua")
 dofile (mobf_modpath .. "/mobf.lua")
-dofile (mobf_modpath .. "/management_functions.lua")
+dofile (mobf_modpath .. "/api.lua")
 dofile (mobf_modpath .. "/debug.lua")
 dofile (mobf_modpath .. "/mob_state.lua")
 
@@ -60,9 +60,10 @@ dofile (mobf_modpath .. "/spawning.lua")
 dofile (mobf_modpath .. "/mgen_probab/main_probab.lua")
 dofile (mobf_modpath .. "/mgen_follow/main_follow.lua")
 dofile (mobf_modpath .. "/mgen_rasterized/mgen_raster.lua")
+dofile (mobf_modpath .. "/mgen_jordan4ibanez/mgen_jordan4ibanez.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "1.9.3"
+mobf_version = "1.9.4"
 
 LOGLEVEL_INFO     = "verbose"
 LOGLEVEL_NOTICE   = "info"

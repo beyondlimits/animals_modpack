@@ -1,4 +1,4 @@
-local version = "0.0.10"
+local version = "0.0.11"
 
 local big_red_groups = {
                         not_in_creative_inventory=1
@@ -78,6 +78,15 @@ big_red_prototype = {
 					algorithm="shadows",
 					height=4
 					},
+		sound = {
+			random = {
+					name="animal_big_red_random_1",
+					min_delta = 30,
+					chance = 0.5,
+					gain = 1,
+					max_hear_distance = 5,
+					},
+			}
 		}
 
 

@@ -293,7 +293,7 @@ function movement_gen.init_dynamic_data(entity,now)
 			ts_random_jump		= now,
 			ts_orientation_upd  = now,
 			mpattern            = mobf_movement_patterns[entity.data.movement.pattern],
-			moving              = true,
+			orientation_fix_needed              = true,
 			}
 	
 	entity.dynamic_data.movement = data

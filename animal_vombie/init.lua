@@ -1,4 +1,4 @@
-local version = "0.0.9"
+local version = "0.0.10"
 
 local vombie_groups = {
 						not_in_creative_inventory=1
@@ -128,14 +128,14 @@ vombie_prototype = {
 					},
 		sound = {
 					random = {
-								name="random_1",
+								name="animal_vombie_random_1",
 								min_delta = 10,
 								chance = 0.5,
-								gain = 0.5,
+								gain = 0.05,
 								max_hear_distance = 5,
 								},
 					sun_damage = {
-								name="sun_damage",
+								name="animal_vombie_sun_damage",
 								gain = 0.25,
 								max_hear_distance = 7,
 								},

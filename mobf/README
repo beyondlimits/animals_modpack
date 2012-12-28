@@ -134,7 +134,12 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
-Changes 1.9.2
+Changes 1.9.4
+-fixed sound name collisions
+-fixed stereo->mono for some sounds
+-added jordan4ibanez movement generator
+
+Changes 1.9.3
 -added lots of security checks to callback handlers
 -added new tracing facilitys mobf_core and mobf_core_helper
 -fixed additional bugs in entity replacement code of state changer

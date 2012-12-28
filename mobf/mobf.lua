@@ -486,3 +486,52 @@ function mobf.register_entity(name, graphics, mob)
 			}
 		)
 end
+
+-------------------------------------------------------------------------------
+-- name: mobf_register_mob_item(mob)
+--
+--! @brief add mob item for catchable mobs
+--! @ingroup framework_int
+--
+--! @param name name of mob
+--! @param modname name of mod mob is defined in
+--! @param description description to use for mob
+-------------------------------------------------------------------------------
+function mobf.register_mob_item(name,modname,description)
+	minetest.register_craftitem(modname..":"..name, {
+			description = description,
+			image = modname.."_"..name.."_item.png",
+			on_place = function(item, placer, pointed_thing)
+				if pointed_thing.type == "node" then
+					local pos = pointed_thing.above
+			
+					local newobject = minetest.env:add_entity(pos,modname..":"..name)
+
+					local newentity = mobf_find_entity(newobject)
+
+					local newpos = newentity.object:getpos()
+
+					if newentity ~= nil then
+					
+						if newentity.dynamic_data ~= nil then
+							-- this can happen if mob is spawned on incorrect place 
+							newentity.dynamic_data.spawning.player_spawned = true
+							
+							if placer:is_player(placer) then
+								minetest.log(LOGLEVEL_INFO,"MOBF: mob placed by " .. placer:get_player_name(placer))
+								newentity.dynamic_data.spawning.spawner = placer:get_player_name(placer)
+							end
+							
+							if (newentity.data.generic.custom_on_place_handler ~= nil) then
+								newentity.data.generic.custom_on_place_handler(newentity, placer, pointed_thing)
+							end
+						end
+						item:take_item()
+					else
+						minetest.log(LOGLEVEL_ERROR,"MOBF: Bug no "..mob.name.." hasn't been created!")
+					end
+					return item
+					end
+				end
+		})
+end

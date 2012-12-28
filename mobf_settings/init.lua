@@ -1,4 +1,4 @@
-mobf_settings_version = "0.0.6"
+mobf_settings_version = "0.0.7"
 
 if type(inventory_plus.register_button) == "function" then
 	minetest.register_on_joinplayer(function(player)
@@ -65,20 +65,20 @@ end
 function contains(cur_table,element)
 
     if cur_table == nil then
-        print("looking in empty table")
+        --print("looking in empty table")
         return false
     end
     
-    print("looking for " .. dump(element) .. " in " .. dump(cur_table))
+    --print("looking for " .. dump(element) .. " in " .. dump(cur_table))
     
     for i,v in ipairs(cur_table) do
         if v == element then
-            print("found: " .. element .. " in table")
+            --print("found: " .. element .. " in table")
             return true
         end
     end
     
-    print("didn't find " .. element)
+    --print("didn't find " .. element)
     return false
 end
 
@@ -169,6 +169,14 @@ function get_known_animals_form(page)
         else
             retval = retval .. "button[0.5,6.75;6,0.5;mobf_log_bug_warnings;Bug warnings are not logged]"
         end
+        
+        
+        if minetest.setting_getbool("disable_vombie_3d_burn_animation") then
+            retval = retval .. "button[0.5,7.5;6,0.5;enable_vombie_3d_burn_animation;Vombie 3D burn animation is disabled]"
+        else
+            retval = retval .. "button[0.5,7.5;6,0.5;disable_vombie_3d_burn_animation;Vombie 3D burn animation is enabled]"
+        end
+        
     
         return retval
     end
@@ -261,7 +269,7 @@ end
 
 -- register_on_player_receive_fields
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-    print("Fields: " .. dump(fields))
+    --print("Fields: " .. dump(fields))
     if fields.mobf or
         fields.mobf_list_page1 then
         inventory_plus.set_inventory_formspec(player, get_formspec(player,"mobf_list_page1"))
@@ -328,6 +336,14 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
         minetest.setting_set("mobf_log_bug_warnings","false")
     end
     
+    if fields.enable_vombie_3d_burn_animation then
+        minetest.setting_set("disable_vombie_3d_burn_animation","false")
+    end
+    
+    if fields.disable_vombie_3d_burn_animation then
+        minetest.setting_set("disable_vombie_3d_burn_animation","true")
+    end
+    
     if fields.mobf_restart_required or
         fields.mobf_enable_spawning or
         fields.mobf_disable_spawning or
@@ -338,7 +354,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
         fields.mobf_delete_disabled_mobs_from_map or
         fields.mobf_dont_delete_disabled_mobs_from_map or
         fields.mobf_log_bug_warnings or
-        fields.mobf_dont_log_bug_warnings
+        fields.mobf_dont_log_bug_warnings or
+        fields.enable_vombie_3d_burn_animation or
+        fields.disable_vombie_3d_burn_animation
         then
         inventory_plus.set_inventory_formspec(player, get_formspec(player,"mobf_restart_required"))
         return true
