@@ -20,9 +20,6 @@
 --! @brief movement pattern for mobs wandering around randomly
 local stop_and_go_prototype = 	{
 		name                            ="stop_and_go",
-		start_movement					=0.25,
-		stop_movement					=0.04,
-		start_stop_delta_time_factor	=0.1,
 		jump_up							=0.4,
 	
 		random_jump_chance              =0,

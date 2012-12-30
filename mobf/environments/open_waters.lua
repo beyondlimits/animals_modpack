@@ -26,7 +26,7 @@ env_open_waters = {
 			surfaces = nil,
 			--ground is first node above/below not beeing of media type
 			max_height_above_ground		= -4,
-			min_height_above_ground     = -30		
+			min_height_above_ground     = -30
 		}
 --!@}
 

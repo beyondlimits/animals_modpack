@@ -1,4 +1,4 @@
-local version = "0.0.6"
+local version = "0.0.7"
 
 local selectionbox_clownfish = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
 
@@ -60,8 +60,9 @@ clownfish_prototype = {
 		spawning = {		
 					rate=0.02,
 					density=350,
-					algorithm="in_shallow_water",
-					height=-1
+					algorithm="in_shallow_water_spawner",
+					height=-1,
+					respawndelay = 60,
 					},
 		}
 

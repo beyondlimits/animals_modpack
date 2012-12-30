@@ -206,7 +206,8 @@ function environment.get_absolute_min_max_pos(env,pos)
 	
 	local min_y = env.min_height_above_ground
 	local max_y = env.max_height_above_ground
-
+	
+	
 	--a fully generic check isn't possible here so we need to use media
 	--specific ways ... it's ugly but works
 	if node.name == "air" then
@@ -221,6 +222,7 @@ function environment.get_absolute_min_max_pos(env,pos)
 	
 	if node.name == "default:lava" or 
 		node.name == "default:lava_flowing" then
+		--TODO e.g. lava fish
 		--not implemented by now
 	end
 
@@ -323,13 +325,19 @@ function environment.pos_is_ok(pos,entity)
 
 	local min_ground_distance   = 0
 	local max_ground_distance   = 0
+	
+	if entity.environment.max_height_above_ground ~= nil then
+		max_ground_distance = entity.environment.max_height_above_ground
+	end 
+	
+	if entity.environment.min_height_above_ground ~= nil then
+		min_ground_distance = entity.environment.min_height_above_ground
+	end
 
 	if entity.data.movement.canfly == nil or
 		entity.data.movement.canfly == false then
 		max_ground_distance = 1	
 	end
-	
-
 
 	dbg_mobf.environment_lvl1("Checking pos "..printpos(pos))
 
@@ -344,6 +352,8 @@ function environment.pos_is_ok(pos,entity)
 		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking position with invalid node")
 		return "invalid"
 	end
+	
+	local ground_distance = mobf_ground_distance(pos,entity.environment.media)
 
 	if environment.is_media_element(node.name,entity.environment.media) == true then
 
@@ -359,14 +369,21 @@ function environment.pos_is_ok(pos,entity)
 					return "above_water"
 				end
 
-				local ground_distance = mobf_ground_distance(pos)
-
 				if ground_distance > max_ground_distance then
 					return "drop"
 				else
 					return environment.checksurface(pos,entity.environment.surfaces)
 				end
 			else
+				local miny,maxy = environment.get_absolute_min_max_pos(entity.environment,pos)
+				if pos.y < miny then
+					return "below_limit"
+				end
+				
+				if pos.y > maxy then
+					return "above_limit"
+				end
+				
 				return environment.checksurface(pos,entity.environment.surfaces) 
 			end
 	end

@@ -81,15 +81,7 @@ function mobf_spawn_in_air1(mob_name,mob_transform,spawning_data,environment)
 
                     if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
 
-						local newobject = minetest.env:add_entity(pos_spawn,mob_name)
-
-						local newentity = mobf_find_entity(newobject)
-
-						if newentity == nil then
-							minetest.log(LOGLEVEL_ERROR,"MOBF: Bug!!! no "..mob_name.." has been created!")
-						end
-
-						minetest.log(LOGLEVEL_INFO, "MOBF: Spawning "..mob_name.." in air "..printpos(pos_spawn))
+						spawning.spawn_and_check(mob_name,"__default",pos_spawn,"in_air1")
 					end
 				end
 				mobf_warn_long_fct(starttime,"mobf_spawn_in_air1")
@@ -97,6 +89,89 @@ function mobf_spawn_in_air1(mob_name,mob_transform,spawning_data,environment)
 		})
 end
 
+-------------------------------------------------------------------------------
+-- name: mobf_spawn_in_air1_spawner(mob_name,mob_transform,spawning_data,environment)
+--
+--! @brief a spawner based spawn spawn algorithm
+--
+--! @param mob_name name of mob
+--! @param mob_transform secondary name of mob
+--! @param spawning_data spawning configuration
+--! @param environment environment of mob
+-------------------------------------------------------------------------------
+function mobf_spawn_in_air1_spawner(mob_name,mob_transform,spawning_data,environment)
+	
+	spawning.register_spawner_entity(mob_name,mob_transform,spawning_data,environment,
+		function(self)
+			local pos = self.object:getpos()
+			local good = true
+			
+			dbg_mobf.spawning_lvl3("MOBF: " .. dump(self.spawner_mob_env))
+			
+			--check if own position is good
+			for x=pos.x-1,pos.x+1,1 do
+			for y=pos.y-1,pos.y+1,1 do
+			for z=pos.z-1,pos.z+1,1 do
+			
+				local node_to_check = minetest.env:get_node({x=x,y=y,z=z})
+				
+				if node_to_check == nil then
+					good = false
+				else
+					dbg_mobf.spawning_lvl3("MOBF: checking " .. node_to_check.name)
+					if not mobf_contains(self.spawner_mob_env.media,node_to_check.name) then
+						good = false
+					end
+				end
+			end
+			end
+			end
+			
+			if not good then
+				dbg_mobf.spawning_lvl2("MOBF: not spawning, spawner for " .. self.spawner_mob_name .. " somehow got to bad place")
+				--TODO try to move spawner to better place
+				
+				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
+				return
+			end
+			
+
+			if mobf_mob_around(self.spawner_mob_name,
+							   self.spawner_mob_transform,
+							   pos,
+							   self.spawner_mob_spawndata.density,true) == 0 then
+
+				spawning.spawn_and_check(self.spawner_mob_name,"__default",pos,"in_air1_spawner_ent")
+				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
+			else
+				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
+				dbg_mobf.spawning_lvl2("MOBF: not spawning " .. self.spawner_mob_name .. " there's a mob around")
+			end
+		end)
+		
+	--add mob spawner on map generation
+	minetest.register_on_generated(function(minp, maxp, seed)
+	
+		spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,
+			function(name,pos,min_y,max_y)
+				dbg_mobf.spawning_lvl3("MOBF: trying to create a spawner for " .. name .. " at " ..printpos(pos))
+				local surface = mobf_get_surface(pos.x,pos.z,min_y,max_y)
+				
+				if surface then
+					pos.y=surface + 8 + math.random(0,5)
+					
+					if mobf_air_above(pos,10) then
+						spawning.spawn_and_check(name,"_spawner",pos,"in_air1_spawner")
+						return true
+					end
+				end
+				return false
+			end)
+    end) --register mapgen
+
+end
+
 --!@}
 
 spawning.register_spawn_algorithm("in_air1", mobf_spawn_in_air1)
+spawning.register_spawn_algorithm("in_air1_spawner", mobf_spawn_in_air1_spawner,spawning.register_cleanup_spawner)

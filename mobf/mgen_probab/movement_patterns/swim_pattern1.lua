@@ -20,15 +20,12 @@
 --! @brief movement pattern for mobs swimming slow
 local swim_pattern1_prototype = 	{
 		name                            ="swim_pattern1",
-		start_movement					=1,
-		stop_movement					=0,
-		start_stop_delta_time_factor	=0,      
-		jump_up							=0,
+		jump_up                         =0,
 	
 		random_jump_chance              =0.2,
 		random_jump_initial_speed       =0,
 		random_jump_delay               =10,
-		random_acceleration_change      =0.3,
+		random_acceleration_change      =0.5,
 
 --
 --      --run towards player or run away?  1 <-> -1

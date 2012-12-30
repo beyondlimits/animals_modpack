@@ -261,7 +261,7 @@ function fighting.restore_previous_state(entity,now)
 			newentity = mob_state.change_state(entity,backup.current_state)
 		else
 			minetest.log(LOGLEVEL_WARNING,"MOBF: unable to restore previous state switching to default")
-			newentity = mob_state.change_state(entity,nil)
+			newentity = mob_state.change_state(entity,mob_state.get_state_by_name(entity,"default"))
 		end
 			
 			
@@ -783,9 +783,9 @@ function fighting.sun_damage_handler(entity,now)
 			dbg_mobf.fighting_lvl1("MOBF: " .. entity.data.name .. 
 										" health at start:" .. entity.object:get_hp())
 			
-			graphics.set_draw_mode(entity,"burning")							
+			graphics.set_animation(entity,"burning")
 				
-			if entity.dynamic_data.combat.ts_last_sun_damage < now then
+			if entity.dynamic_data.combat.ts_last_sun_damage +1 < now then
 				local damage = (1 + math.floor(entity.data.generic.base_health/15))				
 				dbg_mobf.fighting_lvl1("Mob ".. entity.data.name .. " takes " ..damage .." damage because of sun")
 				
@@ -804,7 +804,7 @@ function fighting.sun_damage_handler(entity,now)
 				entity.dynamic_data.combat.ts_last_sun_damage = now
 			end
 		else
-			graphics.set_draw_mode(entity,"init")
+			graphics.set_animation(entity,"stand")
 		end
 	end
 	

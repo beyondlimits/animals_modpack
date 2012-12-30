@@ -22,9 +22,6 @@
 --! that jump every now and then
 local run_and_jump_low_prototype = 	{
 		name                            ="run_and_jump_low",
-		start_movement					=0.7,
-		stop_movement					=0.05,
-		start_stop_delta_time_factor	=0.5,      
 		jump_up							=0.2,
 	
 		random_jump_chance              =0.3,

@@ -21,9 +21,6 @@
 --! @brief a movement pattern resulting in a mob not moving at all
 local dont_move_prototype = 		{
 		name                            ="dont_move",
-		start_movement					=0,
-		stop_movement					=0,
-		start_stop_delta_time_factor	=0,      
 		jump_up							=0,
 	
 		random_jump_chance              =0,

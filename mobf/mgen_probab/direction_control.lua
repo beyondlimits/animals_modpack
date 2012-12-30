@@ -44,7 +44,10 @@ function direction_control.changeaccel(pos,entity,current_velocity)
 
 	local state = environment.pos_is_ok(pos_predicted,entity)
 
-	while  state ~= "ok" do
+	--below_limit and above_limit are ok too respective to movement handled by this component is xz only
+	while  state ~= "ok" and
+			state == "above_limit" and
+			state == "below_limit"do
 		dbg_mobf.pmovement_lvl1("MOBF: predicted pos " .. printpos(pos_predicted) .. " isn't ok " .. maxtries .. " tries left, state: " .. state)
 		local done = false
 
@@ -180,7 +183,9 @@ end
 function direction_control.precheck_movement(entity,movement_state,pos_predicted,pos_predicted_state)
 
 	--next block mob is to be isn't a place where it can be so we need to change something
-	if pos_predicted_state ~= "ok" then
+	if pos_predicted_state ~= "ok" and
+		pos_predicted_state ~= "above_limit" and
+		pos_predicted_state ~= "below_limit" then
 
 		-- mob would walk onto water
 		if movement_state.changed == false and 
@@ -199,9 +204,6 @@ function direction_control.precheck_movement(entity,movement_state,pos_predicted
 				movement_state.accel_to_set = movement_generic.get_accel_to(new_pos,entity)
 				movement_state.changed = true
 			else
-				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG!!! didn't find a way to stop mob at"..printpos(movement_state.basepos)..
-								" from running into water or dropping")
-				
 				local current_state = environment.pos_is_ok(movement_state.basepos,entity)
 				
 				--animal is safe atm stop it to avoid doing silly things
@@ -250,7 +252,7 @@ function direction_control.precheck_movement(entity,movement_state,pos_predicted
 
 		--redirect mob to block thats not above its current level
 		--or jump if possible
-		if movement_state.changed == false and pos_predicted_state == "collision" then			
+		if movement_state.changed == false and pos_predicted_state == "collision" then
 			dbg_mobf.pmovement_lvl1("MOBF: mob is about to collide")
 
 			local new_pos = environment.get_suitable_pos_same_level(movement_state.basepos,1,entity)
@@ -291,8 +293,7 @@ function direction_control.precheck_movement(entity,movement_state,pos_predicted
 					movement_state.changed = true
 				end				
 			end
-		end		
-
+		end
 		
 		--generic try to solve situation eg wrong surface
 		if movement_state.changed == false then

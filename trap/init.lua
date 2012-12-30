@@ -1,4 +1,4 @@
-local version = "0.0.1"
+local version = "0.0.2"
 
 
 
@@ -52,8 +52,9 @@ minetest.register_entity(":trap:undead_ent",
 					--print("checking " .. index .. ": ",value)
 					local luaentity = value:get_luaentity()
 					
+					--TODO check if mobf names are required to use here
 					if luaentity ~= nil and
-						luaentity.name == "animal_vombie:vombie" then
+						luaentity.name == "animal_vombie:vombie__default" then
 						spawning.remove(luaentity)
 						
 						self.object:remove()

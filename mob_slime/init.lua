@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
-local version = "0.0.2"
+local version = "0.0.4"
 
 local selectionbox_slime_L = {-0.5, -0.4, -0.5,  0.5,0.4,0.5}
 local selectionbox_slime_M = {-0.3, -0.2, -0.3,  0.3,0.2,0.3}
@@ -72,25 +72,12 @@ function mob_slime_kill(entity,player)
 	end
 	
 	if mob_name ~= nil then
-		local newobject = minetest.env:add_entity({x=pos.x+toadd.x1,y=pos.y,z=pos.z+toadd.z1},mob_name)
-	
-		local newentity = mobf_find_entity(newobject)
-	
-		if newentity == nil then
-			minetest.log(LOGLEVEL_ERROR,"MOBF: unable to create mob " .. mob_name .. " at pos " .. printpos(pos))
-		else
-			minetest.log(LOGLEVEL_INFO,"MOBF: Spawning "..mob_name.." on kill "..printpos(pos))
-		end	
-		
-		newobject = minetest.env:add_entity({x=pos.x+toadd.x2,y=pos.y,z=pos.z+toadd.z2},mob_name)
-		
-		newentity = mobf_find_entity(newobject)
-	
-		if newentity == nil then
-			minetest.log(LOGLEVEL_ERROR,"MOBF: unable to create mob " .. mob_name .. " at pos " .. printpos(pos))
-		else
-			minetest.log(LOGLEVEL_INFO,"MOBF: Spawning "..mob_name.." on kill "..printpos(pos))
-		end	
+		spawning.spawn_and_check(mob_name,"__default",
+							{x=pos.x+toadd.x1,y=pos.y,z=pos.z+toadd.z1},
+							"slime_kill_spawn")
+		spawning.spawn_and_check(mob_name,"__default",
+							{x=pos.x+toadd.x2,y=pos.y,z=pos.z+toadd.z2},
+							"slime_kill_spawn")
 	end
 	
 end
@@ -200,7 +187,7 @@ local prototype_mob_slime_L = {
 		--! @brief [MANDATORY] typical distance between two mobs of this type when spawend
 		density=50,
 		--! @brief [MANDATORY] identifyer of spawn algorithm
-		algorithm="deep large caves",
+		algorithm="deep_large_caves_spawner",
 		
 		--! @brief [ALGORITHM DEPENDENT] shadows minimum number of air blocks above pos
 		height = 4,

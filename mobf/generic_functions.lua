@@ -327,6 +327,52 @@ function mobf_mob_around(mob_name,mob_transform,pos,range,ignore_playerspawned)
 end
 
 -------------------------------------------------------------------------------
+-- name: mobf_spawner_around(spawner_name,pos,range)
+--
+--! @brief get number of mobs of specified type within range of pos
+--
+--! @param spawner_name basic name of mob
+--! @param pos position to check
+--! @param range range to check
+--! @return number of mob found
+-------------------------------------------------------------------------------
+function mobf_spawner_around(mob_name,pos,range)
+	dbg_mobf.generic_lvl2("MOBF: mobf_spawner_around param: ".. dump(mob_name).. " "..dump(pos).. " " .. dump(range))
+
+	local count = 0
+	local objectcount = 0
+
+	local objectlist = minetest.env:get_objects_inside_radius(pos,range)
+	
+	for index,value in pairs(objectlist) do 
+
+		local entity = value:get_luaentity()
+	
+		dbg_mobf.generic_lvl3("MOBF: entity at: "..dump(value:getpos())..
+							" looking for: "..mob_name .. " " ..
+							dump(value) .. " " ..
+							dump(entity))
+		
+		--any mob is required to have a name so we may use this to decide
+		--if an entity is an mob or not
+		if 	entity ~= nil and
+			entity.spawner_mob_name ~= nil then
+			
+			if entity.spawner_mob_name == mob_name then
+				dbg_mobf.generic_lvl2("MOBF: Found "..mob_name.. " within specified range of "..range)
+				count = count + 1
+			end
+		end
+		
+		objectcount = objectcount +1
+	end
+
+	dbg_mobf.generic_lvl2("MOBF: found " .. objectcount .. " within range " .. count .. " of them are relevant spawners ")
+
+	return count
+end
+
+-------------------------------------------------------------------------------
 -- name: mobf_line_of_sightX(pos1,pos2)
 --
 --! @brief is there a line of sight between two specified positions
@@ -482,23 +528,21 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: mobf_ground_distance(pos)
+-- name: mobf_ground_distance(pos,media)
 --
 --! @brief get number of blocks above solid ground
 --
 --! @param pos position to check
+--! @param media table of blocks not considered to be ground
 --! @return number of blocks to ground
 -------------------------------------------------------------------------------
-function mobf_ground_distance(pos)
+function mobf_ground_distance(pos,media)
 
 	local node_to_check = minetest.env:get_node(pos)
 
 	local count = 0
 	
-	while node_to_check ~= nil and (
-			node_to_check.name == "air" or
-			node_to_check.name == "default:water_source" or
-			node_to_check.name == "default:water_flowing") and
+	while node_to_check ~= nil and mobf_contains(media,node_to_check.name) and
 			count < 32 do
 		
 		count = count +1		
@@ -607,9 +651,9 @@ end
 --! @param max_y maximum y-coordinate to consider
 --! @return y value of surface or nil
 -------------------------------------------------------------------------------
-function mobf_get_surface(x,z, min_y, max_y)
+function mobf_get_sunlight_surface(x,z, min_y, max_y)
 
-    for runy = min_y, max_y do
+    for runy = min_y, max_y,1 do
         local pos = { x=x,y=runy, z=z }
         local node_to_check = minetest.env:get_node(pos)
         
@@ -618,6 +662,35 @@ function mobf_get_surface(x,z, min_y, max_y)
         end
     end
 
+    return nil
+end
+
+-------------------------------------------------------------------------------
+-- name: get_surface(x,z, min_y, max_y)
+--
+--! @brief get surface for x/z coordinates
+--
+--! @param x x-coordinate
+--! @param z z-coordinate
+--! @param min_y minimum y-coordinate to consider
+--! @param max_y maximum y-coordinate to consider
+--! @return y value of surface or nil
+-------------------------------------------------------------------------------
+function mobf_get_surface(x,z, min_y, max_y)
+
+	local last_node = minetest.env:get_node({ x=x,y=min_y, z=z })
+
+    for runy = min_y+1, max_y,1 do
+        local pos = { x=x,y=runy, z=z }
+        local node_to_check = minetest.env:get_node(pos)
+        
+        if node_to_check.name == "air" and
+        	last_node.name ~= "air" and
+        	last_node.mame ~= "ignore" then
+            return pos.y
+        end
+        last_node = node_to_check
+    end
     return nil
 end
 
@@ -645,4 +718,21 @@ function entity_at_loaded_pos(pos)
 	return true
 end
 
+-------------------------------------------------------------------------------
+-- name: mobf_random_direction()
+--
+--! @brief get a random (blocked) 3d direction
+--
+--! @return 3d dir value
+-------------------------------------------------------------------------------
+function mobf_random_direction()
+
+	local retval = {}
+	
+	retval.x=math.random(-1,1)
+	retval.y=math.random(-1,1)
+	retval.z=math.random(-1,1)
+
+	return retval
+end
 --!@}

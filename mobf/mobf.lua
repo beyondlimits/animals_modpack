@@ -249,22 +249,30 @@ function mobf.activate_handler(self,staticdata)
 	
 	
 	local current_state = mob_state.get_state_by_name(self,self.dynamic_data.state.current)
+	local default_state = mob_state.get_state_by_name(self,"default")
 	
-	if self.dynamic_data.state.current ~= "default" and 
-		current_state.movgen ~= nil then
-		--initialize this state move gen
+	if self.dynamic_data.state.current == nil then
+		current_state = default_state
+	end
+	
+	
+	--initialize move gen
+	if current_state.movgen ~= nil then
 		dbg_mobf.mobf_core_lvl1("MOBF: setting movegen to: " .. current_state.movgen)
 		self.dynamic_data.current_movement_gen = getMovementGen(current_state.movgen)
-		
-		if current_state.animation ~= nil then
-			dbg_mobf.mobf_core_lvl1("MOBF: setting animation to: " .. current_state.animation)
-			graphics.set_animation(self,current_state.animation)
-		end
 	else
-		--initialize current movement generator
-		self.dynamic_data.current_movement_gen = getMovementGen(self.data.movement.default_gen)
-		graphics.set_animation(self,"stand")
+		dbg_mobf.mobf_core_lvl1("MOBF: setting movegen to: " .. default_state.movgen)
+		self.dynamic_data.current_movement_gen = getMovementGen(default_state.movgen)
 	end
+	
+	if current_state.animation ~= nil then
+		dbg_mobf.mobf_core_lvl1("MOBF: setting animation to: " .. current_state.animation)
+		graphics.set_animation(self,current_state.animation)
+	else
+		dbg_mobf.mobf_core_lvl1("MOBF: setting animation to: " .. default_state.animation)
+		graphics.set_animation(self,default_state.animation)
+	end
+		
 	
 	self.dynamic_data.current_movement_gen.init_dynamic_data(self,now)
 	
@@ -282,9 +290,6 @@ function mobf.activate_handler(self,staticdata)
 		pos = environment.fix_base_pos(self, self.data.graphics_3d.collisionbox[2] * self.data.graphics_3d.visual_size.y * -1)
 	end
 
-	--initialize sprites
-	graphics.set_draw_mode(self,"init")
-
 	--custom on activate handler
 	if (self.data.generic.custom_on_activate_handler ~= nil) then
 		self.data.generic.custom_on_activate_handler(self)
@@ -294,56 +299,7 @@ function mobf.activate_handler(self,staticdata)
 end
 
 
-------------------------------------------------------------------------------
--- name: prepare_graphic_info(graphics2d,graphics3d)
---
---! @brief get graphics information
---! @ingroup framework_int
---
---! @param graphics2d
---! @param graphics3d
---! @param modname
---! @param animalid
---! @return grahpic information
--------------------------------------------------------------------------------
-function mobf.prepare_graphic_info(graphics2d,graphics3d,modname,animalid)
 
-	local setgraphics = {}
-	
-	local basename = modname .. animalid
-
-	if (graphics3d == nil) or
-		minetest.setting_getbool("mobf_disable_3d_mode") then
-		if (graphics2d == nil) then
-			minetest.log(LOGLEVEL_ERROR,"MOBF: " .. basename .. " 2D mode selected but not available!")
-			return nil
-		end
-		
-		setgraphics.collisionbox    =  {-0.5,
-									-0.5 * graphics2d.visible_height,
-									-0.5,
-									0.5,
-									0.5 * graphics2d.visible_height,
-									0.5}
-									
-		setgraphics.visual          = "sprite"
-		setgraphics.textures        = { basename..".png^[makealpha:128,0,0^[makealpha:128,128,0" }
-		setgraphics.visual_size     = graphics.sprite_scale
-		setgraphics.spritediv        =graphics.sprite_div
-		
-	else
-		if graphics3d.visual == "mesh" then
-			setgraphics.mesh = minetest.get_modpath(modname) .. "/models/" .. graphics3d.mesh
-		end
-		
-		setgraphics.collisionbox    = graphics3d.collisionbox --todo is this required for mesh?
-		setgraphics.visual          = graphics3d.visual
-		setgraphics.visual_size     = graphics3d.visual_size
-		setgraphics.textures        = graphics3d.textures
-	end
-	
-	return setgraphics
-end
 
 
 ------------------------------------------------------------------------------
@@ -367,6 +323,7 @@ function mobf.register_entity(name, graphics, mob)
 				visual_size     = graphics.visual_size,
 				spritediv       = graphics.spritediv,
 				mesh            = graphics.mesh,
+				mode            = graphics.mode,
 				initial_sprite_basepos 	= {x=0, y=0},
 				makes_footstep_sound = true,
 				automatic_rotate = true,
@@ -448,6 +405,7 @@ function mobf.register_entity(name, graphics, mob)
 				print("Current state: " .. self.dynamic_data.state.current )
 				print("Current movgen: " .. self.dynamic_data.current_movement_gen.name )
 				print("Time to state change: " .. self.dynamic_data.state.time_to_next_change .. " seconds")
+				print("Current environmental state: " .. environment.pos_is_ok(self.object:getpos(),self))
 				
 				print("Current accel: " .. printpos(self.object:getacceleration()) .. " Current speed: " .. printpos(self.object:getvelocity()))
 				
@@ -488,7 +446,7 @@ function mobf.register_entity(name, graphics, mob)
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_register_mob_item(mob)
+-- name: register_mob_item(mob)
 --
 --! @brief add mob item for catchable mobs
 --! @ingroup framework_int
@@ -534,4 +492,61 @@ function mobf.register_mob_item(name,modname,description)
 					end
 				end
 		})
+end
+
+-------------------------------------------------------------------------------
+-- name: blacklist_handling(mob)
+--
+--! @brief add mob item for catchable mobs
+--! @ingroup framework_int
+--
+--! @param mob
+-------------------------------------------------------------------------------
+function mobf.blacklisthandling(mob)
+	local blacklisted = minetest.registered_entities[mob.modname.. ":"..mob.name]
+		
+	--remove unknown animal objects
+	if minetest.setting_getbool("mobf_delete_disabled_mobs") then
+		if minetest.registered_entities[mob.modname.. ":"..mob.name] == nil then
+		
+			--cleanup mob entities
+			minetest.register_entity(mob.modname.. ":"..mob.name .. "__default",
+				{
+				 	on_activate = function(self,staticdata)
+				 		self.object:remove()
+				 	end
+				 })
+				 
+			if mob.states ~= nil then
+				for s = 1, #mob.states , 1 do
+					minetest.register_entity(":".. mob_state.get_entity_name(mob,mob.states[s]),
+					{
+					 	on_activate = function(self,staticdata)
+					 		self.object:remove()
+					 	end
+					 })
+				end
+			end
+			
+			--cleanup spawners too
+			if environment_list[mob.generic.envid] ~= nil and
+				mobf_spawn_algorithms[mob.spawning.algorithm] ~= nil and
+				type(mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup) == "function" then
+				
+				mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup(mob.name)
+				
+				if mob.spawning.algorithm_secondary ~= nil and
+					type(mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_cleanup) == "function" then
+						mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_cleanup(mob.name)
+				end
+			end
+				
+		end
+	end
+	
+	if blacklisted == nil then
+		minetest.log(LOGLEVEL_INFO,"MOBF: " .. mob.modname.. ":"..mob.name .. " was blacklisted")
+	else
+		minetest.log(LOGLEVEL_ERROR,"MOBF: " .. mob.modname.. ":"..mob.name .. " already known not registering mob with same name!")
+	end
 end

@@ -1,4 +1,4 @@
-local version = "0.0.11"
+local version = "0.0.12"
 
 local big_red_groups = {
                         not_in_creative_inventory=1
@@ -75,8 +75,9 @@ big_red_prototype = {
 		spawning = {		
 					rate=0.01,
 					density=1000,
-					algorithm="shadows",
-					height=4
+					algorithm="shadows_spawner",
+					height=4,
+					respawndelay = 60,
 					},
 		sound = {
 			random = {

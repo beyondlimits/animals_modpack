@@ -1,4 +1,4 @@
-local version = "0.0.9"
+local version = "0.0.10"
 
 local dm_groups = {
                         not_in_creative_inventory=1
@@ -68,8 +68,9 @@ dm_prototype = {
 		spawning = {		
 					rate=0.02,
 					density=750,
-					algorithm="shadows",
-					height=3
+					algorithm="shadows_spawner",
+					height=3,
+					respawndelay = 60,
 					},
 		sound = {
 					random = {

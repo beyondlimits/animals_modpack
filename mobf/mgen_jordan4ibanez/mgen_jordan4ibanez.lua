@@ -32,7 +32,7 @@ mgen_jordan4ibanez.name = "jordan4ibanez_mov_gen"
 -- name: callback(entity,now)
 --
 --! @brief main callback to make a mob follow its target
---! @memberof mgen_follow
+--! @memberof mgen_jordan4ibanez
 --
 --! @param entity mob to generate movement for
 --! @param now current time
@@ -102,7 +102,7 @@ end
 -- name: initialize()
 --
 --! @brief initialize movement generator
---! @memberof mgen_follow
+--! @memberof mgen_jordan4ibanez
 --! @public
 -------------------------------------------------------------------------------
 function mgen_jordan4ibanez.initialize(entity,now)
@@ -113,7 +113,7 @@ end
 -- name: init_dynamic_data(entity,now)
 --
 --! @brief initialize dynamic data required by movement generator
---! @memberof mgen_follow
+--! @memberof mgen_jordan4ibanez
 --! @public
 --
 --! @param entity mob to initialize dynamic data

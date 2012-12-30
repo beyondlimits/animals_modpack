@@ -139,7 +139,7 @@ function movement_gen.callback(entity)
 	local retval = movement_gen.fix_current_pos(entity, movement_state)
 
 	--mob has been removed due to unfixable problems
-	if retval.abort_processing then		
+	if retval.abort_processing then
 		return
 	end
 	
@@ -409,7 +409,9 @@ function movement_gen.fix_current_pos(entity,movement_state)
 	if current_state ~= "ok" and
 		current_state ~= "drop" and
 		current_state ~= "wrong_surface" and
-		current_state ~= "possible_surface" then
+		current_state ~= "possible_surface" and 
+		current_state ~= "below_limit" and
+		current_state ~= "above_limit" then
 		dbg_mobf.movement_lvl1("MOBF: BUG !!! somehow your mob managed to get where it shouldn't be, trying to fix")
 
 		--stop mob from moving at all
@@ -493,8 +495,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 			if entity.object:get_hp() <= 0 then
 				abort_processing = true
 				spawning.remove(entity)
-			end	
-
+			end
 		end	
 	else
 		entity.dynamic_data.good_surface = movement_state.now

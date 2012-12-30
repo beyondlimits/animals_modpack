@@ -70,9 +70,6 @@ local mob_template = {
 			
 	--! @brief [MANDATORY] configuration of movement generator				
 	movement =  {
-		--! @brief [MANDATORY] if of movement generator to use for default movement
-		default_gen="some movement_gen id",
-		
 		--! @brief [MANDATORY] is this a flying mob
 		canfly=false,
 		
@@ -146,36 +143,6 @@ local mob_template = {
 		
 		--! @brief [MANDATORY] time to transformation
 		delay=1800
-		},
-		
-	--! @brief [2D MANDATORY] 2d graphics configuration for mob
-	graphics = {
-		
-		--! @brief [MANDATORY] scale of sprite
-		sprite_scale={x=0,y=0},
-		
-		--! @brief [MANDATORY] description of multi dimensional sprites (e.g. containing burning/ differend view directions)
-		sprite_div = {x=0,y=0},
-		
-		--! @brief [MANDATORY] height of sprite
-		visible_height = 3.2,
-		
-		},
-		
-	--! @brief [3D MANDATORY] 3d graphics configuration for mob
-	graphics_3d = {
-	
-		--! @brief [MANDATORY] this is the drawtype to use
-		visual = "wielditem",
-		
-		--! @brief [MANDATORY] the model of the mob
-		textures = {"some node declatation"},
-		
-		--! @brief [MANDATORY] collisionbox to use
-		collisionbox = { "<selectionbox declatation>" },
-		
-		--! @brief [MANDATORY] xyz scale factors for the model
-		visual_size = {x=1,y=1,z=1},
 		},
 
 	--! @brief [OPTIONAL] combat settings for mob
@@ -298,8 +265,43 @@ local mob_template = {
 	--! you may specify as many states as you like
 	states = {
 			{
+				--! @brief [MANDATORY] (default state is MUST have!) name of state
+				name = "default",
+				--! @brief [MANDATORY] typical duration of this state
+				typical_state_time = 180,
+				--! @brief [MANDATORY] chance of state to be selected (SUM may not be > 1)
+				chance = 0.5,
+				--! @brief [MANDATORY] a special movement handler for this state
+				movgen = "none",
+				--! @brief [3D MANDATORY] a special model to be used for this state
+				graphics_3d = {
+					--! @brief [MANDATORY] this is the drawtype to use
+					visual = "mesh",
+					--! @brief [MANDATORY] this is the drawtype to use
+					mesh = "mesh.x",
+					--! @brief [MANDATORY] the model of the mob
+					textures = {"some node declatation"},
+					--! @brief [MANDATORY] collisionbox to use
+					collisionbox = { "<selectionbox declatation>" },
+					--! @brief [MANDATORY] xyz scale factors for the model
+					visual_size = {x=1,y=1,z=1},
+					},
+				--! @brief [2D MANDATORY] a special sprite to be used for this state
+				graphics_2d = {
+					--! @brief [MANDATORY] scale of sprite
+					sprite_scale={x=0,y=0},
+					--! @brief [MANDATORY] description of multi dimensional sprites (e.g. containing burning/ differend view directions)
+					sprite_div = {x=0,y=0},
+					--! @brief [MANDATORY] height of sprite
+					visible_height = 3.2,
+					
+					},
+				--! @brief [MANDATORY] a animation to be played while this state is active
+				animation = "walk",
+			},
+			{
 				--! @brief [MANDATORY] name of state
-				name = "example",
+				name = "another_state_example",
 				--! @brief [MANDATORY] typical duration of this state
 				typical_state_time = 180,
 				--! @brief [MANDATORY] chance of state to be selected (SUM may not be > 1)
@@ -315,6 +317,9 @@ local mob_template = {
 				--! @brief [OPTIONAL] a animation to be played while this state is active
 				animation = "name",
 			},
+			{
+				
+			}
 		},
 	--! @brief [OPTIONAL] description of animations
 	animation = {

@@ -90,7 +90,7 @@ vault.make_vault_part = function(p, part, seed)
             {name='air'},
             {name='default:cobble'},
         }
-        mob = "animal_dm:dm"
+        mob = "animal_dm:dm__default"
     elseif part == 'C' then
         top_y = 3
         ns = {
@@ -392,7 +392,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
     --abort in case of above sea level
-    if minp.y > -3 then
+    if maxp.y > -10 then
         return
     end
     

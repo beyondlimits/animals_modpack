@@ -120,36 +120,6 @@ function graphics.update_orientation(entity,now,dtime)
 end
 
 -------------------------------------------------------------------------------
--- name: set_draw_mode(entity,id)
---
---! @brief set the drawmode for an mob entity
---! @memberof graphics
---
---! @param entity mob to set drawmode for
---! @param id identifyer of drawmode to set
--------------------------------------------------------------------------------
-function graphics.set_draw_mode(entity,id)
-
-	--2D mode
-	if (entity.data.graphics_3d == nil) or
-		minetest.setting_getbool("mobf_disable_3d_mode") then
-	
-		if id == "init" then
-			entity.object:setsprite({x=0,y=0}, 1, 0, true)
-		end
-		
-		if id == "burning" then
-			entity.object:setsprite({x=0,y=1}, 1, 0, true)
-		end
-	
-	--3D mode
-	else
-	
-	
-	end
-end
-
--------------------------------------------------------------------------------
 -- name: set_animation(entity,name)
 --
 --! @brief set the drawmode for an mob entity
@@ -160,15 +130,88 @@ end
 -------------------------------------------------------------------------------
 function graphics.set_animation(entity,name)
 
-	--TODO change frame rate due to movement speed
-	dbg_mobf.graphics_lvl3("MOBF: Updating animation")
-	if entity.data.animation ~= nil and
-		name ~= nil and
-		entity.data.animation[name] ~= nil and
-		entity.dynamic_data.animation ~= name then
+	if entity.mode == "2d" then
+	
+		if id == "stand" then
+			entity.object:setsprite({x=0,y=0}, 1, 0, true)
+		end
+	
+		if name == "burning" then
+			entity.object:setsprite({x=0,y=1}, 1, 0, true)
+		end
 		
-		print("Setting animation to " .. name .. " start: " .. entity.data.animation[name].start_frame .. " end: " .. entity.data.animation[name].end_frame)
-		entity.object:set_animation({x=entity.data.animation[name].start_frame,y=entity.data.animation[name].end_frame}, nil, nil)
-		entity.dynamic_data.animation = name
+		return
 	end
+	
+	if entity.mode == "3d" then
+		--TODO change frame rate due to movement speed
+		dbg_mobf.graphics_lvl3("MOBF: Updating animation")
+		if entity.data.animation ~= nil and
+			name ~= nil and
+			entity.data.animation[name] ~= nil and
+			entity.dynamic_data.animation ~= name then
+			
+			print("Setting animation to " .. name .. " start: " .. entity.data.animation[name].start_frame .. " end: " .. entity.data.animation[name].end_frame)
+			entity.object:set_animation({x=entity.data.animation[name].start_frame,y=entity.data.animation[name].end_frame}, nil, nil)
+			entity.dynamic_data.animation = name
+		end
+		
+		return
+	end
+	
+	mobf_bug_warning(LOGLEVEL_WARNING,"MOBF BUG!!: invalid graphics mode specified " .. dump(entity.mode))
+	
+end
+
+------------------------------------------------------------------------------
+-- name: prepare_graphic_info(graphics2d,graphics3d)
+--
+--! @brief get graphics information
+--! @memberof graphics
+--
+--! @param graphics2d
+--! @param graphics3d
+--! @param modname
+--! @param animalid
+--! @return grahpic information
+-------------------------------------------------------------------------------
+function graphics.prepare_info(graphics2d,graphics3d,modname,animalid)
+
+	local setgraphics = {}
+	
+	local basename = modname .. animalid
+
+	if (graphics3d == nil) or
+		minetest.setting_getbool("mobf_disable_3d_mode") then
+		if (graphics2d == nil) then
+			--this maybe correct if there's a state model requested!
+			return nil
+		end
+		
+		setgraphics.collisionbox    =  {-0.5,
+									-0.5 * graphics2d.visible_height,
+									-0.5,
+									0.5,
+									0.5 * graphics2d.visible_height,
+									0.5}
+									
+		setgraphics.visual          = "sprite"
+		setgraphics.textures        = { basename..".png^[makealpha:128,0,0^[makealpha:128,128,0" }
+		setgraphics.visual_size     = graphics.sprite_scale
+		setgraphics.spritediv       = graphics.sprite_div
+		setgraphics.mode 			= "2d"
+		
+	else
+		if graphics3d.visual == "mesh" then
+			setgraphics.mesh = minetest.get_modpath(modname) .. "/models/" .. graphics3d.mesh
+		end
+		
+		setgraphics.collisionbox    = graphics3d.collisionbox --todo is this required for mesh?
+		setgraphics.visual          = graphics3d.visual
+		setgraphics.visual_size     = graphics3d.visual_size
+		setgraphics.textures        = graphics3d.textures
+		setgraphics.mode 			= "3d"
+	end
+	
+	return setgraphics
 end

@@ -181,7 +181,7 @@ end
 --! @public
 -------------------------------------------------------------------------------
 function mgen_follow.initialize(entity,now)
---intentionaly doing nothing this function is for symmetry reasons only
+	--intentionally empty
 end
 
 -------------------------------------------------------------------------------
@@ -202,8 +202,8 @@ function mgen_follow.init_dynamic_data(entity,now)
 	local data = {
 			target = nil,
 			guardspawnpoint = false,
-			moving = true,
 			max_distance = entity.data.movement.max_distance,
+			orientation_fix_needed = true,
 			}
 	
 	if entity.data.movement.guardspawnpoint ~= nil and

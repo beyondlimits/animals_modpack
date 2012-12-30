@@ -1,4 +1,4 @@
-local version = "0.0.16"
+local version = "0.0.17"
 
 local sheep_groups = {
 						sheerable=1,
@@ -41,7 +41,7 @@ sheep_prototype = {
 					max_tool_usage=10,
 					tool_consumed=false,
 					result="wool:white 1", 
-					transforms_to="animal_sheep:sheep_naked",
+					transforms_to="animal_sheep:sheep_naked_default",
 					min_delay=-1,
 					},
 		catching = {
@@ -143,7 +143,7 @@ lamb_prototype = {
 					},
 		random_drop = nil,
 		auto_transform = {
-					result="animal_sheep:sheep",
+					result="animal_sheep:sheep__default",
 					delay=1800
 					},
 		graphics = {
@@ -204,7 +204,7 @@ sheep_naked_prototype = {
 					},
 		random_drop = nil,
 		auto_transform = {
-					result="animal_sheep:sheep",
+					result="animal_sheep:sheep__default",
 					delay=300
 					},
 		graphics = { 

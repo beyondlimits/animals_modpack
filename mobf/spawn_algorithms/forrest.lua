@@ -78,7 +78,7 @@ function mobf_spawn_in_forrest(mob_name,mob_transform,spawning_data,environment)
 							if minetest.env:find_node_near(pos, 3, { "default:leaves",
 							                                         "default:tree"} ) ~= nil then
 
-								local newobject = minetest.env:add_entity(pos_above,mob_name)
+								local newobject = minetest.env:add_entity(pos_above,mob_name .. "__default")
 
 								local newentity = mobf_find_entity(newobject)
 								
@@ -102,80 +102,26 @@ function mobf_spawn_in_forrest_mapgen(mob_name,mob_transform,spawning_data,envir
 	
 	--add mob on map generation
 	minetest.register_on_generated(function(minp, maxp, seed)
-	local starttime = mobf_get_time_ms()
-	
-    local min_x = MIN(minp.x,maxp.x)
-    local min_y = MIN(minp.y,maxp.x)
-    local min_z = MIN(minp.z,maxp.z)
-    
-    local max_x = MAX(minp.x,maxp.x)
-    local max_y = MAX(minp.y,maxp.y)
-    local max_z = MAX(minp.z,maxp.z)
-    
-    
-    local xdivs = math.floor(((max_x - min_x) / spawning_data.density) +1)
-    local zdivs = math.floor(((max_z - min_z) / spawning_data.density) +1)
-    
-    dbg_mobf.spawning_lvl3(min_x .. " " .. max_x .. " # " .. min_z .. " " .. max_z)
-    dbg_mobf.spawning_lvl3("Generating in " .. xdivs .. " | " .. zdivs .. " chunks")
-    
-    for i = 0, xdivs do
-    for j = 0, zdivs do
-    local x_center = min_x + 0.5 * spawning_data.density + spawning_data.density * i
-    local z_center = min_z + 0.5 * spawning_data.density + spawning_data.density * i
-    local surface_center = mobf_get_surface(x_center,z_center,min_y,max_y)
-    
-    local centerpos = {x=x_center,y=surface_center,z=z_center}
-        
-    --check if there is already a mob of same type within area growing tree within area
-    if surface_center  and 
-    	mobf_mob_around(mob_name,mob_transform,centerpos,spawning_data.density,true) == 0 then
-    	dbg_mobf.spawning_lvl3("no " .. mob_name .. " within range of " .. spawning_data.density .. " around " ..printpos(centerpos))
-        for i= 0, 5 do
-            local x_try = math.random(spawning_data.density/-2,spawning_data.density/2)
-            local z_try = math.random(spawning_data.density/-2,spawning_data.density/2)
-            
-            local pos = { x= x_center + x_try,
-                           z= z_center + z_try }
-            
-            local surface = mobf_get_surface(pos.x,pos.z,min_y,max_y)
-            
-            if surface then
-            	pos.y=surface
-            	--check if there s enough space above to place mob
-				if mobf_air_above(pos,spawning_data.height) then
-					dbg_mobf.spawning_lvl3("enough air above " ..printpos(centerpos) .. " minimum is: " .. spawning_data.height )
-					
-					if minetest.env:find_node_near(pos, 3, { "default:leaves",
-							                                         "default:tree"} ) ~= nil or
-					   minetest.env:find_node_near(pos, 3, growing_trees_nodes ) ~= nil then
-	                    local spawnpos = {x=pos.x,y=surface+1,z=pos.z}
-	                    local newobject = minetest.env:add_entity(spawnpos,mob_name)
-	                    
-	                    if newobject then
-							local newentity = mobf_find_entity(newobject)
-							
-							if newentity == nil then
-								dbg_mobf.spawning_lvl3("BUG!!! no "..mob_name.." has been created!")
-								mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! no "..mob_name.." has been created!")
-							else
-								dbg_mobf.spawning_lvl3("Spawning "..mob_name.." on willow at position "..printpos(spawnpos))
-								minetest.log(LOGLEVEL_INFO,"MOBF: Spawning "..mob_name.." on willow at position "..printpos(spawnpos))
-							end
-						else
-							dbg_mobf.spawning_lvl3("BUG!!! no "..mob_name.." object has been created!")
-							mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! no "..mob_name.." object has been created!")
-						end
-						
-						break
-					end -- forrest nodes
-				end -- air_above
-            end -- surface
-        end --for -> 5
-    end --mob around
-    end -- for z divs
-    end -- for x divs
-    dbg_mobf.spawning_lvl3("magen ended")
+		spawning.divide_mapgen(minp,maxp,spawning_data.density,mob_name,mob_transform,
+		
+		function(name,pos,min_y,max_y)
+			
+			--check if there s enough space above to place mob
+			if mobf_air_above(pos,spawning_data.height) then
+				dbg_mobf.spawning_lvl3("enough air above " ..printpos(centerpos) .. " minimum is: " .. spawning_data.height )
+				
+				if minetest.env:find_node_near(pos, 3, { "default:leaves",
+						                                         "default:tree"} ) ~= nil or
+				   minetest.env:find_node_near(pos, 3, growing_trees_nodes ) ~= nil then
+	                local spawnpos = {x=pos.x,y=pos.y+1,z=pos.z}
+	                spawning.spawn_and_check(name,"__default",spawnpos,"in_forrest_mapgen")
+					return true
+				end -- forrest nodes
+			end -- air_above
+			return false
+		end,
+		mobf_get_sunlight_surface,
+		5)
     end) --register mapgen
  end --end spawn algo
 

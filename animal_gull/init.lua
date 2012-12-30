@@ -1,4 +1,4 @@
-local version = "0.0.7"
+local version = "0.0.8"
 
 local gull_groups = {
 						not_in_creative_inventory=1
@@ -49,11 +49,12 @@ gull_prototype = {
 					},		
 		combat         = nil,
 		
-		spawning = {		
+		spawning = {
 					rate=0.02,
-					density=500,
-					algorithm="in_air1",
-					height=-1
+					density=250,
+					algorithm="in_air1_spawner",
+					height=-1,
+					respawndelay=60
 					},
 		}
 

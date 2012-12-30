@@ -100,14 +100,14 @@ function height_level_control.precheck_movement(entity,movement_state,pos_predic
 			
 		--mob would fly/swim into height it shouldn't be
 		if invalid_pos_handled == false and 
-			pos_predicted_state == "above_limit" then			
+			pos_predicted_state == "above_limit" then
 			
 			local min_y,max_y = environment.get_absolute_min_max_pos(entity.environment,movement_state.basepos)
 			
-			if (pos.y - max_y) > 10 then
+			if (pos_predicted.y - max_y) > 10 then
 				movement_state.override_height_change_chance = 1
 			else
-				movement_state.override_height_change_chance = (pos.y - max_y)/10
+				movement_state.override_height_change_chance = (pos_predicted.y - max_y)/10
 			end
 			
 			invalid_pos_handled = true
@@ -119,10 +119,10 @@ function height_level_control.precheck_movement(entity,movement_state,pos_predic
 				 
 			local min_y,max_y = environment.get_absolute_min_max_pos(entity.environment,movement_state.basepos)
 				
-			if (min_y - pos.y) > 10 then
+			if (min_y - pos_predicted.y) > 10 then
 					movement_state.override_height_change_chance = 1
 			else
-					movement_state.override_height_change_chance = (min_y - pos.y)/10
+					movement_state.override_height_change_chance = (min_y - pos_predicted.y)/10
 			end
 		end
 	end
@@ -141,56 +141,51 @@ end
 -------------------------------------------------------------------------------
 function height_level_control.random_jump_fly(entity,movement_state)
 
-	local level_change_time = math.sqrt(2/entity.data.movement.min_accel)
-			
-	if movement_state.now > (entity.dynamic_data.movement.ts_random_jump + 
-		entity.dynamic_data.movement.mpattern.random_jump_delay +
-		level_change_time) or
-		movement_state.override_height_change_chance ~= 0 then
+	--get some information
+	local accel_to_set  = movement_state.current_acceleration
+	local current_state = environment.pos_is_ok(movement_state.basepos,entity)
 
-		if entity.dynamic_data.movement.changing_levels  == false or
-			movement_state.override_height_change_chance ~= nil then
-		
-			local accel_to_set = movement_state.current_acceleration
-		
-			local ydirection = 1
+	--find direction
+	local ydirection = 1
 
-			if math.random() <= 0.5 then
-				ydirection = -1
-			end
-
-			local targetpos = {x=movement_state.basepos.x,y=movement_state.basepos.y+ydirection,z=movement_state.basepos.z}
-
-			local target_state = environment.pos_is_ok(targetpos,entity);
-
-			dbg_mobf.pmovement_lvl2("MOBF: " .. entity.data.name .." flying change y accel dir="..ydirection.." ypos="..movement_state.basepos.y..
-					" min="..entity.environment.min_height_above_ground..
-					" max="..entity.environment.max_height_above_ground..
-					" below="..target_state)
-
-			if (target_state == "ok") then
-			
-				local min_y, max_y = environment.get_absolute_min_max_pos(entity.environment,movement_state.basepos)
-			
-				dbg_mobf.pmovement_lvl2("MOBF: check level borders current=".. movement_state.basepos.y .. 
-											" min=" .. min_y ..
-											" max=" .. max_y)
-				if (movement_state.basepos.y > min_y and
-					ydirection == -1) or
-					(movement_state.basepos.y < max_y and
-					ydirection == 1) 
-					then
-						movement_state.accel_to_set.y = ydirection * entity.data.movement.min_accel
-						entity.dynamic_data.movement.ts_random_jump = movement_state.now
-						entity.dynamic_data.movement.changing_levels = true
-						dbg_mobf.pmovement_lvl2("MOBF: " .. entity.data.name .. " " .. movement_state.now .. " " .. 
-											" changing level within borders: " .. movement_state.accel_to_set.y)	
-						movement_state.changed = true
-					end
-			end
-		else
-			minetest.log(LOGLEVEL_ERROR,"MOBF BUG!!! mob shouldn't be changing levels after that time!")
+	if current_state == "ok" then
+		if math.random() <= 0.5 then
+			ydirection = -1
 		end
+	end
+	
+	if current_state == "above_limit" then
+		ydirection = -1
+	end
+	
+	--state "below_limit" is already handled by initialization value
+	
+
+	--prepare basic information about what may be afterwards
+	local targetpos = {x=movement_state.basepos.x,y=movement_state.basepos.y+ydirection,z=movement_state.basepos.z}
+	local target_state = environment.pos_is_ok(targetpos,entity);
+
+	dbg_mobf.pmovement_lvl2("MOBF: " .. entity.data.name .." flying change y accel dir="..ydirection.." ypos="..movement_state.basepos.y..
+			" min="..entity.environment.min_height_above_ground..
+			" max="..entity.environment.max_height_above_ground..
+			" below="..target_state)
+
+	--really do level change
+	if (target_state == "ok") or 
+		target_state == current_state then
+	
+		local min_y, max_y = environment.get_absolute_min_max_pos(entity.environment,movement_state.basepos)
+	
+		dbg_mobf.pmovement_lvl2("MOBF: check level borders current=".. movement_state.basepos.y .. 
+									" min=" .. min_y ..
+									" max=" .. max_y)
+
+		movement_state.accel_to_set.y = ydirection * entity.data.movement.min_accel
+		entity.dynamic_data.movement.ts_random_jump = movement_state.now
+		entity.dynamic_data.movement.changing_levels = true
+		dbg_mobf.pmovement_lvl2("MOBF: " .. entity.data.name .. " " .. movement_state.now .. " " .. 
+							" changing level within borders: " .. movement_state.accel_to_set.y)	
+		movement_state.changed = true
 	end
 
 end
@@ -274,6 +269,7 @@ end
 function height_level_control.random_movement_handler(entity,movement_state)
 	--generate random y movement changes
 	if movement_state.changed == false and
+		entity.dynamic_data.movement.changing_levels == false and
 		(math.random() < entity.dynamic_data.movement.mpattern.random_jump_chance or
 		 math.random() < movement_state.override_height_change_chance) then
 

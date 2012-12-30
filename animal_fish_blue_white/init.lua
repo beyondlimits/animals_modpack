@@ -1,4 +1,4 @@
-local version = "0.0.7"
+local version = "0.0.8"
 
 local selectionbox_fish_blue_white = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
 
@@ -40,7 +40,7 @@ fish_blue_white_prototype = {
 					default_gen="probab_mov_gen",
 					min_accel=0.1,
 					max_accel=0.3,
-					max_speed=1.1,
+					max_speed=0.8,
 					pattern="swim_pattern1",
 					canfly=true,
 					},		
@@ -68,8 +68,9 @@ fish_blue_white_prototype = {
 		spawning = {		
 					rate=0.02,
 					density=150,
-					algorithm="in_shallow_water",
-					height=-1
+					algorithm="in_shallow_water_spawner",
+					height=-1,
+					respawndelay = 60,
 					},
 		}
 

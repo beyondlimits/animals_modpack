@@ -17,15 +17,8 @@
 -------------------------------------------------------------------------------
 --movement pattern for movement generator
 --	{
---      --paternname           
+--      --patternname           
 --      name                            ="example"
---		--parameters for starting and stopping movement
-		--chances to start or stop a movement phase
---		start_movement					=0,
---		stop_movement					=0,
---		-- this parameter controls if time since last movement change affects 
---      -- chances to start/stop movement. If set to 1 ther ain't any effect.
---      start_stop_delta_time_factor	=1,      
 --
 --		--chance to jump to higher level instead of turning
 --		jump_up							=0,
@@ -39,12 +32,6 @@
 --      
 --      --chance an mob randomly changes its speed/direction
 --      random_acceleration_change      =0,
---
---
---      --run towards player or run away?  1 <-> -1		
---		player_attraction				=0,				--no effect by 20120109
---		--maximum distance a player has an effect
---		player_attraction_range         =-1,			--no effect by 20120109
 -- }
 
 --!@}

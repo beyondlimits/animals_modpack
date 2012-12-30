@@ -21,9 +21,6 @@
 --! @brief a movement pattern used for flying mobs
 local flight_pattern1_prototype = 	{
 		name                            ="flight_pattern1",
-		start_movement					=1,
-		stop_movement					=0,
-		start_stop_delta_time_factor	=0,      
 		jump_up							=0,
 	
 		random_jump_chance              =0.4,

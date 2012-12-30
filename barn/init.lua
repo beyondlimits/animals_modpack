@@ -1,4 +1,4 @@
-local version = "0.0.6"
+local version = "0.0.7"
 
 local modpath = minetest.get_modpath("barn")
 
@@ -87,16 +87,24 @@ function breed(breedpairs,self,now)
 	
 		local luaentity = value:get_luaentity()
 		
-		if luaentity ~= nil and
-			luaentity.name == breedpairs[1] and 
+		local mobname = nil
+		
+		if luaentity.data ~= nil and
+			luaentity.data.name ~= nil and
+			luaentity.data.modname ~= nil then
+			mobname = luaentity.data.modname .. ":" .. luaentity.data.name
+		end
+		
+		if mobname ~= nil and
+			mobname == breedpairs[1] and 
 			luaentity ~= le_animal1 and
 			le_animal2 == nil then
 			
 			le_animal2 = luaentity
 		end
 		
-		if luaentity ~= nil and
-			luaentity.name == breedpairs[2] and 
+		if mobname ~= nil and
+			mobname == breedpairs[2] and 
 			le_animal2 ~= luaentity then
 			
 			le_animal1 = luaentity
@@ -125,7 +133,7 @@ function breed(breedpairs,self,now)
 		
 		local result = breedpairs[math.random(3,4)]
 		
-		local breeded = minetest.env:add_entity(pos_to_breed,result)
+		local breeded = minetest.env:add_entity(pos_to_breed .. "__default",result)
 		
 		local breeded_lua = breeded:get_luaentity()
 		breeded_lua.dynamic_data.spawning.player_spawned = true

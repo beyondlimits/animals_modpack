@@ -72,40 +72,9 @@ function mobf_add_mob(mob)
 		return false
 	end
 	
-	
+	--check if mob may be added
 	if mobf_contains(mobf_registred_mob,mob.modname.. ":"..mob.name) then
-		
-		local balacklisted = minetest.registered_entities[mob.modname.. ":"..mob.name]
-		
-		--remove unknown animal objects
-		if minetest.setting_getbool("mobf_delete_disabled_mobs") then
-			if minetest.registered_entities[mob.modname.. ":"..mob.name] == nil then
-			
-				minetest.register_entity(mob.modname.. ":"..mob.name,
-					{
-					 	on_activate = function(self,staticdata)
-					 		self.object:remove()
-					 	end
-					 })
-					 
-				if mob.states ~= nil then
-					for s = 1, #mob.states , 1 do
-						minetest.register_entity(":".. mob_state.get_entity_name(mob,mob.states[s]),
-						{
-						 	on_activate = function(self,staticdata)
-						 		self.object:remove()
-						 	end
-						 })
-					end
-				end
-			end
-		end
-		
-		if blacklisted == nil then
-			minetest.log(LOGLEVEL_INFO,"MOBF: " .. mob.modname.. ":"..mob.name .. " was blacklisted")
-		else
-			minetest.log(LOGLEVEL_ERROR,"MOBF: " .. mob.modname.. ":"..mob.name .. " already known not registering mob with same name!")
-		end
+		mobf.blacklisthandling(mob)
 		return false
 	end
 	
@@ -116,9 +85,6 @@ function mobf_add_mob(mob)
 	
 	--create default entity
 	minetest.log(LOGLEVEL_INFO,"MOBF: adding: " .. mob.name)
-	local graphic_to_set = mobf.prepare_graphic_info(mob.graphics,mob.graphics_3d,mob.modname,"_"..mob.name)
-	mobf.register_entity(":".. mob.modname .. ":"..mob.name, graphic_to_set, mob)
-	
 	mob_state.prepare_states(mob)
 
 	mobf.register_mob_item(mob.name,mob.modname,mob.generic.description)
@@ -128,6 +94,7 @@ function mobf_add_mob(mob)
 		minetest.log(LOGLEVEL_WARNING,"MOBF: no movement pattern specified!")
 	end
 
+	--spawn mechanism handling
 	if not minetest.setting_getbool("mobf_disable_animal_spawning") then
 		--register spawn callback to world
 		if environment_list[mob.generic.envid] ~= nil then
@@ -136,16 +103,22 @@ function mobf_add_mob(mob)
 				secondary_name = mob.harvest.transforms_to
 			end
 			
-			dbg_mobf.mobf_core_lvl3("MOBGF: Environment to use:" , mob.generic.envid)
+			dbg_mobf.mobf_core_lvl3("MOBGF: Environment to use: " .. tostring(mob.generic.envid))
 			
-			mobf_spawn_algorithms[mob.spawning.algorithm](mob.modname..":"..mob.name,
-																secondary_name,
-																mob.spawning,
-																environment_list[mob.generic.envid])
-																
+			if mobf_spawn_algorithms[mob.spawning.algorithm] ~= nil and
+				type(mobf_spawn_algorithms[mob.spawning.algorithm].register_spawn) == "function" then
+				mobf_spawn_algorithms[mob.spawning.algorithm].register_spawn(mob.modname..":"..mob.name,
+																	secondary_name,
+																	mob.spawning,
+																	environment_list[mob.generic.envid])
+			else
+				dbg_mobf.mobf_core_lvl2("MOBGF: " .. mob.name .. " no primary spawn algorithm defined: " .. tostring(mob.spawning.algorithm))
+			end
+			
 			if minetest.setting_getbool("mobf_animal_spawning_secondary") then
-				if mob.spawning.algorithm_secondary ~= nil then
-					mobf_spawn_algorithms[mob.spawning.algorithm_secondary](mob.modname..":"..mob.name,
+				if mob.spawning.algorithm_secondary ~= nil and 
+					type(mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_spawn) == "function" then
+					mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_spawn(mob.modname..":"..mob.name,
 																secondary_name,
 																mob.spawning,
 																environment_list[mob.generic.envid])

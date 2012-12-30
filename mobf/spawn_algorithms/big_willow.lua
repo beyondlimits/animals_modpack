@@ -17,16 +17,16 @@
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
--- name: mobf_spawn_on_willow(mob_name,mob_transform,spawning_data,environment)
+-- name: mobf_spawn_on_big_willow(mob_name,mob_transform,spawning_data,environment)
 --
---! @brief find a place on willow to spawn a mob
+--! @brief find a place on big willow to spawn a mob
 --
 --! @param mob_name name of mob
 --! @param mob_transform secondary name of mob
 --! @param spawning_data spawning configuration
 --! @param environment environment of mob
 -------------------------------------------------------------------------------
-function mobf_spawn_on_willow(mob_name,mob_transform,spawning_data,environment) 
+function mobf_spawn_on_big_willow(mob_name,mob_transform,spawning_data,environment) 
 	minetest.log(LOGLEVEL_WARNING,"MOBF: using deprecated abm based spawn algorithm \"spawn_on_willow\" most likely causing lag in server!\t Use spawn_on_willow_mapgen instead!")
 	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering willow spawn abm callback for mob "..mob_name)
 	
@@ -63,23 +63,36 @@ function mobf_spawn_on_willow(mob_name,mob_transform,spawning_data,environment)
 					return
 				end
 
-				local node_above = minetest.env:get_node(pos_above)
-
 				if mob_name == nil then
 					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! mob name not available")
 				else
-					--print("Try to spawn mob: "..mob_name)
-					if node_above.name == "air" then
-						--print("Find mobs of same type around:"..mob_name.. " pop dens: ".. population_density)
-					   if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
-							local newobject = minetest.env:add_entity(pos_above,mob_name .. "__default")
-
-							local newentity = mobf_find_entity(newobject)
-							
-							if newentity == nil then
-								mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! no "..mob_name.." has been created!")
+					if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
+					
+						local pos_is_big_willow = true
+				
+						for x=pos.x-2,pos.x+2,1 do
+						for z=pos.z-2,pos.z+2,1 do
+							local node_to_check = minetest.env:getnode({x=x,y=pos.y,z=z})
+				
+							if node_to_check == nil or
+								node_to_check.name ~= "default:dirt_with_grass" then
+								pos_is_big_willow = false
+								break
 							end
-							minetest.log(LOGLEVEL_INFO,"MOBF: Spawning "..mob_name.." on willow at position "..printpos(pos))
+						
+							--check if there s enough space above to place mob
+							if not mobf_air_above({x=x,y=pos.y,z=z},spawning_data.height) then
+								pos_is_big_willow = false
+								break
+							end
+						end
+						end
+						
+						if pos_is_big_willow then
+							dbg_mobf.spawning_lvl3("willow is big enough " ..printpos(centerpos))
+							local spawnpos = {x=pos.x,y=pos.y+1,z=pos.z}
+							spawning.spawn_and_check(name,"__default",spawnpos,"on_big_willow_mapgen")
+							return true
 						end
 					end
 				end
@@ -89,16 +102,16 @@ function mobf_spawn_on_willow(mob_name,mob_transform,spawning_data,environment)
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_spawn_on_willow_mapgen(mob_name,mob_transform,spawning_data,environment)
+-- name: mobf_spawn_on_big_willow_mapgen(mob_name,mob_transform,spawning_data,environment)
 --
---! @brief find a place on willow to spawn a mob on map generation
+--! @brief find a place on big willow to spawn a mob on map generation
 --
 --! @param mob_name name of mob
 --! @param mob_transform secondary name of mob
 --! @param spawning_data spawning configuration
 --! @param environment environment of mob
 -------------------------------------------------------------------------------
-function mobf_spawn_on_willow_mapgen(mob_name,mob_transform,spawning_data,environment)
+function mobf_spawn_on_big_willow_mapgen(mob_name,mob_transform,spawning_data,environment)
 	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering willow mapgen spawn mapgen callback for mob "..mob_name)
 	
 	--add mob on map generation
@@ -106,21 +119,40 @@ function mobf_spawn_on_willow_mapgen(mob_name,mob_transform,spawning_data,enviro
 		spawning.divide_mapgen(minp,maxp,spawning_data.density,mob_name,mob_transform,
 		
 		function(name,pos,min_y,max_y)
+		
+			local pos_is_big_willow = true
 			
-			--check if there s enough space above to place mob
-			if mobf_air_above(pos,spawning_data.height) then
-				dbg_mobf.spawning_lvl3("enough air above " ..printpos(centerpos) .. " minimum is: " .. spawning_data.height )
+			for x=pos.x-2,pos.x+2,1 do
+			for z=pos.z-2,pos.z+2,1 do
+				local node_to_check = minetest.env:getnode({x=x,y=pos.y,z=z})
+				
+				if node_to_check == nil or
+					node_to_check.name ~= "default:dirt_with_grass" then
+					pos_is_big_willow = false
+					break
+				end
+				--check if there s enough space above to place mob
+				if not mobf_air_above({x=x,y=pos.y,z=z},spawning_data.height) then
+					pos_is_big_willow = false
+					break
+				end
+			end
+			end
+			
+			if pos_is_big_willow then
+				dbg_mobf.spawning_lvl3("willow is big enough " ..printpos(centerpos))
 				local spawnpos = {x=pos.x,y=pos.y+1,z=pos.z}
-				spawning.spawn_and_check(name,"__default",spawnpos,"on_willow_mapgen")
+				spawning.spawn_and_check(name,"__default",spawnpos,"on_big_willow_mapgen")
 				return true
-			end -- air_above
+			end
+			
 			return false
 		end,
 		mobf_get_sunlight_surface,
-		5)
+		20)
 	end)
  end --end spawn algo
 --!@}
 
-spawning.register_spawn_algorithm("willow", mobf_spawn_on_willow)
-spawning.register_spawn_algorithm("willow_mapgen", mobf_spawn_on_willow_mapgen)
+spawning.register_spawn_algorithm("big_willow", mobf_spawn_on_big_willow)
+spawning.register_spawn_algorithm("big_willow_mapgen", mobf_spawn_on_big_willow_mapgen)

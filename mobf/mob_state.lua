@@ -50,7 +50,8 @@ function mob_state.initialize(entity,now)
 		for s = 1, #entity.data.states , 1 do
 			sum_chances = sum_chances + entity.data.states[s].chance
 		
-			if entity.data.states[s].name ~= "combat" then
+			if entity.data.states[s].name ~= "combat" and
+				entity.data.states[s].name ~= "default" then
 				state_count = state_count +1
 			end
 		end
@@ -97,6 +98,10 @@ end
 --! @return state data or nil
 -------------------------------------------------------------------------------
 function mob_state.get_state_by_name(entity,name)
+
+	if entity.data == nil then
+		print("MOBF BUG!! unable to get information for entity: " .. tostring(entity.name) .. " " .. dump(entity))
+	end
 
 	for i=1, #entity.data.states, 1 do
 		if entity.data.states[i].name == name then
@@ -201,7 +206,7 @@ function mob_state.callback(entity,now,dstep)
 		end
 		
 		--switch to default state (only reached if no change has been done
-		if mob_state.change_state(entity,nil) ~= nil then
+		if mob_state.change_state(entity,mob_state.get_state_by_name(entity,"default")) ~= nil then
 			return false
 		end
 	else
@@ -244,7 +249,7 @@ function mob_state.switch_entity(entity,state)
 		newentity = spawning.replace_entity(entity,mob_state.get_entity_name(entity.data,state),true)
 	else
 		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " switching to default model ")
-		newentity = spawning.replace_entity(entity,entity.data.modname .. ":"..entity.data.name,true)
+		newentity = spawning.replace_entity(entity,entity.data.modname .. ":"..entity.data.name .. "__default",true)
 	end	
 	
 	if newentity ~= nil then
@@ -316,34 +321,12 @@ function mob_state.change_state(entity,state)
 	--switch to default state if no state given
 	if state == nil then
 		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " invalid state switch, switching to default instead of: " .. dump(state))
-		if entity.dynamic_data.state.current ~= "default" then
-			local newentity = spawning.replace_entity(entity,entity.data.modname .. ":"..entity.data.name,true)
-			
-			if newentity ~= nil then
-				dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name .. " default state replaced entity=" .. tostring(entity) .. " by newentity=" .. tostring(newentity))
-			
-				newentity.dynamic_data.current_movement_gen = getMovementGen(newentity.data.movement.default_gen)
-				newentity.dynamic_data.current_movement_gen.init_dynamic_data(newentity,mobf_get_current_time())
-				
-				newentity.dynamic_data.state.current = "default"
-				
-				newentity.dynamic_data.state.time_to_next_change = 30
-				graphics.set_animation(newentity,"stand")
-				
-				dbg_mobf.mob_state_lvl2("MOBF: time to next change = " .. newentity.dynamic_data.state.time_to_next_change)
-				return newentity
-			end
-		end
-		
-		entity.dynamic_data.state.time_to_next_change = 30
-		graphics.set_animation(entity,"stand")
-		
-		dbg_mobf.mob_state_lvl2("MOBF:  time to next change = " .. entity.dynamic_data.state.time_to_next_change)
-		return nil
+		state = mob_state.get_state_by_name("default")
 	end
 	
 	local entityname = entity.data.name
 	local statename = state.name
+	
 	dbg_mobf.mob_state_lvl2("MOBF: " .. entityname .. " switching state to " .. statename)
 	
 	if entity.dynamic_data.state == nil then
@@ -435,11 +418,12 @@ end
 -------------------------------------------------------------------------------
 function mob_state.prepare_states(mob)
 	local custom_combat_state_defined = false
+	local default_state_defined = false
 
 	--add graphics for any mob state
 	if mob.states ~= nil then
 		for s = 1, #mob.states , 1 do
-			graphic_to_set = mobf.prepare_graphic_info(mob.states[s].graphics,
+			graphic_to_set = graphics.prepare_info(mob.states[s].graphics,
 										mob.states[s].graphics_3d,
 										mob.modname,"_"..mob.name .. "_" .. mob.states[s].name)
 	
@@ -452,7 +436,7 @@ function mob_state.prepare_states(mob)
 			end
 			
 			if mob.states[s].name == "default" then
-				custom_generic_state_defined = true
+				default_state_defined = true
 			end
 			
 
@@ -473,5 +457,46 @@ function mob_state.prepare_states(mob)
 						chance = 0,
 						})
 		end
+	end
+	
+	
+	--legacy code to run old mobs
+	if not default_state_defined then
+		minetest.log(LOGLEVEL_WARNING,"MOBF: -----------------------------------------------------------------------------------------")
+		minetest.log(LOGLEVEL_WARNING,"MOBF: Automatic default state generation is legacy code subject to be removed in later version.")
+		minetest.log(LOGLEVEL_WARNING,"MOBF: -----------------------------------------------------------------------------------------")
+	
+		local default_state = {
+			name 				= "default",
+			movgen 				= mob.movement.default_gen,
+			graphics 			= mob.graphics,
+			graphics_3d 		= mob.graphics_3d,
+			chance				= 0,
+			typical_state_time 	= 30,
+			animation           = "walk",
+		}
+		
+		graphic_to_set = graphics.prepare_info(default_state.graphics,
+										default_state.graphics_3d,
+										mob.modname,"_"..mob.name)
+	
+		if graphic_to_set ~= nil then
+			mobf.register_entity(":" .. mob_state.get_entity_name(mob,default_state), graphic_to_set, mob)
+		end
+		
+		--replace old mobs by new default state mobs
+		minetest.register_entity(":".. mob.modname .. ":"..mob.name,
+			 {
+			 	new_name = mob_state.get_entity_name(mob,default_state),
+			 	on_activate = function(self,staticdata)
+			 		minetest.log(LOGLEVEL_INFO, "MOBF replacing " .. self.name .. " by " .. self.new_name)
+			 		local pos = self.object:getpos()
+			 		self.object:remove()
+			 		
+			 		minetest.env:add_entity(pos,self.new_name)
+			 	end
+			 })
+		
+		table.insert(mob.states,default_state)
 	end
 end

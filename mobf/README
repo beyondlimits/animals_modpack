@@ -134,6 +134,11 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.9.5
+-fixed height level controling for fish and gulls (has been brocken for ages)
+-added spawner based spawning for any abm based spawning
+-"default" state is now mandatory for any mob!
+
 Changes 1.9.4
 -fixed sound name collisions
 -fixed stereo->mono for some sounds

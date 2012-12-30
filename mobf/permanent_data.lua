@@ -183,7 +183,7 @@ function mobf_serialize_permanent_entity_data(entity)
 		--print("DEBUG: serialized -> " .. serialized)
 		return serialized
 	else
-		minetest.log(LOGLEVEL_ERROR,"MOBF: >" .. dump(entity.data.name) .. "< removed=" ..dump(entity.removed) .. " entity=" .. tostring(entity) .. " No spawning information available on saving mob or mob already deleted")
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: >" .. dump(entity.data.name) .. "< removed=" ..dump(entity.removed) .. " entity=" .. tostring(entity) .. " No spawning information available on saving mob or mob already deleted")
 	end
 end
 

@@ -1,4 +1,4 @@
-local version = "0.0.10"
+local version = "0.0.11"
 
 local vombie_groups = {
 						not_in_creative_inventory=1
@@ -122,9 +122,10 @@ vombie_prototype = {
 		
 		spawning = {
 					rate=0.05,
-					density=20,
-					algorithm="at_night",
-					height=2
+					density=15,
+					algorithm="at_night_spawner",
+					height=2,
+					respawndelay=60,
 					},
 		sound = {
 					random = {
