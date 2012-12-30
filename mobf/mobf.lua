@@ -537,7 +537,7 @@ function mobf.blacklisthandling(mob)
 				
 				if mob.spawning.algorithm_secondary ~= nil and
 					type(mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_cleanup) == "function" then
-						mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_cleanup(mob.name)
+						mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_cleanup(mob.modname.. ":" .. mob.name)
 				end
 			end
 				
