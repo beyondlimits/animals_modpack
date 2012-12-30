@@ -533,7 +533,7 @@ function mobf.blacklisthandling(mob)
 				mobf_spawn_algorithms[mob.spawning.algorithm] ~= nil and
 				type(mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup) == "function" then
 				
-				mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup(mob.name)
+				mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup(mob.modname.. ":" .. mob.name)
 				
 				if mob.spawning.algorithm_secondary ~= nil and
 					type(mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_cleanup) == "function" then
