@@ -16,6 +16,8 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
+at_night_surfaces = { "default:stone","default:dirt_with_grass","default:dirt","default:desert_stone","default:desert_sand" }
+
 -------------------------------------------------------------------------------
 -- name: mobf_spawn_at_night(mob_name,mob_transform,spawning_data,environment)
 --
@@ -38,7 +40,7 @@ function mobf_spawn_at_night(mob_name,mob_transform,spawning_data,environment)
 	end
 
 	minetest.register_abm({
-			nodenames = { "default:stone","default:dirt_with_grass","default:dirt" },
+			nodenames = at_night_surfaces,
 			neighbors = media,
 			interval = 20,
 			chance = math.floor(1/spawning_data.rate),
@@ -140,7 +142,7 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 			local node_below = minetest.env:get_node(pos_below)
 			
 			
-			if not mobf_contains({ "default:stone","default:dirt_with_grass","default:dirt" },node_below.name) then
+			if not mobf_contains(at_night_surfaces,node_below.name) then
 				good = false
 			end
 			
@@ -197,7 +199,7 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 					
 					local node = minetest.env:get_node(pos)
 					
-					if not mobf_contains({ "default:stone","default:dirt_with_grass","default:dirt","default:sand" },node.name) then
+					if not mobf_contains(at_night_surfaces,node.name) then
 						dbg_mobf.spawning_lvl3("MOBF: node ain't of correct type: " .. node.name)
 						return false
 					end

@@ -35,7 +35,7 @@ function vombie_on_step_handler(entity,now,dtime)
 	if current_light ~= nil and
 		current_light > LIGHT_MAX and
 		minetest.setting_getbool("mobf_disable_3d_mode") ~= true and
-		minetest.setting_getbool("disable_vombie_3d_burn_animation") ~= true then
+		minetest.setting_getbool("vombie_3d_burn_animation_enabled") == true then
 		
 		
 		local xdelta = (math.random()-0.5)

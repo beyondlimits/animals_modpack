@@ -462,7 +462,7 @@ end
 --
 -------------------------------------------------------------------------------
 function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,surfacefunc,maxtries)
-
+	local starttime = mobf_get_time_ms()
 	dbg_mobf.spawning_lvl3("MOBF: divide_mapgen params: ")
 	dbg_mobf.spawning_lvl3("MOBF:	" .. dump(density))
 	dbg_mobf.spawning_lvl3("MOBF:	" .. dump(name))
@@ -527,6 +527,7 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
     end --surface_center
     end -- for z divs
     end -- for x divs
+    mobf_warn_long_fct(starttime,"on_mapgen" .. name,"mapgen")
     dbg_mobf.spawning_lvl3("magen ended")
 end
 
@@ -559,7 +560,9 @@ function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,en
 
 				
 				if self.spawner_time_passed < 0 then
+					local starttime = mobf_get_time_ms()
 					spawnfunc(self)
+					mobf_warn_long_fct(starttime,"spawnfunc " .. self.spawner_mob_name,"spawnfunc")
 				end
 			end,
 			

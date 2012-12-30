@@ -134,6 +134,15 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.9.6
+-catch misspelled blacklist string
+-fix bug in barn crashing game
+-fix bug custom on step handler making minetest unresponsive
+-fixed crash on invalid blacklist
+-added check to warn on unrealistic count of callbacks
+-added statistics feature for mobf callback times
+-make vombies and boombomb spawn in desert too
+
 Changes 1.9.5
 -fixed height level controling for fish and gulls (has been brocken for ages)
 -added spawner based spawning for any abm based spawning

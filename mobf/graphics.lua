@@ -203,7 +203,7 @@ function graphics.prepare_info(graphics2d,graphics3d,modname,animalid)
 		
 	else
 		if graphics3d.visual == "mesh" then
-			setgraphics.mesh = minetest.get_modpath(modname) .. "/models/" .. graphics3d.mesh
+			setgraphics.mesh = graphics3d.mesh
 		end
 		
 		setgraphics.collisionbox    = graphics3d.collisionbox --todo is this required for mesh?

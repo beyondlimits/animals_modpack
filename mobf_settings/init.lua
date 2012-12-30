@@ -1,4 +1,4 @@
-mobf_settings_version = "0.0.7"
+mobf_settings_version = "0.0.8"
 
 if type(inventory_plus.register_button) == "function" then
 	minetest.register_on_joinplayer(function(player)
@@ -171,10 +171,10 @@ function get_known_animals_form(page)
         end
         
         
-        if minetest.setting_getbool("disable_vombie_3d_burn_animation") then
-            retval = retval .. "button[0.5,7.5;6,0.5;enable_vombie_3d_burn_animation;Vombie 3D burn animation is disabled]"
-        else
+        if minetest.setting_getbool("vombie_3d_burn_animation_enabled") then
             retval = retval .. "button[0.5,7.5;6,0.5;disable_vombie_3d_burn_animation;Vombie 3D burn animation is enabled]"
+        else
+            retval = retval .. "button[0.5,7.5;6,0.5;enable_vombie_3d_burn_animation;Vombie 3D burn animation is disabled]"
         end
         
     
@@ -337,11 +337,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     end
     
     if fields.enable_vombie_3d_burn_animation then
-        minetest.setting_set("disable_vombie_3d_burn_animation","false")
+        minetest.setting_set("vombie_3d_burn_animation_enabled","true")
     end
     
     if fields.disable_vombie_3d_burn_animation then
-        minetest.setting_set("disable_vombie_3d_burn_animation","true")
+        minetest.setting_set("vombie_3d_burn_animation_enabled","false")
     end
     
     if fields.mobf_restart_required or

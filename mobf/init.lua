@@ -115,6 +115,11 @@ function mobf_init_framework()
 	
 	if mobf_mob_blacklist_string ~= nil then
 		mobf_registred_mob = minetest.deserialize(mobf_mob_blacklist_string)
+		
+		if mobf_registred_mob == nil then
+			print()
+			mobf_registred_mob = {}
+		end
 	end
 	
 	print("Initializing probabilistic movement generator")
@@ -243,7 +248,7 @@ function mobf_init_modules()
 			name = "custom_hooks",
 			handler = function(entity,now,dtime)
 					if type(entity.data.generic.custom_on_step_handler) == "function" then
-						table.insert(entity.on_step_hooks,entity.data.generic.custom_on_step_handler)
+						entity.data.generic.custom_on_step_handler(entity,now,dtime)
 					end
 				end,
 			configcheck = function(entity)

@@ -61,6 +61,10 @@ end
 -------------------------------------------------------------------------------
 function mobf.init_on_step_callbacks(entity,now)
 	entity.on_step_hooks = {}
+	
+	if #mobf.on_step_callbacks > 32 then
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: " .. #mobf.on_step_callbacks .. " incredible high number of onstep callbacks registred!")
+	end
 
 	dbg_mobf.mobf_core_lvl2("MOBF: initializing " .. #mobf.on_step_callbacks ..  " on_step callbacks for " .. entity.data.name .. " entity=" .. tostring(entity))
 	for i = 1, #mobf.on_step_callbacks , 1 do
@@ -365,12 +369,16 @@ function mobf.register_entity(name, graphics, mob)
 				    return
 				end
 				
-				mobf_warn_long_fct(starttime,"on_step lifecycle")
+				mobf_warn_long_fct(starttime,"on_step lifecycle","lifecycle")
 				
 				--movement generator
 				self.dynamic_data.current_movement_gen.callback(self,now)
 				
-				mobf_warn_long_fct(starttime,"on_step movement")
+				mobf_warn_long_fct(starttime,"on_step movement","movement")
+				
+				if #self.on_step_hooks > 32 then
+					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: " .. tostring(self) .. " incredible high number of onstep hooks! ".. #self.on_step_hooks .. " ohlist: " .. tostring(self.on_step_hooks))
+				end
 				
 				--dynamic modules
 				for i = 1, #self.on_step_hooks, 1 do
@@ -379,9 +387,10 @@ function mobf.register_entity(name, graphics, mob)
 						dbg_mobf.mobf_core_lvl1("MOBF: on_step: " .. self.data.name .. " aborting callback processing entity=" .. tostring(self))
 						break
 					end
-					mobf_warn_long_fct(starttime,"callback nr " .. i)
+					mobf_warn_long_fct(starttime,"callback nr " .. i,"callback_os_" .. self.data.name .. "_" .. i)
 				end
 				
+				mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
 				self.current_dtime = 0
 				end,
 
@@ -394,7 +403,7 @@ function mobf.register_entity(name, graphics, mob)
 					if self.on_punch_hooks[i](self,hitter,now,time_from_last_punch, tool_capabilities, dir) then
 						return
 					end
-					mobf_warn_long_fct(starttime,"callback nr " .. i)
+					mobf_warn_long_fct(starttime,"callback nr " .. i,"callback_op_" .. self.data.name .. "_" .. i)
 				end
 				end,
 

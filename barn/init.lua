@@ -89,7 +89,8 @@ function breed(breedpairs,self,now)
 		
 		local mobname = nil
 		
-		if luaentity.data ~= nil and
+		if luaentity ~= nil and
+			luaentity.data ~= nil and
 			luaentity.data.name ~= nil and
 			luaentity.data.modname ~= nil then
 			mobname = luaentity.data.modname .. ":" .. luaentity.data.name
@@ -133,7 +134,7 @@ function breed(breedpairs,self,now)
 		
 		local result = breedpairs[math.random(3,4)]
 		
-		local breeded = minetest.env:add_entity(pos_to_breed .. "__default",result)
+		local breeded = minetest.env:add_entity(pos_to_breed ,result .. "__default")
 		
 		local breeded_lua = breeded:get_luaentity()
 		breeded_lua.dynamic_data.spawning.player_spawned = true
