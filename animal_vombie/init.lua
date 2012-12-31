@@ -1,4 +1,4 @@
-local version = "0.0.11"
+local version = "0.0.12"
 
 local vombie_groups = {
 						not_in_creative_inventory=1

@@ -134,6 +134,12 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.9.7
+-fixed bug big_willow spawner not enabled
+-fixed bug steer not using big_willow spawner
+-make mobs more smart in avoiding dropping
+-make mobs more smart in avoiding falling into water
+
 Changes 1.9.6
 -catch misspelled blacklist string
 -fix bug in barn crashing game

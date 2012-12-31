@@ -339,7 +339,7 @@ function environment.pos_is_ok(pos,entity)
 		max_ground_distance = 1	
 	end
 
-	dbg_mobf.environment_lvl1("Checking pos "..printpos(pos))
+	dbg_mobf.environment_lvl2("MOBF: Checking pos "..printpos(pos))
 
 	if pos == nil then
 		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking pos with nil value this won't work")
@@ -356,22 +356,26 @@ function environment.pos_is_ok(pos,entity)
 	local ground_distance = mobf_ground_distance(pos,entity.environment.media)
 
 	if environment.is_media_element(node.name,entity.environment.media) == true then
-
+			dbg_mobf.environment_lvl2("MOBF: \tin environment")
 			--following return codes are only usefull for non flying
 			if entity.data.movement.canfly == nil or
 				entity.data.movement.canfly == false then
 
 				if mobf_above_water(pos) then
-					if ground_distance > regular_ground_distance then
+					
+					if ground_distance > max_ground_distance then
+						dbg_mobf.environment_lvl2("MOBF: \tdropping above water")
 						return "drop_above_water"
 					end
-
+					dbg_mobf.environment_lvl2("MOBF: \tabove water")
 					return "above_water"
 				end
 
 				if ground_distance > max_ground_distance then
+					dbg_mobf.environment_lvl2("MOBF: \tdropping")
 					return "drop"
 				else
+					dbg_mobf.environment_lvl2("MOBF: \tsurface dependent")
 					return environment.checksurface(pos,entity.environment.surfaces)
 				end
 			else
@@ -429,6 +433,10 @@ end
 --! @return y-acceleration
 ------------------------------------------------------------------------------
 function environment.get_default_gravity(pos,media,canfly)
+
+	if pos == nil then
+		return nil
+	end
 
 	local node = minetest.env:get_node(pos)
 

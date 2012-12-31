@@ -192,7 +192,7 @@ function direction_control.precheck_movement(entity,movement_state,pos_predicted
 			( pos_predicted_state == "above_water" or
 			  pos_predicted_state == "drop")
 			then
-			dbg_mobf.pmovement_lvl1("mob is going to walk on water or drop")
+			dbg_mobf.pmovement_lvl1("MOBF: mob " .. entity.data.name .. " is going to walk on water or drop")
 			local new_pos = environment.get_suitable_pos_same_level(movement_state.basepos,1,entity)
 
 			--try to find at least a possible position
@@ -201,7 +201,28 @@ function direction_control.precheck_movement(entity,movement_state,pos_predicted
 			end
 
 			if new_pos ~= nil then
+				dbg_mobf.pmovement_lvl2("MOBF: redirecting to safe position .. " .. printpos(new_pos))
 				movement_state.accel_to_set = movement_generic.get_accel_to(new_pos,entity)
+				pos_predicted = movement_generic.predict_next_block( movement_state.basepos,
+																movement_state.current_velocity,
+																movement_state.accel_to_set)
+				pos_predicted_state = environment.pos_is_ok({x=pos_predicted.x,y=pos_predicted.y+1,z=pos_predicted.z},entity)
+				for i=0,10,1 do
+					if pos_predicted_state == "ok" or 
+						pos_predicted_state == "possible_surface" then
+						break
+					end
+					movement_state.accel_to_set = movement_generic.get_accel_to(new_pos,entity)
+					pos_predicted = movement_generic.predict_next_block( movement_state.basepos,
+																movement_state.current_velocity,
+																movement_state.accel_to_set)
+					pos_predicted_state = environment.pos_is_ok({x=pos_predicted.x,y=pos_predicted.y+1,z=pos_predicted.z},entity)
+				end
+				
+				if pos_predicted_state == "ok" or 
+						pos_predicted_state == "possible_surface" then
+					dbg_mobf.pmovement_lvl1("MOBF: redirecting to safe position .. " .. printpos(new_pos) .. " failed!")
+				end
 				movement_state.changed = true
 			else
 				local current_state = environment.pos_is_ok(movement_state.basepos,entity)

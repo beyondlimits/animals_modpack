@@ -1,4 +1,4 @@
-local version = "0.0.16"
+local version = "0.0.17"
 
 
 local cow_groups = {
@@ -158,7 +158,7 @@ steer_prototype = {
         spawning = {
                     rate=0.001,
                     density=200,
-                    algorithm="willow_mapgen",
+                    algorithm="big_willow_mapgen",
                     height=2
                     },
         sound = {

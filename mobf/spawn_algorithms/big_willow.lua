@@ -66,8 +66,7 @@ function mobf_spawn_on_big_willow(mob_name,mob_transform,spawning_data,environme
 				if mob_name == nil then
 					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! mob name not available")
 				else
-					if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
-					
+					if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then					
 						local pos_is_big_willow = true
 				
 						for x=pos.x-2,pos.x+2,1 do
@@ -76,7 +75,6 @@ function mobf_spawn_on_big_willow(mob_name,mob_transform,spawning_data,environme
 				
 							if node_to_check == nil or
 								node_to_check.name ~= "default:dirt_with_grass" then
-								pos_is_big_willow = false
 								break
 							end
 						
@@ -119,18 +117,17 @@ function mobf_spawn_on_big_willow_mapgen(mob_name,mob_transform,spawning_data,en
 		spawning.divide_mapgen(minp,maxp,spawning_data.density,mob_name,mob_transform,
 		
 		function(name,pos,min_y,max_y)
-		
 			local pos_is_big_willow = true
-			
+
 			for x=pos.x-2,pos.x+2,1 do
 			for z=pos.z-2,pos.z+2,1 do
-				local node_to_check = minetest.env:getnode({x=x,y=pos.y,z=z})
-				
+				local node_to_check = minetest.env:get_node({x=x,y=pos.y,z=z})
 				if node_to_check == nil or
 					node_to_check.name ~= "default:dirt_with_grass" then
 					pos_is_big_willow = false
 					break
 				end
+			
 				--check if there s enough space above to place mob
 				if not mobf_air_above({x=x,y=pos.y,z=z},spawning_data.height) then
 					pos_is_big_willow = false

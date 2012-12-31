@@ -109,9 +109,9 @@ function movement_gen.callback(entity)
 	local movement_state = {
 		basepos         = entity.getbasepos(entity),
 		default_y_accel = nil,
-		centerpos       = nil,
-		acceleration    = nil,
-		velocity        = nil,
+		centerpos       = entity.object:getpos(),
+		current_acceleration    = nil,
+		current_velocity        = entity.object:getvelocity(),
 		now             = nil,
 		
 		override_height_change_chance = 0,
@@ -132,7 +132,9 @@ function movement_gen.callback(entity)
 	movement_state.default_y_accel = environment.get_default_gravity(movement_state.basepos,
 								entity.environment.media,
 								entity.data.movement.canfly)
+	assert(movement_state.default_y_accel ~= nil)
 	movement_state.now			   = mobf_get_current_time()
+	
 
 	--check current position	
 	--movement state is modified by this function
@@ -144,9 +146,7 @@ function movement_gen.callback(entity)
 	end
 	
 	--read additional information required for further processing
-	movement_state.centerpos            = entity.object:getpos()	
 	movement_state.current_acceleration = entity.object:getacceleration()
-	movement_state.current_velocity 	= entity.object:getvelocity()
 	       
 	if movement_state.changed then
 		minetest.log(LOGLEVEL_WARNING,"MOBF:position got fixed ".. entity.data.name)
@@ -182,7 +182,7 @@ function movement_gen.callback(entity)
 																movement_state.current_acceleration)
 																
 		local pos_predicted_state = environment.pos_is_ok(pos_predicted,entity)
-		dbg_mobf.pmovement_lvl3("Pos predicted state: " .. pos_predicted_state)
+		dbg_mobf.pmovement_lvl3("MOBF: Pos predicted state ".. entity.data.name .. ": " .. pos_predicted_state)
 		-- Y-Movement
 		if movement_state.changed == false then
 		    height_level_control.precheck_movement(entity,movement_state,pos_predicted,pos_predicted_state)
@@ -286,6 +286,8 @@ function movement_gen.init_dynamic_data(entity,now)
 					entity.environment.media,
 					entity.data.movement.canfly)
 
+	assert(accel_to_set.y ~= nil)
+
 	local data = {
 			started				= false,
 			acceleration		= accel_to_set,
@@ -313,35 +315,41 @@ function movement_gen.fix_runaway(entity,movement_state)
 	--avoid mobs racing away
 	local xzspeed = math.sqrt(math.pow(movement_state.current_velocity.x,2)+
 	                          math.pow(movement_state.current_velocity.z,2))
+	dbg_mobf.pmovement_lvl3("MOBF: checkrunaway x=" .. movement_state.current_velocity.x .. 
+									" z=" ..movement_state.current_velocity.z ..
+									" xz=" .. xzspeed .. 
+									" maximum=" .. entity.data.movement.max_speed)
 
 	if xzspeed > entity.data.movement.max_speed then
 		dbg_mobf.pmovement_lvl3("MOBF: too fast! vxz=" .. xzspeed)
+		dbg_mobf.pmovement_lvl3("MOBF: current acceleration:" .. printpos(movement_state.current_acceleration))
 		local newaccel = {x=0,y=movement_state.current_acceleration.y,z=0}
 		
 		--calculate sign of acceleration
 		if movement_state.current_velocity.x > 0 and 
 		    movement_state.current_acceleration.x >= 0 then
-				newaccel.x = entity.data.movement.min_accel * -1
+				newaccel.x = entity.data.movement.max_accel * -1
 		else
-				newaccel.x = entity.data.movement.min_accel
+				newaccel.x = entity.data.movement.max_accel
 		end
 		
 		if movement_state.current_velocity.z > 0 and 
 		    movement_state.current_acceleration.z >= 0 then
-				newaccel.z = entity.data.movement.min_accel * -1
+				newaccel.z = entity.data.movement.max_accel * -1
 		else
-				newaccel.z = entity.data.movement.min_accel
+				newaccel.z = entity.data.movement.max_accel
 		end
 		
 		--calculate relative partition of acceleration based on velocity
 		if movement_state.current_velocity.x > 0 and
-			movement_state.current_velocity.z > 0 then			
+			movement_state.current_velocity.z > 0 then
 			newaccel.x = newaccel.x * movement_state.current_velocity.x / 
 						 (movement_state.current_velocity.x+movement_state.current_velocity.z)
 			newaccel.z = newaccel.z * movement_state.current_velocity.z /
-						 (movement_state.current_velocity.x+movement_state.current_velocity.z)			
+						 (movement_state.current_velocity.x+movement_state.current_velocity.z)
 		end
-				
+		
+		dbg_mobf.pmovement_lvl3("MOBF: fixed acceleration:" .. printpos(newaccel))
 		--set acceleration based on min acceleration
 		movement_state.accel_to_set = newaccel
 		movement_state.changed = true
@@ -362,9 +370,10 @@ function movement_gen.fix_to_slow(entity,movement_state)
 	local xzspeed = math.sqrt(math.pow(movement_state.current_velocity.x,2) + 
 								math.pow(movement_state.current_velocity.z,2) )
 	                          
-	dbg_mobf.pmovement_lvl3("MOBF: x=" .. movement_state.current_velocity.x .. 
+	dbg_mobf.pmovement_lvl3("MOBF: checktoslow x=" .. movement_state.current_velocity.x .. 
 										" z=" ..movement_state.current_velocity.z ..
-										" xz=" .. xzspeed)
+										" xz=" .. xzspeed ..
+										" minimum=" .. dump(entity.data.movement.min_speed))
 	
 	--this ain't perfect to avoid flying mobs standing in air 
 	--but it's a quick solution to fix most of the problems
@@ -391,7 +400,10 @@ end
 function movement_gen.fix_current_pos(entity,movement_state)
 
 	--check if current pos is ok
-	local current_state = environment.pos_is_ok(movement_state.basepos,entity)	
+	local current_state = environment.pos_is_ok(movement_state.basepos,entity)
+	local handled = false
+	
+	dbg_mobf.pmovement_lvl3("MOBF: current state ".. entity.data.name .. ": " .. current_state)
 
 	movement_state.accel_to_set = { x=0,
 									y=movement_state.default_y_accel,
@@ -401,8 +413,8 @@ function movement_gen.fix_current_pos(entity,movement_state)
 	
 	if current_state == "ok" or
 		current_state == "possible_surface" then
-		
-		entity.dynamic_data.movement.last_pos_in_env = movement_state.basepos
+		entity.dynamic_data.movement.last_pos_in_env = movement_state.centerpos
+		handled = true
 	end
 
 	--states ok drop and wrong_surface don't require an imediate action
@@ -419,62 +431,54 @@ function movement_gen.fix_current_pos(entity,movement_state)
 		movement_state.force_change = true
 
 		--mob is currently in whater try to find a suitable position 1 level above current level
-		if current_state == "in_water" then
-			local targetpos = environment.get_suitable_pos_same_level({x=movement_state.basepos.x,
+		if current_state == "in_water" or 
+			current_state == "above_water" then
+		
+			local targetpos = nil
+			if entity.dynamic_data.movement.last_pos_in_env == nil then
+				targetpos = environment.get_suitable_pos_same_level({x=movement_state.basepos.x,
 																				y=movement_state.basepos.y+1,
 																				z=movement_state.basepos.z},
 																			1,
 																			entity)
+			end
 
-			if targetpos == nil and
-				entity.dynamic_data.movement.last_pos_in_env then
-				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way out of water, for mob at: " .. printpos(movement_state.basepos) .. " using last known good position")
-				targetpos = { x=entity.dynamic_data.movement.last_pos_in_env.x,
-									y=entity.dynamic_data.movement.last_pos_in_env.y+1,
-									z=entity.dynamic_data.movement.last_pos_in_env.z }
+			if targetpos ~= nil or
+				entity.dynamic_data.movement.last_pos_in_env ~= nil then
+				mobf_bug_warning(LOGLEVEL_INFO,"MOBF: BUG !!! didn't find a way out of water, for mob at: " .. printpos(movement_state.basepos) .. " using last known good position")
+				
+				if targetpos == nil then
+					targetpos = entity.dynamic_data.movement.last_pos_in_env
+				else
+					targetpos.y = targetpos.y+1 --TODO use collision box 
+				end
 				
 				minetest.log(LOGLEVEL_WARNING,"MOBF: Your mob dropt into water moving to "..
 						printpos(targetpos).." state: "..
 						environment.pos_is_ok(targetpos,entity))
 				entity.object:moveto(targetpos)
+				movement_state.current_velocity.x = movement_state.current_velocity.x/10
+				movement_state.current_velocity.z = movement_state.current_velocity.z/10
+				entity.object:setvelocity(movement_state.current_velocity)
+				movement_state.centerpos = targetpos
+				movement_state.basepos = entity.getbasepos(entity)
 				movement_state.accel_to_set.y = environment.get_default_gravity(targetpos,
 							entity.environment.media,
 							entity.data.movement.canfly)
+				assert(movement_state.accel_to_set.y ~= nil)
 			else
-				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way out of water, for mob at: " .. printpos(movement_state.basepos) .. " drowning")
+				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way out of water, for mob at: " .. printpos(movement_state.basepos) .. " drowning " .. dump(entity.dynamic_data.movement.last_pos_in_env))
 				abort_processing = true
 				spawning.remove(entity)
 			end
 			
-
+			handled = true
 		end
 
 		if current_state == "in_air" then
 			--TODO die?
+			handled = true
 		end
-
-		--mob is most likely to fall in water soon find a dry place around
-		if current_state == "above_water" then
-			dbg_mobf.movement_lvl1("MOBF: mob is lurking around above water")
-			local targetpos = environment.get_suitable_pos_same_level({x=movement_state.basepos.x,
-																			 y=movement_state.basepos.y,
-																			 z=movement_state.basepos.z},1,entity)
-	
-			if targetpos ~= nil then
-                --simple way of fixing
-				dbg_mobf.movement_lvl1("mob ".. entity.data.name .. " above water, moving to "..printpos(targetpos).." state: "..environment.pos_is_ok(targetpos,entity))
-				entity.object:moveto(targetpos)	
-				
-				--after moving there might be a new default accel
-				movement_state.default_y_accel = environment.get_default_gravity(pos,
-								entity.environment.media,
-								entity.data.movement.canfly)
-								
-				movement_state.basepos = targetpos
-			else
-				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way from water, mob is most likely to drown soon")
-			end
-		end      
 	end
 	
 	local damagetime = 60
@@ -496,7 +500,9 @@ function movement_gen.fix_current_pos(entity,movement_state)
 				abort_processing = true
 				spawning.remove(entity)
 			end
-		end	
+		end
+		
+		handled = true
 	else
 		entity.dynamic_data.good_surface = movement_state.now
 	end
@@ -509,7 +515,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 			tostring( current_pos.y )..":"..
 			tostring( current_pos.z ).." Nodename:"..
 			tostring( current_node.name ).." walkable:"..
-			tostring( minetest.registered_nodes[current_node.name].walkable ));
+			tostring( minetest.registered_nodes[current_node.name].walkable ))
 		
 		if not mobf_is_walkable(current_node) then
 			local targetpos = environment.get_suitable_pos_same_level({x=current_pos.x,
@@ -534,14 +540,21 @@ function movement_gen.fix_current_pos(entity,movement_state)
 				movement_state.accel_to_set.y = environment.get_default_gravity(targetpos,
 									entity.environment.media,
 									entity.data.movement.canfly)
+				assert(movement_state.default_y_accel ~= nil)
 			else
 				minetest.log(LOGLEVEL_WARNING,"MOBF: mob " .. entity.data.name .. " was within solid block, removed")
 				abort_processing = true
 				spawning.remove(entity)
 			end
 		end
+		
+		handled = true
 	end
-
+	
+	if not handled then
+		dbg_mobf.movement_lvl1("MOBF: ".. entity.data.name .. " state: ".. current_state .. " not handled!")
+	end
+	
 	return {	abort_processing=abort_processing,	 }
 end
 

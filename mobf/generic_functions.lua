@@ -703,13 +703,14 @@ function mobf_above_water(pos)
 	while node_to_check ~= nil and 
 			node_to_check.name == "air" do
 			
-			if node_to_check.name == "default:water_source" or
-					node_to_check.name == "default:water_flowing" then
-				return true			
-			end
 			--print("Checking node below " .. node_to_check.name .. " pos: ".. printpos(pos))
 			pos = {x=pos.x,y=pos.y-1,z=pos.z};
 			node_to_check = minetest.env:get_node(pos)
+	end
+	
+	if node_to_check.name == "default:water_source" or
+		node_to_check.name == "default:water_flowing" then
+		return true
 	end
 
 	return false
