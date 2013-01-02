@@ -24,6 +24,7 @@ mob_inventory = {}
 
 --!@}
 mob_inventory.trader_inventories = {}
+mob_inventory.formspecs = {}
 
 
 -------------------------------------------------------------------------------
@@ -46,7 +47,6 @@ function mob_inventory.allow_move(inv, from_list, from_index, to_list, to_index,
 
 	dbg_mobf.trader_inv_lvl1("MOBF: move inv: " .. tostring(inv) .. " from:" .. dump(from_list) .. 
 								" to: " .. dump(to_list))
-	
 	if to_list ~= "selection" or
 		from_list == "price_1" or 
 		from_list == "price_2" or
@@ -371,7 +371,7 @@ function mob_inventory.init_trader_inventory(entity)
 			"list[detached:" .. unique_entity_id .. ";takeaway;7,4.5;1,1;]" ..
 			"list[current_player;main;0,6;8,4;]"
 			
-	if minetest.create_detached_formspec("formspec_" .. unique_entity_id, trader_formspec) == false then
+	if mob_inventory.register_formspec("formspec_" .. unique_entity_id,trader_formspec) == false then
 		dbg_mobf.trader_inv_lvl1("MOBF: unable to create trader formspec")
 	end
 end
@@ -395,6 +395,25 @@ function mob_inventory.config_check(entity)
 end
 
 -------------------------------------------------------------------------------
+-- name: register_formspec(name,formspec)
+--
+--! @brief check if mob is configured as trader
+--! @memberof mob_inventory
+--
+--! @param entity mob being checked
+--! @return true/false if succesfull or not
+-------------------------------------------------------------------------------
+function mob_inventory.register_formspec(name,formspec)
+
+	if mob_inventory.formspecs[name] == nil then
+		mob_inventory.formspecs[name] = formspec
+		return true
+	end
+
+	return false
+end
+
+-------------------------------------------------------------------------------
 -- name: callback(entity,player,now)
 --
 --! @brief callback handler for harvest by player
@@ -410,8 +429,10 @@ function mob_inventory.trader_callback(entity,player)
 	--local unique_entity_id = "testinv"
 	local playername = player.get_player_name(player)
 	
-	if minetest.show_detached_formspec(playername,"formspec_" .. unique_entity_id) == false then
-		dbg_mobf.trader_inv_lvl1("MOBF: unable to show trader formspec")
+	if mob_inventory.formspecs["formspec_" .. unique_entity_id] ~= nil then
+		if minetest.show_formspec(playername,mob_inventory.formspecs["formspec_" .. unique_entity_id]) == false then
+			dbg_mobf.trader_inv_lvl1("MOBF: unable to show trader formspec")
+		end
 	end
 end
 
