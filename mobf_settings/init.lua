@@ -1,4 +1,4 @@
-mobf_settings_version = "0.0.9"
+mobf_settings_version = "0.0.10"
 
 
 mobf_settings = {}
@@ -422,9 +422,9 @@ minetest.register_privilege("mobfw_admin",
 -- register button for mobf settings to inventory plus
 ------------------------------------------------------------------------------
 if type(inventory_plus.register_button) == "function" then
-	minetest.register_on_joinplayer(function(player)
-		mobf_settings_debug("MOBF_SETTINGS: checking player " .. playername .. " for sufficent privileges")
+	minetest.register_on_joinplayer(function(player)		
 		local playername = player:get_player_name()
+		mobf_settings_debug("MOBF_SETTINGS: checking player " .. playername .. " for sufficent privileges")
 		if minetest.check_player_privs(playername, {mobfw_admin=true}) then
 			mobf_settings_debug("MOBF_SETTINGS: player is allowed to do mobf configuration")
 			inventory_plus.register_button(player,"mobf","Mobf Settings")
