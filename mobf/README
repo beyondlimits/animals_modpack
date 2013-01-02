@@ -134,6 +134,11 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.9.8
+-added trader support
+-fixed sheep not being sheered
+-added support for on_rightclick callbacks
+
 Changes 1.9.7
 -fixed bug big_willow spawner not enabled
 -fixed bug steer not using big_willow spawner

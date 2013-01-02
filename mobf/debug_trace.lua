@@ -85,4 +85,8 @@ dbg_mobf = {
 	mobf_core_helper_lvl1	= function () end,
 	mobf_core_helper_lvl2	= function () end,
 	mobf_core_helper_lvl3	= function () end,
+	
+	trader_inv_lvl1			= function () end,
+	trader_inv_lvl2			= function () end,
+	trader_inv_lvl3			= function () end,
 }

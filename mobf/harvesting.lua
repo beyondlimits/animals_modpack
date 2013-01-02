@@ -170,7 +170,7 @@ function harvesting.callback(entity,player,now)
 		
 		--play harvest sound
 		if entity.data.sound ~= nil then		
-			sound.play(entity.object:getpos(),entity.data.sound.harvest);		
+			sound.play(entity.object:getpos(),entity.data.sound.harvest);
 		end
 
 		--harvest done

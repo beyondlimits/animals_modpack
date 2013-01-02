@@ -24,6 +24,7 @@ mobf = {}
 
 mobf.on_step_callbacks = {}
 mobf.on_punch_callbacks = {}
+mobf.on_rightclick_callbacks = {}
 
 
 ------------------------------------------------------------------------------
@@ -84,6 +85,29 @@ function mobf.init_on_step_callbacks(entity,now)
 
 end
 
+------------------------------------------------------------------------------
+-- name: register_on_rightclick_callback(callback)
+--
+--! @brief make a new on_rightclick callback known to mobf
+--! @ingroup mobf
+--
+--! @param callback to make known to mobf
+-------------------------------------------------------------------------------
+function mobf.register_on_rightclick_callback(callback)
+
+	if callback.configcheck == nil or
+		type(callback.configcheck) ~= "function" then
+		return false
+	end
+	
+	if callback.handler == nil or
+		type(callback.configcheck) ~= "function" then
+		return false
+	end
+
+	table.insert(mobf.on_rightclick_callbacks,callback)
+end
+
 
 ------------------------------------------------------------------------------
 -- name: register_on_punch_callback(callback)
@@ -135,6 +159,37 @@ function mobf.init_on_punch_callbacks(entity,now)
 			end
 		else
 			dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") callback " .. mobf.on_punch_callbacks[i].name .. " disabled due to config check")
+		end
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: init_on_rightclick_callbacks(entity,now)
+--
+--! @brief initalize callbacks to be used on punch
+--! @ingroup mobf
+--
+--! @param entity entity to initialize on_punch handler
+--! @param now current time
+-------------------------------------------------------------------------------
+function mobf.init_on_rightclick_callbacks(entity,now)
+	entity.on_rightclick_hooks = {}
+
+	dbg_mobf.mobf_core_lvl2("MOBF: initializing " .. #mobf.on_rightclick_callbacks ..  " on_rightclick callbacks for " .. entity.data.name .. " entity=" .. tostring(entity))
+	for i = 1, #mobf.on_rightclick_callbacks , 1 do
+		if mobf.on_rightclick_callbacks[i].configcheck(entity) and
+			type(mobf.on_rightclick_callbacks[i].handler) == "function" then
+			dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") enabling callback " .. mobf.on_rightclick_callbacks[i].name)
+			table.insert(entity.on_rightclick_hooks,mobf.on_rightclick_callbacks[i].handler)
+			
+			if type(mobf.on_rightclick_callbacks[i].init) == "function" then
+				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") executing init function for " .. mobf.on_rightclick_callbacks[i].name)
+				mobf.on_rightclick_callbacks[i].init(entity,now)
+			else
+				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") no init function defined")
+			end
+		else
+			dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") callback " .. mobf.on_rightclick_callbacks[i].name .. " disabled due to config check")
 		end
 	end
 end
@@ -220,6 +275,7 @@ function mobf.activate_handler(self,staticdata)
 	
 	mobf.init_on_step_callbacks(self,now)
 	mobf.init_on_punch_callbacks(self,now)
+	mobf.init_on_rightclick_callbacks(self,now)
 	
 	--restore saved data
 	local retval = mobf_deserialize_permanent_entity_data(staticdata)
@@ -409,6 +465,14 @@ function mobf.register_entity(name, graphics, mob)
 
 		--rightclick is only used for debug reasons by now
 			on_rightclick = function(self, clicker)
+				local starttime = mobf_get_time_ms()
+				for i = 1, #self.on_rightclick_hooks, 1 do
+					if self.on_rightclick_hooks[i](self,clicker) then
+						break
+					end
+					mobf_warn_long_fct(starttime,"callback nr " .. i,"callback_or_" .. self.data.name .. "_" .. i)
+				end
+			
 				local lifetime = mobf_get_current_time() - self.dynamic_data.spawning.original_spawntime
 				print(self.data.name .. " is alive for " .. lifetime .. " seconds")
 				print("Current state: " .. self.dynamic_data.state.current )

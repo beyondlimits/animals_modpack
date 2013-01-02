@@ -1,4 +1,4 @@
-local version = "0.0.17"
+local version = "0.0.18"
 
 local sheep_groups = {
 						sheerable=1,
@@ -41,7 +41,7 @@ sheep_prototype = {
 					max_tool_usage=10,
 					tool_consumed=false,
 					result="wool:white 1", 
-					transforms_to="animal_sheep:sheep_naked_default",
+					transforms_to="animal_sheep:sheep_naked__default",
 					min_delay=-1,
 					},
 		catching = {

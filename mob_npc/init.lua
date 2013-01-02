@@ -1,4 +1,4 @@
-local version = "0.0.1"
+local version = "0.0.2"
 
 local modpath = minetest.get_modpath("mob_npc")
 
@@ -14,6 +14,7 @@ npc_prototype = {
 						fleshy=3,
 					},
 					envid="on_ground_1",
+					custom_on_activate_handler=mob_inventory.init_trader_inventory,
 				},
 		movement =  {
 					default_gen="none",
@@ -61,10 +62,17 @@ npc_prototype = {
 					start_frame = 0,
 					end_frame   = 79,
 					},
+			},
+		trader_inventory = {
+				goods = {
+							{ "default:mese 1", "default:dirt 99", "default:cobble 50"},
+							{ "default:steel_ingot 1", "default:dirt 50", "default:cobble 20"},
+							{ "default:sword_steel 1", "default:cobble 50", "default:stone 20"},
+						},
+				random_names = { "Hans","Franz","Xaver","Fritz","Thomas","Martin"},
 			}
 		}
-
-
+		
 --register with animals mod
 print ("Adding animal "..npc_prototype.name)
 mobf_add_mob(npc_prototype)

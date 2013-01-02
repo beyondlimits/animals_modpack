@@ -52,6 +52,7 @@ dofile (mobf_modpath .. "/mobf.lua")
 dofile (mobf_modpath .. "/api.lua")
 dofile (mobf_modpath .. "/debug.lua")
 dofile (mobf_modpath .. "/mob_state.lua")
+dofile (mobf_modpath .. "/inventory.lua")
 
 --include spawning support
 dofile (mobf_modpath .. "/spawning.lua")
@@ -273,12 +274,20 @@ function mobf_init_modules()
 				})
 	
 	mobf.register_on_punch_callback({
-			name = "on_punch",
+			name = "punching",
 			handler = fighting.hit,
 			configcheck = function(entity)
 					return true
 				end
 				})
+				
+				
+	--on rightclick callbacks
+	mobf.register_on_rightclick_callback({
+			name = "tradercallback",
+			handler		= mob_inventory.trader_callback,
+			configcheck	= mob_inventory.config_check
+			})
 end
 
 mobf_init_framework()
