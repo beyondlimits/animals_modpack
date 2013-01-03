@@ -1,4 +1,4 @@
-local version = "0.0.12"
+local version = "0.0.13"
 
 local big_red_groups = {
                         not_in_creative_inventory=1
@@ -23,6 +23,7 @@ big_red_prototype = {
 						cracky=1,
 						deamon=1,
 					},
+					groups = big_red_groups,
 					envid="on_ground_1",
 				},
 		movement =  {

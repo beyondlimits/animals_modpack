@@ -134,6 +134,10 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.9.10
+-fixed group support for mobs
+-fixed doku
+
 Changes 1.9.9
 -added trader spawning
 -multiple fixes related to new state only modes

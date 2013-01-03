@@ -1,4 +1,8 @@
-local version = "0.0.6"
+local version = "0.0.7"
+
+local wolf_groups = {
+						not_in_creative_inventory=1
+					}
 
 local modpath = minetest.get_modpath("animal_wolf")
 
@@ -18,6 +22,7 @@ wolf_prototype = {
 					armor_groups= {
 						fleshy=3,
 					},
+					groups = wolf_groups,
 					addoncatch = "animal_wolf:tamed_wolf",
 					envid="on_ground_2"
 				},
@@ -79,6 +84,7 @@ tamed_wolf_prototype = {
 					armor_groups= {
 						fleshy=3,
 					},
+					groups = wolf_groups,
 					envid="on_ground_2",
 					--this needs to be done by animal as first on_activate handler is called
 					--before placer is known to entity

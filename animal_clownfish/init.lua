@@ -1,6 +1,10 @@
-local version = "0.0.7"
+local version = "0.0.8"
 
 local selectionbox_clownfish = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
+
+local clownfish_groups = {
+						not_in_creative_inventory=1
+					}
 
 local modpath = minetest.get_modpath("animal_clownfish")
 
@@ -26,6 +30,7 @@ clownfish_prototype = {
 					armor_groups= {
 						fleshy=3,
 					},
+					groups = clownfish_groups,
 					envid = "open_waters"
 				},				
 		movement =  {

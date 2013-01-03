@@ -1,4 +1,8 @@
-local version = "0.0.3"
+local version = "0.0.4"
+
+local npc_groups = {
+						not_in_creative_inventory=1
+					}
 
 local modpath = minetest.get_modpath("mob_npc")
 
@@ -15,6 +19,7 @@ npc_prototype = {
 					armor_groups= {
 						fleshy=3,
 					},
+					groups = npc_groups,
 					envid="on_ground_1",
 				},
 		movement =  {
@@ -77,6 +82,7 @@ npc_trader_prototype = {
 					armor_groups= {
 						fleshy=3,
 					},
+					groups = npc_groups,
 					envid="on_ground_1",
 					custom_on_activate_handler=mob_inventory.init_trader_inventory,
 				},

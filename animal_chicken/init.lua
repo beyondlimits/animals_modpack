@@ -1,4 +1,4 @@
-local version = "0.0.10"
+local version = "0.0.11"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
@@ -35,6 +35,7 @@ chicken_prototype = {
 					armor_groups= {
 						fleshy=3,
 					},
+					groups = chicken_groups,
 					envid = "meadow"
 				},
 		movement =  {

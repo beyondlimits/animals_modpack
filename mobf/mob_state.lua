@@ -12,7 +12,7 @@
 --! @date 2012-08-09
 --
 --
---! @defgroup mob_state functions for state handling and changeing
+--! @defgroup mob_state State handling functions
 --! @brief a component to do basic changes to mob on state change
 --! @ingroup framework_int
 --! @{ 
@@ -412,7 +412,7 @@ end
 -- name: prepare_states(mob)
 --
 --! @brief register a mob within mob framework
---! @ingroup framework_mob
+--! @ingroup mob_state
 --
 --! @param mob a mob declaration
 -------------------------------------------------------------------------------

@@ -1,6 +1,10 @@
-local version = "0.0.6"
+local version = "0.0.7"
 
 local selectionbox_rat = {-0.35, -0.0625, -0.0625, 0.35, 0.125, 0.0625}
+
+local rat_groups = {
+						not_in_creative_inventory=1
+					}
 
 local modpath = minetest.get_modpath("animal_rat")
 
@@ -18,6 +22,7 @@ rat_prototype = {
 					armor_groups= {
 						fleshy=3,
 					},
+					groups = rat_groups,
 					envid="on_ground_1",
 				},
 		movement =  {

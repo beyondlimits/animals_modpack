@@ -11,7 +11,7 @@
 --! @author Sapier
 --! @date 2013-01-02
 --
---! @defgroup inventory inventory subcomponent
+--! @defgroup Inventory inventory subcomponent
 --! @brief Component handling mob inventory
 --! @ingroup framework_int
 --! @{

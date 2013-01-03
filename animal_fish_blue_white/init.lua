@@ -1,6 +1,10 @@
-local version = "0.0.8"
+local version = "0.0.9"
 
 local selectionbox_fish_blue_white = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
+
+local fish_blue_white_groups = {
+                        not_in_creative_inventory=1
+                    }
 
 local modpath = minetest.get_modpath("animal_fish_blue_white")
 
@@ -34,6 +38,7 @@ fish_blue_white_prototype = {
 					armor_groups= {
 						fleshy=3,
 					},
+					groups = fish_blue_white_groups,
 					envid="shallow_waters",
 				},				
 		movement =  { 

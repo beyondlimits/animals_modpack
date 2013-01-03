@@ -1,6 +1,6 @@
-local version = "0.0.7"
+local version = "0.0.8"
 
-local chicken_deer = {
+local deer_groups = {
 						not_in_creative_inventory=1
 					}
 
@@ -21,6 +21,7 @@ deer_prototype = {
 					armor_groups= {
 						fleshy=3,
 					},
+					groups = deer_groups,
 					envid="meadow",
 				},
 		movement =  { 

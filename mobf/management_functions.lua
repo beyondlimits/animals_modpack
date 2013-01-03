@@ -239,7 +239,7 @@ function mobf_add_mob(mob)
 				secondary_name = mob.harvest.transforms_to
 			end
 			
-			dbg_mobf.mobf_core_lvl3("MOBGF: Environment to use:" , mob.generic.envid)
+			dbg_mobf.generic_lvl3("Environment to use:" , mob.generic.envid)
 			
 			mobf_spawn_algorithms[mob.spawning.algorithm](mob.modname..":"..mob.name,
 																secondary_name,
@@ -258,7 +258,7 @@ function mobf_add_mob(mob)
 			minetest.log(LOGLEVEL_ERROR,"MOBF: specified mob >" .. mob.name .. "< without environment!")
 		end
 	else
-		dbg_mobf.mobf_core_lvl3("MOBF: MOB spawning disabled!")
+		print("MOB spawning disabled!")
 	end
 
 	--register mob name to internal data structures

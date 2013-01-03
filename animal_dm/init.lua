@@ -1,4 +1,4 @@
-local version = "0.0.10"
+local version = "0.0.11"
 
 local dm_groups = {
                         not_in_creative_inventory=1
@@ -22,6 +22,7 @@ dm_prototype = {
 						fleshy=1,
 						deamon=1,
 					},
+					groups = dm_groups,
 					envid="simple_air"
 				},				
 		movement =  {

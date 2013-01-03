@@ -1,4 +1,4 @@
-local version = "0.0.12"
+local version = "0.0.13"
 
 local vombie_groups = {
 						not_in_creative_inventory=1
@@ -79,6 +79,7 @@ vombie_prototype = {
 						fleshy=3,
 						daemon=1,
 					},
+					groups = vombie_groups,
 					envid="on_ground_1",
 					custom_on_step_handler = vombie_on_step_handler,
 					custom_on_activate_handler = vombie_on_activate_handler,

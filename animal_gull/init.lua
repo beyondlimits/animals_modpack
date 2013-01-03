@@ -1,4 +1,4 @@
-local version = "0.0.8"
+local version = "0.0.9"
 
 local gull_groups = {
 						not_in_creative_inventory=1
@@ -21,6 +21,7 @@ gull_prototype = {
 					armor_groups= {
 						fleshy=3,
 					},
+					groups = gull_groups,
 					envid="flight_1",
 				},				
 		movement =  {

@@ -14,13 +14,17 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
-local version = "0.0.4"
+local version = "0.0.5"
 
 local selectionbox_slime_L = {-0.5, -0.4, -0.5,  0.5,0.4,0.5}
 local selectionbox_slime_M = {-0.3, -0.2, -0.3,  0.3,0.2,0.3}
 local selectionbox_slime_S = {-0.15,-0.1,-0.15,  0.15,0.1,0.15}
 
 local modpath = minetest.get_modpath("mob_slime")
+
+local slime_groups = {
+						not_in_creative_inventory=1
+					}
 
 --include debug trace functions
 dofile (modpath .. "/model.lua")
@@ -106,6 +110,7 @@ local prototype_mob_slime_L = {
 		--! @brief [OPTIONAL] armor groups of mob
 		armor_groups = nil,
 		
+		groups = slime_groups,
 		
 		--! @brief [OPTIONAL] custom on_kill(entity,player) callback return true to skip normal on kill handling
 		on_kill_callback = mob_slime_kill,
@@ -220,6 +225,7 @@ local prototype_mob_slime_S = {
 		--! @brief [OPTIONAL] armor groups of mob
 		armor_groups = nil,
 		
+		groups = slime_groups,
 		
 		--! @brief [OPTIONAL] custom on_kill(entity,player) callback return true to skip normal on kill handling
 		on_kill_callback = mob_slime_kill,
@@ -334,6 +340,7 @@ local prototype_mob_slime_M = {
 		--! @brief [OPTIONAL] armor groups of mob
 		armor_groups = nil,
 		
+		groups = slime_groups,
 		
 		--! @brief [OPTIONAL] custom on_kill(entity,player) callback return true to skip normal on kill handling
 		on_kill_callback = mob_slime_kill,

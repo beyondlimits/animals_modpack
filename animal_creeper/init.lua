@@ -1,4 +1,4 @@
-local version = "0.0.8"
+local version = "0.0.9"
 
 local creeper_groups = {
                         not_in_creative_inventory=1
@@ -18,6 +18,7 @@ creeper_prototype = {
 					armor_groups= {
 						cracky=3,
 					},
+					groups = creeper_groups,
 					envid="on_ground_1",
 				},				
 		movement =  {

@@ -12,7 +12,7 @@
 --! @date 2012-08-09
 --
 --
---! @defgroup mobf basic mobf functions
+--! @defgroup mobf Basic mob entity functions
 --! @brief a component containing basic functions for mob handling and initialization
 --! @ingroup framework_int
 --! @{ 
@@ -508,7 +508,7 @@ end
 -- name: register_mob_item(mob)
 --
 --! @brief add mob item for catchable mobs
---! @ingroup framework_int
+--! @ingroup mobf
 --
 --! @param name name of mob
 --! @param modname name of mod mob is defined in
@@ -554,7 +554,7 @@ end
 -- name: blacklist_handling(mob)
 --
 --! @brief add mob item for catchable mobs
---! @ingroup framework_int
+--! @ingroup mobf
 --
 --! @param mob
 -------------------------------------------------------------------------------
