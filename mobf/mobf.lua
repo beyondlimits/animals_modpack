@@ -523,10 +523,7 @@ function mobf.register_mob_item(name,modname,description)
 					local pos = pointed_thing.above
 			
 					local newobject = minetest.env:add_entity(pos,modname..":"..name)
-
 					local newentity = mobf_find_entity(newobject)
-
-					local newpos = newentity.object:getpos()
 
 					if newentity ~= nil then
 					
