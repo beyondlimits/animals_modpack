@@ -235,8 +235,8 @@ function spawning.replace_entity(entity,name,preserve)
 	local newentity = mobf_find_entity(newobject)
 
 	if newentity ~= nil then
-		dbg_mobf.spawning_lvl2("MOBF: replace_entity 3 : " ..  name .. 
-						" added at " .. printpos(newentity.dynamic_data.spawning.spawnpoint))
+		--dbg_mobf.spawning_lvl2("MOBF: replace_entity 3 : " ..  name .. 
+		--				" added at " .. printpos(newentity.dynamic_data.spawning.spawnpoint))
 		newentity.dynamic_data = temporary_dynamic_data
 		newentity.object:set_hp(health)
 		newentity.object:setyaw(entity_orientation)
