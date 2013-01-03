@@ -313,11 +313,12 @@ end
 --! @brief spawn an entity and check for presence
 --! @memberof spawning
 --
+--! @return spawned mob entity
 -------------------------------------------------------------------------------
 function spawning.spawn_and_check(name,suffix,pos,text)
-    local newobject = minetest.env:add_entity(pos,name .. suffix)
-    
-    if newobject then
+	local newobject = minetest.env:add_entity(pos,name .. suffix)
+	
+	if newobject then
 		local newentity = mobf_find_entity(newobject)
 		
 		if newentity == nil then
@@ -326,11 +327,14 @@ function spawning.spawn_and_check(name,suffix,pos,text)
 		else
 			dbg_mobf.spawning_lvl2("MOBF: spawning "..name.." entity by " .. text .. " at position ".. printpos(pos))
 			minetest.log(LOGLEVEL_INFO,"MOBF: spawning "..name.." entity by " .. text .. " at position ".. printpos(pos))
+			return newentity
 		end
 	else
 		dbg_mobf.spawning_lvl3("MOBF BUG!!! no "..name.." object has been created by " .. text .. "!")
 		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!! no "..name.." object has been created by " .. text .. "!")
 	end
+	
+	return nil
 end
 
 

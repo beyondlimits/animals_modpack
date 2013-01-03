@@ -521,28 +521,22 @@ function mobf.register_mob_item(name,modname,description)
 			on_place = function(item, placer, pointed_thing)
 				if pointed_thing.type == "node" then
 					local pos = pointed_thing.above
-			
-					local newobject = minetest.env:add_entity(pos,modname..":"..name)
-					local newentity = mobf_find_entity(newobject)
-
-					if newentity ~= nil then
 					
-						if newentity.dynamic_data ~= nil then
-							-- this can happen if mob is spawned on incorrect place 
-							newentity.dynamic_data.spawning.player_spawned = true
+					local entity = spawning.spawn_and_check(modname..":"..name,"__default",pos,"item_spawner")
+
+					if entity ~= nil then
+						entity.dynamic_data.spawning.player_spawned = true
 							
-							if placer:is_player(placer) then
-								minetest.log(LOGLEVEL_INFO,"MOBF: mob placed by " .. placer:get_player_name(placer))
-								newentity.dynamic_data.spawning.spawner = placer:get_player_name(placer)
-							end
-							
-							if (newentity.data.generic.custom_on_place_handler ~= nil) then
-								newentity.data.generic.custom_on_place_handler(newentity, placer, pointed_thing)
-							end
+						if placer:is_player(placer) then
+							minetest.log(LOGLEVEL_INFO,"MOBF: mob placed by " .. placer:get_player_name(placer))
+							entity.dynamic_data.spawning.spawner = placer:get_player_name(placer)
 						end
+							
+						if entity.data.generic.custom_on_place_handler ~= nil then
+							entity.data.generic.custom_on_place_handler(entity, placer, pointed_thing)
+						end
+
 						item:take_item()
-					else
-						minetest.log(LOGLEVEL_ERROR,"MOBF: Bug no "..mob.name.." hasn't been created!")
 					end
 					return item
 					end
