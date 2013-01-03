@@ -53,7 +53,6 @@ function mobf_print_usage(player, command, toadd)
 		print("CMD: ".. player .."> "..  "Mob successfully spawned "..toadd)
 		minetest.chat_send_player(player, "Mob successfully spawned "..toadd)
 	end
-
 end
 
 -------------------------------------------------------------------------------
@@ -248,6 +247,11 @@ function mobf_debug_handler(name,message)
 		return true
 	end
 	
+	if string.find(message,"/house") ~= nil then
+		handle_spawnhouse(name,message)
+		return true
+	end
+	
 	return false
 end
 
@@ -259,6 +263,62 @@ end
 ------------------------------------------------------------------------------
 function mobf_init_debug()
 	minetest.register_on_chat_message(mobf_debug_handler)
+end
+
+
+-------------------------------------------------------------------------------
+-- name: handle_spawnhouse(name,message)
+--
+--! @brief spawn small house
+--
+------------------------------------------------------------------------------
+function handle_spawnhouse(name,message)
+	local start_pos = string.find(message," ")
+
+	if (start_pos == nil) then
+		return true
+	end
+
+	start_pos = start_pos +1
+	
+	local spawnpoint = {x=0,y=0,z=0}
+	
+	local end_pos = string.find(message,",",start_pos)
+
+	if end_pos ~= nil then
+		print("Found: ".. string.sub(message,start_pos,end_pos-1).. " as x")
+		spawnpoint.x = tonumber(string.sub(message,start_pos,end_pos-1))
+	else
+		return true
+	end
+
+	start_pos = end_pos +1
+	end_pos = string.find(message,",",start_pos)
+
+	if end_pos ~= nil then
+		print("Found: ".. string.sub(message,start_pos,end_pos-1).. " as y")
+		spawnpoint.y = tonumber(string.sub(message,start_pos,end_pos-1))
+	else
+		return true
+	end
+	
+		if end_pos ~= nil then
+		print("Found: ".. string.sub(message,start_pos,end_pos-1).. " as y")
+		spawnpoint.y = tonumber(string.sub(message,start_pos,end_pos-1))
+	else
+		return true
+	end
+
+	start_pos = end_pos +1
+
+	print("Found: ".. string.sub(message,start_pos).. " as z")
+	spawnpoint.z = tonumber(string.sub(message,start_pos))
+
+	if spawnpoint.z == nil then
+		return true
+	end
+	
+	build_small_house(spawnpoint)
 end
 
 --!@}

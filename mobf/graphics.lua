@@ -151,7 +151,7 @@ function graphics.set_animation(entity,name)
 			entity.data.animation[name] ~= nil and
 			entity.dynamic_data.animation ~= name then
 			
-			print("Setting animation to " .. name .. " start: " .. entity.data.animation[name].start_frame .. " end: " .. entity.data.animation[name].end_frame)
+			dbg_mobf.graphics_lvl3("MOBF: Setting animation to " .. name .. " start: " .. entity.data.animation[name].start_frame .. " end: " .. entity.data.animation[name].end_frame)
 			entity.object:set_animation({x=entity.data.animation[name].start_frame,y=entity.data.animation[name].end_frame}, nil, nil)
 			entity.dynamic_data.animation = name
 		end

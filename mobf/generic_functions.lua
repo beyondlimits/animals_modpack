@@ -157,12 +157,14 @@ end
 callback_statistics = {}
 
 -------------------------------------------------------------------------------
--- name: mobf_warn_long_fct()
+-- name: mobf_warn_long_fct(starttime,fctname,facility)
 --
 --! @brief alias to get current time
 --
 --! @param starttime time fct started
 --! @param fctname name of function
+--! @param facility name of facility to add time to
+--
 --! @return current time in seconds
 -------------------------------------------------------------------------------
 function mobf_warn_long_fct(starttime,fctname,facility)
@@ -402,11 +404,11 @@ function mobf_mob_around(mob_name,mob_transform,pos,range,ignore_playerspawned)
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_spawner_around(spawner_name,pos,range)
+-- name: mobf_spawner_around(mob_name,pos,range)
 --
 --! @brief get number of mobs of specified type within range of pos
 --
---! @param spawner_name basic name of mob
+--! @param mob_name basic name of mob
 --! @param pos position to check
 --! @param range range to check
 --! @return number of mob found

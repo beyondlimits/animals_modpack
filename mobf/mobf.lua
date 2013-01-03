@@ -211,19 +211,11 @@ function mobf.get_basepos(entity)
 
 	-- if visual height is more than one block the center of base block is 
 	-- below the entities center
-	-- legacy 2D mode
-	if (entity.data.graphics_3d == nil) or
-		minetest.setting_getbool("mobf_disable_3d_mode") then
-		if (entity.data.graphics.visible_height > 1) then
-			pos.y = pos.y - (entity.data.graphics.visible_height/2) + 0.5
-		end
-	else
-		if (entity.data.graphics_3d.collisionbox[2] < -0.5) then
-			pos.y = pos.y + (entity.data.graphics_3d.collisionbox[2] + 0.5)
-			dbg_mobf.mobf_core_helper_lvl3("MOBF: collision box lower end: " .. entity.data.graphics_3d.collisionbox[2])
-			
-		end
+	if (entity.collisionbox[2] < -0.5) then
+		pos.y = pos.y + (entity.collisionbox[2] + 0.5)
+		dbg_mobf.mobf_core_helper_lvl3("MOBF: collision box lower end: " .. entity.collisionbox[2])
 	end
+
 	nodeatpos = minetest.env:get_node(pos)
 	dbg_mobf.mobf_core_helper_lvl3("MOBF: Base Position: " .. printpos(pos) .. " is: " .. nodeatpos.name)
 
@@ -342,13 +334,7 @@ function mobf.activate_handler(self,staticdata)
 	end
 
 	--initialize height level
-	--legacy 2D mode
-	if (self.data.graphics_3d == nil) or
-		minetest.setting_getbool("mobf_disable_3d_mode") then
-		pos = environment.fix_base_pos(self, self.data.graphics.visible_height/2)
-	else
-		pos = environment.fix_base_pos(self, self.data.graphics_3d.collisionbox[2] * self.data.graphics_3d.visual_size.y * -1)
-	end
+	pos = environment.fix_base_pos(self, self.collisionbox[2] * -1)
 
 	--custom on activate handler
 	if (self.data.generic.custom_on_activate_handler ~= nil) then

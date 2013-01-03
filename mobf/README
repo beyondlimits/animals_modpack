@@ -134,6 +134,11 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.9.9
+-added trader spawning
+-multiple fixes related to new state only modes
+-fixed doku
+
 Changes 1.9.8
 -added trader support
 -fixed sheep not being sheered

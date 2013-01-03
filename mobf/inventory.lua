@@ -230,7 +230,7 @@ end
 --! @brief update content of takeaway
 --! @memberof mob_inventory
 --
---! @param inventory to check
+--! @param inv to update
 -------------------------------------------------------------------------------
 function mob_inventory.update_takeaway(inv)
 	if mob_inventory.check_pay(inv,false) then
@@ -252,7 +252,8 @@ end
 --! @brief check if there is enough at payroll
 --! @memberof mob_inventory
 --
---! @param inventory to check
+--! @param inv inventory to do check
+--! @param paynow true/false if it's called to pay or not
 --
 --! @return true/false
 -------------------------------------------------------------------------------
@@ -307,7 +308,6 @@ end
 --! @memberof mob_inventory
 --
 --! @param entity mob to initialize harvest dynamic data
---! @param now current time
 -------------------------------------------------------------------------------
 function mob_inventory.init_trader_inventory(entity)
 	--TODO find out why calling "tostring" is necessary?!
@@ -400,7 +400,9 @@ end
 --! @brief check if mob is configured as trader
 --! @memberof mob_inventory
 --
---! @param entity mob being checked
+--! @param name name of formspec to register
+--! @param formspec formspec definition
+--
 --! @return true/false if succesfull or not
 -------------------------------------------------------------------------------
 function mob_inventory.register_formspec(name,formspec)
@@ -421,7 +423,7 @@ end
 --
 --! @param entity mob being harvested
 --! @param player player harvesting
---! @param now the current time
+--
 --! @return true/false if handled by harvesting or not
 -------------------------------------------------------------------------------
 function mob_inventory.trader_callback(entity,player)
@@ -446,6 +448,9 @@ end
 -------------------------------------------------------------------------------
 function mob_inventory.get_entity(inv)
 	dbg_mobf.trader_inv_lvl3("MOBF: checking " .. #mob_inventory.trader_inventories .. " registred inventorys")
+	
+	--TODO use this to identify corresponding entity
+	local location = inv.get_location(inv)
 	
 	--TODO this is a dirty workaround
 	local identifier_item_stack = inv.get_stack(inv,"identifier", 1)

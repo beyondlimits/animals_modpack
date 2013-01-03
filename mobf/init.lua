@@ -64,7 +64,7 @@ dofile (mobf_modpath .. "/mgen_rasterized/mgen_raster.lua")
 dofile (mobf_modpath .. "/mgen_jordan4ibanez/mgen_jordan4ibanez.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "1.9.7"
+mobf_version = "1.9.9"
 
 LOGLEVEL_INFO     = "verbose"
 LOGLEVEL_NOTICE   = "info"
