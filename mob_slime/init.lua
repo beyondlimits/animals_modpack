@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
-local version = "0.0.5"
+local version = "0.0.6"
 
 local selectionbox_slime_L = {-0.5, -0.4, -0.5,  0.5,0.4,0.5}
 local selectionbox_slime_M = {-0.3, -0.2, -0.3,  0.3,0.2,0.3}
@@ -199,6 +199,11 @@ local prototype_mob_slime_L = {
 		
 		min_depth = -100,
 		},
+	die = {
+			name="mob_slime_die",
+			gain = 0.7,
+			max_hear_distance = 4,
+			},
 	}
 	
 local prototype_mob_slime_S = {
@@ -314,6 +319,11 @@ local prototype_mob_slime_S = {
 		
 		min_depth = -100,
 		},
+	die = {
+		name="mob_slime_die",
+		gain = 0.7,
+		max_hear_distance = 4,
+		},
 	}
 	
 local prototype_mob_slime_M = {
@@ -428,6 +438,11 @@ local prototype_mob_slime_M = {
 		height = 4,
 		
 		min_depth = -100,
+		},
+	die = {
+		name="mob_slime_die",
+		gain = 0.7,
+		max_hear_distance = 4,
 		},
 	}
 	

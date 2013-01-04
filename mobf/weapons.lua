@@ -139,6 +139,8 @@ end
 --! @param range square around pos to set on fire
 -------------------------------------------------------------------------------
 function MOBF_FIREBALL_ENTITY.surfacefire(pos,range)
+
+	if mobf_rtd.fire_enabled then
 		--start fire on any surface within inner damage range
 		for i=pos.x-range/2, pos.x+range/2, 1 do
 		for j=pos.y-range/2, pos.y+range/2, 1 do
@@ -158,6 +160,9 @@ function MOBF_FIREBALL_ENTITY.surfacefire(pos,range)
 		end
 		end
 		end
+	else
+		minetest.log(LOGLEVEL_ERROR,"MOBF: A fireball without fire mod??!? You're kidding!!")
+	end
 end
 
 -------------------------------------------------------------------------------

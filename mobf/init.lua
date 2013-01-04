@@ -22,13 +22,21 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
---!registry for movement patterns
-mobf_movement_patterns = {}
---!registry of mobs
-mobf_registred_mob = {}
-
---!registred mobs_data
-mobf_registred_mob_data = {}
+--! @brief runtime data required to be setup once on start
+mobf_rtd = {
+	--!is mob running with fire support
+	fire_enabled			= false,
+	--!do we have luatrace
+	luatrace_enabled		= false,
+	--!do we have inventory plus support
+	inventory_plus_enabled = false,
+	--!registry for movement patterns
+	movement_patterns		= {},
+	--!registry of mobs
+	registred_mob			= {},
+	--!registred mobs_data
+	registred_mob_data		= {},
+}
 
 --!path of mod
 mobf_modpath = minetest.get_modpath("mobf")
@@ -92,8 +100,6 @@ function mobf_init_basic_tools()
 		}
 	})
 	
-
-	
 	minetest.register_craft({
 	output = 'animalmaterials:sword_deamondeath',
 	recipe = {
@@ -108,38 +114,68 @@ end
 
 --! @brief main initialization function
 function mobf_init_framework()
-	print("Initializing mob framework")
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing mob framework")
 	mobf_init_basic_tools()
 	
-	print("Reading mob blacklist")
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Reading mob blacklist")
 	local mobf_mob_blacklist_string = minetest.setting_get("mobf_blacklist")
 	
 	if mobf_mob_blacklist_string ~= nil then
-		mobf_registred_mob = minetest.deserialize(mobf_mob_blacklist_string)
+		mobf_rtd.registred_mob = minetest.deserialize(mobf_mob_blacklist_string)
 		
-		if mobf_registred_mob == nil then
-			print()
-			mobf_registred_mob = {}
+		if mobf_rtd.registred_mob == nil then
+			minetest.log(LOGLEVEL_ERROR,"MOBF: Error on serializing blacklist!")
+			mobf_rtd.registred_mob = {}
 		end
 	end
 	
-	print("Initializing probabilistic movement generator")
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize external mod dependencys...")
+	mobf_init_mod_deps()
+	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing probabilistic movement generator")
 	movement_gen.initialize()
 	
-	print("Initializing weaponry..")
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing weaponry..")
 	mobf_init_weapons()
 
-	print("Initializing debug hooks..")
-	mobf_init_debug()
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing debug hooks..")
+	debug.init()
 	
-	print("Initialize mobf supplied modules..")
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize mobf supplied modules..")
 	mobf_init_modules()
 	
-	--luatrace = require("luatrace")
+	-- initialize luatrace if necessary
+	if mobf_rtd.luatrace_enabled then
+		luatrace = require("luatrace")
+	end
+	
+	-- register privilege to change mobf settings
+	minetest.register_privilege("mobfw_admin", 
+	{
+		description = "Player may change mobf settings",
+		give_to_singleplayer = true
+	})
 
-	print("mob framework mod "..mobf_version.." loaded starttime is:" .. mobf_get_time_ms())
+	print("mob framework mod "..mobf_version.." loaded starttime is:" 
+		.. mobf_get_time_ms())
 end
 
+--! @brief initialize mod dependencys
+function mobf_init_mod_deps()
+	local modlist = minetest.get_modnames()
+	
+	for i=1,#modlist,1 do
+		if modlist[i] == "fire" then
+			mobf_rtd.fire_enabled = true
+		end
+		
+		if modlist[i] == "inventory_plus" then
+			mobf_rtd.inventory_plus_enabled = true
+		end
+	end	
+end
+
+--! @brief initialize mobf submodules
 function mobf_init_modules()
 
 	--state change callback
@@ -283,11 +319,22 @@ function mobf_init_modules()
 				
 				
 	--on rightclick callbacks
+	--Note debug needs to be registred FIRST!
+	mobf.register_on_rightclick_callback({
+			name = "debugcallback",
+			handler		= debug.rightclick_callback,
+			configcheck	= function(entity)
+					return true
+				end
+			})
+			
 	mobf.register_on_rightclick_callback({
 			name = "tradercallback",
 			handler		= mob_inventory.trader_callback,
 			configcheck	= mob_inventory.config_check
 			})
+			
+
 end
 
 mobf_init_framework()

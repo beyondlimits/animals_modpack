@@ -1,4 +1,4 @@
-local version = "0.0.4"
+local version = "0.0.5"
 
 local npc_groups = {
 						not_in_creative_inventory=1
@@ -107,10 +107,17 @@ npc_trader_prototype = {
 				movgen = "none",
 				chance = 0,
 				animation = "stand",
+				graphics = {
+					visual = "upright_sprite",
+					sprite_scale={x=1.5,y=2},
+					sprite_div = {x=1,y=1},
+					visible_height = 2,
+					visible_width = 1,
+					},
 				graphics_3d = {
 					visual = "mesh",
 					mesh = "character.x",
-					textures = {"wizard.png"},
+					textures = {"mob_npc_trader_mesh.png"},
 					collisionbox = {-0.3,-1.0,-0.3, 0.3,0.8,0.3},
 					visual_size= {x=1, y=1},
 					},

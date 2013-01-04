@@ -1,0 +1,16 @@
+Licenses
+
+CC0, Author Temperest
+	models/dm.blend
+
+CC0
+	models/dm.x
+	sounds/animal_dm_fireball.ogg
+
+Unknown
+	sounds/animal_dm_die.ogg
+	sounds/animal_dm_hit.ogg
+	sounds/animal_dm_random.ogg
+
+Everything not mentioned:
+	CC-BY-SA, Author sapier

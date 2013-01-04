@@ -45,8 +45,8 @@ mob_inventory.formspecs = {}
 -------------------------------------------------------------------------------
 function mob_inventory.allow_move(inv, from_list, from_index, to_list, to_index, count, player)
 
-	dbg_mobf.trader_inv_lvl1("MOBF: move inv: " .. tostring(inv) .. " from:" .. dump(from_list) .. 
-								" to: " .. dump(to_list))
+	dbg_mobf.trader_inv_lvl1("MOBF: move inv: " .. tostring(inv) .. " from:"
+		.. dump(from_list) .. " to: " .. dump(to_list))
 	if to_list ~= "selection" or
 		from_list == "price_1" or 
 		from_list == "price_2" or
@@ -74,7 +74,8 @@ end
 --! @return number of elements allowed to put
 -------------------------------------------------------------------------------
 function mob_inventory.allow_put(inv, listname, index, stack, player)
-	dbg_mobf.trader_inv_lvl1("MOBF: put inv: " .. tostring(inv) .. " to:" .. dump(listname))
+	dbg_mobf.trader_inv_lvl1("MOBF: put inv: " .. tostring(inv) .. " to:"
+		.. dump(listname))
 	
 	if listname == "pay" then
 		return 99
@@ -98,7 +99,8 @@ end
 --! @return number of elements allowed to take
 -------------------------------------------------------------------------------
 function mob_inventory.allow_take(inv, listname, index, stack, player)
-	dbg_mobf.trader_inv_lvl1("MOBF: take inv: " .. tostring(inv) .. " to:" .. dump(listname))
+	dbg_mobf.trader_inv_lvl1("MOBF: take inv: " .. tostring(inv) .. " to:" 
+		.. dump(listname))
 	
 	if listname == "takeaway" or
 		listname == "pay" then
@@ -122,7 +124,9 @@ end
 --! @param player doing changes
 -------------------------------------------------------------------------------
 function mob_inventory.on_move(inv, from_list, from_index, to_list, to_index, count, player)
-	dbg_mobf.trader_inv_lvl1("MOBF: inv\"" .. tostring(inv) .. "\" moving " .. count .. " items from: " .. from_list .. ":" .. from_index .. " to: " .. to_list .. ":" .. to_index)
+	dbg_mobf.trader_inv_lvl1("MOBF: inv\"" .. tostring(inv) .. "\" moving " 
+		.. count .. " items from: " .. from_list .. ":" .. from_index .. " to: "
+		.. to_list .. ":" .. to_index)
 
 	if from_list == "goods" and
 		to_list == "selection" then
@@ -173,7 +177,8 @@ function mob_inventory.on_put(inv, listname, index, stack, player)
 		local playername = player.get_player_name(player)
 		local count = now_at_pay.get_count(now_at_pay)
 		local name  = now_at_pay.get_name(now_at_pay)
-		dbg_mobf.trader_inv_lvl1("MOBF: putpay player: " .. playername .. " pays now count=" .. count .. " of type=" ..name)
+		dbg_mobf.trader_inv_lvl1("MOBF: putpay player: " .. playername 
+			.. " pays now count=" .. count .. " of type=" ..name)
 		
 		mob_inventory.update_takeaway(inv)
 	end
@@ -199,7 +204,8 @@ function mob_inventory.on_take(inv, listname, index, stack, player)
 		local playername = player.get_player_name(player)
 		local count = now_at_pay.get_count(now_at_pay)
 		local name  = now_at_pay.get_name(now_at_pay)
-		dbg_mobf.trader_inv_lvl2("MOBF: takeaway player: " .. playername .. " pays now count=" .. count .. " of type=" ..name)
+		dbg_mobf.trader_inv_lvl2("MOBF: takeaway player: " .. playername 
+			.. " pays now count=" .. count .. " of type=" ..name)
 		
 		if not mob_inventory.check_pay(inv,true) then
 			dbg_mobf.trader_inv_lvl1("MOBF: error player hasn't payed enough!")
@@ -333,15 +339,6 @@ function mob_inventory.init_trader_inventory(entity)
 	trader_inventory.set_size(trader_inventory,"price_2",1)
 	trader_inventory.set_size(trader_inventory,"pay",1)
 	
-	--TODO dirty workaround
-	trader_inventory.set_size(trader_inventory,"identifier",1)
-	trader_inventory.set_stack(trader_inventory,"identifier",1,unique_entity_id .. " 1")
-	
-	local identifier_item_stack = trader_inventory.get_stack(trader_inventory,"identifier", 1)
-	local identifier  = identifier_item_stack.get_name(identifier_item_stack)
-	dbg_mobf.trader_inv_lvl3("MOBF: added identifier item: " .. identifier)
-	
-	
 	mob_inventory.add_goods(entity,trader_inventory)
 	
 	--register to trader inventories
@@ -350,7 +347,9 @@ function mob_inventory.init_trader_inventory(entity)
 										inv_ref 	= trader_inventory,
 										ent_ref 	= entity,
 										})
-	dbg_mobf.trader_inv_lvl3("MOBF: registering identifier: " .. unique_entity_id .. " invref \"" .. tostring(trader_inventory) .. "\"  for entity \"" .. tostring(entity) .. "\"" )
+	dbg_mobf.trader_inv_lvl3("MOBF: registering identifier: " .. unique_entity_id 
+		.. " invref \"" .. tostring(trader_inventory) .. "\"  for entity \"" 
+		.. tostring(entity) .. "\"" )
 
 	local trader_formspec = "size[8,10;]" ..
 			"label[2,0;Trader " .. tradername .. " Inventory]" .. 
@@ -432,6 +431,19 @@ function mob_inventory.trader_callback(entity,player)
 	local playername = player.get_player_name(player)
 	
 	if mob_inventory.formspecs["formspec_" .. unique_entity_id] ~= nil then
+		--rotate mob to face player
+		local direction = mobf_get_direction(entity.object:getpos(),
+												player:getpos())
+
+		if entity.mode == "3d" then
+			entity.object:setyaw(mobf_calc_yaw(direction.x,direction.z))
+		else
+			entity.object:setyaw(mobf_calc_yaw(direction.x,direction.z)+3.14/2)
+		end
+	
+--		if minetest.show_formspec(playername,
+--					"formspec_" .. unique_entity_id,
+--					mob_inventory.formspecs["formspec_" .. unique_entity_id]) == false then
 		if minetest.show_formspec(playername,mob_inventory.formspecs["formspec_" .. unique_entity_id]) == false then
 			dbg_mobf.trader_inv_lvl1("MOBF: unable to show trader formspec")
 		end
@@ -447,20 +459,18 @@ end
 --! @param inv name of inventory
 -------------------------------------------------------------------------------
 function mob_inventory.get_entity(inv)
-	dbg_mobf.trader_inv_lvl3("MOBF: checking " .. #mob_inventory.trader_inventories .. " registred inventorys")
+	dbg_mobf.trader_inv_lvl3("MOBF: checking " .. #mob_inventory.trader_inventories 
+		.. " registred inventorys")
 	
-	--TODO use this to identify corresponding entity
 	local location = inv.get_location(inv)
 	
-	--TODO this is a dirty workaround
-	local identifier_item_stack = inv.get_stack(inv,"identifier", 1)
-	local identifier  = identifier_item_stack.get_name(identifier_item_stack)
-	
-	
-	for i=1,#mob_inventory.trader_inventories,1 do
-		dbg_mobf.trader_inv_lvl3("MOBF: comparing \"" .. identifier .. "\" to \"" .. mob_inventory.trader_inventories[i].identifier .. "\"")
-		if mob_inventory.trader_inventories[i].identifier == identifier then
-			return mob_inventory.trader_inventories[i].ent_ref
+	if location.type == "detached" then
+		for i=1,#mob_inventory.trader_inventories,1 do
+			dbg_mobf.trader_inv_lvl3("MOBF: comparing \"" .. location.name .. "\" to \"" 
+				.. mob_inventory.trader_inventories[i].identifier .. "\"")
+			if mob_inventory.trader_inventories[i].identifier == location.name then
+				return mob_inventory.trader_inventories[i].ent_ref
+			end
 		end
 	end
 	
@@ -484,7 +494,8 @@ function mob_inventory.fill_prices(entity,inventory,goodname)
 	
 	for i=1,#entity.data.trader_inventory.goods,1 do
 		local stackstring = goodname .. " 1"
-		dbg_mobf.trader_inv_lvl3("MOBF: comparing \"" .. stackstring .. "\" to \"" .. entity.data.trader_inventory.goods[i][1] .. "\"")
+		dbg_mobf.trader_inv_lvl3("MOBF: comparing \"" .. stackstring .. "\" to \"" 
+			.. entity.data.trader_inventory.goods[i][1] .. "\"")
 		if entity.data.trader_inventory.goods[i][1] == stackstring then
 			good = entity.data.trader_inventory.goods[i]
 		end
@@ -506,10 +517,12 @@ end
 --! @param trader_inventory to put goods
 -------------------------------------------------------------------------------
 function mob_inventory.add_goods(entity,trader_inventory)
-	dbg_mobf.trader_inv_lvl3("MOBF: adding " .. #entity.data.trader_inventory.goods .. " goods for trader")
+	dbg_mobf.trader_inv_lvl3("MOBF: adding " .. #entity.data.trader_inventory.goods 
+		.. " goods for trader")
 	for i=1,#entity.data.trader_inventory.goods,1 do
 		dbg_mobf.trader_inv_lvl3("MOBF:\tadding " .. entity.data.trader_inventory.goods[i][1])
-		trader_inventory.add_item(trader_inventory,"goods",entity.data.trader_inventory.goods[i][1])
+		trader_inventory.add_item(trader_inventory,"goods",
+									entity.data.trader_inventory.goods[i][1])
 	end
 
 end

@@ -37,8 +37,8 @@ end
 -------------------------------------------------------------------------------
 function mobf_get_mob_definition(mobname)
 
-	if mobf_registred_mob_data[mobname] ~= nil then
-		local copy = minetest.serialize(mobf_registred_mob_data[mobname])
+	if mobf_rtd.registred_mob_data[mobname] ~= nil then
+		local copy = minetest.serialize(mobf_rtd.registred_mob_data[mobname])
 		return minetest.deserialize(copy)
 	end
 	return nil
@@ -73,7 +73,7 @@ function mobf_add_mob(mob)
 	end
 	
 	--check if mob may be added
-	if mobf_contains(mobf_registred_mob,mob.modname.. ":"..mob.name) then
+	if mobf_contains(mobf_rtd.registred_mob,mob.modname.. ":"..mob.name) then
 		mobf.blacklisthandling(mob)
 		return false
 	end
@@ -90,7 +90,7 @@ function mobf_add_mob(mob)
 	mobf.register_mob_item(mob.name,mob.modname,mob.generic.description)
 	
 	--check if a movement pattern was specified
-	if mobf_movement_patterns[mob.movement.pattern] == nil then
+	if mobf_rtd.movement_patterns[mob.movement.pattern] == nil then
 		minetest.log(LOGLEVEL_WARNING,"MOBF: no movement pattern specified!")
 	end
 
@@ -112,7 +112,9 @@ function mobf_add_mob(mob)
 																	mob.spawning,
 																	environment_list[mob.generic.envid])
 			else
-				dbg_mobf.mobf_core_lvl2("MOBGF: " .. mob.name .. " no primary spawn algorithm defined: " .. tostring(mob.spawning.algorithm))
+				dbg_mobf.mobf_core_lvl2("MOBGF: " .. mob.name 
+					.. " no primary spawn algorithm defined: " 
+					.. tostring(mob.spawning.algorithm))
 			end
 			
 			if minetest.setting_getbool("mobf_animal_spawning_secondary") then
@@ -125,15 +127,16 @@ function mobf_add_mob(mob)
 				end
 			end
 		else
-			minetest.log(LOGLEVEL_ERROR,"MOBF: specified mob >" .. mob.name .. "< without environment!")
+			minetest.log(LOGLEVEL_ERROR,"MOBF: specified mob >" .. mob.name 
+				.. "< without environment!")
 		end
 	else
 		dbg_mobf.mobf_core_lvl3("MOBF: MOB spawning disabled!")
 	end
 
 	--register mob name to internal data structures
-	table.insert(mobf_registred_mob,mob.modname.. ":"..mob.name)
-	mobf_registred_mob_data[mob.modname.. ":"..mob.name] = mob;
+	table.insert(mobf_rtd.registred_mob,mob.modname.. ":"..mob.name)
+	mobf_rtd.registred_mob_data[mob.modname.. ":"..mob.name] = mob;
 	
 	return true
 end
@@ -148,7 +151,7 @@ end
 --! @return true/false
 -------------------------------------------------------------------------------
 function mobf_is_known_mob(name)
-	for i,val in ipairs(mobf_registred_mob) do
+	for i,val in ipairs(mobf_rtd.registred_mob) do
 		if name == val then
 			return true
 		end

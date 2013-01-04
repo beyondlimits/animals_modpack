@@ -1,4 +1,4 @@
-local version = "0.0.11"
+local version = "0.0.12"
 
 local dm_groups = {
                         not_in_creative_inventory=1
@@ -8,14 +8,12 @@ local selectionbox_dm = {-0.75, -1, -0.75, 0.75, 1, 0.75}
 
 local modpath = minetest.get_modpath("animal_dm")
 
-dofile (modpath .. "/model.lua")
-
 dm_prototype = {   
 		name="dm",
 		modname="animal_dm",
 	
 		generic = {
-					description="Dungeonmaster (Animals)",
+					description="Dungeonmaster (MOBF)",
 					base_health=50,
 					kill_result="",
 					armor_groups= {
@@ -26,30 +24,13 @@ dm_prototype = {
 					envid="simple_air"
 				},				
 		movement =  {
-					default_gen="probab_mov_gen",
 					min_accel=0.2,
 					max_accel=0.4,
-					max_speed=2,
+					max_speed=0.25,
 					pattern="stop_and_go",
 					canfly=false,
 					},
-		harvest        = nil,
-		catching       = nil,
-		random_drop    = nil,
-		auto_transform = nil,
-		graphics = {
-					sprite_scale={x=4,y=4},
-					sprite_div = {x=6,y=1},
-					visible_height = 2,
-					},
-       graphics_3d = {
-            visual = "wielditem",
-            textures = {"animal_dm:box_dm"},
-            collisionbox = selectionbox_dm,
-            visual_size= {x=1.5,y=1.5,z=1.5},
-            },
 		combat = {
-					mgen="follow_mov_gen",
 					angryness=0.99,
 					starts_attack=true,
 					sun_sensitive=true,
@@ -96,7 +77,56 @@ dm_prototype = {
 								gain = 0.7,
 								max_hear_distance = 5,
 								},
-					},		
+					},
+		animation = {
+				walk = {
+					start_frame = 31,
+					end_frame   = 60,
+					},
+				stand = {
+					start_frame = 1,
+					end_frame   = 30,
+					},
+				combat = {
+					start_frame = 61,
+					end_frame   = 90,
+					},
+			},
+		states = {
+				{ 
+				name = "default",
+				movgen = "none",
+				chance = 0,
+				animation = "stand",
+				graphics_3d = {
+					visual = "mesh",
+					mesh = "animal_dm.x",
+					textures = {"animal_dm_mesh.png"},
+					collisionbox = selectionbox_dm,
+					visual_size= {x=1,y=1,z=1},
+					},
+				graphics = {
+					sprite_scale={x=4,y=4},
+					sprite_div = {x=6,y=1},
+					visible_height = 2,
+					},
+				typical_state_time = 30,
+				},
+				{ 
+				name = "walking",
+				movgen = "probab_mov_gen",
+				chance = 0.25,
+				animation = "walk",
+				typical_state_time = 180,
+				},
+				{
+				movgen="follow_mov_gen",
+				name = "combat",
+				chance = 0,
+				animation = "combat",
+				typical_state_time = 0,
+				},
+			},
 		}
 		
 dm_debug = function (msg)

@@ -43,10 +43,12 @@ environment_list = {}
 --! @return {x,y,z} position found or nil
 -------------------------------------------------------------------------------
 function environment.get_suitable_pos_same_level(pos_raw,maxsearcharea,entity,accept_possible)
-    dbg_mobf.movement_lvl3("MOBF: --> get_suitable_pos_same_level "..printpos(pos_raw))
+    dbg_mobf.movement_lvl3("MOBF: --> get_suitable_pos_same_level " 
+    	.. printpos(pos_raw))
 	local pos = mobf_round_pos(pos_raw)
 
-	dbg_mobf.movement_lvl1("MOBF: Starting pos is "..printpos(pos).." max search area is "..maxsearcharea)
+	dbg_mobf.movement_lvl1("MOBF: Starting pos is "..printpos(pos)
+		.." max search area is "..maxsearcharea)
 
 	local e1 = "|"
 	local e2 = "|"
@@ -64,7 +66,8 @@ function environment.get_suitable_pos_same_level(pos_raw,maxsearcharea,entity,ac
 			local pos_tocheck = { x= pos.x + current,y=pos.y,z=pos.z -search}		
 			local pos_state = environment.pos_is_ok(pos_tocheck,entity)
 
-			dbg_mobf.movement_lvl1("MOBF: state of "..printpos(pos_tocheck).." is ".. pos_state)
+			dbg_mobf.movement_lvl1("MOBF: state of "..printpos(pos_tocheck).." is " 
+				.. pos_state)
 
 			if pos_state == "ok" then
 				dbg_mobf.movement_lvl1("found new pos")
@@ -85,7 +88,8 @@ function environment.get_suitable_pos_same_level(pos_raw,maxsearcharea,entity,ac
 			local pos_tocheck = { x= pos.x + search,y=pos.y,z=pos.z + current}		
 			local pos_state = environment.pos_is_ok(pos_tocheck,entity)
 			
-			dbg_mobf.movement_lvl1("MOBF: state of "..printpos(pos_tocheck).." is ".. pos_state)
+			dbg_mobf.movement_lvl1("MOBF: state of "..printpos(pos_tocheck).." is "
+				.. pos_state)
 
 			if pos_state == "ok" then
 				dbg_mobf.movement_lvl1("found new pos")
@@ -104,7 +108,8 @@ function environment.get_suitable_pos_same_level(pos_raw,maxsearcharea,entity,ac
 			local pos_tocheck = { x= pos.x + current,y=pos.y,z=pos.z + search}		
 			local pos_state = environment.pos_is_ok(pos_tocheck,entity)
 
-			dbg_mobf.movement_lvl1("MOBF: state of "..printpos(pos_tocheck).." is ".. pos_state)
+			dbg_mobf.movement_lvl1("MOBF: state of "..printpos(pos_tocheck).." is "
+				.. pos_state)
 
 			if pos_state == "ok" then
 				dbg_mobf.movement_lvl1("found new pos")
@@ -122,7 +127,8 @@ function environment.get_suitable_pos_same_level(pos_raw,maxsearcharea,entity,ac
 			local pos_tocheck = { x= pos.x -search,y=pos.y,z=pos.z + current}		
 			local pos_state = environment.pos_is_ok(pos,entity)
 
-			dbg_mobf.movement_lvl1("MOBF: state of "..printpos(pos_tocheck).." is ".. pos_state)
+			dbg_mobf.movement_lvl1("MOBF: state of "..printpos(pos_tocheck).." is "
+				.. pos_state)
 
 			if pos_state == "ok" then
 				dbg_mobf.movement_lvl1("found new pos")
@@ -392,7 +398,8 @@ function environment.pos_is_ok(pos,entity)
 			end
 	end
 	
-	dbg_mobf.environment_lvl1("MOBF pos "..printpos(pos) .. " isn't ok " .. node.name .. " for mob " .. entity.data.name)
+	dbg_mobf.environment_lvl1("MOBF pos "..printpos(pos) .. " isn't ok " 
+		.. node.name .. " for mob " .. entity.data.name)
 
 	--position is not ok gather some usefull information
 	local pos_above = {x=pos.x,y=pos.y+1,z=pos.z}	
@@ -490,12 +497,14 @@ function environment.fix_base_pos(entity, center_to_bottom)
 		
 		if node_pos ~= nil and
 			node_pos_check ~= nil then
-			dbg_mobf.environment_lvl3("MOBF: fixing y position / base position required? " .. node_pos.name .. " " .. node_pos_check.name)
+			dbg_mobf.environment_lvl3("MOBF: fixing y position / base position required? " 
+				.. node_pos.name .. " " .. node_pos_check.name)
 			if node_pos.name ~= node_pos_check.name then
 				distance_to_ground = mobf_surface_distance(pos)
 				
 				pos.y = pos.y + (center_to_bottom - distance_to_ground +0.5)
-				dbg_mobf.environment_lvl2("MOBF: fixing y position of " .. entity.data.name .. " got distance " .. center_to_bottom .. " moving to " ..printpos(pos))
+				dbg_mobf.environment_lvl2("MOBF: fixing y position of " .. entity.data.name 
+					.. " got distance " .. center_to_bottom .. " moving to " ..printpos(pos))
 				entity.object:moveto(pos)
 			end
 		end

@@ -1,4 +1,4 @@
-mobf_settings_version = "0.0.10"
+mobf_settings_version = "0.0.11"
 
 
 mobf_settings = {}
@@ -7,6 +7,8 @@ mobf_settings_buttons = {}
 max_list_page_num = 5
 
 mobf_settings_debug = print
+
+local formspechandler = nil
 
 ------------------------------------------------------------------------------
 -- name: get_animal_list
@@ -31,7 +33,7 @@ function mobf_settings.get_animal_list(page_number)
 
     local start_at = page_number -1
 
-    for i,val in ipairs(mobf_registred_mob) do
+    for i,val in ipairs(mobf_rtd.registred_mob) do
         
         if i > (start_at*16) then
 	        if i <= (start_at*16 + 8) then
@@ -187,7 +189,7 @@ end
 --! @return
 -------------------------------------------------------------------------------
 function mobf_settings.handle_mob_en_disable_button(fields)
-    for i,val in ipairs(mobf_registred_mob) do
+    for i,val in ipairs(mobf_rtd.registred_mob) do
         
         local page = nil
         
@@ -343,7 +345,7 @@ end
 -------------------------------------------------------------------------------
 function mobf_settings.set_mob_list_page(player,fields)
 	if fields.mobf then
-		inventory_plus.set_inventory_formspec(player, mobf_settings.get_formspec(player,"mobf_list_page1"))
+		formspechandler(player, mobf_settings.get_formspec(player,"mobf_list_page1"))
 		return true
 	end
 	
@@ -352,7 +354,7 @@ function mobf_settings.set_mob_list_page(player,fields)
 		local namestring = "mobf_list_page" .. i
 
 		if fields[namestring] ~= nil then
-			inventory_plus.set_inventory_formspec(player, mobf_settings.get_formspec(player,namestring))
+			formspechandler(player, mobf_settings.get_formspec(player,namestring))
 			return true
 		end
 	end
@@ -386,7 +388,6 @@ end
 -- register handler for pressed buttons to inventory plus
 ------------------------------------------------------------------------------
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-
 	--if one of your page buttons is pressed show another moblist page
 	if mobf_settings.set_mob_list_page(player,fields) then
 		return true
@@ -395,45 +396,65 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if mobf_settings.handle_config_changed_button(fields) or 
 		fields.mobf_restart_required ~= nil then
 		mobf_settings_debug("MOBF_SETTINGS: settings have been changed, show settings page: " .. dump(fields.mobf_restart_required))
-		inventory_plus.set_inventory_formspec(player, mobf_settings.get_formspec(player,"mobf_restart_required"))
+		formspechandler(player, mobf_settings.get_formspec(player,"mobf_restart_required"))
 		return true
 	end
 	
 	local blacklist_changed_page = mobf_settings.handle_mob_en_disable_button(fields)
 	
 	if blacklist_changed_page ~= nil then
-		inventory_plus.set_inventory_formspec(player, mobf_settings.get_formspec(player,blacklist_changed_page))
+		formspechandler(player, mobf_settings.get_formspec(player,blacklist_changed_page))
 		return true
 	end
 	
 	return false
 end)
 
-------------------------------------------------------------------------------
--- register privilege to change mobf settings
-------------------------------------------------------------------------------
-minetest.register_privilege("mobfw_admin", 
-	{
-		description = "Player may change mobf settings",
-		give_to_singleplayer = true
-	})
 
-------------------------------------------------------------------------------
--- register button for mobf settings to inventory plus
-------------------------------------------------------------------------------
-if type(inventory_plus.register_button) == "function" then
-	minetest.register_on_joinplayer(function(player)		
-		local playername = player:get_player_name()
-		mobf_settings_debug("MOBF_SETTINGS: checking player " .. playername .. " for sufficent privileges")
-		if minetest.check_player_privs(playername, {mobfw_admin=true}) then
-			mobf_settings_debug("MOBF_SETTINGS: player is allowed to do mobf configuration")
-			inventory_plus.register_button(player,"mobf","Mobf Settings")
-		end
-	end)
+--do only register to inventory plus if mod available
+if mobf_rtd.inventory_plus_enabled then
+	------------------------------------------------------------------------------
+	-- register button for mobf settings to inventory plus
+	------------------------------------------------------------------------------
+	if type(inventory_plus.register_button) == "function" then
+		minetest.register_on_joinplayer(function(player)		
+			local playername = player:get_player_name()
+			mobf_settings_debug("MOBF_SETTINGS: checking player " .. playername .. " for sufficent privileges")
+			if minetest.check_player_privs(playername, {mobfw_admin=true}) then
+				mobf_settings_debug("MOBF_SETTINGS: player is allowed to do mobf configuration")
+				inventory_plus.register_button(player,"mobf","Mobf Settings")
+			end
+		end)
+	else
+		mobf_settings_debug("MOBF_SETTINGS: Inventory Plus legacy mode, no privs checking enabled!")
+		inventory_plus.pages["mobf"] = "Mobf Settings"
+	end
+	
+	--make inventoryplus formspechandler
+	formspechandler = inventory_plus.set_inventory_formspec
+	
 else
-	mobf_settings_debug("MOBF_SETTINGS: Inventory Plus legacy mode, no privs checking enabled!")
-    inventory_plus.pages["mobf"] = "Mobf Settings"
+	formspechandler = function(player,formspec)
+	
+			name = player:get_player_name()
+			
+			minetest.show_formspec(name,"mobf_settings:mainform",formspec)
+		end
+		
+	--register chatcommand
+	minetest.register_chatcommand("mobf_settings",
+	{
+		params		= "",
+		description = "show mobf settings" ,
+		privs		= {mobfw_admin=true},
+		func		= function(name,param)
+				local player = minetest.env:get_player_by_name(name)
+				formspechandler(player,mobf_settings.get_formspec(player,"mobf_list_page1"))
+			end
+	})
 end
+
+
 
 ------------------------------------------------------------------------------
 -- register mobf_settings buttons

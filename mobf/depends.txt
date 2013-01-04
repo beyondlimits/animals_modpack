@@ -1,4 +1,2 @@
 default
 animalmaterials
-wool
-fire

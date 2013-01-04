@@ -1,6 +1,6 @@
 
+mob_npc_houses = {}
 building_spawner = {}
-
 
 blueprint_normalhouse = {
 	size = {x=8,z=10},
@@ -63,11 +63,7 @@ blueprint_normalhouse = {
 		}
 }
 
-function build_small_house(pos)
-	
-	building_spawner.builder(pos,blueprint_normalhouse)
-end
-
+table.insert(mob_npc_houses,blueprint_normalhouse)
 
 function building_spawner.buid_wall(material,startpos,endpos)
 
@@ -200,11 +196,6 @@ function building_spawner.builder(startpos,blueprint,mobname)
 	return false
 end
 
-
-mob_npc_houses = {
-	blueprint_normalhouse
-}
-
 -------------------------------------------------------------------------------
 -- name: mobf_spawn_on_willow_mapgen(mob_name,mob_transform,spawning_data,environment)
 --
@@ -224,16 +215,73 @@ function mob_npc_spawn_building(mob_name,mob_transform,spawning_data,environment
 		
 		function(name,pos,min_y,max_y)
 			
-			local blueprint = mob_npc_houses[math.random(1,#mob_npc_houses)]
-			
-			if building_spawner.builder(pos,blueprint,mob_name .."__default") then
-				return true
+			if math.random() < 0.25 then
+				local blueprint = mob_npc_houses[math.random(1,#mob_npc_houses)]
+				
+				if building_spawner.builder(pos,blueprint,mob_name .."__default") then
+					return true
+				end
 			end
 			return false
 		end,
 		mobf_get_sunlight_surface,
 		20)
 	end)
- end --end spawn algo
+end --end spawn algo
+
+function build_house_cmd_handler(name,param)
+	local parameters = param:split(" ")
+
+	if #parameters ~= 2 and
+		#parameters ~= 3 then
+		minetest.chat_send_player(name, "/build_house invalid parameter count: " .. #parameters)
+		return
+	end
+	
+	local pos_strings = parameters[1]:split(",")
+
+	if #pos_strings ~= 3 then
+		minetest.chat_send_player(name, "/build_house invalid position")
+		return
+	end
+
+	local spawnpoint = {
+						x=tonumber(pos_strings[1]),
+						y=tonumber(pos_strings[2]),
+						z=tonumber(pos_strings[3])
+						}
+
+	if spawnpoint.x == nil or
+		spawnpoint.y == nil or
+		spawnpoint.z == nil then
+		minetest.chat_send_player(name, "/build_house invalid position")
+		return
+	end
+	
+	local blueprintnumber = tonumber(parameters[2])
+	
+	if blueprintnumber == nil then
+		minetest.chat_send_player(name, "/build_house invalid blueprintnumber")
+		return
+	end
+	
+	if mob_npc_houses[blueprintnumber] == nil then
+		minetest.chat_send_player(name, "/build_house no blueprint with number " .. blueprintnumber .. " known")
+		return
+	end
+	
+	if not building_spawner.builder(spawnpoint,mob_npc_houses[blueprintnumber],parameters[3]) then
+		minetest.chat_send_player(name, "/build_house failed to build house maybe ground wasn't suitable")
+	end
+end
  
- spawning.register_spawn_algorithm("building_spawner", mob_npc_spawn_building)
+minetest.register_chatcommand("build_house",
+			{
+				params		= "<pos> <blueprintnumber> <mobname|optional>",
+				description = "spawn a house at a specific position" ,
+				privs		= {mobfw_admin=true},
+				func		= build_house_cmd_handler,
+
+			})
+ 
+spawning.register_spawn_algorithm("building_spawner", mob_npc_spawn_building)

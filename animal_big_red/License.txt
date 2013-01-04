@@ -1,0 +1,8 @@
+Licenses
+
+CC0
+	sounds/animal_big_red_hit.ogg
+	sounds/animal_big_red_random_1.ogg
+
+Everything not mentioned:
+	CC-BY-SA, Author sapier

@@ -136,7 +136,18 @@ Changelog:
 -------------------------------------------------------------------------------
 Changes 1.9.10
 -fixed group support for mobs
+-fixed sun damage handler resetting animation to "stand"
+-fix orientation not updated correct for mobs following new default state schema
+-fixed bug 2d sprites not shown correctly
 -fixed doku
+-added support for upright sprites
+-added 3d mesh model for dm
+-added 3d mesh models for chicken
+-added sounds for some mod
+-added license information
+-added support for mobf without fire mod
+-added non inventory_plus settings gui (requres core patch)
+-replaced custom debug chatcommand handlers by official minetest ones
 
 Changes 1.9.9
 -added trader spawning

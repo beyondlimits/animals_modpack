@@ -59,7 +59,9 @@ function graphics.update_orientation(entity,now,dtime)
 
 	if entity.dynamic_data == nil or
 		entity.dynamic_data.movement == nil then
-		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: >" ..entity.data.name .. "< removed=" .. dump(entity.removed) .. " entity=" .. tostring(entity) .. " graphics callback without dynamic data")
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: >" ..entity.data.name 
+			.. "< removed=" .. dump(entity.removed) .. " entity=" 
+			.. tostring(entity) .. " graphics callback without dynamic data")
 		return
 	end
 
@@ -75,7 +77,7 @@ function graphics.update_orientation(entity,now,dtime)
 		local acceleration = entity.object:getacceleration()
 		local pos = entity.getbasepos(entity)
 		
-		dbg_mobf.graphics_lvl2("MOBF: vel: (" .. current_velocity.x .. ",".. current_velocity.z .. ") " .. 
+		dbg_mobf.graphics_lvl3("MOBF: vel: (" .. current_velocity.x .. ",".. current_velocity.z .. ") " .. 
 											"accel: (" ..acceleration.x .. "," .. acceleration.z .. ")")
 		
 		--predict position mob will be in 0.25 seconds
@@ -87,8 +89,7 @@ function graphics.update_orientation(entity,now,dtime)
 		local delta_z = current_velocity.z
 
 		--legacy 2d mode
-		if (entity.data.graphics_3d == nil) or
-			minetest.setting_getbool("mobf_disable_3d_mode") then
+		if (entity.mode == "2d") then
 			graphics.update_orientation_simple(entity,{x=delta_x, z=delta_z})
 		-- 3d mode
 		else
@@ -96,20 +97,13 @@ function graphics.update_orientation(entity,now,dtime)
 			if (delta_x ~= 0 ) and
 				(delta_z ~= 0) then
 				
-				local direction = 0
+				entity.object:setyaw(mobf_calc_yaw(delta_x,delta_z))
 				
-				direction = math.atan2(delta_z,delta_x)
-				
-				while direction < 0 do
-					direction = direction + (2* math.pi)
-				end
-				
-				entity.object:setyaw(direction)
-				
-				dbg_mobf.graphics_lvl2("MOBF: x-delta: " .. delta_x .. " z-delta: " .. delta_z .. " direction: " .. direction)
+				dbg_mobf.graphics_lvl3("MOBF: x-delta: " .. delta_x 
+					.. " z-delta: " .. delta_z)
 			elseif (delta_x ~= 0) or
 					(delta_z ~= 0) then
-					dbg_mobf.graphics_lvl2("MOBF: at least speed for one direction is 0")
+					dbg_mobf.graphics_lvl3("MOBF: at least speed for one direction is 0")
 					graphics.update_orientation_simple(entity,{x=delta_x,z=delta_z})
 			else
 				dbg_mobf.movement_lvl3("MOBF: not moving")
@@ -130,6 +124,11 @@ end
 -------------------------------------------------------------------------------
 function graphics.set_animation(entity,name)
 
+	if name == nil then
+		dbg_mobf.graphics_lvl2("MOBF: calling updating animation without name for " .. entity.data.name)
+		return
+	end
+
 	if entity.mode == "2d" then
 	
 		if id == "stand" then
@@ -145,21 +144,27 @@ function graphics.set_animation(entity,name)
 	
 	if entity.mode == "3d" then
 		--TODO change frame rate due to movement speed
-		dbg_mobf.graphics_lvl3("MOBF: Updating animation")
+		dbg_mobf.graphics_lvl2("MOBF: " .. entity.data.name .. " updating animation: " .. name)
 		if entity.data.animation ~= nil and
 			name ~= nil and
 			entity.data.animation[name] ~= nil and
 			entity.dynamic_data.animation ~= name then
 			
-			dbg_mobf.graphics_lvl3("MOBF: Setting animation to " .. name .. " start: " .. entity.data.animation[name].start_frame .. " end: " .. entity.data.animation[name].end_frame)
-			entity.object:set_animation({x=entity.data.animation[name].start_frame,y=entity.data.animation[name].end_frame}, nil, nil)
+			dbg_mobf.graphics_lvl2("MOBF:\tSetting animation to " .. name 
+				.. " start: " .. entity.data.animation[name].start_frame 
+				.. " end: " .. entity.data.animation[name].end_frame)
+			entity.object:set_animation({
+											x=entity.data.animation[name].start_frame,
+											y=entity.data.animation[name].end_frame
+										}, nil, nil)
 			entity.dynamic_data.animation = name
 		end
 		
 		return
 	end
 	
-	mobf_bug_warning(LOGLEVEL_WARNING,"MOBF BUG!!: invalid graphics mode specified " .. dump(entity.mode))
+	mobf_bug_warning(LOGLEVEL_WARNING,"MOBF BUG!!: invalid graphics mode specified " 
+		.. dump(entity.mode))
 	
 end
 
@@ -172,14 +177,15 @@ end
 --! @param graphics2d
 --! @param graphics3d
 --! @param modname
---! @param animalid
+--! @param name
+--! @param statename
 --! @return grahpic information
 -------------------------------------------------------------------------------
-function graphics.prepare_info(graphics2d,graphics3d,modname,animalid)
+function graphics.prepare_info(graphics2d,graphics3d,modname,name,statename)
 
 	local setgraphics = {}
 	
-	local basename = modname .. animalid
+	
 
 	if (graphics3d == nil) or
 		minetest.setting_getbool("mobf_disable_3d_mode") then
@@ -188,19 +194,28 @@ function graphics.prepare_info(graphics2d,graphics3d,modname,animalid)
 			return nil
 		end
 		
+		local basename = modname .. name
+	
+		if statename ~= nil and
+			statename ~= "default" then
+			basename = basename .. "__" .. statename
+		end
+		
 		setgraphics.collisionbox    =  {-0.5,
 									-0.5 * graphics2d.visible_height,
 									-0.5,
 									0.5,
 									0.5 * graphics2d.visible_height,
 									0.5}
-									
-		setgraphics.visual          = "sprite"
+		if graphics2d.visual ~= nil then
+			setgraphics.visual          = graphics2d.visual
+		else
+			setgraphics.visual          = "sprite"
+		end
 		setgraphics.textures        = { basename..".png^[makealpha:128,0,0^[makealpha:128,128,0" }
-		setgraphics.visual_size     = graphics.sprite_scale
-		setgraphics.spritediv       = graphics.sprite_div
+		setgraphics.visual_size     = graphics2d.sprite_scale
+		setgraphics.spritediv       = graphics2d.sprite_div
 		setgraphics.mode 			= "2d"
-		
 	else
 		if graphics3d.visual == "mesh" then
 			setgraphics.mesh = graphics3d.mesh

@@ -1,4 +1,4 @@
-local version = "0.0.9"
+local version = "0.0.10"
 
 local creeper_groups = {
                         not_in_creative_inventory=1
@@ -78,7 +78,7 @@ creeper_prototype = {
 								max_hear_distance = 75,
 								},
 					self_destruct = {
-								name="bomb_explosion",
+								name="animal_creeper_bomb_explosion",
 								gain = 2,
 								max_hear_distance = 150,
 								},

@@ -1,0 +1,7 @@
+Licenses
+
+CC0
+	sounds/mob_slime_die.ogg
+
+Everything not mentioned:
+	CC-BY-SA, Author sapier

@@ -195,7 +195,7 @@ function spawning.replace_entity(entity,name,preserve)
 	dbg_mobf.spawning_lvl3("MOBF: --> replace_entity(".. entity.data.name .. "|" .. name .. ")")
 	
 	if minetest.registered_entities[name] == nil then
-		minetest.log(LOGLEVEL_ERROR,"MOBF: replace_entity 1 : Bug no "..name.." is registred")
+		minetest.log(LOGLEVEL_ERROR,"MOBF: replace_entity: Bug no "..name.." is registred")
 		return nil
 	end
 	
@@ -223,7 +223,7 @@ function spawning.replace_entity(entity,name,preserve)
 	
 
 	--delete current mob
-	dbg_mobf.spawning_lvl2("MOBF: replace_entity 2 : removing " ..  entity.data.name)
+	dbg_mobf.spawning_lvl2("MOBF: replace_entity: removing " ..  entity.data.name)
 	
 	--unlink dynamic data (this should work but doesn't due to other bugs)
 	entity.dynamic_data = nil
@@ -235,11 +235,20 @@ function spawning.replace_entity(entity,name,preserve)
 	local newentity = mobf_find_entity(newobject)
 
 	if newentity ~= nil then
-		--dbg_mobf.spawning_lvl2("MOBF: replace_entity 3 : " ..  name .. 
-		--				" added at " .. printpos(newentity.dynamic_data.spawning.spawnpoint))
-		newentity.dynamic_data = temporary_dynamic_data
-		newentity.object:set_hp(health)
-		newentity.object:setyaw(entity_orientation)
+		if newentity.dynamic_data ~= nil then
+			dbg_mobf.spawning_lvl2("MOBF: replace_entity: " ..  name .. 
+							" added at " .. printpos(newentity.dynamic_data.spawning.spawnpoint))
+			newentity.dynamic_data = temporary_dynamic_data
+			newentity.object:set_hp(health)
+			newentity.object:setyaw(entity_orientation)
+		else
+			minetest.log(LOGLEVEL_ERROR,"MOBF: replace_entity: dynamic data not set for "..name.." maybe delayed activation?")
+			newentity.dyndata_delayed = {
+				data = temporary_dynamic_data,
+				health = health,
+				orientation = entity_orientation
+			}
+		end
 	else
 		minetest.log(LOGLEVEL_ERROR,"MOBF: replace_entity 4 : Bug no "..name.." has been created")
 	end

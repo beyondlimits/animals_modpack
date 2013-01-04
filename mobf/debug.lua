@@ -19,8 +19,10 @@
 --! @ingroup framework_int
 --! @{
 
+debug = {}
+
 -------------------------------------------------------------------------------
--- name: mobf_print_usage(player,command,toadd)
+-- name: print_usage(player,command,toadd)
 --
 --! @brief send errormessage to player
 --
@@ -28,7 +30,7 @@
 --! @param command display usage for this command
 --! @param toadd additional information to transfer to player
 -------------------------------------------------------------------------------
-function mobf_print_usage(player, command, toadd)
+function debug.print_usage(player, command, toadd)
 
 	if toadd == nil then
 		toadd = ""
@@ -56,125 +58,82 @@ function mobf_print_usage(player, command, toadd)
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_handle_spawn_mob_cmd(name,message)
+-- name: spawn_mob(name,param)
 --
 --! @brief handle a spawn mob command
 --
 --! @param name name of player
---! @param message message received
+--! @param param parameters received
 ------------------------------------------------------------------------------
-function mobf_handle_spawn_mob_cmd(name,message)
-	local start_pos = string.find(message," ")		
-
-	if (start_pos == nil) then
-		mobf_print_usage(name,"spawnmob")	
-		return true
-	end
-
-	start_pos = start_pos +1
-
-	local end_pos = string.find(message," ",start_pos)
-
-	if end_pos == nil then
-		mobf_print_usage(name,"spawmob")	
-		return true
-	end
-
-	local mobname = string.sub(message,start_pos,end_pos-1)
-
-	if mobf_is_known_mob(mobname) ~= true then
-		mobf_print_usage(name,"ukn_mob", ">"..mobname.."<") 
-		return true
-	end
-
-	local spawnpoint = {x=0,y=0,z=0}
-
-	start_pos = end_pos +1
-	end_pos = string.find(message,",",start_pos)
-
-	if end_pos ~= nil then
-		print("Found: ".. string.sub(message,start_pos,end_pos-1).. " as x")
-		spawnpoint.x = tonumber(string.sub(message,start_pos,end_pos-1))
-	else
-		mobf_print_usage(name,"spawnmob")	
-		return true
-	end
-
-	start_pos = end_pos +1
-	end_pos = string.find(message,",",start_pos)
-
-	if end_pos ~= nil then
-		print("Found: ".. string.sub(message,start_pos,end_pos-1).. " as y")
-		spawnpoint.y = tonumber(string.sub(message,start_pos,end_pos-1))
-	else
-		mobf_print_usage(name,"spawnmob")	
-		return true
-	end
-
-	start_pos = end_pos +1
-
-	print("Found: ".. string.sub(message,start_pos).. " as z")
-	spawnpoint.z = tonumber(string.sub(message,start_pos))
-
-	if spawnpoint.z == nil then
-		mobf_print_usage(name,"spawnmob")	
-		return true
-	end
-
-	local node_at_spawnpoint = minetest.env:get_node(spawnpoint)
-
-	if mobf_pos_is_zero(spawnpoint) or
-		node_at_spawnpoint == nil and
-		node_at_spawnpoint.name ~= "air" then
-		mobf_print_usage(name,"inv_pos",printpos(spawnpoint))	
-		return true
-	end
-
-	print("Spawning mob ".. mobname .." at " .. printpos(spawnpoint))
-
-	local newobject = minetest.env:add_entity(spawnpoint,mobname)
-
-	local newentity = mobf_find_entity(newobject)
+function debug.spawn_mob(name,param)
+	print("name: " .. name .. " param: " .. dump(param))
 	
-	if newentity ~= nil then
-		mobf_print_usage(name,"mob_spawned", mobname)
-	else
-		print("Bug no "..mobname.." has been created!")
+	local parameters = param:split(" ")
+	
+	if #parameters ~= 2 then
+		mobf_print_usage(name,"spawnmob")
+		return
+	end
+	
+	local pos_strings = parameters[2]:split(",")
+	
+	if #pos_strings ~= 3 then
+		mobf_print_usage(name,"spawmob")
+		return
 	end
 
+	if mobf_is_known_mob(parameters[1]) ~= true then
+		mobf_print_usage(name,"ukn_mob", ">"..parameters[1].."<") 
+		return true
+	end
+
+	local spawnpoint = {
+						x=tonumber(pos_strings[1]),
+						y=tonumber(pos_strings[2]),
+						z=tonumber(pos_strings[3])
+						}
+
+	if spawnpoint.x == nil or
+		spawnpoint.y == nil or
+		spawnpoint.z == nil then
+		mobf_print_usage(name,"spawnmob")	
+		return
+	end
+
+	spawning.spawn_and_check(parameters[1],"__default",spawnpoint,"debug_spawner")
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_handle_list_active_mobs_cmd(name,message)
+-- name: list_active_mobs(name,param)
 --
 --! @brief print list of all current active mobs
 --
 --! @param name name of player
---! @param message message received
+--! @param param parameters received
 ------------------------------------------------------------------------------
-function mobf_handle_list_active_mobs_cmd(name,message)
+function debug.list_active_mobs(name,param)
 	
 	local count = 1
 	for index,value in pairs(minetest.luaentities) do 
 		if value.data.name ~= nil then
-			local tosend = count .. ": " .. value.data.name .. " at " .. printpos(value.object:getpos())
+			local tosend = count .. ": " .. value.data.name .. " at " 
+				.. printpos(value.object:getpos())
 			print(tosend)
 			minetest.chat_send_player(name,tosend)
 			count = count +1
 		end
 	end
-
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_handle_add_tools_cmd(name,message)
+-- name: add_tools(name,param)
 --
 --! @brief add toolset for testing
 --
 --! @param name name of player
---! @param message message received
+--! @param param parameters received
 ------------------------------------------------------------------------------
-function mobf_handle_add_tools_cmd(name,message)
+function debug.add_tools(name,param)
 	local player = minetest.env:get_player_by_name(name)
 	
 	if player ~= nil then
@@ -187,17 +146,17 @@ function mobf_handle_add_tools_cmd(name,message)
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_handle_list_mobs_cmd(name,message)
+-- name: list_defined_mobs(name,param)
 --
 --! @brief list all registred mobs
 --
 --! @param name name of player
---! @param message message received
+--! @param param parameters received
 ------------------------------------------------------------------------------
-function mobf_handle_list_mobs_cmd(name,message)
+function debug.list_defined_mobs(name,param)
 
 	local text = ""
-	for i,val in ipairs(mobf_registred_mob) do
+	for i,val in ipairs(mobf_rtd.registred_mob) do
 		text = text .. val .. " "
 	end
 	minetest.chat_send_player(name, "MOBF: "..text)
@@ -206,63 +165,60 @@ end
 -------------------------------------------------------------------------------
 -- name: mobf_debug_handler(name,message)
 --
---! @brief global chat message handler for mob framework
---
---! @param name name of player
---! @param message message received
-------------------------------------------------------------------------------
-function mobf_debug_handler(name,message)
-
-	if message == nil then
-		return false
-	end
-
-	if string.find(message,"/spawnmob") ~= nil then
-		mobf_handle_spawn_mob_cmd(name,message)
-		return true
-	end
-
-	if string.find(message,"/listactivemobs") ~= nil then
-		mobf_handle_list_active_mobs_cmd(name,message)
-		return true
-	end
-	
-	if string.find(message,"/debug_add_tools") ~= nil then
-		mobf_handle_add_tools_cmd(name,message)
-		return true
-	end
-	
-	if string.find(message,"/listmobs") ~= nil then
-		mobf_handle_list_mobs_cmd(name,message)
-		return true
-	end
-	
-	if string.find(message,"/traceon") ~= nil then
-		luatrace.tron()
-		return true
-	end
-	
-	if string.find(message,"/traceoff") ~= nil then
-		luatrace.troff()
-		return true
-	end
-	
-	if string.find(message,"/house") ~= nil then
-		handle_spawnhouse(name,message)
-		return true
-	end
-	
-	return false
-end
-
--------------------------------------------------------------------------------
--- name: mobf_debug_handler(name,message)
---
 --! @brief initialize debug commands chat handler
 --
 ------------------------------------------------------------------------------
-function mobf_init_debug()
-	minetest.register_on_chat_message(mobf_debug_handler)
+function debug.init()
+
+	minetest.register_chatcommand("spawnmob",
+		{
+			params		= "<name> <pos>",
+			description = "spawn a mob at position" ,
+			privs		= {mobfw_admin=true},
+			func		= debug.spawn_mob
+		})
+		
+	minetest.register_chatcommand("listactivemobs",
+		{
+			params		= "",
+			description = "list all currently active mobs" ,
+			privs		= {mobfw_admin=true},
+			func		= debug.list_active_mobs
+		})
+		
+	minetest.register_chatcommand("listdefinedmobs",
+		{
+			params		= "",
+			description = "list all currently defined mobs" ,
+			privs		= {mobfw_admin=true},
+			func		= debug.list_defined_mobs
+		})
+		
+	minetest.register_chatcommand("mob_add_tools",
+		{
+			params		= "",
+			description = "add some mob specific tools to player" ,
+			privs		= {mobfw_admin=true},
+			func		= debug.add_tools
+		})
+
+	if mobf_rtd.luatrace_enabled then
+		minetest.register_chatcommand("traceon",
+			{
+				params		= "",
+				description = "start luatrace tracing" ,
+				privs		= {mobfw_admin=true},
+				func		= luatrace.tron()
+			})
+			
+		minetest.register_chatcommand("traceon",
+			{
+				params		= "",
+				description = "stop luatrace tracing" ,
+				privs		= {mobfw_admin=true},
+				func		= luatrace.troff()
+			})
+	end
 end
 
 
@@ -271,54 +227,20 @@ end
 --
 --! @brief spawn small house
 --
+--! @param entity entity rightclicked
+--! @param player player doing rightclick
 ------------------------------------------------------------------------------
-function handle_spawnhouse(name,message)
-	local start_pos = string.find(message," ")
-
-	if (start_pos == nil) then
-		return true
-	end
-
-	start_pos = start_pos +1
-	
-	local spawnpoint = {x=0,y=0,z=0}
-	
-	local end_pos = string.find(message,",",start_pos)
-
-	if end_pos ~= nil then
-		print("Found: ".. string.sub(message,start_pos,end_pos-1).. " as x")
-		spawnpoint.x = tonumber(string.sub(message,start_pos,end_pos-1))
-	else
-		return true
-	end
-
-	start_pos = end_pos +1
-	end_pos = string.find(message,",",start_pos)
-
-	if end_pos ~= nil then
-		print("Found: ".. string.sub(message,start_pos,end_pos-1).. " as y")
-		spawnpoint.y = tonumber(string.sub(message,start_pos,end_pos-1))
-	else
-		return true
-	end
-	
-		if end_pos ~= nil then
-		print("Found: ".. string.sub(message,start_pos,end_pos-1).. " as y")
-		spawnpoint.y = tonumber(string.sub(message,start_pos,end_pos-1))
-	else
-		return true
-	end
-
-	start_pos = end_pos +1
-
-	print("Found: ".. string.sub(message,start_pos).. " as z")
-	spawnpoint.z = tonumber(string.sub(message,start_pos))
-
-	if spawnpoint.z == nil then
-		return true
-	end
-	
-	build_small_house(spawnpoint)
+function debug.rightclick_callback(entity,player)
+	local lifetime = mobf_get_current_time() - entity.dynamic_data.spawning.original_spawntime
+	print("MOBF: " .. entity.data.name .. " is alive for " .. lifetime .. " seconds")
+	print("MOBF: \tCurrent state:               " .. entity.dynamic_data.state.current )
+	print("MOBF: \tCurrent movgen:              " .. entity.dynamic_data.current_movement_gen.name )
+	print("MOBF: \tTime to state change:        " .. entity.dynamic_data.state.time_to_next_change .. " seconds")
+	print("MOBF: \tCurrent environmental state: " .. environment.pos_is_ok(entity.object:getpos(),entity))
+	print("MOBF: \tCurrent accel:               " .. printpos(entity.object:getacceleration()))
+	print("MOBF: \tCurrent speed:               " .. printpos(entity.object:getvelocity()))
+	return false
 end
+
 
 --!@}

@@ -61,8 +61,8 @@ movement_gen.name = "probab_mov_gen"
 -------------------------------------------------------------------------------
 function movement_gen.register_pattern(pattern) 
 		print ("\tregistering pattern "..pattern.name)
-		if mobf_movement_patterns[pattern.name] == nil then
-			mobf_movement_patterns[pattern.name] = pattern
+		if mobf_rtd.movement_patterns[pattern.name] == nil then
+			mobf_rtd.movement_patterns[pattern.name] = pattern
 			return true
 		else
 			return false
@@ -294,7 +294,7 @@ function movement_gen.init_dynamic_data(entity,now)
 			changing_levels     = false,
 			ts_random_jump		= now,
 			ts_orientation_upd  = now,
-			mpattern            = mobf_movement_patterns[entity.data.movement.pattern],
+			mpattern            = mobf_rtd.movement_patterns[entity.data.movement.pattern],
 			orientation_fix_needed              = true,
 			}
 	

@@ -386,7 +386,8 @@ function mobf_mob_around(mob_name,mob_transform,pos,range,ignore_playerspawned)
 					entity.data.modname..":"..entity.data.name == mob_transform then
 					if (ignore_playerspawned and entity.dynamic_data.spawning.player_spawned) or
 						ignore_playerspawned ~= false then	
-						dbg_mobf.generic_lvl1("MOBF: Found "..mob_name.. " or "..mob_transform .. " within specified range of "..range)
+						dbg_mobf.generic_lvl1("MOBF: Found "..mob_name.. " or "
+							..mob_transform .. " within specified range of "..range)
 						count = count + 1
 					end
 				end
@@ -398,7 +399,8 @@ function mobf_mob_around(mob_name,mob_transform,pos,range,ignore_playerspawned)
 		objectcount = objectcount +1
 	end
 
-	dbg_mobf.generic_lvl2("MOBF: found " .. objectcount .. " within range " .. count .. " of them are relevant mobs ")
+	dbg_mobf.generic_lvl2("MOBF: found " .. objectcount .. " within range " 
+		.. count .. " of them are relevant mobs ")
 
 	return count
 end
@@ -414,7 +416,8 @@ end
 --! @return number of mob found
 -------------------------------------------------------------------------------
 function mobf_spawner_around(mob_name,pos,range)
-	dbg_mobf.generic_lvl2("MOBF: mobf_spawner_around param: ".. dump(mob_name).. " "..dump(pos).. " " .. dump(range))
+	dbg_mobf.generic_lvl2("MOBF: mobf_spawner_around param: ".. dump(mob_name)
+		.. " "..dump(pos).. " " .. dump(range))
 
 	local count = 0
 	local objectcount = 0
@@ -436,7 +439,8 @@ function mobf_spawner_around(mob_name,pos,range)
 			entity.spawner_mob_name ~= nil then
 			
 			if entity.spawner_mob_name == mob_name then
-				dbg_mobf.generic_lvl2("MOBF: Found "..mob_name.. " within specified range of "..range)
+				dbg_mobf.generic_lvl2("MOBF: Found "..mob_name 
+					.. " within specified range of "..range)
 				count = count + 1
 			end
 		end
@@ -444,7 +448,8 @@ function mobf_spawner_around(mob_name,pos,range)
 		objectcount = objectcount +1
 	end
 
-	dbg_mobf.generic_lvl2("MOBF: found " .. objectcount .. " within range " .. count .. " of them are relevant spawners ")
+	dbg_mobf.generic_lvl2("MOBF: found " .. objectcount .. " within range " 
+		.. count .. " of them are relevant spawners ")
 
 	return count
 end
@@ -493,9 +498,8 @@ function mobf_line_of_sight(pos1,pos2)
 
 
 		if minetest.registered_nodes[node.name].sunlight_propagates ~= true then
-				--print("No line of sight between "..printpos(pos1).." and "..printpos(pos2) .. " due to " .. node.name)
-				line_of_sight = false
-				break
+			line_of_sight = false
+			break
 		end
 	end
 
@@ -622,8 +626,7 @@ function mobf_ground_distance(pos,media)
 	while node_to_check ~= nil and mobf_contains(media,node_to_check.name) and
 			count < 32 do
 		
-		count = count +1		
-		--print("Checking node below " .. node_to_check.name .. " pos: ".. printpos(pos))
+		count = count +1
 		pos = {x=pos.x,y=pos.y-1,z=pos.z};
 		node_to_check = minetest.env:get_node(pos)
 	end
@@ -651,7 +654,6 @@ function mobf_surface_distance(pos)
 		
 		count = count +1
 		
-		--print("Checking node below " .. node_to_check.name .. " pos: ".. printpos(pos))
 		pos = {x=pos.x,y=pos.y-1,z=pos.z};
 		node_to_check = minetest.env:get_node(pos)
 	end
@@ -678,7 +680,6 @@ function mobf_air_distance(pos)
 			node_to_check.name == "default:water_flowing") do
 		
 		count = count +1		
-		--print("Checking node below " .. node_to_check.name .. " pos: ".. printpos(pos))
 		pos = {x=pos.x,y=pos.y+1,z=pos.z};
 		node_to_check = minetest.env:get_node(pos)
 	end
@@ -705,7 +706,6 @@ function mobf_above_water(pos)
 	while node_to_check ~= nil and 
 			node_to_check.name == "air" do
 			
-			--print("Checking node below " .. node_to_check.name .. " pos: ".. printpos(pos))
 			pos = {x=pos.x,y=pos.y-1,z=pos.z};
 			node_to_check = minetest.env:get_node(pos)
 	end
@@ -812,5 +812,25 @@ function mobf_random_direction()
 	retval.z=math.random(-1,1)
 
 	return retval
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_calc_yaw(x,z)
+--
+--! @brief calculate radians value of a 2 dimendional vector
+--
+--! @param x vector component 1
+--! @param z vector component 2
+--
+--! @return radians value
+-------------------------------------------------------------------------------
+function mobf_calc_yaw(x,z)
+	local direction = math.atan2(z,x)
+				
+	while direction < 0 do
+		direction = direction + (2* math.pi)
+	end
+				
+	return direction
 end
 --!@}
