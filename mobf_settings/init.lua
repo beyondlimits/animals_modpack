@@ -1,4 +1,4 @@
-mobf_settings_version = "0.0.11"
+mobf_settings_version = "0.0.12"
 
 
 mobf_settings = {}
@@ -9,6 +9,7 @@ max_list_page_num = 5
 mobf_settings_debug = print
 
 local formspechandler = nil
+local mobf_settings_menubutton = ""
 
 ------------------------------------------------------------------------------
 -- name: get_animal_list
@@ -316,14 +317,14 @@ function mobf_settings.get_formspec(player,page)
 		    local pageform = mobf_settings.get_known_animals_form(page)
 		    
 			return "size[13,10]"
-			.."button[11,9.5;2,0.5;main; Mainmenu ]"
+			..mobf_settings_menubutton
 			.."button[0.5,0.75;3,0.5;mobf_list_page1; Known Mobs ]"
 			.."button[4,0.75;3,0.5;mobf_restart_required; Settings ]"
 			.."label[5.5,0;MOBF " .. version .. "]"
 			.. pageform
 	else
 		return "size[13,10]"
-			.."button[11,9.5;2,0.5;main; Mainmenu ]"
+			..mobf_settings_menubutton
 			.."label[0.5,1.0;You are not allowed to change any setting!]"
 			.."label[0.5,2.25;Go Away!]"
 			.."label[5.5,0;MOBF " .. version .. "]"
@@ -432,8 +433,9 @@ if mobf_rtd.inventory_plus_enabled then
 	
 	--make inventoryplus formspechandler
 	formspechandler = inventory_plus.set_inventory_formspec
-	
+	mobf_settings_menubutton = "button[11,9.5;2,0.5;main; Mainmenu ]"
 else
+	mobf_settings_menubutton = "button_exit[11,9.5;2,0.5;main; Exit]"
 	formspechandler = function(player,formspec)
 	
 			name = player:get_player_name()

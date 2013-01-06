@@ -289,6 +289,9 @@ function mobf.activate_handler(self,staticdata)
 	mobf.init_on_punch_callbacks(self,now)
 	mobf.init_on_rightclick_callbacks(self,now)
 	
+	--initialize ride support
+	mobf_ride.init(self)
+	
 	--check if this was a replacement mob
 	if self.dyndata_delayed ~= nil then
 		minetest.log(LOGLEVEL_ERROR,"MOBF: delayed activation for replacement mob." 
@@ -431,6 +434,11 @@ function mobf.register_entity(name, graphics, mob)
 						return
 					end
 				end
+				
+				--do special ride callback
+				if mobf_ride.on_step_callback(self) then
+					return
+				end
 			
 				self.current_dtime = self.current_dtime + dtime
 				
@@ -499,6 +507,9 @@ function mobf.register_entity(name, graphics, mob)
 					mobf_warn_long_fct(starttime,"callback nr " .. i,"callback_or_" 
 						.. self.data.name .. "_" .. i)
 				end
+				
+				--tesrcode only
+				--mobf_ride.attache_player(self,clicker)
 				end,
 
 		--do basic mob initialization on activation
@@ -520,6 +531,26 @@ function mobf.register_entity(name, graphics, mob)
 				end,
 			
 			getbasepos       = mobf.get_basepos,
+			is_on_ground     = function(entity)
+			
+				local basepos = entity.getbasepos(entity)
+				local posbelow = { x=basepos.x, y=basepos.y-1,z=basepos.z}
+	
+				for dx=-1,1 do
+				for dz=-1,1 do
+					local fp0 = posbelow
+					local fp = { x= posbelow.x + (0.5*dx),
+								  y= posbelow.y,
+								  z= posbelow.z + (0.5*dz) }
+					local n = minetest.env:get_node(fp)
+					if not mobf_is_walkable(n) then
+						return true
+					end
+				end
+				end
+				
+				return false
+				end,
 				
 		--prepare permanent data
 			get_staticdata = function(self)

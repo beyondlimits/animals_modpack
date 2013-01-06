@@ -56,6 +56,7 @@ dofile (mobf_modpath .. "/fighting.lua")
 dofile (mobf_modpath .. "/random_drop.lua")
 dofile (mobf_modpath .. "/sound.lua")
 dofile (mobf_modpath .. "/permanent_data.lua")
+dofile (mobf_modpath .. "/ride.lua")
 dofile (mobf_modpath .. "/mobf.lua")
 dofile (mobf_modpath .. "/api.lua")
 dofile (mobf_modpath .. "/debug.lua")
@@ -72,7 +73,7 @@ dofile (mobf_modpath .. "/mgen_rasterized/mgen_raster.lua")
 dofile (mobf_modpath .. "/mgen_jordan4ibanez/mgen_jordan4ibanez.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "1.9.11"
+mobf_version = "1.9.12"
 
 LOGLEVEL_INFO     = "verbose"
 LOGLEVEL_NOTICE   = "info"
@@ -139,7 +140,7 @@ function mobf_init_framework()
 	mobf_init_weapons()
 
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing debug hooks..")
-	debug.init()
+	mobf_debug.init()
 	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize mobf supplied modules..")
 	mobf_init_modules()

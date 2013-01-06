@@ -21,9 +21,18 @@
 env_on_ground_1 = {
 			media = {
 						"air",
-						"default:junglegrass"
 					}
 		}
 --!@}
+
+table.foreach(mobf_env_placable_items,
+	function(index) 
+		table.insert(env_on_ground_1.media,mobf_env_placable_items[index]) 
+	end)
+	
+table.foreach(mobf_env_plants,
+	function(index) 
+		table.insert(env_on_ground_1.media,mobf_env_plants[index]) 
+	end)
 
 environment.register("on_ground_1", env_on_ground_1)

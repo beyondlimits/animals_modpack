@@ -22,7 +22,6 @@
 env_meadow = {
 			media = {
 						"air",
-						"default:junglegrass"
 					},
 			surfaces = {
 						good = {
@@ -35,5 +34,15 @@ env_meadow = {
 						},
 		}
 --!@}
+
+table.foreach(mobf_env_placable_items,
+	function(index) 
+		table.insert(env_meadow.media,mobf_env_placable_items[index]) 
+	end)
+	
+table.foreach(mobf_env_plants,
+	function(index) 
+		table.insert(env_meadow.media,mobf_env_plants[index]) 
+	end)
 
 environment.register("meadow", env_meadow)

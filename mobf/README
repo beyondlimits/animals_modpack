@@ -14,9 +14,30 @@ suggestions too!
 No what is in?
 -------------------------------------------------------------------------------
 
+--hostile mobs--
 Vombies
 Hostile mobs spawning at night in unlighted areas. They can't withstand the 
 sun and will burn as sun rises
+
+Dungeonmasters
+Just dungenmasters throwing fireballs they spawn in dark stony areas too.
+
+Big Red
+They look like giant easter bunnys but beware of their plasma balls! Big red
+spawns in dark stony areas
+
+Boombomb
+Don't get near they will explode
+
+--slime--
+will bounce in large caves below surface
+
+--semi hostile mobs -- 
+
+Wolf
+A animal hiding in the woods that can be tamed to follow you
+
+--friendly mobs --
 
 Chicken
 Cicken droping egs now and then
@@ -31,18 +52,8 @@ Cows will spawn on willows and produce milk.
 Deer
 Will spawn below trees.
 
-Big Red
-They look like giant easter bunnys but beware of their plasma balls! Big red
-spawns in dark stony areas
-
-Dungeonmasters
-Just dungenmasters throwing fireballs they spawn in dark stony areas too.
-
 Rat 
 Just a small animal jumping around
-
-Boombomb
-Don't get near they will explode
 
 Blue White Fish
 Just a swimming animal
@@ -53,32 +64,28 @@ flys around over your head!
 Clownfish
 A funny small quick fish swiming around
 
-Wolf
-A animal hiding in the woods that can be tamed to follow you
+--npc trader--
+will sell goods
 
 
 What can you do with them?
 -------------------------------------------------------------------------------
 
-Sheep -> take scissors and sheer them
-Cow -> take an empty glass and get milk
-Chicken -> collect eggs
-Vombie -> drops bone on kill
-Clownfish -> drops golden scale on kill
-Wolf -> tame it!
+Sheep      -> take scissors and sheer them
+Cow        -> take an empty glass and get milk
+Chicken    -> collect eggs
+Vombie     -> drops bone on kill
+Clownfish  -> drops golden scale on kill
+Wolf       -> tame it!
+NPC trader -> trading of course
 
 
-How to catch mobs? Take a lasso or net to catch them, create a farm. No they 
-won't breed except sheep if there's a filled barn nearby
+How to catch mobs? Take a lasso or net to catch them, create a farm. Sheep,
+chicken and cow will even breed if there's a filled barn nearby
 
 
 Recieps:
 -------------------------------------------------------------------------------
-Empty glass
-
-none glass none
-none glass none
-none none  none
 
 Lasso
 
@@ -102,6 +109,11 @@ Barn
 
 stick stick stick
 wood  wood  wood
+
+Small barn
+
+stick stick
+wood  wood
 
 Vombie trap
 
@@ -134,6 +146,11 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.9.12
+-rename debug class to avoid naming conflicts
+-improve environment definition
+-add ride support (experimental no mob using it by now)
+
 Changes 1.9.11
 -added calf mesh
 -added rat mesh
@@ -516,4 +533,18 @@ http://www.mediafire.com/?7hm2xm51aoytbua Version 1.2.90 (loose weight)
 http://www.mediafire.com/?lnw1bcs5gq6au83 Version 1.2.91 (fix it)
 http://www.mediafire.com/?axuhv41wc2ch7yl Version 1.2.92 (enter the 3rd dimension)
 http://www.mediafire.com/?vldqym8hrasjbuk Version 1.2.93 (finding the right direction)
+http://www.mediafire.com/?1ne46d88ej6qlus Version 1.3.0 (let there be pets)
+http://www.mediafire.com/?vr9w97ac350u215 Version 1.3.1 (paperworks)
+http://www.mediafire.com/?25an9a14ty4ifat Version 1.3.3 (no trace)
+http://www.mediafire.com/?p8a3wkl3s936n6o Version 1.3.4 (finetuning)
+http://www.mediafire.com/?jmm1g4j2j4hp8d4 Version 1.4.0 (slimy)
+http://www.mediafire.com/?goyb9r7e94h8gwl Version 1.4.1 (dropper)
+http://www.mediafire.com/?63o9qgycaccb3q3 Version 1.4.2 (dropper)
+http://www.mediafire.com/?jcocc1vop19a3kj Version 1.4.3 (no respawn)
+http://www.mediafire.com/?b8hw3fo3599wbtd Version 1.4.4 (more breeding)
+http://www.mediafire.com/?5cuh2lz2m12915p Version 1.4.5 (more breeding)
+http://www.mediafire.com/?ds4g46v3dhnkdg9 Version 1.9.0 (sleeping sheep) --experimental
+http://www.mediafire.com/?umbcd1ptax9bbcb Version 1.9.1 (animating!) --experimental
+http://www.mediafire.com/?66v84hi9p43hw7o Version 1.9.6 (faster?) --experimental
+http://www.mediafire.com/?5z5wz2d329m849k Version 1.9.7 (frightened about water) --experimental
 

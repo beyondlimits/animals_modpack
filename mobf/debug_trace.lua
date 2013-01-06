@@ -89,4 +89,8 @@ dbg_mobf = {
 	trader_inv_lvl1			= function () end,
 	trader_inv_lvl2			= function () end,
 	trader_inv_lvl3			= function () end,
+	
+	ride_lvl1				= function () end,
+	ride_lvl2				= function () end,
+	ride_lvl3				= function () end,
 }

@@ -533,6 +533,7 @@ function environment.register(name, environment)
 	return true	 
 end
 
+dofile (mobf_modpath .. "/environments/general_env_sets.lua")
 dofile (mobf_modpath .. "/environments/flight_1.lua")
 dofile (mobf_modpath .. "/environments/meadow.lua")
 dofile (mobf_modpath .. "/environments/on_ground_1.lua")

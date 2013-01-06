@@ -837,4 +837,24 @@ function mobf_calc_yaw(x,z)
 				
 	return direction
 end
+
+-------------------------------------------------------------------------------
+-- name: mobf_calc_speed_components(dir_radians,absolute_speed)
+--
+--! @brief calculate calculate x and z components of a directed speed
+--
+--! @param dir_radians direction of movement radians
+--! @param absolute_speed speed in direction
+--
+--! @return {x,z}
+-------------------------------------------------------------------------------
+function mobf_calc_speed_components(dir_radians,absolute_speed)
+
+	local retval = {x=0,z=0}
+	
+	retval.x = absolute_speed * math.cos(dir_radians)
+	retval.z = absolute_speed * math.sin(dir_radians)
+
+	return retval
+end
 --!@}

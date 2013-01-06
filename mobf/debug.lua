@@ -19,7 +19,7 @@
 --! @ingroup framework_int
 --! @{
 
-debug = {}
+mobf_debug = {}
 
 -------------------------------------------------------------------------------
 -- name: print_usage(player,command,toadd)
@@ -30,7 +30,7 @@ debug = {}
 --! @param command display usage for this command
 --! @param toadd additional information to transfer to player
 -------------------------------------------------------------------------------
-function debug.print_usage(player, command, toadd)
+function mobf_debug.print_usage(player, command, toadd)
 
 	if toadd == nil then
 		toadd = ""
@@ -65,25 +65,25 @@ end
 --! @param name name of player
 --! @param param parameters received
 ------------------------------------------------------------------------------
-function debug.spawn_mob(name,param)
+function mobf_debug.spawn_mob(name,param)
 	print("name: " .. name .. " param: " .. dump(param))
 	
 	local parameters = param:split(" ")
 	
 	if #parameters ~= 2 then
-		debug.print_usage(name,"spawnmob")
+		mobf_debug.print_usage(name,"spawnmob")
 		return
 	end
 	
 	local pos_strings = parameters[2]:split(",")
 	
 	if #pos_strings ~= 3 then
-		debug.print_usage(name,"spawmob")
+		mobf_debug.print_usage(name,"spawmob")
 		return
 	end
 
 	if mobf_is_known_mob(parameters[1]) ~= true then
-		debug.print_usage(name,"ukn_mob", ">"..parameters[1].."<") 
+		mobf_debug.print_usage(name,"ukn_mob", ">"..parameters[1].."<") 
 		return true
 	end
 
@@ -96,11 +96,11 @@ function debug.spawn_mob(name,param)
 	if spawnpoint.x == nil or
 		spawnpoint.y == nil or
 		spawnpoint.z == nil then
-		debug.print_usage(name,"spawnmob")	
+		mobf_debug.print_usage(name,"spawnmob")	
 		return
 	end
 
-	spawning.spawn_and_check(parameters[1],"__default",spawnpoint,"debug_spawner")
+	spawning.spawn_and_check(parameters[1],"__default",spawnpoint,"mobf_debug_spawner")
 end
 
 -------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ end
 --! @param name name of player
 --! @param param parameters received
 ------------------------------------------------------------------------------
-function debug.list_active_mobs(name,param)
+function mobf_debug.list_active_mobs(name,param)
 	
 	local count = 1
 	for index,value in pairs(minetest.luaentities) do 
@@ -133,7 +133,7 @@ end
 --! @param name name of player
 --! @param param parameters received
 ------------------------------------------------------------------------------
-function debug.add_tools(name,param)
+function mobf_debug.add_tools(name,param)
 	local player = minetest.env:get_player_by_name(name)
 	
 	if player ~= nil then
@@ -153,7 +153,7 @@ end
 --! @param name name of player
 --! @param param parameters received
 ------------------------------------------------------------------------------
-function debug.list_defined_mobs(name,param)
+function mobf_debug.list_defined_mobs(name,param)
 
 	local text = ""
 	for i,val in ipairs(mobf_rtd.registred_mob) do
@@ -163,19 +163,19 @@ function debug.list_defined_mobs(name,param)
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_debug_handler(name,message)
+-- name: init()
 --
 --! @brief initialize debug commands chat handler
 --
 ------------------------------------------------------------------------------
-function debug.init()
+function mobf_debug.init()
 
 	minetest.register_chatcommand("spawnmob",
 		{
 			params		= "<name> <pos>",
 			description = "spawn a mob at position" ,
 			privs		= {mobfw_admin=true},
-			func		= debug.spawn_mob
+			func		= mobf_debug.spawn_mob
 		})
 		
 	minetest.register_chatcommand("listactivemobs",
@@ -183,7 +183,7 @@ function debug.init()
 			params		= "",
 			description = "list all currently active mobs" ,
 			privs		= {mobfw_admin=true},
-			func		= debug.list_active_mobs
+			func		= mobf_debug.list_active_mobs
 		})
 		
 	minetest.register_chatcommand("listdefinedmobs",
@@ -191,7 +191,7 @@ function debug.init()
 			params		= "",
 			description = "list all currently defined mobs" ,
 			privs		= {mobfw_admin=true},
-			func		= debug.list_defined_mobs
+			func		= mobf_debug.list_defined_mobs
 		})
 		
 	minetest.register_chatcommand("mob_add_tools",
@@ -199,7 +199,7 @@ function debug.init()
 			params		= "",
 			description = "add some mob specific tools to player" ,
 			privs		= {mobfw_admin=true},
-			func		= debug.add_tools
+			func		= mobf_debug.add_tools
 		})
 
 	if mobf_rtd.luatrace_enabled then
@@ -230,7 +230,7 @@ end
 --! @param entity entity rightclicked
 --! @param player player doing rightclick
 ------------------------------------------------------------------------------
-function debug.rightclick_callback(entity,player)
+function mobf_debug.rightclick_callback(entity,player)
 	local lifetime = mobf_get_current_time() - entity.dynamic_data.spawning.original_spawntime
 	print("MOBF: " .. entity.data.name .. " is alive for " .. lifetime .. " seconds")
 	print("MOBF: \tCurrent state:               " .. entity.dynamic_data.state.current )

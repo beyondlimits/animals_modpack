@@ -20,10 +20,20 @@
 --! @brief simple environment only checking for air
 env_simple_air = {
 			media = {
-						"air"
+						"air",
 					}
 		}
 		
 --!@}
+
+table.foreach(mobf_env_placable_items,
+	function(index) 
+		table.insert(env_simple_air.media,mobf_env_placable_items[index]) 
+	end)
+	
+table.foreach(mobf_env_plants,
+	function(index) 
+		table.insert(env_simple_air.media,mobf_env_plants[index]) 
+	end)
 		
 environment.register("simple_air", env_simple_air)
