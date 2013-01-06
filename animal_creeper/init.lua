@@ -1,4 +1,4 @@
-local version = "0.0.10"
+local version = "0.0.11"
 
 local creeper_groups = {
                         not_in_creative_inventory=1
@@ -28,6 +28,7 @@ creeper_prototype = {
 					max_speed=2,
 					pattern="stop_and_go",
 					canfly=false,
+					follow_speedup=10,
 					},		
 		harvest        = nil,
 		catching       = nil,
@@ -40,7 +41,7 @@ creeper_prototype = {
 					},
 		graphics_3d = {
 					visual = "mesh",
-					mesh = "boombomb.x",
+					mesh = "boombomb.b3d",
 					textures = {"boombomb_mesh.png"},
 					collisionbox = selectionbox_creeper,
 					visual_size= {x=1,y=1,z=1},

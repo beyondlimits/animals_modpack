@@ -436,9 +436,9 @@ function mob_inventory.trader_callback(entity,player)
 												player:getpos())
 
 		if entity.mode == "3d" then
-			entity.object:setyaw(mobf_calc_yaw(direction.x,direction.z))
+			entity.object:setyaw(mobf_calc_yaw(direction.x,direction.z)-math.pi/2)
 		else
-			entity.object:setyaw(mobf_calc_yaw(direction.x,direction.z)+3.14/2)
+			entity.object:setyaw(mobf_calc_yaw(direction.x,direction.z)+math.pi/2)
 		end
 	
 --		if minetest.show_formspec(playername,

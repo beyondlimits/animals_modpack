@@ -35,6 +35,7 @@ random_drop = {}
 -------------------------------------------------------------------------------
 function random_drop.callback(entity,now)
 	if entity.data.random_drop ~= nil and
+		entity.dynamic_data.random_drop ~= nil and
 		entity.data.random_drop.result ~= "" then
 
 		dbg_mobf.random_drop_lvl3("MOBF: random drop for ".. entity.data.name .." is set")
@@ -96,16 +97,37 @@ function random_drop.register(random_drop)
 		minetest.log("LOGLEVEL_INFO","MOBF:\tregistering random drop entity: "..":"..random_drop.result.."_ent"..
 				" item="..drop_itemname .. " basename=" .. drop_basename)
 		
+		local ent_graphics = {}
+		local id = drop_basename .. "_" .. drop_itemname
+		
+		if minetest.setting_getbool("mobf_disable_3d_mode") or 
+			animalmaterialsdata[id] == nil or
+			animalmaterialsdata[id].graphics_3d == nil then
+			ent_graphics.visual = "sprite"
+			ent_graphics.textures = {drop_basename .. "_"..drop_itemname..".png"}
+			ent_graphics.collisionbox = {-0.5,-0.5,-0.5, 0.5,0.5,0.5}
+		else
+			ent_graphics.visual = animalmaterialsdata[id].graphics_3d.visual
+			ent_graphics.mesh   = animalmaterialsdata[id].graphics_3d.mesh
+			ent_graphics.textures = animalmaterialsdata[id].graphics_3d.textures
+			ent_graphics.collisionbox = animalmaterialsdata[id].graphics_3d.collisionbox
+			ent_graphics.visual_size = animalmaterialsdata[id].graphics_3d.visual_size
+		end
+		
+		
 		--Entity
 		minetest.register_entity(":"..random_drop.result.."_ent",
 			{
 				physical 		= true,
-				collisionbox 	= {-0.5,-0.5,-0.5, 0.5,0.5,0.5},
-				visual 			= "sprite",
-				textures 		= {drop_basename .. "_"..drop_itemname..".png"},
+				collisionbox 	= ent_graphics.collisionbox,
+				visual 			= ent_graphics.visual,
+				textures 		= ent_graphics.textures,
+				mesh			= ent_graphics.mesh,
+				visual_size		= ent_graphics.visual_size,
 
 				on_activate = function(self,staticdata)
 
+					self.object:setacceleration({x=0,y=-9.81,z=0})
 					local now = mobf_get_current_time()
 					
 					if staticdata == "" then

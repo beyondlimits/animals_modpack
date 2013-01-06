@@ -453,7 +453,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 					targetpos.y = targetpos.y+1 --TODO use collision box 
 				end
 				
-				minetest.log(LOGLEVEL_WARNING,"MOBF: Your mob dropt into water moving to "..
+				minetest.log(LOGLEVEL_WARNING,"MOBF: Your mob " .. tostring(entity) .. " dropt into water moving to "..
 						printpos(targetpos).." state: "..
 						environment.pos_is_ok(targetpos,entity))
 				entity.object:moveto(targetpos)

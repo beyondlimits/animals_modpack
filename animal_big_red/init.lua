@@ -1,4 +1,4 @@
-local version = "0.0.13"
+local version = "0.0.14"
 
 local big_red_groups = {
                         not_in_creative_inventory=1
@@ -33,6 +33,7 @@ big_red_prototype = {
 					max_speed=2,
 					pattern="stop_and_go",
 					canfly=false,
+					follow_speedup=30,
 					},
 		harvest = {	
 					tool="",
@@ -61,7 +62,7 @@ big_red_prototype = {
 					starts_attack=true,
 					sun_sensitive=true,
 					melee = {
-						maxdamage=4,
+						maxdamage=2,
 						range=2,
 						speed=2,
 						},

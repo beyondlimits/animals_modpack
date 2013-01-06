@@ -130,5 +130,4 @@ function movement_generic.predict_next_block(pos,velocity,acceleration)
 	end
 	
 	return pos_predicted
-
 end

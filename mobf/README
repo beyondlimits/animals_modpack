@@ -134,6 +134,16 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.9.11
+-added calf mesh
+-added rat mesh
+-replaced .x meshes by .b3d meshes
+-fixed bug 3d inventory mob not facing player correctly
+-fixed crash in random drop handling with incorrect dynamic_data
+-mobs will face player on combat now
+-improved follow behaviour (you can't get away that easy anymore)
+-reduced damage done by mobs
+
 Changes 1.9.10
 -fixed group support for mobs
 -fixed sun damage handler resetting animation to "stand"

@@ -1,10 +1,11 @@
-local version = "0.0.12"
+local version = "0.0.14"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
 					}
 
-local selectionbox_chicken = {-0.25, -0.25, -0.25, 0.2, 0.25, 0.25}
+local selectionbox_chicken = {-0.25, -0.15, -0.25, 0.2, 0.25, 0.25}
+local selectionbox_rooster = {-0.25, -0.20, -0.25, 0.2, 0.25, 0.25}
 local selectionbox_chick = {-0.1, -0.125, -0.1, 0.1, 0.15, 0.1}
 
 local modpath = minetest.get_modpath("animal_chicken")
@@ -91,7 +92,7 @@ chicken_prototype = {
 				animation = "stand",
 				graphics_3d = {
 					visual = "mesh",
-					mesh = "animal_chicken.x",
+					mesh = "animal_chicken.b3d",
 					textures = {"animal_chicken_chicken_mesh.png"},
 					collisionbox = selectionbox_chicken,
 					visual_size= {x=1,y=1,z=1},
@@ -173,9 +174,9 @@ rooster_prototype = {
 				animation = "stand",
 				graphics_3d = {
 					visual = "mesh",
-					mesh = "animal_rooster.x",
+					mesh = "animal_rooster.b3d",
 					textures = {"animal_chicken_chicken_mesh.png"},
-					collisionbox = selectionbox_chicken,
+					collisionbox = selectionbox_rooster,
 					visual_size= {x=1,y=1,z=1},
 					},
 				graphics = {
@@ -250,7 +251,7 @@ chick_m_prototype = {
 				animation = "stand",
 				graphics_3d = {
 					visual = "mesh",
-					mesh = "animal_chick.x",
+					mesh = "animal_chick.b3d",
 					textures = {"animal_chicken_chick_mesh.png"},
 					collisionbox = selectionbox_chick,
 					visual_size= {x=1,y=1,z=1},
@@ -328,7 +329,7 @@ chick_f_prototype = {
 				animation = "stand",
 				graphics_3d = {
 					visual = "mesh",
-					mesh = "animal_chick.x",
+					mesh = "animal_chick.b3d",
 					textures = {"animal_chicken_chick_mesh.png"},
 					collisionbox = selectionbox_chick,
 					visual_size= {x=1,y=1,z=1},

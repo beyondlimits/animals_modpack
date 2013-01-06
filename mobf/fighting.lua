@@ -99,6 +99,12 @@ function fighting.hit(entity,player)
 	local playerpos = player:getpos()
 	local dir = mobf_get_direction(playerpos,mob_basepos)
 	
+	--update mob orientation
+	if entity.mode == "3d" then
+		entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)+math.pi)
+	else
+		entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)-math.pi)
+	end
 	
 	if entity.data.sound ~= nil then
 		sound.play(mob_pos,entity.data.sound.hit);
@@ -481,13 +487,15 @@ function fighting.aggression(entity,now)
 	end
 
 	--mob is specified as self attacking
-	if entity.data.combat.starts_attack then
+	if entity.data.combat.starts_attack and 
+		(entity.dynamic_data.combat.target == nil or
+		entity.dynamic_data.combat.target == "") then
 		dbg_mobf.fighting_lvl3("MOBF: ".. entity.data.name .. " " .. now
 			.. " aggressive mob, is it time to attack?")
-		if entity.dynamic_data.combat.ts_last_attack + 5 < now then
+		if entity.dynamic_data.combat.ts_last_aggression_chance + 1 < now then
 			dbg_mobf.fighting_lvl3("MOBF: ".. entity.data.name .. " " .. now
 				.. " lazzy time over try to find an enemy")
-			entity.dynamic_data.combat.ts_last_attack = now
+			entity.dynamic_data.combat.ts_last_aggression_chance = now
 
 			if math.random() < entity.data.combat.angryness then
 
@@ -531,7 +539,7 @@ function fighting.init_dynamic_data(entity,now)
 		ts_last_aggression_chance 	= now,
 		ts_self_destruct_triggered  = -1,
 		
-		target             = targetstring,		
+		target             = targetstring,
 	}	
 	
 	entity.dynamic_data.combat = data

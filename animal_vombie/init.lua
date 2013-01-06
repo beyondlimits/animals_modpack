@@ -87,10 +87,11 @@ vombie_prototype = {
 		movement =  {
 					default_gen="probab_mov_gen",
 					min_accel=0.3,
-					max_accel=0.7,
+					max_accel=1.5,
 					max_speed=2,
 					pattern="stop_and_go",
 					canfly=false,
+					follow_speedup=15,
 					},
 		harvest        = nil,
 		catching       = nil,
@@ -113,7 +114,7 @@ vombie_prototype = {
 					starts_attack=true,
 					sun_sensitive=true,
 					melee = {
-						maxdamage=4,
+						maxdamage=2,
 						range=2, 
 						speed=1,
 						},

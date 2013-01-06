@@ -11,9 +11,6 @@ local selectionbox_baby_calf = {-0.8, -0.8, -0.5, 0.8, 0.8, 0.5}
 
 local modpath = minetest.get_modpath("animal_cow")
 
---include debug trace functions
-dofile (modpath .. "/model.lua")
-
 cow_prototype = {   
 		name="cow",
 		modname="animal_cow",
@@ -48,22 +45,6 @@ cow_prototype = {
 					tool="animalmaterials:lasso",
 					consumed=true,
 					},
-		random_drop    = nil,
-		auto_transform = nil,
-		graphics = {
-					sprite_scale={x=4,y=4},
-					sprite_div = {x=6,y=1},
-					visible_height = 2,
-					},
-		graphics_3d = {
-					visual = "mesh",
-					mesh = "cow.x",
-					textures = {"cow_mesh.png"},
-					collisionbox = selectionbox_cow,
-					visual_size= {x=1,y=1,z=1},
-					},
-		combat         = nil,
-	
 		spawning = {
 					rate=0.001,
 					density=200,
@@ -93,6 +74,25 @@ cow_prototype = {
 				typical_state_time = 45,
 				chance = 0.25,
 				animation = "eat",
+				},
+				{
+				name = "default",
+				movgen = "none",
+				typical_state_time = 45,
+				chance = 0.25,
+				animation = "stand",
+				graphics = {
+					sprite_scale={x=4,y=4},
+					sprite_div = {x=6,y=1},
+					visible_height = 2,
+				},
+				graphics_3d = {
+					visual = "mesh",
+					mesh = "animal_cow.b3d",
+					textures = {"cow_mesh.png"},
+					collisionbox = selectionbox_cow,
+					visual_size= {x=1,y=1,z=1},
+					},
 				},
 			},
 		animation = {
@@ -139,22 +139,6 @@ steer_prototype = {
                     tool="animalmaterials:lasso",
                     consumed=true,
                     },
-        random_drop    = nil,
-        auto_transform = nil,
-        graphics = {
-                    sprite_scale={x=4,y=4},
-                    sprite_div = {x=6,y=1},
-                    visible_height = 2,
-                    },
-		graphics_3d = {
-					visual = "mesh",
-					mesh = "steer.x",
-					textures = {"steer_mesh.png"},
-					collisionbox = selectionbox_cow,
-					visual_size= {x=1,y=1,z=1},
-					},
-        combat         = nil,
-    
         spawning = {
                     rate=0.001,
                     density=200,
@@ -184,6 +168,25 @@ steer_prototype = {
 				typical_state_time = 45,
 				chance = 0.25,
 				animation = "eat",
+				},
+				{
+				name = "default",
+				movgen = "none",
+				typical_state_time = 45,
+				chance = 0.25,
+				animation = "stand",
+				graphics = {
+					sprite_scale={x=4,y=4},
+					sprite_div = {x=6,y=1},
+					visible_height = 2,
+				},
+				graphics_3d = {
+					visual = "mesh",
+					mesh = "animal_steer.b3d",
+					textures = {"steer_mesh.png"},
+					collisionbox = selectionbox_cow,
+					visual_size= {x=1,y=1,z=1},
+					},
 				},
 			},
 		animation = {
@@ -225,26 +228,13 @@ baby_calf_f_prototype = {
                     pattern="stop_and_go",
                     canfly=false,
                     },      
-        harvest = nil,
         catching = {
                     tool="animalmaterials:lasso",
                     consumed=true,
                     },
-        random_drop    = nil,
         auto_transform = {
-                    result="animal_cow:cow",
+                    result="animal_cow:cow__default",
                     delay=7200,
-                    },
-        graphics = {
-                    sprite_scale={x=2,y=2},
-                    sprite_div = {x=6,y=1},
-                    visible_height = 1,
-                    },
-        graphics_3d = {
-                    visual = "wielditem",
-                    textures = {"animal_cow:box_baby_calf"},
-                    collisionbox = selectionbox_baby_calf,
-                    visual_size= {x=1,y=1,z=1},
                     },
         combat         = nil,
     
@@ -262,7 +252,45 @@ baby_calf_f_prototype = {
                                 gain = 1,
                                 max_hear_distance = 10,
                                 },
-                    },  
+                    },
+        animation = {
+				walk = {
+					start_frame = 1,
+					end_frame   = 40,
+					},
+				stand = {
+					start_frame = 41,
+					end_frame   = 80,
+					},
+			},
+		states = {
+				{ 
+				name = "walking",
+				movgen = "probab_mov_gen",
+				typical_state_time = 180,
+				chance = 0.50,
+				animation = "walk",
+				},
+				{
+				name = "default",
+				movgen = "none",
+				typical_state_time = 45,
+				chance = 0.0,
+				animation = "stand",
+				graphics = {
+					sprite_scale={x=2,y=2},
+					sprite_div = {x=6,y=1},
+					visible_height = 1,
+					},
+				graphics_3d = {
+					visual = "mesh",
+					mesh = "animal_calf.b3d",
+					textures = {"animal_calf_mesh.png"},
+					collisionbox = selectionbox_baby_calf,
+					visual_size= {x=1,y=1,z=1},
+					},
+				},
+			},
         }
         
 baby_calf_m_prototype = {   
@@ -280,7 +308,6 @@ baby_calf_m_prototype = {
                     envid = "meadow"
                 },              
         movement =  {
-                    default_gen="probab_mov_gen",
                     min_accel=0.025,
                     max_accel=0.15,
                     max_speed=0.2,
@@ -293,24 +320,10 @@ baby_calf_m_prototype = {
                     tool="animalmaterials:lasso",
                     consumed=true,
                     },
-        random_drop    = nil,
         auto_transform = {
-                    result="animal_cow:steer",
+                    result="animal_cow:steer__default",
                     delay=7200,
                     },
-        graphics = {
-                    sprite_scale={x=2,y=2},
-                    sprite_div = {x=6,y=1},
-                    visible_height = 1,
-                    },
-        graphics_3d = {
-                    visual = "wielditem",
-                    textures = {"animal_cow:box_baby_calf"},
-                    collisionbox = selectionbox_baby_calf,
-                    visual_size= {x=1,y=1,z=1},
-                    },
-        combat         = nil,
-    
         spawning = {
                     rate=0.001,
                     density=200,
@@ -325,16 +338,54 @@ baby_calf_m_prototype = {
                                 gain = 1,
                                 max_hear_distance = 10,
                                 },
-                    },  
+                    },
+		animation = {
+				walk = {
+					start_frame = 1,
+					end_frame   = 40,
+					},
+				stand = {
+					start_frame = 41,
+					end_frame   = 80,
+					},
+			},
+		states = {
+				{ 
+				name = "walking",
+				movgen = "probab_mov_gen",
+				typical_state_time = 180,
+				chance = 0.50,
+				animation = "walk",
+				},
+				{
+				name = "default",
+				movgen = "none",
+				typical_state_time = 45,
+				chance = 0.0,
+				animation = "stand",
+				graphics = {
+					sprite_scale={x=2,y=2},
+					sprite_div = {x=6,y=1},
+					visible_height = 1,
+					},
+				graphics_3d = {
+					visual = "mesh",
+					mesh = "animal_calf.b3d",
+					textures = {"animal_calf_mesh.png"},
+					collisionbox = selectionbox_baby_calf,
+					visual_size= {x=1,y=1,z=1},
+					},
+				},
+			},
         }
 
 --register with animals mod
-print ("Adding animal "..baby_calf_f_prototype.name)
+print ("Adding "..baby_calf_f_prototype.name)
 animals_add_animal(baby_calf_f_prototype)
-print ("Adding animal "..baby_calf_m_prototype.name)
+print ("Adding "..baby_calf_m_prototype.name)
 animals_add_animal(baby_calf_m_prototype)
-print ("Adding animal "..cow_prototype.name)
+print ("Adding "..cow_prototype.name)
 animals_add_animal(cow_prototype)
-print ("Adding animal "..steer_prototype.name)
+print ("Adding "..steer_prototype.name)
 animals_add_animal(steer_prototype)
 print ("animal_cow mod version " .. version .. " loaded")

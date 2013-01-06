@@ -71,19 +71,19 @@ function debug.spawn_mob(name,param)
 	local parameters = param:split(" ")
 	
 	if #parameters ~= 2 then
-		mobf_print_usage(name,"spawnmob")
+		debug.print_usage(name,"spawnmob")
 		return
 	end
 	
 	local pos_strings = parameters[2]:split(",")
 	
 	if #pos_strings ~= 3 then
-		mobf_print_usage(name,"spawmob")
+		debug.print_usage(name,"spawmob")
 		return
 	end
 
 	if mobf_is_known_mob(parameters[1]) ~= true then
-		mobf_print_usage(name,"ukn_mob", ">"..parameters[1].."<") 
+		debug.print_usage(name,"ukn_mob", ">"..parameters[1].."<") 
 		return true
 	end
 
@@ -96,7 +96,7 @@ function debug.spawn_mob(name,param)
 	if spawnpoint.x == nil or
 		spawnpoint.y == nil or
 		spawnpoint.z == nil then
-		mobf_print_usage(name,"spawnmob")	
+		debug.print_usage(name,"spawnmob")	
 		return
 	end
 

@@ -1,4 +1,4 @@
-local version = "0.0.12"
+local version = "0.0.14"
 
 local dm_groups = {
                         not_in_creative_inventory=1
@@ -29,13 +29,14 @@ dm_prototype = {
 					max_speed=0.25,
 					pattern="stop_and_go",
 					canfly=false,
+					follow_speedup=10,
 					},
 		combat = {
 					angryness=0.99,
 					starts_attack=true,
 					sun_sensitive=true,
 					melee = {
-						maxdamage=8,
+						maxdamage=3,
 						range=5, 
 						speed=1,
 						},
@@ -100,7 +101,7 @@ dm_prototype = {
 				animation = "stand",
 				graphics_3d = {
 					visual = "mesh",
-					mesh = "animal_dm.x",
+					mesh = "animal_dm.b3d",
 					textures = {"animal_dm_mesh.png"},
 					collisionbox = selectionbox_dm,
 					visual_size= {x=1,y=1,z=1},

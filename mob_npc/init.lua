@@ -37,7 +37,7 @@ npc_prototype = {
 		auto_transform = nil,
 		graphics_3d = {
 					visual = "mesh",
-					mesh = "character.x",
+					mesh = "npc_character.b3d",
 					textures = {"zombie.png"},
 					collisionbox = {-0.3,-1.0,-0.3, 0.3,0.8,0.3},
 					visual_size= {x=1, y=1},
@@ -116,7 +116,7 @@ npc_trader_prototype = {
 					},
 				graphics_3d = {
 					visual = "mesh",
-					mesh = "character.x",
+					mesh = "npc_character.b3d",
 					textures = {"mob_npc_trader_mesh.png"},
 					collisionbox = {-0.3,-1.0,-0.3, 0.3,0.8,0.3},
 					visual_size= {x=1, y=1},

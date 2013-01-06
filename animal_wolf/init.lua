@@ -34,6 +34,7 @@ wolf_prototype = {
 					min_accel=0.5,
 					max_accel=0.9,
 					max_speed=2,
+					follow_speedup=20,
 					},		
 		harvest = nil,
 		catching = {
@@ -113,6 +114,7 @@ tamed_wolf_prototype = {
 					max_accel=0.9,
 					max_speed=1.5,
 					max_distance=2,
+					follow_speedup=20,
 					},
 		harvest = nil,
 		catching = {

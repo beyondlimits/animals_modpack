@@ -1,17 +1,12 @@
-local version = "0.0.7"
+local version = "0.0.8"
 
-local selectionbox_rat = {-0.35, -0.0625, -0.0625, 0.35, 0.125, 0.0625}
+local selectionbox_rat = {-0.2, -0.0625, -0.2, 0.2, 0.125, 0.2}
 
 local rat_groups = {
 						not_in_creative_inventory=1
 					}
 
-local modpath = minetest.get_modpath("animal_rat")
-
---include debug trace functions
-dofile (modpath .. "/model.lua")
-
-rat_prototype = {   
+rat_prototype = {
 		name="rat", 
 		modname="animal_rat",
 	
@@ -33,37 +28,60 @@ rat_prototype = {
 					pattern="run_and_jump_low",
 					canfly=false,
 					},
-		harvest        = nil,
 		catching = {
 					tool="animalmaterials:net",
 					consumed=true,
 					},
-		random_drop    = nil,
-		auto_transform = nil,
-		graphics_3d = {
-					visual = "wielditem",
-					textures = {"animal_rat:box_rat"},
-					collisionbox = selectionbox_rat,
-					visual_size= {x=0.666,y=0.666,z=0.666},
-					},
-		graphics = {
-					sprite_scale={x=1,y=1},
-					sprite_div = {x=6,y=1},
-					visible_height = 1,
-					visible_width = 1,
-					},	
-		combat         = nil,
 		spawning = {
 					rate=0.02,
 					density=250,
 					algorithm="forrest_mapgen",
 					height=1
 					},
+		animation = {
+				walk = {
+					start_frame = 1,
+					end_frame   = 40,
+					},
+				stand = {
+					start_frame = 41,
+					end_frame   = 80,
+					},
+			},
+		states = {
+				{ 
+				name = "default",
+				movgen = "none",
+				chance = 0,
+				animation = "stand",
+				graphics_3d = {
+					visual = "mesh",
+					mesh = "animal_rat.b3d",
+					textures = {"animal_rat_mesh.png"},
+					collisionbox = selectionbox_rat,
+					visual_size= {x=1,y=1,z=1},
+					},
+				graphics = {
+					sprite_scale={x=1,y=1},
+					sprite_div = {x=6,y=1},
+					visible_height = 1,
+					visible_width = 1,
+					},	
+				typical_state_time = 10,
+				},
+				{ 
+				name = "walking",
+				movgen = "probab_mov_gen",
+				chance = 0.75,
+				animation = "walk",
+				typical_state_time = 180,
+				},
+			},
 		}
 
 
 
 --register with animals mod
-print ("Adding animal "..rat_prototype.name)
+print ("Adding "..rat_prototype.name)
 animals_add_animal(rat_prototype)
 print ("animal_rat mod version " .. version .. " loaded")

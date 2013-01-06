@@ -830,6 +830,10 @@ function mobf_calc_yaw(x,z)
 	while direction < 0 do
 		direction = direction + (2* math.pi)
 	end
+	
+	while direction > (2*math.pi) do
+		direction = direction - (2* math.pi)
+	end
 				
 	return direction
 end

@@ -1,4 +1,7 @@
-local version = "0.0.13"
+local version = "0.0.14"
+
+
+animalmaterialsdata = {}
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Node definitions
@@ -17,7 +20,7 @@ local version = "0.0.13"
 --
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-	minetest.register_tool("animalmaterials:sword_deamondeath", {
+minetest.register_tool("animalmaterials:sword_deamondeath", {
 	description = "Sword (Deamondeath)",
 	inventory_image = "default_tool_steelsword.png",
 	tool_capabilities = {
@@ -188,6 +191,27 @@ minetest.register_craftitem("animalmaterials:egg_big", {
 	image = "animalmaterials_egg_big.png",
 	stack_max=5
 })
+
+animalmaterialsdata["animalmaterials_egg"] = {
+			graphics_3d = {
+				visual = "mesh",
+				mesh   = "animalmaterials_egg_ent.b3d",
+				textures = { "animalmaterials_egg_ent_mesh.png" },
+				collisionbox = { -0.12,-0.125,-0.12,0.12,0.125,0.12 },
+				visual_size     = {x=1,y=1,z=1},
+				}
+	}
+	
+animalmaterialsdata["animalmaterials_egg_big"] = {
+			graphics_3d = {
+				visual = "mesh",
+				mesh   = "animalmaterials_egg_ent.b3d",
+				textures = { "animalmaterials_egg_ent_mesh.png" },
+				collisionbox = { -0.24,-0.25,-0.24,0.24,0.25,0.24 },
+				visual_size     = {x=2,y=2,z=2},
+				}
+	}
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- bone
