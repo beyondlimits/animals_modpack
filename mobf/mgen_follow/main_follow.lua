@@ -284,7 +284,17 @@ function mgen_follow.checkspeed(entity)
 	return false
 end
 
-
+-------------------------------------------------------------------------------
+-- name: set_acceleration(entity,accel,speedup)
+--
+--! @brief apply acceleration to entity
+--! @memberof mgen_follow
+--! @private
+--
+--! @param entity mob to apply to
+--! @param accel acceleration to set
+--! @param speedup speedup factor
+-------------------------------------------------------------------------------
 function mgen_follow.set_acceleration(entity,accel,speedup)
 		entity.object:setacceleration({x=accel.x*speedup,
 								   y=accel.y,

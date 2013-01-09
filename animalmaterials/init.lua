@@ -1,4 +1,4 @@
-local version = "0.0.14"
+local version = "0.0.15"
 
 
 animalmaterialsdata = {}
@@ -74,6 +74,17 @@ minetest.register_craftitem("animalmaterials:net", {
 })
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+-- saddle
+--
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+minetest.register_craftitem("animalmaterials:saddle", {
+	description = "Saddle",
+	image = "animalmaterials_saddle.png",
+	stack_max=1
+})
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 -- meat
 --
 -------------------------------------------------------------------------------
@@ -129,6 +140,13 @@ minetest.register_craftitem("animalmaterials:meat_undead", {
 })
 minetest.register_craftitem("animalmaterials:meat_toxic", {
 	description = "Toxic Meat",
+	image = "animalmaterials_meat_raw.png",
+	on_use = minetest.item_eat(-5),
+	groups = { meat=1, eatable=1 },
+	stack_max=5
+})
+minetest.register_craftitem("animalmaterials:meat_ostrich", {
+	description = "Ostrich Meat",
 	image = "animalmaterials_meat_raw.png",
 	on_use = minetest.item_eat(-5),
 	groups = { meat=1, eatable=1 },
@@ -223,8 +241,7 @@ minetest.register_craftitem("animalmaterials:bone", {
 	image = "animalmaterials_bone.png",
 	stack_max=25
 })
-
-
+-------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- furs
 --
@@ -235,6 +252,7 @@ minetest.register_craftitem("animalmaterials:fur", {
 	image = "animalmaterials_fur.png",
 	stack_max=25
 })
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- scale

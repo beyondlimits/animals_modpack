@@ -309,6 +309,12 @@ function mobf_init_modules()
 					return false
 				end
 				})
+				
+	mobf.register_on_punch_callback({
+			name		= "riding",
+			handler		= mobf_ride.on_punch_callback,
+			configcheck	= mobf_ride.is_enabled
+			})
 	
 	mobf.register_on_punch_callback({
 			name = "punching",

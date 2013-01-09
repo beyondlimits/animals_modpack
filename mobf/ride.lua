@@ -46,6 +46,9 @@ function mobf_ride.attache_player(entity,player)
 	end
 		
 	player:set_attach(entity.object,"",attacheoffset, {x=0,y=0,z=0})
+	if entity.data.ride.texturemod ~= nil then
+		entity.object:settexturemod(entity.data.ride.texturemod);
+	end
 end
 
 ------------------------------------------------------------------------------
@@ -62,7 +65,7 @@ function mobf_ride.dettache_player(entity)
 	entity.dynamic_data.ride.is_attached = false
 	entity.dynamic_data.ride.player:set_detach()
 	entity.dynamic_data.ride.player = nil
-	
+	entity.object:settexturemod("");
 end
 
 
@@ -163,6 +166,19 @@ function mobf_ride.on_step_callback(entity)
 				
 					speed_to_set.x = speed_to_set_xz.x
 					speed_to_set.z = speed_to_set_xz.z
+					
+					if entity.data.ride.walk_anim ~= nil then
+						graphics.set_animation(entity,entity.data.ride.walk_anim)
+					end
+				else
+					if entity.data.ride.walk_anim ~= nil then
+						if entity.data.ride.stand_anim ~= nil then
+							graphics.set_animation(entity,entity.data.ride.stand_anim)
+							mob_state.change_state(entity,mob_state.get_state_by_name(entity,entity.data.ride.state_stand))
+						else
+							graphics.set_animation(entity,"stand")
+						end
+					end
 				end
 				
 				entity.object:setvelocity(speed_to_set)
@@ -173,11 +189,66 @@ function mobf_ride.on_step_callback(entity)
 			
 		
 		end
-		
 		return true
 	else
 		return false
 	end
+end
+
+------------------------------------------------------------------------------
+-- name: on_punch_callback(entity,player)
+--
+--! @brief make a player ride this mob
+--! @ingroup mobf
+--
+--! @param entity entity to be ridden
+--! @param player player riding
+-------------------------------------------------------------------------------
+function mobf_ride.on_punch_callback(entity,player)
+	dbg_mobf.ride_lvl2("MOBF: ride on punch callback")
+	print("MOBF: ride on punch callback")
+	--detache
+	if entity.dynamic_data.ride.is_attached ~= false then
+		dbg_mobf.ride_lvl2("MOBF: punched ridden mob")
+		if entity.dynamic_data.ride.player == player then
+			dbg_mobf.ride_lvl2("MOBF: detaching player")
+			mobf_ride.dettache_player(entity)
+			player:get_inventory():add_item("main","animalmaterials:saddle 1")
+			return true
+		end
+	else
+		--check if player has saddle
+		dbg_mobf.ride_lvl2("MOBF: punched free mob")
+		if player:get_wielded_item():get_name() == "animalmaterials:saddle" then
+			dbg_mobf.ride_lvl2("MOBF: punching with saddle")
+			if player:get_inventory():contains_item("main","animalmaterials:saddle 1") then
+				dbg_mobf.ride_lvl2("MOBF: have saddle")
+				mobf_ride.attache_player(entity,player)
+				player:get_inventory():remove_item("main","animalmaterials:saddle 1")
+				return true
+			end
+		else
+			dbg_mobf.ride_lvl2("MOBF: not punching with saddle but: " .. player:get_wielded_item():get_name())
+		end
+	end
+	
+	return false
+end
+
+------------------------------------------------------------------------------
+-- name: is_enabled(entity)
+--
+--! @brief check if riding is enabled for a mob
+--! @ingroup mobf
+--
+--! @param entity entity to be ridden
+-------------------------------------------------------------------------------
+function mobf_ride.is_enabled(entity)
+	if entity.data.ride ~= nil then
+		return true
+	end
+	dbg_mobf.ride_lvl2("riding of " .. entity.data.name .. " is disabled")
+	return false
 end
 
 ------------------------------------------------------------------------------
