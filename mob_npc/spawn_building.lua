@@ -136,9 +136,11 @@ function building_spawner.checkfloor(startpos,endpos)
 					found_air = true
 				end
 				
-				if node_to_check.name ~= "air" and
-					node_to_check.name ~= "default:water_flowing" and
-					node_to_check.name ~= "default:water_source" then
+				if node_to_check.name == "default:dirt" or
+					node_to_check.name == "default:stone" or
+					node_to_check.name == "default:dirt_with_grass" or 
+					node_to_check.name == "default:desert_stone" or
+					node_to_check.name == "default:desert_sand" then
 					found_ground = true
 				end
 			end
@@ -158,9 +160,18 @@ end
 
 function building_spawner.builder(startpos,blueprint,mobname)
 
-	if building_spawner.checkfloor(startpos,{x=startpos.x +blueprint.size.x,
-											 y=startpos.y,
-											 z=startpos.z +blueprint.size.z}) then
+	if building_spawner.checkfloor(
+			{
+				x=startpos.x -1,
+				y=startpos.y,
+				z=startpos.z -1
+			},
+			{
+				x=startpos.x +blueprint.size.x + 1,
+				y=startpos.y,
+				z=startpos.z +blueprint.size.z + 1
+			}
+		) then
 		--print("spawning building at " .. printpos(startpos) .. "!")
 		for i=1,#blueprint.walls,1 do
 			building_spawner.buid_wall(blueprint.walls[i][1],

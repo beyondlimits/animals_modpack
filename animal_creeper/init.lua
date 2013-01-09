@@ -1,4 +1,4 @@
-local version = "0.0.11"
+local version = "0.0.12"
 
 local creeper_groups = {
                         not_in_creative_inventory=1
@@ -13,7 +13,7 @@ creeper_prototype = {
 	
 		generic = {
 					description="BoomBomb",
-					base_health=5,
+					base_health=3,
 					kill_result="",
 					armor_groups= {
 						cracky=3,
@@ -28,7 +28,7 @@ creeper_prototype = {
 					max_speed=2,
 					pattern="stop_and_go",
 					canfly=false,
-					follow_speedup=10,
+					follow_speedup=5,
 					},		
 		harvest        = nil,
 		catching       = nil,
@@ -68,7 +68,8 @@ creeper_prototype = {
 					rate=0.02,
 					density=500,
 					algorithm="at_night",
-					height=2
+					height=2,
+					respawndelay=60,
 					},
 		sound = {
 					random = {

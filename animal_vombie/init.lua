@@ -1,4 +1,4 @@
-local version = "0.0.14"
+local version = "0.0.15"
 
 local vombie_groups = {
 						not_in_creative_inventory=1
@@ -73,7 +73,7 @@ vombie_prototype = {
 	
 		generic = {
 					description="Vombie",
-					base_health=40,
+					base_health=8,
 					kill_result=vombie_drop,
 					armor_groups= {
 						fleshy=3,
@@ -91,7 +91,7 @@ vombie_prototype = {
 					max_speed=2,
 					pattern="stop_and_go",
 					canfly=false,
-					follow_speedup=15,
+					follow_speedup=10,
 					},
 		harvest        = nil,
 		catching       = nil,

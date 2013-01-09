@@ -14,7 +14,7 @@ dm_prototype = {
 	
 		generic = {
 					description="Dungeonmaster (MOBF)",
-					base_health=50,
+					base_health=10,
 					kill_result="",
 					armor_groups= {
 						fleshy=1,
@@ -29,7 +29,7 @@ dm_prototype = {
 					max_speed=0.25,
 					pattern="stop_and_go",
 					canfly=false,
-					follow_speedup=10,
+					follow_speedup=5,
 					},
 		combat = {
 					angryness=0.99,

@@ -159,7 +159,7 @@ function mobf_ride.on_step_callback(entity)
 				
 
 				if setspeed then
-					speed_to_set_xz = mobf_calc_speed_components(dir,selected_speed)
+					speed_to_set_xz = mobf_calc_vector_components(dir,selected_speed)
 				
 					speed_to_set.x = speed_to_set_xz.x
 					speed_to_set.z = speed_to_set_xz.z

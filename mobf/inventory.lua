@@ -441,10 +441,9 @@ function mob_inventory.trader_callback(entity,player)
 			entity.object:setyaw(mobf_calc_yaw(direction.x,direction.z)+math.pi/2)
 		end
 	
---		if minetest.show_formspec(playername,
---					"formspec_" .. unique_entity_id,
---					mob_inventory.formspecs["formspec_" .. unique_entity_id]) == false then
-		if minetest.show_formspec(playername,mob_inventory.formspecs["formspec_" .. unique_entity_id]) == false then
+		if minetest.show_formspec(playername,
+					"formspec_" .. unique_entity_id,
+					mob_inventory.formspecs["formspec_" .. unique_entity_id]) == false then
 			dbg_mobf.trader_inv_lvl1("MOBF: unable to show trader formspec")
 		end
 	end

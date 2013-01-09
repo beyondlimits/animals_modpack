@@ -64,6 +64,42 @@ function fighting.do_on_death_callback(entity,hitter)
 	end
 end
 
+-------------------------------------------------------------------------------
+-- name: push_back(entity,player)
+--
+--! @brief move a mob backward if it's punched
+--! @memberof fighting
+--
+--! @param entity mobbeing punched
+--! @param hitter object doing last punch
+-------------------------------------------------------------------------------
+function fighting.push_back(entity,dir)
+	--get some base information
+	local mob_pos = entity.object:getpos()
+	local mob_basepos = entity.getbasepos(entity)
+	local dir_rad = mobf_calc_yaw(dir.x,dir.z)
+	local posdelta = mobf_calc_vector_components(dir_rad,0.5)
+	
+	--push back mob	
+	local new_pos = {
+		x=mob_basepos.x + posdelta.x,
+		y=mob_basepos.y,
+		z=mob_basepos.z + posdelta.z
+		}
+		
+	local pos_valid = environment.possible_pos(entity,new_pos)
+	new_pos.y = mob_pos.y
+	local line_of_sight = mobf_line_of_sight(mob_pos,new_pos)
+
+	dbg_mobf.fighting_lvl2("MOBF: trying to punch mob from " .. printpos(mob_pos) 
+		.. " to ".. printpos(new_pos))
+	if 	pos_valid and line_of_sight then
+		dbg_mobf.fighting_lvl2("MOBF: punching back ")
+		entity.object:moveto(new_pos)
+	else
+		dbg_mobf.fighting_lvl2("MOBF: not punching mob: " .. dump(pos_valid) .. " " ..dump(line_of_sight))
+	end
+end
 
 
 -------------------------------------------------------------------------------
@@ -94,8 +130,8 @@ function fighting.hit(entity,player)
 	
 
 	--get some base information
-	local mob_basepos = entity.getbasepos(entity)
 	local mob_pos = entity.object:getpos()
+	local mob_basepos = entity.getbasepos(entity)
 	local playerpos = player:getpos()
 	local dir = mobf_get_direction(playerpos,mob_basepos)
 	
@@ -110,23 +146,7 @@ function fighting.hit(entity,player)
 		sound.play(mob_pos,entity.data.sound.hit);
 	end
 	
-	--push back mob	
-	local new_pos = {x=(mob_basepos.x + (dir.x *0.5)),
-							y=mob_basepos.y,
-							z=(mob_basepos.z + (dir.z *0.5))}
-	local pos_state = environment.pos_is_ok(new_pos,entity)
-	new_pos.y = mob_pos.y
-	dbg_mobf.fighting_lvl2("trying to move mob from " .. printpos(mob_pos) 
-		.. " to ".. printpos(new_pos) .. " state="..pos_state)
-	if pos_state == "ok" or
-		pos_state == "drop" then
-		dbg_mobf.fighting_lvl2("moving")
-		entity.object:moveto(new_pos)
-	else
-		dbg_mobf.fighting_lvl2("not moving mob due to position state: " .. pos_state)
-	end
-	
-
+	fighting.push_back(entity,dir)
 
 	-- make it die
 	if entity.object:get_hp() < 1 then

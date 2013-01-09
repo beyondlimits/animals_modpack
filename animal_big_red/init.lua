@@ -1,4 +1,4 @@
-local version = "0.0.14"
+local version = "0.0.15"
 
 local big_red_groups = {
                         not_in_creative_inventory=1
@@ -16,7 +16,7 @@ big_red_prototype = {
 		
 		generic = {
 					description="Big Red",
-					base_health=30,
+					base_health=8,
 					kill_result="animalmaterials:meat_toxic 3",
 					armor_groups= {
 						fleshy=1,

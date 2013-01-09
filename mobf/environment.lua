@@ -533,6 +533,28 @@ function environment.register(name, environment)
 	return true	 
 end
 
+-------------------------------------------------------------------------------
+-- name: pos_state_is_impossible(entity,pos)
+--
+--! @brief checks if a entity can be there (not if it would move there by its own)
+--! @memberof environment
+--
+--! @param entity entity to check
+--! @param pos position to check
+--! @return true entity may be there, entity can never be there
+-------------------------------------------------------------------------------
+function environment.possible_pos(entity,pos)
+	local state = environment.pos_is_ok(pos,entity)
+
+	if 	state == "collision" or
+		state == "collision_jumpable" or
+		state == "invalid" then
+		return false
+	end
+	
+	return true
+end
+
 dofile (mobf_modpath .. "/environments/general_env_sets.lua")
 dofile (mobf_modpath .. "/environments/flight_1.lua")
 dofile (mobf_modpath .. "/environments/meadow.lua")

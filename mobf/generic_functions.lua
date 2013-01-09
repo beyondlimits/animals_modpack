@@ -839,7 +839,7 @@ function mobf_calc_yaw(x,z)
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_calc_speed_components(dir_radians,absolute_speed)
+-- name: mobf_calc_vector_components(dir_radians,absolute_speed)
 --
 --! @brief calculate calculate x and z components of a directed speed
 --
@@ -848,7 +848,7 @@ end
 --
 --! @return {x,z}
 -------------------------------------------------------------------------------
-function mobf_calc_speed_components(dir_radians,absolute_speed)
+function mobf_calc_vector_components(dir_radians,absolute_speed)
 
 	local retval = {x=0,z=0}
 	

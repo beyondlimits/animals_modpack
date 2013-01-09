@@ -1,4 +1,4 @@
-local version = "0.0.7"
+local version = "0.0.8"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
@@ -17,7 +17,7 @@ wolf_prototype = {
 	
 		generic = {
 					description="Wolf",
-					base_health=10,
+					base_health=5,
 					kill_result="animalmaterials:fur 1",
 					armor_groups= {
 						fleshy=3,
@@ -33,8 +33,8 @@ wolf_prototype = {
 					teleportdelay = 60,
 					min_accel=0.5,
 					max_accel=0.9,
-					max_speed=2,
-					follow_speedup=20,
+					max_speed=1.5,
+					follow_speedup=10,
 					},		
 		harvest = nil,
 		catching = {

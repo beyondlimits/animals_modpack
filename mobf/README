@@ -150,6 +150,12 @@ Changes 1.9.12
 -rename debug class to avoid naming conflicts
 -improve environment definition
 -add ride support (experimental no mob using it by now)
+-fixed punch mob not pushing back animals correctly
+-fixed mobs don't respawn within torch ...
+-fixed crash on show npc inventory due to changed api
+-fixed drop avoidance not working if dropping to water (due to another fix)
+-improve house spawning
+
 
 Changes 1.9.11
 -added calf mesh

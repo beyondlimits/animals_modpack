@@ -190,13 +190,15 @@ function direction_control.precheck_movement(entity,movement_state,pos_predicted
 		-- mob would walk onto water
 		if movement_state.changed == false and 
 			( pos_predicted_state == "above_water" or
-			  pos_predicted_state == "drop")
+			  pos_predicted_state == "drop" or
+			  pos_predicted_state == "drop_above_water")
 			then
 			dbg_mobf.pmovement_lvl1("MOBF: mob " .. entity.data.name .. " is going to walk on water or drop")
 			local new_pos = environment.get_suitable_pos_same_level(movement_state.basepos,1,entity)
 
 			--try to find at least a possible position
 			if new_pos == nil then
+				dbg_mobf.pmovement_lvl1("MOBF: mob " .. entity.data.name .. " no prefect fitting position found")
 				new_pos = environment.get_suitable_pos_same_level(movement_state.basepos,1,entity,true)
 			end
 
@@ -228,7 +230,8 @@ function direction_control.precheck_movement(entity,movement_state,pos_predicted
 				local current_state = environment.pos_is_ok(movement_state.basepos,entity)
 				
 				--animal is safe atm stop it to avoid doing silly things
-				if current_state == "ok" then
+				if current_state == "ok" or
+					current_state == "possible_surface" then
 					entity.object:setvelocity({x=0,y=0,z=0})
 					movement_state.accel_to_set = {x=0,y=nil,z=0}
 					movement_state.changed = true

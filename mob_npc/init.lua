@@ -1,4 +1,4 @@
-local version = "0.0.5"
+local version = "0.0.6"
 
 local npc_groups = {
 						not_in_creative_inventory=1

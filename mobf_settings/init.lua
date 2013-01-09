@@ -1,4 +1,4 @@
-mobf_settings_version = "0.0.12"
+mobf_settings_version = "0.0.13"
 
 
 mobf_settings = {}
@@ -8,8 +8,12 @@ max_list_page_num = 5
 
 mobf_settings_debug = print
 
-local formspechandler = nil
-local mobf_settings_menubutton = ""
+local formspechandler = function(player,formspec)
+			name = player:get_player_name()
+			minetest.show_formspec(name,"mobf_settings:mainform",formspec)
+		end
+		
+local mobf_settings_menubutton = "button_exit[11,9.5;2,0.5;main; Exit]"
 
 ------------------------------------------------------------------------------
 -- name: get_animal_list
@@ -412,39 +416,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 end)
 
 
---do only register to inventory plus if mod available
-if mobf_rtd.inventory_plus_enabled then
-	------------------------------------------------------------------------------
-	-- register button for mobf settings to inventory plus
-	------------------------------------------------------------------------------
-	if type(inventory_plus.register_button) == "function" then
-		minetest.register_on_joinplayer(function(player)		
-			local playername = player:get_player_name()
-			mobf_settings_debug("MOBF_SETTINGS: checking player " .. playername .. " for sufficent privileges")
-			if minetest.check_player_privs(playername, {mobfw_admin=true}) then
-				mobf_settings_debug("MOBF_SETTINGS: player is allowed to do mobf configuration")
-				inventory_plus.register_button(player,"mobf","Mobf Settings")
-			end
-		end)
-	else
-		mobf_settings_debug("MOBF_SETTINGS: Inventory Plus legacy mode, no privs checking enabled!")
-		inventory_plus.pages["mobf"] = "Mobf Settings"
-	end
-	
-	--make inventoryplus formspechandler
-	formspechandler = inventory_plus.set_inventory_formspec
-	mobf_settings_menubutton = "button[11,9.5;2,0.5;main; Mainmenu ]"
-else
-	mobf_settings_menubutton = "button_exit[11,9.5;2,0.5;main; Exit]"
-	formspechandler = function(player,formspec)
-	
-			name = player:get_player_name()
-			
-			minetest.show_formspec(name,"mobf_settings:mainform",formspec)
-		end
-		
-	--register chatcommand
-	minetest.register_chatcommand("mobf_settings",
+--register chatcommand
+minetest.register_chatcommand("mobf_settings",
 	{
 		params		= "",
 		description = "show mobf settings" ,
@@ -454,9 +427,6 @@ else
 				formspechandler(player,mobf_settings.get_formspec(player,"mobf_list_page1"))
 			end
 	})
-end
-
-
 
 ------------------------------------------------------------------------------
 -- register mobf_settings buttons

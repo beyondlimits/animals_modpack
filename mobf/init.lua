@@ -323,7 +323,7 @@ function mobf_init_modules()
 	--Note debug needs to be registred FIRST!
 	mobf.register_on_rightclick_callback({
 			name = "debugcallback",
-			handler		= debug.rightclick_callback,
+			handler		= mobf_debug.rightclick_callback,
 			configcheck	= function(entity)
 					return true
 				end

@@ -435,16 +435,23 @@ function movement_gen.fix_current_pos(entity,movement_state)
 			current_state == "above_water" then
 		
 			local targetpos = nil
-			if entity.dynamic_data.movement.last_pos_in_env == nil then
+			
+			--if we don't have an old pos or old pos is to far away try to finde another good pos around
+			if entity.dynamic_data.movement.last_pos_in_env == nil or
+				entity.dynamic_data.movement.last_pos_in_env.y > movement_state.centerpos.y + 2 then
 				targetpos = environment.get_suitable_pos_same_level({x=movement_state.basepos.x,
 																				y=movement_state.basepos.y+1,
 																				z=movement_state.basepos.z},
 																			1,
 																			entity)
+				if targetpos ~= nil then
+					targetpos.y = targetpos.y - entity.collisionbox[2]
+				end
+			else
+				targetpos = entity.dynamic_data.movement.last_pos_in_env
 			end
 
-			if targetpos ~= nil or
-				entity.dynamic_data.movement.last_pos_in_env ~= nil then
+			if targetpos ~= nil then
 				mobf_bug_warning(LOGLEVEL_INFO,"MOBF: BUG !!! didn't find a way out of water, for mob at: " .. printpos(movement_state.basepos) .. " using last known good position")
 				
 				if targetpos == nil then
@@ -488,7 +495,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 	end
 	
 	if current_state == "wrong_surface" and
-		entity.dynamic_data.good_surface ~= nil	then		
+		entity.dynamic_data.good_surface ~= nil then
 		if movement_state.now - entity.dynamic_data.good_surface  > damagetime then
 		
 			entity.object:set_hp(entity.object:get_hp() - (entity.data.generic.base_health/25))
@@ -500,6 +507,8 @@ function movement_gen.fix_current_pos(entity,movement_state)
 				abort_processing = true
 				spawning.remove(entity)
 			end
+			
+			movement_state.force_change = true
 		end
 		
 		handled = true
