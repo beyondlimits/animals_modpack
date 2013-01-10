@@ -305,6 +305,26 @@ function environment.checksurface(pos,surface)
 
 end
 
+function environment.get_min_max_ground_dist(entity)
+	local min_ground_distance   = 0
+	local max_ground_distance   = 0
+	
+	if entity.environment.max_height_above_ground ~= nil then
+		max_ground_distance = entity.environment.max_height_above_ground
+	end 
+	
+	if entity.environment.min_height_above_ground ~= nil then
+		min_ground_distance = entity.environment.min_height_above_ground
+	end
+
+	if entity.data.movement.canfly == nil or
+		entity.data.movement.canfly == false then
+		max_ground_distance = 1	
+	end
+
+	return min_ground_distance,max_ground_distance
+end
+
 -------------------------------------------------------------------------------
 -- name: pos_is_ok(pos,entity)
 --
@@ -327,23 +347,9 @@ end
 --!           -wrong_surface         -@>position is above surface mob shouldn't be
 --!           -invalid               -@>unable to check position
 -------------------------------------------------------------------------------
-function environment.pos_is_ok(pos,entity)
+function environment.old_pos_is_ok(pos,entity)
 
-	local min_ground_distance   = 0
-	local max_ground_distance   = 0
-	
-	if entity.environment.max_height_above_ground ~= nil then
-		max_ground_distance = entity.environment.max_height_above_ground
-	end 
-	
-	if entity.environment.min_height_above_ground ~= nil then
-		min_ground_distance = entity.environment.min_height_above_ground
-	end
-
-	if entity.data.movement.canfly == nil or
-		entity.data.movement.canfly == false then
-		max_ground_distance = 1	
-	end
+	local min_ground_distance,max_ground_distance = environment.get_min_max_ground_dist(entity)
 
 	dbg_mobf.environment_lvl2("MOBF: Checking pos "..printpos(pos))
 
@@ -425,6 +431,135 @@ function environment.pos_is_ok(pos,entity)
 	end
 
 	return "collision"
+
+end
+
+-------------------------------------------------------------------------------
+-- name: pos_is_ok(pos,entity)
+--
+--! @brief check if a position is suitable for an mob
+--! @memberof environment
+--
+--! @param pos position to check
+--! @param entity mob to check
+--! @return suitability of position for mob values:
+--!           -ok                    -@>position is ok                         
+--!           -collision             -@>position is within a node
+--!           -collision_jumpable    -@>position is within a node that can be jumped onto
+--!           -drop                  -@>position is a drop
+--!           -drop_above_water      -@>position is to far above water
+--!           -above_water           -@>position is right over water
+--!           -in_water              -@>position is within a water node(source or flow)
+--!			  -in_air                -@>position is in air
+--!           -above_limit           -@>position is above level limit
+--!           -below_limit           -@>position is below level limit
+--!           -wrong_surface         -@>position is above surface mob shouldn't be
+--!           -invalid               -@>unable to check position
+-------------------------------------------------------------------------------
+function environment.pos_is_ok(pos,entity,jumpcheck)
+
+	local min_ground_distance,max_ground_distance = environment.get_min_max_ground_dist(entity)
+	
+	local cornerpositions = {}
+	
+	table.insert(cornerpositions,pos)
+	--read positions at corners
+	table.insert(cornerpositions,mobf_round_pos({x=pos.x + entity.collisionbox[4],y=pos.y,z=pos.z + entity.collisionbox[6]}))
+	table.insert(cornerpositions,mobf_round_pos({x=pos.x + entity.collisionbox[4],y=pos.y,z=pos.z + entity.collisionbox[3]}))
+	table.insert(cornerpositions,mobf_round_pos({x=pos.x + entity.collisionbox[1],y=pos.y,z=pos.z + entity.collisionbox[6]}))
+	table.insert(cornerpositions,mobf_round_pos({x=pos.x + entity.collisionbox[1],y=pos.y,z=pos.z + entity.collisionbox[3]}))
+	
+	local lastpos = nil
+	
+	local retval = "temp_ok"
+	
+	--check if mob at pos will be in correct environment
+	for i=1,#cornerpositions,1 do
+		if not mobf_pos_is_same(lastpos,cornerpositions[i]) then
+			local node_to_check = minetest.env:get_node(cornerpositions[i])
+			
+			if node_to_check == nil then
+				mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking position with invalid node")
+				retval = "invalid"
+				break
+			end
+			
+			if not environment.is_media_element(node_to_check.name,entity.environment.media) == true then
+				dbg_mobf.environment_lvl3("MOBF: at pos " .. printpos(cornerpositions[i]) .. " not within environment")
+				
+				if mobf_pos_is_same(pos,cornerpositions[i]) then
+					if node_to_check.name == "default:water_source" or 
+						node_to_check.name == "default:water_flowing" then
+						retval = "in_water"
+						break
+					end
+
+					if node_to_check.name == "air" then
+						retval = "in_air"
+						break
+					end
+					
+					--TODO maybe replace by "invalid medium"
+				else
+					retval = "collision"
+				end
+			end
+		end
+		lastpos = cornerpositions[i]
+	end
+	
+	--
+	if retval == "temp_ok" then
+		dbg_mobf.environment_lvl2("MOBF: \tin environment")
+		local ground_distance = mobf_ground_distance(pos,entity.environment.media)
+		
+		--following return codes are only usefull for non flying
+		if entity.data.movement.canfly == nil or
+			entity.data.movement.canfly == false then
+
+			if mobf_above_water(pos) then
+				
+				if ground_distance > max_ground_distance then
+					dbg_mobf.environment_lvl2("MOBF: \tdropping above water")
+					retval = "drop_above_water"
+				end
+				dbg_mobf.environment_lvl2("MOBF: \tabove water")
+				retval = "above_water"
+			end
+
+			if ground_distance > max_ground_distance then
+				dbg_mobf.environment_lvl2("MOBF: \tdropping")
+				retval = "drop"
+			else
+				dbg_mobf.environment_lvl2("MOBF: \tsurface dependent")
+				retval = environment.checksurface(pos,entity.environment.surfaces)
+			end
+		else
+			local miny,maxy = environment.get_absolute_min_max_pos(entity.environment,pos)
+			if pos.y < miny then
+				retval = "below_limit"
+			end
+			
+			if pos.y > maxy then
+				retval = "above_limit"
+			end
+			
+			retval = environment.checksurface(pos,entity.environment.surfaces) 
+		end
+	end
+	
+	if retval == "collision" and jumpcheck then
+		if environment.extended_pos_is_ok(pos,entity,false) == "ok" then
+			retval = "collision_jumpable"
+		end
+	end
+	
+	return retval
+end
+
+function environment.state_prio(oldstate,newstate)
+
+
 
 end
 

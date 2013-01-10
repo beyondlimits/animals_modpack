@@ -156,6 +156,7 @@ Changes 1.9.12
 -fixed drop avoidance not working if dropping to water (due to another fix)
 -improve house spawning
 -add ostrich
+-improve collision checking for pos_is_ok
 
 
 Changes 1.9.11
