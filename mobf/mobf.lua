@@ -357,7 +357,7 @@ function mobf.activate_handler(self,staticdata)
 		dbg_mobf.mobf_core_lvl1("MOBF: setting animation to: " .. current_state.animation)
 		graphics.set_animation(self,current_state.animation)
 	else
-		dbg_mobf.mobf_core_lvl1("MOBF: setting animation to: " .. default_state.animation)
+		dbg_mobf.mobf_core_lvl1("MOBF: setting animation to: " .. dump(default_state.animation))
 		graphics.set_animation(self,default_state.animation)
 	end
 		

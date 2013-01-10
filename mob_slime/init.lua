@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
-local version = "0.0.6"
+local version = "0.0.7"
 
 local selectionbox_slime_L = {-0.5, -0.4, -0.5,  0.5,0.4,0.5}
 local selectionbox_slime_M = {-0.3, -0.2, -0.3,  0.3,0.2,0.3}
@@ -26,19 +26,15 @@ local slime_groups = {
 						not_in_creative_inventory=1
 					}
 
---include debug trace functions
-dofile (modpath .. "/model.lua")
-
-
 function mob_slime_bounce(entity)
 	local pos = entity.object:getpos()
+	local current_velocity = entity.object:getvelocity()
 	
-	if entity.dynamic_data.lasty ~= nil and
-		entity.dynamic_data.lasty == pos.y then
-		entity.object:setvelocity( {x=0,y=entity.data.movement.bounce,z=0})
+	local node_below = minetest.env:get_node({x=pos.x,y=pos.y + entity.collisionbox[2] -0.01,z=pos.z})
+	
+	if not mobf_is_walkable(node_below) then
+		entity.object:setvelocity( {x=current_velocity.x,y=entity.data.movement.bounce,z=current_velocity.z})
 	end
-	
-	entity.dynamic_data.lasty = pos.y
 end
 
 function mob_slime_kill(entity,player)
@@ -125,9 +121,6 @@ local prototype_mob_slime_L = {
 			
 	--! @brief [MANDATORY] configuration of movement generator				
 	movement =  {
-		--! @brief [MANDATORY] if of movement generator to use for default movement
-		default_gen="none",
-		
 		--! @brief [MANDATORY] is this a flying mob
 		canfly=false,
 		
@@ -204,6 +197,20 @@ local prototype_mob_slime_L = {
 			gain = 0.7,
 			max_hear_distance = 4,
 			},
+	states = {
+				{ 
+				name = "default",
+				movgen = "none",
+				chance = 0,
+				graphics_3d = {
+					visual = "mesh",
+					mesh = "mob_slime_slime.b3d",
+					textures = {"mob_slime_slime_mesh.png"},
+					collisionbox = selectionbox_slime_L,
+					visual_size= {x=1,y=1,z=1},
+					},
+				},
+			},
 	}
 	
 local prototype_mob_slime_S = {
@@ -245,9 +252,6 @@ local prototype_mob_slime_S = {
 			
 	--! @brief [MANDATORY] configuration of movement generator				
 	movement =  {
-		--! @brief [MANDATORY] if of movement generator to use for default movement
-		default_gen="none",
-		
 		--! @brief [MANDATORY] is this a flying mob
 		canfly=false,
 		
@@ -265,22 +269,6 @@ local prototype_mob_slime_S = {
 		
 		--custom parameter for bouncing
 		bounce = 3,
-		},
-		
-	--! @brief [3D MANDATORY] 3d graphics configuration for mob
-	graphics_3d = {
-	
-		--! @brief [MANDATORY] this is the drawtype to use
-		visual = "wielditem",
-		
-		--! @brief [MANDATORY] the model of the mob
-		textures = {"mob_slime:box_slime_S"},
-		
-		--! @brief [MANDATORY] collisionbox to use
-		collisionbox = selectionbox_slime_S,
-		
-		--! @brief [MANDATORY] xyz scale factors for the model
-		visual_size = {x=0.66,y=0.66,z=0.66},
 		},
 
 	--! @brief [OPTIONAL] combat settings for mob
@@ -321,9 +309,23 @@ local prototype_mob_slime_S = {
 		},
 	die = {
 		name="mob_slime_die",
-		gain = 0.7,
+		gain = 0.3,
 		max_hear_distance = 4,
 		},
+	states = {
+				{ 
+				name = "default",
+				movgen = "none",
+				chance = 0,
+				graphics_3d = {
+					visual = "mesh",
+					mesh = "mob_slime_slime.b3d",
+					textures = {"mob_slime_slime_mesh.png"},
+					collisionbox = selectionbox_slime_L,
+					visual_size= {x=0.5,y=0.5,z=0.5},
+					},
+				},
+			},
 	}
 	
 local prototype_mob_slime_M = {
@@ -365,9 +367,6 @@ local prototype_mob_slime_M = {
 			
 	--! @brief [MANDATORY] configuration of movement generator				
 	movement =  {
-		--! @brief [MANDATORY] if of movement generator to use for default movement
-		default_gen="none",
-		
 		--! @brief [MANDATORY] is this a flying mob
 		canfly=false,
 		
@@ -386,23 +385,6 @@ local prototype_mob_slime_M = {
 		--custom parameter for bouncing
 		bounce = 4,
 		},
-		
-	--! @brief [3D MANDATORY] 3d graphics configuration for mob
-	graphics_3d = {
-	
-		--! @brief [MANDATORY] this is the drawtype to use
-		visual = "wielditem",
-		
-		--! @brief [MANDATORY] the model of the mob
-		textures = {"mob_slime:box_slime_M"},
-		
-		--! @brief [MANDATORY] collisionbox to use
-		collisionbox = selectionbox_slime_M,
-		
-		--! @brief [MANDATORY] xyz scale factors for the model
-		visual_size = {x=0.66,y=0.66,z=0.66},
-		},
-
 	--! @brief [OPTIONAL] combat settings for mob
 	combat = {
 		--! @brief [MANDATORY] does mob start an attack on its own?
@@ -441,9 +423,23 @@ local prototype_mob_slime_M = {
 		},
 	die = {
 		name="mob_slime_die",
-		gain = 0.7,
+		gain = 0.5,
 		max_hear_distance = 4,
 		},
+		states = {
+				{ 
+				name = "default",
+				movgen = "none",
+				chance = 0,
+				graphics_3d = {
+					visual = "mesh",
+					mesh = "mob_slime_slime.b3d",
+					textures = {"mob_slime_slime_mesh.png"},
+					collisionbox = selectionbox_slime_L,
+					visual_size= {x=0.75,y=0.75,z=0.75},
+					},
+				},
+			},
 	}
 	
 print ("Adding mob "..prototype_mob_slime_L.name)
