@@ -1,4 +1,4 @@
-local version = "0.0.18"
+local version = "0.0.19"
 
 local sheep_groups = {
 						sheerable=1,
@@ -8,10 +8,6 @@ local sheep_groups = {
 
 local selectionbox_sheep = {-0.65, -0.8, -0.65, 0.65, 0.45, 0.65}
 local selectionbox_lamb = {-0.65*0.6, -0.8*0.6, -0.65*0.6, 0.65*0.6, 0.45*0.6, 0.65*0.65}		
-
-local modpath = minetest.get_modpath("animal_sheep")
-
-dofile (modpath .. "/model.lua")
 
 sheep_prototype = {
 		name="sheep",
@@ -28,7 +24,6 @@ sheep_prototype = {
 					envid="meadow",
 				},
 		movement =  {
-					default_gen="probab_mov_gen",
 					min_accel=0.05,
 					max_accel=0.1,
 					max_speed=0.5,
@@ -48,21 +43,6 @@ sheep_prototype = {
 					tool="animalmaterials:lasso",
 					consumed=true,
 					},
-		random_drop    = nil,
-		auto_transform = nil,
-		graphics = { 
-					sprite_scale={x=4,y=4},
-					sprite_div = {x=6,y=1},
-					visible_height = 1.5,
-					},	
-		graphics_3d = { 
-					visual = "wielditem",
-					textures = {"animal_sheep:box_wool"},
-					collisionbox = selectionbox_sheep,
-					visual_size= {x=1,y=1,z=1},
-					},
-		combat         = nil,
-		
 		spawning = {
 					rate=0.002,
 					density=50,
@@ -84,32 +64,68 @@ sheep_prototype = {
 								max_hear_distance = 5
 								},
 					},
+		animation = {
+				walk = {
+					start_frame = 0,
+					end_frame   = 60,
+					},
+				stand = {
+					start_frame = 61,
+					end_frame   = 120,
+					},
+				eating = {
+					start_frame = 121,
+					end_frame   = 180,
+					},
+				sleep = {
+					start_frame = 181,
+					end_frame   = 240,
+					},
+			},
 		states = {
-				{ 
-				name = "sleeping",
-				custom_preconhandler = nil,
-				movgen = "none",
-				typical_state_time = 180,
-				chance = 0.20,
-				graphics_3d = {
-					visual = "wielditem",
-					textures = {"animal_sheep:box_wool_sleeping"},
-					collisionbox = selectionbox_sheep,
-					visual_size= {x=1,y=1,z=1},
-					}
+				{
+					name = "default",
+					movgen = "none",
+					typical_state_time = 30,
+					chance = 0,
+					animation = "stand",
+					graphics = { 
+						sprite_scale={x=4,y=4},
+						sprite_div = {x=6,y=1},
+						visible_height = 1.5,
+						},
+					graphics_3d = {
+						visual = "mesh",
+						mesh = "animal_sheep_sheep.b3d",
+						textures = {"animal_sheep_mesh.png"},
+						collisionbox = selectionbox_sheep,
+						visual_size= {x=1,y=1,z=1},
+						},
 				},
 				{ 
-				name = "eating",
-				custom_preconhandler = nil,
-				movgen = "none",
-				typical_state_time = 20,
-				chance = 0.25,
-				graphics_3d = {
-					visual = "wielditem",
-					textures = {"animal_sheep:box_wool_eating"},
-					collisionbox = selectionbox_sheep,
-					visual_size= {x=1,y=1,z=1},
-					}
+					name = "sleeping",
+					--TODO replace by check for night
+					custom_preconhandler = nil,
+					movgen = "none",
+					typical_state_time = 300,
+					chance = 0.10,
+					animation = "sleep",
+				},
+				{ 
+					name = "eating",
+					custom_preconhandler = nil,
+					movgen = "none",
+					typical_state_time = 20,
+					chance = 0.25,
+					animation = "eating"
+				},
+				{ 
+					name = "walking",
+					custom_preconhandler = nil,
+					movgen = "probab_mov_gen",
+					typical_state_time = 180,
+					chance = 0.50,
+					animation = "walk"
 				},
 			}
 		}
@@ -128,7 +144,6 @@ lamb_prototype = {
 					envid="meadow",
 				},
 		movement =  {
-					default_gen="probab_mov_gen",
 					canfly=false,
 					min_accel=0.025,
 					max_accel=0.05,
@@ -141,23 +156,10 @@ lamb_prototype = {
 					tool="animalmaterials:lasso",
 					consumed=true,
 					},
-		random_drop = nil,
 		auto_transform = {
 					result="animal_sheep:sheep__default",
 					delay=1800
 					},
-		graphics = {
-					sprite_scale={x=4,y=4},
-					sprite_div = {x=6,y=1},
-					visible_height = 1,
-					},
-		graphics_3d = { 
-					visual = "wielditem",
-					textures = {"animal_sheep:box_wool"},
-					collisionbox = selectionbox_lamb,
-					visual_size= {x=0.6,y=1,z=0.6},
-					},
-		combat      = nil,
 		spawning = {
 					rate=0,
 					density=0,
@@ -173,6 +175,70 @@ lamb_prototype = {
 								max_hear_distance = 10,
 								},
 					},
+		animation = {
+				walk = {
+					start_frame = 0,
+					end_frame   = 60,
+					},
+				stand = {
+					start_frame = 61,
+					end_frame   = 120,
+					},
+				eating = {
+					start_frame = 121,
+					end_frame   = 180,
+					},
+				sleep = {
+					start_frame = 181,
+					end_frame   = 240,
+					},
+			},
+		states = {
+				{
+					name = "default",
+					movgen = "none",
+					typical_state_time = 30,
+					chance = 0,
+					animation = "stand",
+					graphics = { 
+						sprite_scale={x=4,y=4},
+						sprite_div = {x=6,y=1},
+						visible_height = 1.5,
+						},
+					graphics_3d = {
+						visual = "mesh",
+						mesh = "animal_sheep_sheep.b3d",
+						textures = {"animal_sheep_mesh.png"},
+						collisionbox = selectionbox_sheep,
+						visual_size= {x=0.5,y=0.5,z=0.5},
+						},
+				},
+				{ 
+					name = "sleeping",
+					--TODO replace by check for night
+					custom_preconhandler = nil,
+					movgen = "none",
+					typical_state_time = 300,
+					chance = 0.10,
+					animation = "sleep",
+				},
+				{ 
+					name = "eating",
+					custom_preconhandler = nil,
+					movgen = "none",
+					typical_state_time = 20,
+					chance = 0.25,
+					animation = "eating"
+				},
+				{ 
+					name = "walking",
+					custom_preconhandler = nil,
+					movgen = "probab_mov_gen",
+					typical_state_time = 180,
+					chance = 0.50,
+					animation = "walk"
+				},
+			}
 		}
 	
 sheep_naked_prototype = {
@@ -189,7 +255,6 @@ sheep_naked_prototype = {
 					envid="meadow"
 				},
 		movement =  {
-					default_gen="probab_mov_gen",
 					canfly=false,
                     min_accel=0.05,
                     max_accel=0.1,
@@ -197,28 +262,14 @@ sheep_naked_prototype = {
                     min_speed=0.1,
 					pattern="stop_and_go"
 					},		
-		harvest     = nil,
 		catching = {
 					tool="animalmaterials:lasso",
 					consumed=true,
 					},
-		random_drop = nil,
 		auto_transform = {
 					result="animal_sheep:sheep__default",
 					delay=300
 					},
-		graphics = { 
-					sprite_scale={x=4,y=4},
-					sprite_div = {x=6,y=1},
-					visible_height = 1.5,
-					},
-		graphics_3d = {
-					visual = "wielditem",
-					textures = {"animal_sheep:box_naked"},
-					collisionbox = selectionbox_sheep,
-					visual_size= {x=1,y=1,z=1},
-					},
-		combat      = nil,
 		spawning = {
 					rate=0,
 					density=0,
@@ -234,32 +285,68 @@ sheep_naked_prototype = {
 								max_hear_distance = 10,
 								},
 					},
+		animation = {
+				walk = {
+					start_frame = 0,
+					end_frame   = 60,
+					},
+				stand = {
+					start_frame = 61,
+					end_frame   = 120,
+					},
+				eating = {
+					start_frame = 121,
+					end_frame   = 180,
+					},
+				sleep = {
+					start_frame = 181,
+					end_frame   = 240,
+					},
+			},
 		states = {
-				{ 
-				name = "sleeping",
-				custom_preconhandler = nil,
-				movgen = "none",
-				typical_state_time = 180,
-				chance = 0.20,
-				graphics_3d = {
-					visual = "wielditem",
-					textures = {"animal_sheep:box_naked_sleeping"},
-					collisionbox = selectionbox_sheep,
-					visual_size= {x=1,y=1,z=1},
-					}
+				{
+					name = "default",
+					movgen = "none",
+					typical_state_time = 30,
+					chance = 0,
+					animation = "stand",
+					graphics = { 
+						sprite_scale={x=4,y=4},
+						sprite_div = {x=6,y=1},
+						visible_height = 1.5,
+						},
+					graphics_3d = {
+						visual = "mesh",
+						mesh = "animal_sheep_sheep.b3d",
+						textures = {"animal_sheep_naked_mesh.png"},
+						collisionbox = selectionbox_sheep,
+						visual_size= {x=1,y=1,z=1},
+						},
 				},
 				{ 
-				name = "eating",
-				custom_preconhandler = nil,
-				movgen = "none",
-				typical_state_time = 20,
-				chance = 0.25,
-				graphics_3d = {
-					visual = "wielditem",
-					textures = {"animal_sheep:box_naked_eating"},
-					collisionbox = selectionbox_sheep,
-					visual_size= {x=1,y=1,z=1},
-					}
+					name = "sleeping",
+					--TODO replace by check for night
+					custom_preconhandler = nil,
+					movgen = "none",
+					typical_state_time = 300,
+					chance = 0.10,
+					animation = "sleep",
+				},
+				{ 
+					name = "eating",
+					custom_preconhandler = nil,
+					movgen = "none",
+					typical_state_time = 20,
+					chance = 0.25,
+					animation = "eating"
+				},
+				{ 
+					name = "walking",
+					custom_preconhandler = nil,
+					movgen = "probab_mov_gen",
+					typical_state_time = 180,
+					chance = 0.50,
+					animation = "walk"
 				},
 			}
 		}	
