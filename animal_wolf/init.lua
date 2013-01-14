@@ -1,13 +1,8 @@
-local version = "0.0.8"
+local version = "0.0.9"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
 					}
-
-local modpath = minetest.get_modpath("animal_wolf")
-
---include debug trace functions
-dofile (modpath .. "/model.lua")
 
 local selectionbox_wolf = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
 
@@ -35,23 +30,14 @@ wolf_prototype = {
 					max_accel=0.9,
 					max_speed=1.5,
 					follow_speedup=10,
-					},		
-		harvest = nil,
+					},
 		catching = {
 					tool="animalmaterials:net",
 					consumed=true,
 					},
-		random_drop    = nil,
-		auto_transform = nil,
-		graphics_3d = { 
-					visual = "wielditem",
-					textures = {"animal_wolf:box_wolf"},
-					collisionbox = selectionbox_wolf,
-					visual_size = {x=1,y=1,z=1},
-					},		
 		combat = {
 					angryness=1,
-					starts_attack=true,
+					starts_attack=false,
 					sun_sensitive=false,
 					melee = {
 						maxdamage=5,
@@ -72,6 +58,51 @@ wolf_prototype = {
 		sound = {
 					random = nil,
 					},
+		animation = {
+				stand = {
+					start_frame = 0,
+					end_frame   = 60,
+					},
+				walk = {
+					start_frame = 61,
+					end_frame   = 120,
+					},
+				sleep = {
+					start_frame = 121,
+					end_frame   = 180,
+					},
+			},
+		states = {
+				{
+					name = "default",
+					movgen = "none",
+					typical_state_time = 30,
+					chance = 0,
+					animation = "stand",
+					graphics_3d = {
+						visual = "mesh",
+						mesh = "animal_wolf.b3d",
+						textures = {"animal_wolf_mesh.png"},
+						collisionbox = selectionbox_wolf,
+						visual_size= {x=1,y=1,z=1},
+						},
+				},
+				{ 
+					name = "sleeping",
+					--TODO replace by check for night
+					custom_preconhandler = nil,
+					movgen = "none",
+					typical_state_time = 300,
+					chance = 0.10,
+					animation = "sleep",
+				},
+				{ 
+					name = "combat",
+					typical_state_time = 9999,
+					chance = 0.0,
+					animation = "walk"
+				},
+			}
 		}
 		
 tamed_wolf_prototype = {
@@ -106,7 +137,6 @@ tamed_wolf_prototype = {
 					end
 				},
 		movement =  {
-					default_gen="follow_mov_gen",
 					canfly=false,
 					guardspawnpoint = false,
 					teleportdelay = 20,
@@ -116,21 +146,10 @@ tamed_wolf_prototype = {
 					max_distance=2,
 					follow_speedup=20,
 					},
-		harvest = nil,
 		catching = {
 					tool="animalmaterials:net",
 					consumed=true,
 					},
-		random_drop    = nil,
-		auto_transform = nil,
-		graphics_3d = { 
-					visual = "wielditem",
-					textures = {"animal_wolf:box_tamed_wolf"},
-					collisionbox = selectionbox_wolf,
-					visual_size = {x=1,y=1,z=1},
-					},
-		combat = nil,
-		
 		spawning = {
 					rate=0.002,
 					density=150,
@@ -141,10 +160,36 @@ tamed_wolf_prototype = {
 		sound = {
 					random = nil,
 					},
+				animation = {
+				stand = {
+					start_frame = 0,
+					end_frame   = 60,
+					},
+				walk = {
+					start_frame = 61,
+					end_frame   = 120,
+					},
+			},
+		states = {
+				{
+					name = "default",
+					movgen = "follow_mov_gen",
+					typical_state_time = 60,
+					chance = 0,
+					animation = "stand",
+					graphics_3d = {
+						visual = "mesh",
+						mesh = "animal_wolf.b3d",
+						textures = {"animal_wolf_tamed_mesh.png"},
+						collisionbox = selectionbox_wolf,
+						visual_size= {x=1,y=1,z=1},
+						},
+				},
+			}
 		}
 		
-print ("Adding animal "..wolf_prototype.name)
-animals_add_animal(wolf_prototype)
-print ("Adding animal "..tamed_wolf_prototype.name)
-animals_add_animal(tamed_wolf_prototype)
+print ("Adding mob "..wolf_prototype.name)
+mobf_add_mob(wolf_prototype)
+print ("Adding mob "..tamed_wolf_prototype.name)
+mobf_add_mob(tamed_wolf_prototype)
 print ("animal_wolf mod version " .. version .. " loaded")
