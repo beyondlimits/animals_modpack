@@ -20,7 +20,8 @@ deer_prototype = {
 					groups = deer_groups,
 					envid="meadow",
 				},
-		movement =  {
+		movement =  { 
+					default_gen="probab_mov_gen",
 					min_accel=0.2,
 					max_accel=0.4,
 					max_speed=2,
@@ -95,7 +96,7 @@ deer_prototype = {
 					chance = 0.25,
 					animation = "eating"
 				},
-				{ 
+				{
 					name = "walking",
 					custom_preconhandler = nil,
 					movgen = "probab_mov_gen",
@@ -105,6 +106,15 @@ deer_prototype = {
 				},
 			}
 		}
+		
+--compatibility code
+minetest.register_entity(":animal_deer:deer__default",
+	{
+		on_activate = function(self,staticdata)
+			minetest.env:add_entity(self.object:getpos(),"animal_deer:deer_m__default")
+			self.object:remove()
+		end
+	})
 
 
 --register with animals mod

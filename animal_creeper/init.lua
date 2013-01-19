@@ -1,4 +1,4 @@
-local version = "0.0.12"
+local version = "0.0.13"
 
 local creeper_groups = {
                         not_in_creative_inventory=1
@@ -67,7 +67,7 @@ creeper_prototype = {
 		spawning = {
 					rate=0.02,
 					density=500,
-					algorithm="at_night",
+					algorithm="at_night_spawner",
 					height=2,
 					respawndelay=60,
 					},

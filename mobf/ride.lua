@@ -268,3 +268,32 @@ function mobf_ride.init(entity)
 		
 	entity.dynamic_data.ride = data
 end
+
+minetest.register_on_leaveplayer( function(player)
+	if player ~= nil and
+		player.object ~= nil then
+		local pos = player.object:getpos()
+		
+		--print("MOBF: got player position: " ..printpos(pos) )
+		
+		if pos ~= nil then
+			local objects = get_objects_inside_radius(pos, 5)
+			
+			print("MOBF: found " .. dump(#objects) .. " objects around player")
+			
+			if objects ~= nil then
+				for i=1,#objects,1 do
+					local entity = objects[i]:get_luaentity()
+					if entity ~= nil and
+						entity.dynamic_data ~= nil and
+						entity.dynamic_data.ride ~= nil and
+						entity.dynamic_data.ride.player == player then
+						print("MOBF: found player to be attached")
+						ride.dettache_player(entity)
+						break
+					end
+				end
+			end
+		end
+	end
+end)

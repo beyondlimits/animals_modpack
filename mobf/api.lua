@@ -119,8 +119,8 @@ function mobf_add_mob(mob)
 			
 			if minetest.setting_getbool("mobf_animal_spawning_secondary") then
 				if mob.spawning.algorithm_secondary ~= nil and 
-					type(mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_spawn) == "function" then
-					mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_spawn(mob.modname..":"..mob.name,
+					type(mobf_spawn_algorithms[mob.spawning.algorithm_secondary].register_spawn) == "function" then
+					mobf_spawn_algorithms[mob.spawning.algorithm_secondary].register_spawn(mob.modname..":"..mob.name,
 																secondary_name,
 																mob.spawning,
 																environment_list[mob.generic.envid])

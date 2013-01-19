@@ -157,7 +157,14 @@ Changes 1.9.12
 -improve house spawning
 -add ostrich
 -improve collision checking for pos_is_ok
-
+-add fish blue_white mesh
+-add chatcommand show version
+-add wolf mesh
+-add sheep mesh
+-fixed crash with secondary spawning enabled
+-fixed crash on listactivemobs
+-fixed boombomb still using abm based spawner
+-updated dm model to 4aiman version
 
 Changes 1.9.11
 -added calf mesh

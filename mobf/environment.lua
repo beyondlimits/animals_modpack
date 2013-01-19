@@ -184,7 +184,7 @@ function environment.is_media_element( nodename, media )
 	dbg_mobf.environment_lvl2("MOBF: " .. nodename .. " is not within environment list:")
 	
 	for i,v in ipairs(media) do
-		dbg_mobf.environment_lvl2("MOBF: " .. v)
+		dbg_mobf.environment_lvl3("MOBF: " .. v)
 	end
 	
 	return false
@@ -347,115 +347,6 @@ end
 --!           -wrong_surface         -@>position is above surface mob shouldn't be
 --!           -invalid               -@>unable to check position
 -------------------------------------------------------------------------------
-function environment.old_pos_is_ok(pos,entity)
-
-	local min_ground_distance,max_ground_distance = environment.get_min_max_ground_dist(entity)
-
-	dbg_mobf.environment_lvl2("MOBF: Checking pos "..printpos(pos))
-
-	if pos == nil then
-		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking pos with nil value this won't work")
-		return "invalid"	
-	end
-	
-	local node = minetest.env:get_node(pos)
-
-	if node == nil then
-		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking position with invalid node")
-		return "invalid"
-	end
-	
-	local ground_distance = mobf_ground_distance(pos,entity.environment.media)
-
-	if environment.is_media_element(node.name,entity.environment.media) == true then
-			dbg_mobf.environment_lvl2("MOBF: \tin environment")
-			--following return codes are only usefull for non flying
-			if entity.data.movement.canfly == nil or
-				entity.data.movement.canfly == false then
-
-				if mobf_above_water(pos) then
-					
-					if ground_distance > max_ground_distance then
-						dbg_mobf.environment_lvl2("MOBF: \tdropping above water")
-						return "drop_above_water"
-					end
-					dbg_mobf.environment_lvl2("MOBF: \tabove water")
-					return "above_water"
-				end
-
-				if ground_distance > max_ground_distance then
-					dbg_mobf.environment_lvl2("MOBF: \tdropping")
-					return "drop"
-				else
-					dbg_mobf.environment_lvl2("MOBF: \tsurface dependent")
-					return environment.checksurface(pos,entity.environment.surfaces)
-				end
-			else
-				local miny,maxy = environment.get_absolute_min_max_pos(entity.environment,pos)
-				if pos.y < miny then
-					return "below_limit"
-				end
-				
-				if pos.y > maxy then
-					return "above_limit"
-				end
-				
-				return environment.checksurface(pos,entity.environment.surfaces) 
-			end
-	end
-	
-	dbg_mobf.environment_lvl1("MOBF pos "..printpos(pos) .. " isn't ok " 
-		.. node.name .. " for mob " .. entity.data.name)
-
-	--position is not ok gather some usefull information
-	local pos_above = {x=pos.x,y=pos.y+1,z=pos.z}	
-	local node_above = minetest.env:get_node(pos_above)
-
-	if node_above == nil then
-		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking position with invalid node above")
-		return "invalid"
-	end
-
-	if 	environment.is_media_element(node_above.name,entity.environment.media) and
-		environment.is_jumpable_surface(node.name,entity.environment) then
-		return "collision_jumpable"
-	end
-
-	if node.name == "default:water_source" or 
-		node.name == "default:water_flowing" then
-		return "in_water"
-	end
-
-	if node.name == "air" then
-		return "in_air"
-	end
-
-	return "collision"
-
-end
-
--------------------------------------------------------------------------------
--- name: pos_is_ok(pos,entity)
---
---! @brief check if a position is suitable for an mob
---! @memberof environment
---
---! @param pos position to check
---! @param entity mob to check
---! @return suitability of position for mob values:
---!           -ok                    -@>position is ok                         
---!           -collision             -@>position is within a node
---!           -collision_jumpable    -@>position is within a node that can be jumped onto
---!           -drop                  -@>position is a drop
---!           -drop_above_water      -@>position is to far above water
---!           -above_water           -@>position is right over water
---!           -in_water              -@>position is within a water node(source or flow)
---!			  -in_air                -@>position is in air
---!           -above_limit           -@>position is above level limit
---!           -below_limit           -@>position is below level limit
---!           -wrong_surface         -@>position is above surface mob shouldn't be
---!           -invalid               -@>unable to check position
--------------------------------------------------------------------------------
 function environment.pos_is_ok(pos,entity,jumpcheck)
 
 	local min_ground_distance,max_ground_distance = environment.get_min_max_ground_dist(entity)
@@ -528,7 +419,8 @@ function environment.pos_is_ok(pos,entity,jumpcheck)
 			end
 
 			if ground_distance > max_ground_distance then
-				dbg_mobf.environment_lvl2("MOBF: \tdropping")
+				dbg_mobf.environment_lvl2("MOBF: \tdropping "
+					.. ground_distance .. " / " .. max_ground_distance)
 				retval = "drop"
 			else
 				dbg_mobf.environment_lvl2("MOBF: \tsurface dependent")

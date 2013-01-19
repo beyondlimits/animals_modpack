@@ -115,7 +115,7 @@ function mobf_debug.list_active_mobs(name,param)
 	
 	local count = 1
 	for index,value in pairs(minetest.luaentities) do 
-		if value.data.name ~= nil then
+		if value.data ~= nil and value.data.name ~= nil then
 			local tosend = count .. ": " .. value.data.name .. " at " 
 				.. printpos(value.object:getpos())
 			print(tosend)
@@ -201,6 +201,16 @@ function mobf_debug.init()
 			privs		= {mobfw_admin=true},
 			func		= mobf_debug.add_tools
 		})
+		
+	minetest.register_chatcommand("mobf_version",
+		{
+			params		= "",
+			description = "show mobf version number" ,
+			privs		= {mobfw_admin=true},
+			func		= function(name,param)
+								minetest.chat_send_player(name,"MOBF version: " .. mobf_version)
+							end 
+		})
 
 	if mobf_rtd.luatrace_enabled then
 		minetest.register_chatcommand("traceon",
@@ -236,7 +246,7 @@ function mobf_debug.rightclick_callback(entity,player)
 	print("MOBF: \tCurrent state:               " .. entity.dynamic_data.state.current )
 	print("MOBF: \tCurrent movgen:              " .. entity.dynamic_data.current_movement_gen.name )
 	print("MOBF: \tTime to state change:        " .. entity.dynamic_data.state.time_to_next_change .. " seconds")
-	print("MOBF: \tCurrent environmental state: " .. environment.pos_is_ok(entity.object:getpos(),entity))
+	print("MOBF: \tCurrent environmental state: " .. environment.pos_is_ok(entity.getbasepos(entity),entity))
 	print("MOBF: \tCurrent accel:               " .. printpos(entity.object:getacceleration()))
 	print("MOBF: \tCurrent speed:               " .. printpos(entity.object:getvelocity()))
 	return false
