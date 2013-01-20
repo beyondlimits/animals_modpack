@@ -1,4 +1,4 @@
-local version = "0.0.15"
+local version = "0.0.16"
 
 local vombie_groups = {
 						not_in_creative_inventory=1
@@ -8,10 +8,7 @@ local selectionbox_vombie = {-0.3, -1.2, -0.5, 0.3, 1, 0.5}
 
 local modpath = minetest.get_modpath("animal_vombie")
 
-dofile (modpath .. "/model.lua")
 dofile (modpath .. "/flame.lua")
-
-
 
 function vombie_drop()
 	local result = {}
@@ -85,29 +82,12 @@ vombie_prototype = {
 					custom_on_activate_handler = vombie_on_activate_handler,
 				},
 		movement =  {
-					default_gen="probab_mov_gen",
 					min_accel=0.3,
 					max_accel=1.5,
 					max_speed=2,
 					pattern="stop_and_go",
 					canfly=false,
 					follow_speedup=10,
-					},
-		harvest        = nil,
-		catching       = nil,
-		random_drop    = nil,
-		auto_transform = nil,
-		graphics_3d = {
-					visual = "wielditem",
-					textures = {"animal_vombie:box_vombie"},
-					collisionbox = selectionbox_vombie,
-					visual_size= {x=1.5,y=1.5,z=1.5},
-					},
-		graphics = {
-					sprite_scale={x=4,y=4},
-					sprite_div = {x=6,y=2},
-					visible_height = 2.2,
-					visible_width = 1,
 					},
 		combat = {
 					angryness=1,
@@ -142,11 +122,61 @@ vombie_prototype = {
 								gain = 0.25,
 								max_hear_distance = 7,
 								},
-					},	
+					},
+		animation = {
+				stand = {
+					start_frame = 0,
+					end_frame   = 80,
+					},
+				walk = {
+					start_frame = 168,
+					end_frame   = 188,
+					},
+				attack = {
+					start_frame = 81,
+					end_frame   = 110,
+					},
+			},
+		states = {
+				{
+					name = "default",
+					movgen = "none",
+					typical_state_time = 30,
+					chance = 0,
+					animation = "stand",
+					graphics = {
+						sprite_scale={x=4,y=4},
+						sprite_div = {x=6,y=2},
+						visible_height = 2.2,
+						visible_width = 1,
+					},
+					graphics_3d = {
+						visual = "mesh",
+						mesh = "animal_vombie_vombie.b3d",
+						textures = {"animal_vombie_vombie_mesh.png"},
+						collisionbox = selectionbox_vombie,
+						visual_size= {x=1,y=1,z=1},
+						},
+				},
+				{
+					name = "walking",
+					movgen = "probab_mov_gen",
+					typical_state_time = 120,
+					chance = 0.5,
+					animation = "walk",
+				},
+				{ 
+					name = "combat",
+					typical_state_time = 9999,
+					chance = 0.0,
+					animation = "attack",
+					movgen="follow_mov_gen",
+				},
+			}
 		}
 
 
 --register with animals mod
-print ("Adding animal "..vombie_prototype.name)
-animals_add_animal(vombie_prototype)
+print ("Adding mob "..vombie_prototype.name)
+mobf_add_mob(vombie_prototype)
 print ("animal_vombie mod version " .. version .. " loaded")
