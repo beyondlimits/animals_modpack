@@ -615,45 +615,56 @@ end
 -------------------------------------------------------------------------------
 function mobf.blacklisthandling(mob)
 	local blacklisted = minetest.registered_entities[mob.modname.. ":"..mob.name]
-		
+	
+	
+	local on_activate_fct = nil
+	
 	--remove unknown animal objects
 	if minetest.setting_getbool("mobf_delete_disabled_mobs") then
-		if minetest.registered_entities[mob.modname.. ":"..mob.name] == nil then
+		on_activate_fct = function(self,staticdata)
+				self.object:remove()
+			end
 		
-			--cleanup mob entities
-			minetest.register_entity(mob.modname.. ":"..mob.name .. "__default",
-				{
-				 	on_activate = function(self,staticdata)
-				 		self.object:remove()
-				 	end
-				 })
-				 
-			if mob.states ~= nil then
-				for s = 1, #mob.states , 1 do
-					minetest.register_entity(":".. mob_state.get_entity_name(mob,mob.states[s]),
-					{
-					 	on_activate = function(self,staticdata)
-					 		self.object:remove()
-					 	end
-					 })
-				end
-			end
+		
+		
+		--cleanup spawners too
+		if minetest.registered_entities[mob.modname.. ":"..mob.name] == nil and
+			environment_list[mob.generic.envid] ~= nil and
+			mobf_spawn_algorithms[mob.spawning.algorithm] ~= nil and
+			type(mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup) == "function" then
 			
-			--cleanup spawners too
-			if environment_list[mob.generic.envid] ~= nil and
-				mobf_spawn_algorithms[mob.spawning.algorithm] ~= nil and
-				type(mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup) == "function" then
-				
-				mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup(mob.modname.. ":" .. mob.name)
-				
-				if mob.spawning.algorithm_secondary ~= nil and
-					type(mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_cleanup) == "function" then
-						mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_cleanup(mob.modname.. ":" .. mob.name)
-				end
+			mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup(mob.modname.. ":" .. mob.name)
+			
+			if mob.spawning.algorithm_secondary ~= nil and
+				type(mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_cleanup) == "function" then
+					mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_cleanup(mob.modname.. ":" .. mob.name)
 			end
-				
+		end
+	else
+		on_activate_fct = function(self,staticdata)
+				self.object:setacceleration({x=0,y=0,z=0})
+				self.object:setvelocity({x=0,y=0,z=0})
+			end
+	end
+	
+	if minetest.registered_entities[mob.modname.. ":"..mob.name] == nil then
+	
+		--cleanup mob entities
+		minetest.register_entity(mob.modname.. ":"..mob.name .. "__default",
+			{
+				on_activate = on_activate_fct
+			})
+		
+		if mob.states ~= nil then
+			for s = 1, #mob.states , 1 do
+				minetest.register_entity(":".. mob_state.get_entity_name(mob,mob.states[s]),
+				{
+					on_activate = on_activate_fct
+				})
+			end
 		end
 	end
+
 	
 	if blacklisted == nil then
 		minetest.log(LOGLEVEL_INFO,"MOBF: " .. mob.modname.. ":"..mob.name .. " was blacklisted")

@@ -1,4 +1,4 @@
-local version = "0.0.1"
+local version = "0.0.2"
 
 local ostrich_groups = {
 						not_in_creative_inventory=1
@@ -20,7 +20,7 @@ function ostrich_drop()
 end
 
 ostrich_f_prototype = {
-		name="ostrich_m",
+		name="ostrich_f",
 		modname="mob_ostrich",
 	
 		generic = {

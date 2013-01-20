@@ -146,6 +146,15 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.9.13
+-add gull 3d mesh
+-fix bug tamed wolf removed immediatly
+-fix bug ostich_f can't be spawned
+-revert accidentaly changed wolf to be not agressive
+-fix mobs following don't jump
+-fix height level check for flying mobs not working
+-stop movement of inactive mobs
+
 Changes 1.9.12
 -rename debug class to avoid naming conflicts
 -improve environment definition

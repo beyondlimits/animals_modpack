@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 
 mobf_settings = {}
-mobf_settings.version = "0.0.14"
+mobf_settings.version = "0.0.15"
 mobf_settings.max_list_page_num = 5
 mobf_settings.buttons = {}
 mobf_settings.menubutton = "button_exit[11,9.5;2,0.5;main; Exit]"
@@ -24,7 +24,7 @@ mobf_settings.formspechandler = function(player,formspec)
 			minetest.show_formspec(name,"mobf_settings:mainform",formspec)
 		end
 		
-mobf_settings_debug = print
+mobf_settings_debug = function () end
 ------------------------------------------------------------------------------
 -- name: save
 --

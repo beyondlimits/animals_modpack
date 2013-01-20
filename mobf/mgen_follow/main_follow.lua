@@ -84,7 +84,7 @@ function mgen_follow.callback(entity,now)
 		state == "above_water" or
 		state == "in_air" or
 		state == "drop_above_water" then
-		print("followed to wrong place")
+		dbg_mobf.fmovement_lvl1("MOBF: followed to wrong place " .. state)
 		if entity.dynamic_data.movement.last_pos_in_env ~= nil then
 			entity.object:moveto(entity.dynamic_data.movement.last_pos_in_env)
 		else
@@ -169,7 +169,7 @@ function mgen_follow.callback(entity,now)
 					--TODO check if movement in this direction is possible or if we need to jump
 					local accel_to_set = movement_generic.get_accel_to(targetpos,entity)
 					accel_to_set.y = yaccel
-					dbg_mobf.fmovement_lvl3("MOBF:   setting acceleration to: " .. printpos(accel_to_set));
+					
 					local current_velocity = entity.object:getvelocity()
 					local predicted_pos = movement_generic.predict_next_block(basepos,current_velocity,accel_to_set)
 					local pos_state  = environment.pos_is_ok(predicted_pos,entity)
@@ -179,6 +179,9 @@ function mgen_follow.callback(entity,now)
 						pos_to_set.y = pos_to_set.y + 1.1
 						entity.object:moveto(pos_to_set)
 					end
+					dbg_mobf.fmovement_lvl3("MOBF:   setting acceleration to: " 
+						.. printpos(accel_to_set) .. " predicted_state: "
+						.. pos_state);
 					mgen_follow.set_acceleration(entity,accel_to_set,follow_speedup)
 				end
 			end

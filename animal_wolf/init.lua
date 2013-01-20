@@ -1,4 +1,4 @@
-local version = "0.0.9"
+local version = "0.0.10"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
@@ -37,7 +37,7 @@ wolf_prototype = {
 					},
 		combat = {
 					angryness=1,
-					starts_attack=false,
+					starts_attack=true,
 					sun_sensitive=false,
 					melee = {
 						maxdamage=5,
@@ -130,9 +130,13 @@ tamed_wolf_prototype = {
 						if (entity.dynamic_data.spawning.spawner ~= nil) then
 							print("ANIMAL tamed wolf: setting target to: " .. entity.dynamic_data.spawning.spawner )
 							entity.dynamic_data.movement.target = minetest.env:get_player_by_name(entity.dynamic_data.spawning.spawner)
-						else
-							print("ANIMAL tamed wolf: tamed wolf without owner removing")
-							spawning.remove(entity)
+						end
+					end,
+					custom_on_step_handler = function(entity,now,dstep)
+						if entity.dynamic_data.spawning.spawner == nil and
+							now - entity.dynamic_data.spawning.original_spawntime > 30 then
+								print("ANIMAL tamed wolf: tamed wolf without owner removing")
+								spawning.remove(entity)
 						end
 					end
 				},

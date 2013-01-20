@@ -184,7 +184,7 @@ function environment.is_media_element( nodename, media )
 	dbg_mobf.environment_lvl2("MOBF: " .. nodename .. " is not within environment list:")
 	
 	for i,v in ipairs(media) do
-		dbg_mobf.environment_lvl3("MOBF: " .. v)
+		dbg_mobf.environment_lvl3("MOBF: \t" .. v)
 	end
 	
 	return false
@@ -333,6 +333,7 @@ end
 --
 --! @param pos position to check
 --! @param entity mob to check
+--! @param dont_do_jumpcheck
 --! @return suitability of position for mob values:
 --!           -ok                    -@>position is ok                         
 --!           -collision             -@>position is within a node
@@ -347,7 +348,7 @@ end
 --!           -wrong_surface         -@>position is above surface mob shouldn't be
 --!           -invalid               -@>unable to check position
 -------------------------------------------------------------------------------
-function environment.pos_is_ok(pos,entity,jumpcheck)
+function environment.pos_is_ok(pos,entity,dont_do_jumpcheck)
 
 	local min_ground_distance,max_ground_distance = environment.get_min_max_ground_dist(entity)
 	
@@ -355,10 +356,10 @@ function environment.pos_is_ok(pos,entity,jumpcheck)
 	
 	table.insert(cornerpositions,pos)
 	--read positions at corners
-	table.insert(cornerpositions,mobf_round_pos({x=pos.x + entity.collisionbox[4],y=pos.y,z=pos.z + entity.collisionbox[6]}))
-	table.insert(cornerpositions,mobf_round_pos({x=pos.x + entity.collisionbox[4],y=pos.y,z=pos.z + entity.collisionbox[3]}))
-	table.insert(cornerpositions,mobf_round_pos({x=pos.x + entity.collisionbox[1],y=pos.y,z=pos.z + entity.collisionbox[6]}))
-	table.insert(cornerpositions,mobf_round_pos({x=pos.x + entity.collisionbox[1],y=pos.y,z=pos.z + entity.collisionbox[3]}))
+	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[4] -0.01,y=pos.y,z=pos.z + entity.collisionbox[6] -0.01})
+	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[4] -0.01,y=pos.y,z=pos.z + entity.collisionbox[3] +0.01})
+	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[1] +0.01,y=pos.y,z=pos.z + entity.collisionbox[6] -0.01})
+	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[1] +0.01,y=pos.y,z=pos.z + entity.collisionbox[3] +0.01})
 	
 	local lastpos = nil
 	
@@ -376,7 +377,9 @@ function environment.pos_is_ok(pos,entity,jumpcheck)
 			end
 			
 			if not environment.is_media_element(node_to_check.name,entity.environment.media) == true then
-				dbg_mobf.environment_lvl3("MOBF: at pos " .. printpos(cornerpositions[i]) .. " not within environment")
+				dbg_mobf.environment_lvl3("MOBF: " .. i .. ": " .. 
+					printpos(cornerpositions[i]) .. " -- " .. printpos(pos) .. 
+					" not within environment")
 				
 				if mobf_pos_is_same(pos,cornerpositions[i]) then
 					if node_to_check.name == "default:water_source" or 
@@ -428,31 +431,32 @@ function environment.pos_is_ok(pos,entity,jumpcheck)
 			end
 		else
 			local miny,maxy = environment.get_absolute_min_max_pos(entity.environment,pos)
+			dbg_mobf.environment_lvl2("MOBF: \tflying mob detected, min: " 
+				.. miny .. " max: " .. maxy .. " current: " .. pos.y)
 			if pos.y < miny then
 				retval = "below_limit"
-			end
-			
-			if pos.y > maxy then
+			else if pos.y > maxy then
 				retval = "above_limit"
-			end
-			
-			retval = environment.checksurface(pos,entity.environment.surfaces) 
+			else
+				retval = environment.checksurface(pos,entity.environment.surfaces)
+			end end
 		end
 	end
 	
-	if retval == "collision" and jumpcheck then
-		if environment.extended_pos_is_ok(pos,entity,false) == "ok" then
+	if retval == "collision" and not dont_do_jumpcheck then
+		dbg_mobf.environment_lvl2("MOBF: check if pos is jumpable")
+		local upper_pos_state = environment.pos_is_ok({x=pos.x,
+																y=pos.y+1,
+																z=pos.z},
+																entity,true)
+		if  upper_pos_state == "ok" then
 			retval = "collision_jumpable"
+		else
+			dbg_mobf.environment_lvl2("MOBF: upper pos state was: " .. upper_pos_state)
 		end
 	end
 	
 	return retval
-end
-
-function environment.state_prio(oldstate,newstate)
-
-
-
 end
 
 -------------------------------------------------------------------------------
