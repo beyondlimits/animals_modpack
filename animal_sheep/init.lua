@@ -1,4 +1,4 @@
-local version = "0.0.19"
+local version = "0.0.20"
 
 local sheep_groups = {
 						sheerable=1,

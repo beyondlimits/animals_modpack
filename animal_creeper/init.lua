@@ -1,4 +1,4 @@
-local version = "0.0.13"
+local version = "0.0.14"
 
 local creeper_groups = {
                         not_in_creative_inventory=1
@@ -22,29 +22,12 @@ creeper_prototype = {
 					envid="on_ground_1",
 				},				
 		movement =  {
-					default_gen="probab_mov_gen",
 					min_accel=0.4,
 					max_accel=0.6,
 					max_speed=2,
 					pattern="stop_and_go",
 					canfly=false,
 					follow_speedup=5,
-					},		
-		harvest        = nil,
-		catching       = nil,
-		random_drop    = nil,
-		auto_transform = nil,
-		graphics = {
-					sprite_scale={x=4,y=4},
-					sprite_div = {x=6,y=1},
-					visible_height = 1.5,
-					},
-		graphics_3d = {
-					visual = "mesh",
-					mesh = "boombomb.b3d",
-					textures = {"boombomb_mesh.png"},
-					collisionbox = selectionbox_creeper,
-					visual_size= {x=1,y=1,z=1},
 					},
 		combat = {
 					angryness=0.95,
@@ -84,11 +67,31 @@ creeper_prototype = {
 								gain = 2,
 								max_hear_distance = 150,
 								},
-					},	
+					},
+		states = {
+				{
+					name = "default",
+					movgen = "probab_mov_gen",
+					typical_state_time = 30,
+					chance = 0,
+					graphics = {
+						sprite_scale={x=4,y=4},
+						sprite_div = {x=6,y=1},
+						visible_height = 1.5,
+						},
+					graphics_3d = {
+						visual = "mesh",
+						mesh = "boombomb.b3d",
+						textures = {"boombomb_mesh.png"},
+						collisionbox = selectionbox_creeper,
+						visual_size= {x=1,y=1,z=1},
+					},
+				},
+			}
 		}
 
 
 --register with animals mod
-print ("Adding animal "..creeper_prototype.name)
-animals_add_animal(creeper_prototype)
+print ("Adding mob "..creeper_prototype.name)
+mobf_add_mob(creeper_prototype)
 print ("animal_creeper mod version " .. version .. " loaded")

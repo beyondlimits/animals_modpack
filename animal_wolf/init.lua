@@ -1,4 +1,4 @@
-local version = "0.0.10"
+local version = "0.0.11"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
@@ -100,7 +100,8 @@ wolf_prototype = {
 					name = "combat",
 					typical_state_time = 9999,
 					chance = 0.0,
-					animation = "walk"
+					animation = "walk",
+					movgen = "follow_mov_gen"
 				},
 			}
 		}

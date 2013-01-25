@@ -146,6 +146,21 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.9.14
+-add vombie 3d mesh
+-fix crash when trying to access empty movgen
+-fix old default movgen definition was still used instead of default state 
+ movgen in state change handling
+-fixed deer model flying when lying
+-fix crash in changestate
+-fixed bug mobs disapearing as soon as attacking if spawned in slightly wrong
+ positions
+-fixed boombomb and npc to use current api
+-added big_red mesh
+-fixed big_red not being agressive
+-fixed wolf missing combat movegen
+-added backtrace support
+
 Changes 1.9.13
 -add gull 3d mesh
 -fix bug tamed wolf removed immediatly

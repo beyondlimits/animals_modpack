@@ -1,4 +1,4 @@
-local version = "0.0.15"
+local version = "0.0.16"
 
 local big_red_groups = {
                         not_in_creative_inventory=1
@@ -6,11 +6,7 @@ local big_red_groups = {
 
 local selectionbox_big_red = {-0.75, -1.9, -0.75, 0.75, 1.9, 0.75}
 
-local modpath = minetest.get_modpath("animal_big_red")
-
-dofile (modpath .. "/model.lua")
-
-big_red_prototype = {   
+big_red_prototype = {
 		name="big_red",
 		modname="animal_big_red",
 		
@@ -41,24 +37,9 @@ big_red_prototype = {
 					result="", 
 					transforms_to="",
 					min_delay=-1,
-				  	},
-		catching       = nil,
-		random_drop    = nil,
-		auto_transform = nil,
-		graphics_3d = {
-			visual = "wielditem",
-			textures = {"animal_big_red:box_big_red"},
-			collisionbox = selectionbox_big_red,
-			visual_size= {x=1.5,y=2.5,z=1.5},
-			},
-		graphics = {
-					sprite_scale={x=6,y=6},
-					sprite_div = {x=1,y=1},
-					visible_height = 3.2,
-					visible_width = 1,
 					},
 		combat = {
-					angryness=0,--0.95,
+					angryness=0.95,
 					starts_attack=true,
 					sun_sensitive=true,
 					melee = {
@@ -70,7 +51,7 @@ big_red_prototype = {
 						attack="mobf:plasmaball_entity", 
 						range=10,
 						speed=2,
-						},				
+						},
 					self_destruct = nil,
 					},
 		
@@ -89,11 +70,65 @@ big_red_prototype = {
 					gain = 1,
 					max_hear_distance = 5,
 					},
-			}
+			},
+		animation = {
+				walk = {
+					start_frame = 91,
+					end_frame   = 170,
+					},
+				stand = {
+					start_frame = 11,
+					end_frame   = 90,
+					},
+				combat = {
+					start_frame = 171,
+					end_frame   = 250,
+					},
+				throw_plasmaball = {
+					start_frame = 1,
+					end_frame = 10,
+				}
+			},
+		states = {
+				{ 
+				name = "default",
+				movgen = "none",
+				chance = 0,
+				animation = "stand",
+				graphics_3d = {
+					visual = "mesh",
+					mesh = "animal_big_red.b3d",
+					textures = {"animal_big_red_mesh.png"},
+					collisionbox = selectionbox_big_red,
+					visual_size= {x=1,y=1,z=1},
+					},
+				graphics = {
+					sprite_scale={x=6,y=6},
+					sprite_div = {x=1,y=1},
+					visible_height = 3.2,
+					visible_width = 1,
+					},
+				typical_state_time = 30,
+				},
+				{ 
+				name = "walking",
+				movgen = "probab_mov_gen",
+				chance = 0.25,
+				animation = "walk",
+				typical_state_time = 180,
+				},
+				{
+				movgen="follow_mov_gen",
+				name = "combat",
+				chance = 0,
+				animation = "combat",
+				typical_state_time = 0,
+				},
+			},
 		}
 
 
 --register with animals mod
-print ("Adding animal "..big_red_prototype.name)
-animals_add_animal(big_red_prototype)
+print ("Adding mob "..big_red_prototype.name)
+mobf_add_mob(big_red_prototype)
 print ("animal_big_red mod version " .. version .. " loaded")

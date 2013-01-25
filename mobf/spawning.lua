@@ -279,8 +279,8 @@ function spawning.lifecycle(entity,now)
 	
 		if current_age > 0 and 
 			current_age > lifetime then
-			
-			entity.object:remove()
+			dbg_mobf.spawning_lvl1("MOBF: removing animal due to limited lifetime")
+			spawning.remove(entity)
 			return false
 		end
 	else

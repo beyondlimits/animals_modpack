@@ -1,4 +1,4 @@
-local version = "0.0.9"
+local version = "0.0.10"
 
 local deer_groups = {
 						not_in_creative_inventory=1

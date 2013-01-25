@@ -46,7 +46,7 @@ function movement_generic.get_accel_to(new_pos,entity)
 	local yaccel = environment.get_default_gravity(old_pos,
 							entity.environment.media,
 							entity.data.movement.canfly)
-	assert(yaccel ~= nil)
+	mobf_assert_backtrace(yaccel ~= nil)
 
 	-- calc y speed for flying mobs
 	local x_diff = new_pos.x - old_pos.x

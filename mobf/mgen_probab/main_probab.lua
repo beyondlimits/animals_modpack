@@ -132,7 +132,7 @@ function movement_gen.callback(entity)
 	movement_state.default_y_accel = environment.get_default_gravity(movement_state.basepos,
 								entity.environment.media,
 								entity.data.movement.canfly)
-	assert(movement_state.default_y_accel ~= nil)
+	mobf_assert_backtrace(movement_state.default_y_accel ~= nil)
 	movement_state.now			   = mobf_get_current_time()
 	
 
@@ -286,7 +286,7 @@ function movement_gen.init_dynamic_data(entity,now)
 					entity.environment.media,
 					entity.data.movement.canfly)
 
-	assert(accel_to_set.y ~= nil)
+	mobf_assert_backtrace(accel_to_set.y ~= nil)
 
 	local data = {
 			started				= false,
@@ -472,7 +472,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 				movement_state.accel_to_set.y = environment.get_default_gravity(targetpos,
 							entity.environment.media,
 							entity.data.movement.canfly)
-				assert(movement_state.accel_to_set.y ~= nil)
+				mobf_assert_backtrace(movement_state.accel_to_set.y ~= nil)
 			else
 				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way out of water, for mob at: " .. printpos(movement_state.basepos) .. " drowning " .. dump(entity.dynamic_data.movement.last_pos_in_env))
 				abort_processing = true
@@ -549,7 +549,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 				movement_state.accel_to_set.y = environment.get_default_gravity(targetpos,
 									entity.environment.media,
 									entity.data.movement.canfly)
-				assert(movement_state.default_y_accel ~= nil)
+				mobf_assert_backtrace(movement_state.default_y_accel ~= nil)
 			else
 				minetest.log(LOGLEVEL_WARNING,"MOBF: mob " .. entity.data.name .. " was within solid block, removed")
 				abort_processing = true

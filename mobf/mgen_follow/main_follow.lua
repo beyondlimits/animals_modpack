@@ -29,6 +29,90 @@ mgen_follow = {}
 --! @memberof mgen_follow
 mgen_follow.name = "follow_mov_gen"
 
+-------------------------------------------------------------------------------
+-- name: identify_movement_state(ownpos,targetpos)
+--
+--! @brief check what situation we are
+--! @memberof mgen_follow
+--
+--! @param ownpos position of entity
+--! @param targetpos position of target
+--!
+--! @return  "below_los"
+--!          "below_no_los"
+--!          "same_height_los"
+--!          "same_height_no_los"
+--!          "above_los"
+--!          "above_no_los"
+--!          "unknown"
+-------------------------------------------------------------------------------
+function mgen_follow.identify_movement_state(ownpos,targetpos)
+	local same_height_delta = 0.1
+	
+	local los = mobf_line_of_sight(ownpos,targetpos)
+	
+	if ownpos.y > targetpos.y - same_height_delta and
+		ownpos.y < targetpos.y + same_height_delta then
+		
+		if los then
+			return "same_height_los"
+		else
+			return "same_height_no_los"
+		end
+	end
+	
+	if ownpos.y < targetpos.y then
+		if los then
+			return "below_los"
+		else
+			return "below_no_los"
+		end
+	end
+
+	if ownpos.y > targetpos.y then
+		if los then
+			return "above_los"
+		else
+			return "above_no_los"
+		end
+	end
+	
+	return "unknown"
+end
+
+-------------------------------------------------------------------------------
+-- name: handleteleport(entity,now)
+--
+--! @brief handle teleportsupport
+--! @memberof mgen_follow
+--
+--! @param entity mob to check for teleport
+--! @param now current time
+--!
+--! @return true/false finish processing
+-------------------------------------------------------------------------------
+function mgen_follow.handleteleport(entity,now)
+
+	if (entity.dynamic_data.movement.last_next_to_target ~= nil ) then
+		local time_since_next_to_target =
+			now - entity.dynamic_data.movement.last_next_to_target
+			
+		dbg_mobf.fmovement_lvl3("MOBF:   time since next to target: " .. time_since_next_to_target .. 
+									" delay: " .. dump(entity.data.movement.teleportdelay) ..
+									" teleportsupport: " .. dump(entity.dynamic_data.movement.teleportsupport))
+
+		if (entity.dynamic_data.movement.teleportsupport) and
+			time_since_next_to_target > entity.data.movement.teleportdelay then
+
+			entity.object:setvelocity({x=0,y=0,z=0})
+			entity.object:setacceleration({x=0,y=0,z=0})
+			entity.object:moveto(targetpos)
+			entity.dynamic_data.movement.last_next_to_target = now
+			return true
+		end
+	end
+	return false
+end
 
 -------------------------------------------------------------------------------
 -- name: callback(entity,now)
@@ -87,8 +171,17 @@ function mgen_follow.callback(entity,now)
 		dbg_mobf.fmovement_lvl1("MOBF: followed to wrong place " .. state)
 		if entity.dynamic_data.movement.last_pos_in_env ~= nil then
 			entity.object:moveto(entity.dynamic_data.movement.last_pos_in_env)
+			basepos  = entity.getbasepos(entity)
 		else
-			entity.object:remove()
+			local newpos = environment.get_suitable_pos_same_level(basepos,1,entity,true)
+			
+			if newpos == nil then
+				spawning.remove(entity)
+			else
+				newpos.y = newpos.y - (entity.collisionbox[2] + 0.49)
+				entity.object:moveto(newpos)
+				basepos  = entity.getbasepos(entity)
+			end
 		end
 	end
 	
@@ -130,60 +223,55 @@ function mgen_follow.callback(entity,now)
 		dbg_mobf.fmovement_lvl3("MOBF: max distance is set to : " .. max_distance)
 		if distance > max_distance then
 		
-			if (entity.dynamic_data.movement.last_next_to_target ~= nil ) then
-				local time_since_next_to_target =
-					now - entity.dynamic_data.movement.last_next_to_target
-					
-				dbg_mobf.fmovement_lvl3("MOBF:   time since next to target: " .. time_since_next_to_target .. 
-											" delay: " .. dump(entity.data.movement.teleportdelay) ..
-											" teleportsupport: " .. dump(entity.dynamic_data.movement.teleportsupport))
-	
-				if (entity.dynamic_data.movement.teleportsupport) and
-					time_since_next_to_target > entity.data.movement.teleportdelay then
-	
-					entity.object:setvelocity({x=0,y=0,z=0})
-					entity.object:setacceleration({x=0,y=0,z=0})
-					entity.object:moveto(targetpos)
-					entity.dynamic_data.movement.last_next_to_target = now
-					return
-				end
+			if mgen_follow.handleteleport(entity,now) then
+				return
 			end
 
 			dbg_mobf.fmovement_lvl3("MOBF:   distance:" .. distance)
-			if basepos.y == targetpos.y then
-				dbg_mobf.fmovement_lvl3("MOBF:   same height")
+			
+			local current_state = mgen_follow.identify_movement_state(basepos,targetpos)
+			local handled = false
+			
+			if handled == false and 
+				(current_state == "same_height_los" or
+				current_state == "above_los" or
+				current_state == "above_no_los" ) then
+				dbg_mobf.fmovement_lvl3("MOBF: \t Case 1: " .. current_state)
 				local accel_to_set = movement_generic.get_accel_to(targetpos,entity)
 				accel_to_set.y = yaccel
 				dbg_mobf.fmovement_lvl3("MOBF:   setting acceleration to: " .. printpos(accel_to_set));
 				mgen_follow.set_acceleration(entity,accel_to_set,follow_speedup)
-			else
-				dbg_mobf.fmovement_lvl3("MOBF:   not same height")
-				if basepos.y > targetpos.y then
-					dbg_mobf.fmovement_lvl3("MOBF:   target below")
-					local accel_to_set = movement_generic.get_accel_to(targetpos,entity)
-					accel_to_set.y = yaccel
-					dbg_mobf.fmovement_lvl3("MOBF:   setting acceleration to: " .. printpos(accel_to_set));
-					mgen_follow.set_acceleration(entity,accel_to_set,follow_speedup)
-				else
-					dbg_mobf.fmovement_lvl3("MOBF:   above")
-					--TODO check if movement in this direction is possible or if we need to jump
-					local accel_to_set = movement_generic.get_accel_to(targetpos,entity)
-					accel_to_set.y = yaccel
-					
-					local current_velocity = entity.object:getvelocity()
-					local predicted_pos = movement_generic.predict_next_block(basepos,current_velocity,accel_to_set)
-					local pos_state  = environment.pos_is_ok(predicted_pos,entity)
-					
-					if pos_state == "collision_jumpable" then			
-						local pos_to_set = entity.object:getpos()
-						pos_to_set.y = pos_to_set.y + 1.1
-						entity.object:moveto(pos_to_set)
-					end
-					dbg_mobf.fmovement_lvl3("MOBF:   setting acceleration to: " 
-						.. printpos(accel_to_set) .. " predicted_state: "
-						.. pos_state);
-					mgen_follow.set_acceleration(entity,accel_to_set,follow_speedup)
+				
+				handled = true
+			end
+			
+			if handled == false and
+				(current_state == "below_los" or
+				 current_state == "below_no_los" or
+				 current_state == "same_height_no_los" ) then
+				dbg_mobf.fmovement_lvl3("MOBF: \t Case 2: " .. current_state)
+				local accel_to_set = movement_generic.get_accel_to(targetpos,entity)
+				accel_to_set.y = yaccel
+				
+				local current_velocity = entity.object:getvelocity()
+				local predicted_pos = movement_generic.predict_next_block(basepos,current_velocity,accel_to_set)
+				local pos_state  = environment.pos_is_ok(predicted_pos,entity)
+				
+				if pos_state == "collision_jumpable" then			
+					local pos_to_set = entity.object:getpos()
+					pos_to_set.y = pos_to_set.y + 1.1
+					entity.object:moveto(pos_to_set)
 				end
+				dbg_mobf.fmovement_lvl3("MOBF:   setting acceleration to: " 
+					.. printpos(accel_to_set) .. " predicted_state: "
+					.. pos_state);
+				mgen_follow.set_acceleration(entity,accel_to_set,follow_speedup)
+				
+				handled = true
+			end
+
+			if handled == false then
+				dbg_mobf.fmovement_lvl1("MOBF: \t Unexpected movement state: " .. current_state)
 			end
 		--nothing to do
 		else

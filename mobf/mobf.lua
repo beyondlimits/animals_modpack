@@ -361,7 +361,8 @@ function mobf.activate_handler(self,staticdata)
 		graphics.set_animation(self,default_state.animation)
 	end
 		
-	
+	mobf_assert_backtrace(self.dynamic_data.current_movement_gen ~= nil)
+
 	self.dynamic_data.current_movement_gen.init_dynamic_data(self,now)
 	
 	--initialize armor groups

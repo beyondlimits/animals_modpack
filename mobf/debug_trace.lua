@@ -34,8 +34,8 @@ dbg_mobf = {
 	graphics_lvl2			= function () end,
 	graphics_lvl3			= function () end,
 	
-	spawning_lvl1			= function () end,
-	spawning_lvl2			= function () end,
+	spawning_lvl1			= print,
+	spawning_lvl2			= print,
 	spawning_lvl3			= function () end,
 	
 	permanent_store_lvl1	= function () end,
@@ -50,7 +50,7 @@ dbg_mobf = {
 	pmovement_lvl2			= function () end,
 	pmovement_lvl3			= function () end,
 	
-	fmovement_lvl1  		= function () end,
+	fmovement_lvl1  		= print,
 	fmovement_lvl2  		= function () end,
 	fmovement_lvl3  		= function () end,
 	
@@ -74,7 +74,7 @@ dbg_mobf = {
 	random_drop_lvl2		= function () end,
 	random_drop_lvl3		= function () end,
 	
-	mob_state_lvl1			= function () end,
+	mob_state_lvl1			= print,
 	mob_state_lvl2			= function () end,
 	mob_state_lvl3			= function () end,
 	

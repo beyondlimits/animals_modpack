@@ -245,6 +245,14 @@ function mobf_debug.rightclick_callback(entity,player)
 	print("MOBF: " .. entity.data.name .. " is alive for " .. lifetime .. " seconds")
 	print("MOBF: \tCurrent state:               " .. entity.dynamic_data.state.current )
 	print("MOBF: \tCurrent movgen:              " .. entity.dynamic_data.current_movement_gen.name )
+	if entity.dynamic_data.current_movement_gen.name == "follow_mov_gen" then
+			local basepos  = entity.getbasepos(entity)
+			local targetpos = entity.dynamic_data.spawning.spawnpoint	
+			if entity.dynamic_data.movement.guardspawnpoint ~= true then
+				targetpos = entity.dynamic_data.movement.target:getpos()
+			end
+			print("MOBF: \t\tmovement state:              " .. mgen_follow.identify_movement_state(basepos,targetpos) )
+	end
 	print("MOBF: \tTime to state change:        " .. entity.dynamic_data.state.time_to_next_change .. " seconds")
 	print("MOBF: \tCurrent environmental state: " .. environment.pos_is_ok(entity.getbasepos(entity),entity))
 	print("MOBF: \tCurrent accel:               " .. printpos(entity.object:getacceleration()))

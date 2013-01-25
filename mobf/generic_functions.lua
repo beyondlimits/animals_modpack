@@ -152,6 +152,7 @@ end
 -------------------------------------------------------------------------------
 function mobf_get_current_time()
 	return os.time(os.date('*t'))
+	--return minetest.get_time()
 end
 
 callback_statistics = {}
@@ -887,5 +888,20 @@ function mobf_pos_is_same(pos1,pos2)
 	end
 	
 	return true
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_assert_backtrace(value)
+--
+--! @brief assert in case value is false
+--
+--! @param value to evaluate
+-------------------------------------------------------------------------------
+function mobf_assert_backtrace(value)
+	if minetest.assert_backtrace ~= nil then
+		minetest.assert_backtrace(value)
+	else
+		assert(value)
+	end
 end
 --!@}

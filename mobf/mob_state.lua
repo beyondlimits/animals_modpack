@@ -20,7 +20,6 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
-
 mob_state = {}
 
 -------------------------------------------------------------------------------
@@ -100,11 +99,7 @@ end
 --! @return state data or nil
 -------------------------------------------------------------------------------
 function mob_state.get_state_by_name(entity,name)
-
-	if entity.data == nil then
-		print("MOBF BUG!! unable to get information for entity: " 
-			.. tostring(entity.name) .. " " .. dump(entity))
-	end
+	mobf_assert_backtrace(entity ~= nil and entity.data ~= nil)
 
 	for i=1, #entity.data.states, 1 do
 		if entity.data.states[i].name == name then
@@ -154,7 +149,8 @@ function mob_state.callback(entity,now,dstep)
 		minetest.log(LOGLEVEL_ERRROR,"MOBF BUG: " .. entity.data.name 
 			.. " mob state callback without mob dynamic data!")
 		mob_state.initialize(entity,now)
-		entity.dynamic_data.current_movement_gen = getMovementGen(entity.data.movement.default_gen)
+		local default_state = mob_state.get_state_by_name(self,"default")
+		entity.dynamic_data.current_movement_gen = getMovementGen(default_state.movgen)
 		entity.dynamic_data.current_movement_gen.init_dynamic_data(entity,mobf_get_current_time())
 		entity = spawning.replace_entity(entity,entity.data.modname .. ":"..entity.data.name,true)
 		return true
@@ -291,7 +287,8 @@ function mob_state.switch_movgen(entity,state)
 	if state.movgen ~= nil then
 		mov_to_set = getMovementGen(state.movgen)
 	else
-		mov_to_set = getMovementGen(entity.data.movement.default_gen)
+		local default_state = mob_state.get_state_by_name(entity,"default")
+		mov_to_set = getMovementGen(default_state.movgen)
 	end
 	
 	--check if new mov gen differs from old one

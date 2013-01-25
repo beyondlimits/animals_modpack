@@ -1,4 +1,4 @@
-local version = "0.0.6"
+local version = "0.0.7"
 
 local npc_groups = {
 						not_in_creative_inventory=1
@@ -23,7 +23,6 @@ npc_prototype = {
 					envid="on_ground_1",
 				},
 		movement =  {
-					default_gen="none",
 					min_accel=0.3,
 					max_accel=0.7,
 					max_speed=1.5,
@@ -31,18 +30,6 @@ npc_prototype = {
 					pattern="stop_and_go",
 					canfly=false,
 					},
-		harvest        = nil,
-		catching       = nil,
-		random_drop    = nil,
-		auto_transform = nil,
-		graphics_3d = {
-					visual = "mesh",
-					mesh = "npc_character.b3d",
-					textures = {"zombie.png"},
-					collisionbox = {-0.3,-1.0,-0.3, 0.3,0.8,0.3},
-					visual_size= {x=1, y=1},
-					},
-		combat = nil,
 		
 		spawning = {
 					rate=0,
@@ -57,6 +44,20 @@ npc_prototype = {
 				typical_state_time = 180,
 				chance = 0.50,
 				animation = "walk",
+				},
+				{ 
+				name = "default",
+				movgen = "none",
+				typical_state_time = 180,
+				chance = 0.00,
+				animation = "stand",
+				graphics_3d = {
+					visual = "mesh",
+					mesh = "npc_character.b3d",
+					textures = {"zombie.png"},
+					collisionbox = {-0.3,-1.0,-0.3, 0.3,0.8,0.3},
+					visual_size= {x=1, y=1},
+					},
 				},
 			},
 		animation = {
