@@ -146,6 +146,11 @@ mobf_animal_spawning_secondary = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 1.9.15
+-fixed crash when mob got spawned at unloaded pos
+-make mobf_version command available to all users
+
+
 Changes 1.9.14
 -add vombie 3d mesh
 -fix crash when trying to access empty movgen

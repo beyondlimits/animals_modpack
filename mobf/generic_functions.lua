@@ -787,14 +787,15 @@ function entity_at_loaded_pos(pos)
 
 	if current_node ~= nil then
 		if current_node.name == "ignore" then
-			minetest.log(LOGLEVEL_WARNING,"MOBF: spawned at unloaded pos!")
+			minetest.log(LOGLEVEL_WARNING,"MOBF: spawned at unloaded pos! : " 
+			.. dump(pos)) 
 			return false
 		else
 			return true
 		end
 	end
 	minetest.log(LOGLEVEL_WARNING,"MOBF: spawned at invalid pos!")
-	return true
+	return false
 end
 
 -------------------------------------------------------------------------------

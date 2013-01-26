@@ -159,7 +159,8 @@ function mobf_serialize_permanent_entity_data(entity)
 		
 		if entity.dynamic_data.spawning.original_spawntime == nil then
 			entity.dynamic_data.spawning.original_spawntime = mobf_get_current_time()
-			minetest.log(LOGLEVEL_WARNING, "MOBF: deactivating entity without spawntime setting current time")
+			minetest.log(LOGLEVEL_WARNING, 
+				"MOBF: deactivating entity without spawntime setting current time")
 		end
 		
 		local serialized = playerspawned ..
@@ -183,8 +184,12 @@ function mobf_serialize_permanent_entity_data(entity)
 		--print("DEBUG: serialized -> " .. serialized)
 		return serialized
 	else
-		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: >" .. dump(entity.data.name) .. "< removed=" ..dump(entity.removed) .. " entity=" .. tostring(entity) .. " No spawning information available on saving mob or mob already deleted")
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: >" .. dump(entity.data.name) .. 
+		"< removed=" ..dump(entity.removed) .. " entity=" .. tostring(entity) .. 
+		" No spawning information available on saving mob or mob already deleted")
 	end
+	
+	return ""
 end
 
 --!@}

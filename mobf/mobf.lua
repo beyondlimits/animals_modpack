@@ -426,6 +426,12 @@ function mobf.register_entity(name, graphics, mob)
 						.. self.data.name .. " on_step for removed entity????")
 					return
 				end
+				
+				if self.dynamic_data == nil then
+					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: on_step: " 
+						.. "no dynamic data available!")
+					return
+				end
 			
 				if (self.dynamic_data.initialized == false) then
 					if entity_at_loaded_pos(self.object:getpos()) then
@@ -526,7 +532,7 @@ function mobf.register_entity(name, graphics, mob)
 					entity_at_loaded_pos(pos) then
 						mobf.activate_handler(self,staticdata)
 					else
-						minetest.log(LOGLEVE_INFO,"MOBF: animal activated at invalid position .. delaying activation")
+						minetest.log(LOGLEVEL_INFO,"MOBF: animal activated at invalid position .. delaying activation")
 						self.dynamic_data.last_static_data = staticdata
 					end
 				end,

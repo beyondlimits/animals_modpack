@@ -206,7 +206,7 @@ function mobf_debug.init()
 		{
 			params		= "",
 			description = "show mobf version number" ,
-			privs		= {mobfw_admin=true},
+			privs		= {},
 			func		= function(name,param)
 								minetest.chat_send_player(name,"MOBF version: " .. mobf_version)
 							end 

@@ -267,13 +267,10 @@ end
 -------------------------------------------------------------------------------
 function spawning.lifecycle(entity,now)
 
-	if entity.dynamic_data.spawning.original_spawntime ~= nil then
+	if entity.dynamic_data.spawning.original_spawntime ~= nil and
+		entity.data.spawning.lifetime ~= nil then
 	
-		local lifetime = 3600*48
-		
-		if entity.data.spawning.lifetime ~= nil then
-			lifetime = entity.data.spawning.lifetime
-		end
+		local lifetime = entity.data.spawning.lifetime
 		
 		local current_age = now - entity.dynamic_data.spawning.original_spawntime
 	
