@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.0.21"
+local version = "0.0.22"
 
 local sheep_groups = {
 						sheerable=1,
@@ -24,7 +24,7 @@ local sheep_groups = {
 					}
 
 local selectionbox_sheep = {-0.65, -0.8, -0.65, 0.65, 0.45, 0.65}
-local selectionbox_lamb = {-0.65*0.6, -0.8*0.6, -0.65*0.6, 0.65*0.6, 0.45*0.6, 0.65*0.65}		
+local selectionbox_lamb = {-0.65*0.6, -0.8*0.6, -0.65*0.6, 0.65*0.6, 0.45*0.6, 0.65*0.65}
 
 sheep_prototype = {
 		name="sheep",
@@ -149,7 +149,7 @@ sheep_prototype = {
 		
 lamb_prototype = {
 		name="lamb",
-		modname="animal_sheep", 
+		modname="animal_sheep",
 	
 		generic = {
 					description="Lamp",
