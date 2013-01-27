@@ -198,6 +198,14 @@ function mgen_follow.callback(entity,now)
 			targetpos = entity.dynamic_data.movement.target:getpos()
 		end
 		
+		if targetpos == nil then
+			minetest.log(LOGLEVEL_ERROR,"MOBF: " .. entity.data.name 
+			.. " don't have targetpos " 
+			.. "SP: " .. dump(entity.dynamic_data.spawning.spawnpoint)
+			.. " TGT: " .. dump(entity.dynamic_data.movement.target))
+			return
+		end
+		
 		local distance = mobf_calc_distance_2d(basepos,targetpos)
 		
 		local yaccel = environment.get_default_gravity(basepos,

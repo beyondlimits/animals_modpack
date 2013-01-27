@@ -157,13 +157,18 @@ mobf_delete_disabled_mobs = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.0.2
+-fix crash with invalid targetpos in follow movgen
+
+Changes 2.0.1
+-fix crash on teleport of wolf
+
 Changes 2.0.0
 -documentation update
 -add more items for trader
 -fix price update bug in trader
 -new cow textures
 -improve sheep model
--fix crash on teleport of wolf
 
 Changes 1.9.15
 -fixed crash when mob got spawned at unloaded pos
