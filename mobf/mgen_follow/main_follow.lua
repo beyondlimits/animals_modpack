@@ -11,7 +11,7 @@
 --! @author Sapier
 --! @date 2012-08-09
 --
---! @defgroup mgen_follow Follow movement generator
+--! @defgroup mgen_follow MGEN: follow movement generator
 --! @brief A movement generator creating movement that trys to follow a moving 
 --! target or reach a given point on map
 --! @ingroup framework_int

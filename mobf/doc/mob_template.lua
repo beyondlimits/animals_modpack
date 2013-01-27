@@ -9,7 +9,7 @@
 --! @brief template for mob
 --! @copyright Sapier
 --! @author Sapier
---! @date 2012-08-11
+--! @date 2013-01-27
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
@@ -331,4 +331,31 @@ local mob_template = {
 			end_frame   = 2,
 			},
 		},
+	--! @brief [OPTIONAL] parameters for rideable mobs
+	ride = {
+					--! @brief [OPTIONAL] speed when walking
+					walkspeed  = 7.8,
+					--! @brief [OPTIONAL] speed when sneaking
+					sneakspeed = 0.8,
+					--! @brief [OPTIONAL] inital jumpspeed
+					jumpspeed  = 58,
+					--! @brief [OPTIONAL] offset to center player is put to
+					attacheoffset = { x=0,y=2,z=0},					
+					--! @brief [OPTIONAL] texture modifier when player is attached
+					texturemod = "^mob_ostrich_ostrich_saddle_mesh.png",
+					--! @brief [OPTIONAL] animation to show when riding
+					walk_anim = "walk"
+			},
+	--! @brief [OPTIONAL] configuration for a trader mob
+	trader_inventory = {
+				--! @brief [MANDATORY] goodlist to be sold
+				goods = {
+							--! @brief [MANDOTORY] first element in list
+							{ "default:mese 1", "default:dirt 99", "default:cobble 50"},
+							--! @brief [OPTIONAL] any further element
+							{ "default:steel_ingot 1", "default:dirt 50", "default:cobble 20"},
+						},
+				--! @brief [MANDATORY] list of names randomly choosen for trader
+				random_names = { "Name1","Name2","Name3"},
+			}
 	} 

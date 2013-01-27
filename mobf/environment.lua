@@ -19,22 +19,19 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
-
-
---! @class environment
---! @brief environment related features
 environment = {}
 
 --! @brief list of known environments
 --! @memberof environment
 environment_list = {}
 
---!@}
+
 
 -------------------------------------------------------------------------------
 -- name: get_suitable_pos_same_level(pos_raw,maxsearcharea,entity)
 --
 --! @brief find a position suitable around a specific position
+--! @ingroup environment
 --
 --! @param pos_raw position to look at
 --! @param maxsearcharea max range to look for suitable position
@@ -161,7 +158,7 @@ end
 -- name: is_media_element(nodename,environment)
 --
 --! @brief check if nodename is in environment
---! @memberof environment
+--! @ingroup environment
 --
 --! @param nodename name to check
 --! @param media environment of mob
@@ -194,7 +191,7 @@ end
 -- name: get_absolute_min_max_pos(env, pos)
 --
 --! @brief check if nodename is in environment
---! @memberof environment
+--! @ingroup environment
 --
 --! @param env environment mob should be
 --! @param pos position it is currently
@@ -240,7 +237,7 @@ end
 -- name: is_jumpable_surface(name)
 --
 --! @brief check if name is a surface an mob may jump onto
---! @memberof environment
+--! @ingroup environment
 --
 --! @param name name to check
 --! @return true/false
@@ -265,7 +262,7 @@ end
 -- name: checksurfacek(pos,surfaces)
 --
 --! @brief check if a position is suitable for an mob
---! @memberof environment
+--! @ingroup environment
 --
 --! @param pos position to check
 --! @param surface surfaces valid
@@ -305,6 +302,15 @@ function environment.checksurface(pos,surface)
 
 end
 
+-------------------------------------------------------------------------------
+-- name: get_min_max_ground_dist(entity)
+--
+--! @brief calculate absolute minimum and maximum height for a mob
+--! @ingroup environment
+--
+--! @param entity mob to check
+--! @return min y val,max y val
+-------------------------------------------------------------------------------
 function environment.get_min_max_ground_dist(entity)
 	local min_ground_distance   = 0
 	local max_ground_distance   = 0
@@ -329,7 +335,7 @@ end
 -- name: pos_is_ok(pos,entity)
 --
 --! @brief check if a position is suitable for an mob
---! @memberof environment
+--! @ingroup environment
 --
 --! @param pos position to check
 --! @param entity mob to check
@@ -463,7 +469,7 @@ end
 -- name: get_default_gravity(pos,environment,canfly)
 --
 --! @brief get default acceleration depending on mobs medium and pos
---! @memberof environment
+--! @ingroup environment
 --
 --! @param pos position where to check gravity
 --! @param media mobs movement medium
@@ -509,7 +515,7 @@ end
 -- name: fix_base_pos(entity, middle_to_bottom)
 --
 --! @brief fix the mobs y position according to model or sprite height
---! @memberof environment
+--! @ingroup environment
 --
 --! @param entity mob to fix base position
 --! @param center_to_bottom distance from center of mob to its bottom (absolute value)
@@ -548,7 +554,7 @@ end
 -- name: register(name, environment)
 --
 --! @brief register an environment to mob framework
---! @memberof environment
+--! @ingroup environment
 --
 --! @param name id of environment
 --! @param environment description of environment
@@ -568,7 +574,7 @@ end
 -- name: pos_state_is_impossible(entity,pos)
 --
 --! @brief checks if a entity can be there (not if it would move there by its own)
---! @memberof environment
+--! @ingroup environment
 --
 --! @param entity entity to check
 --! @param pos position to check
@@ -585,6 +591,8 @@ function environment.possible_pos(entity,pos)
 	
 	return true
 end
+
+--!@}
 
 dofile (mobf_modpath .. "/environments/general_env_sets.lua")
 dofile (mobf_modpath .. "/environments/flight_1.lua")

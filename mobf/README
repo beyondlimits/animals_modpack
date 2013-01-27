@@ -121,7 +121,7 @@ wood       wood     wood
 wood  scale_golden  wood
 wood       wood     wood
 
-Settings:
+Settings (it's recommended to use mobf_settings command to change settings):
 -------------------------------------------------------------------------------
 mobf_enable_socket_trace  = true/false
 -->enable socket mod tracing
@@ -138,14 +138,32 @@ mobf_disable_animal_spawning = true/false
 mobf_blacklist = <serialized table of animal names>
 -->disable all animals in table e.g.
     mobf_blacklist = return {animal_sheep:sheep}
-    Have a look at mobf_settings auxiliary mod too this adds a gui to do this
     
 mobf_animal_spawning_secondary = true/false
 -->enable/disable secondary spawning mechanism 
     NOTE secondary mechanism may cause serious lag issues sometimes
+    
+mobf_log_removed_entities = true/false
+	log removed mobs with reason of removal
+	
+vombie_3d_burn_animation_enabled = true/false
+	show vombie burn animation (may cause huge lag)
+	
+mobf_log_bug_warnings = true/false
+	show all mobf bug warnings
+	
+mobf_delete_disabled_mobs = true/false
+	delete mobs and spawners if a mob is disabled
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.0.0
+-documentation update
+-add more items for trader
+-fix price update bug in trader
+-new cow textures
+-improve sheep model
+
 Changes 1.9.15
 -fixed crash when mob got spawned at unloaded pos
 -make mobf_version command available to all users

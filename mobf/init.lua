@@ -43,6 +43,12 @@ mobf_rtd = {
 --!path of mod
 mobf_modpath = minetest.get_modpath("mobf")
 
+LOGLEVEL_INFO     = "verbose"
+LOGLEVEL_NOTICE   = "info"
+LOGLEVEL_WARNING  = "action"
+LOGLEVEL_ERROR    = "error"
+LOGLEVEL_CRITICAL = "error"
+
 --include debug trace functions
 dofile (mobf_modpath .. "/debug_trace.lua")
 
@@ -75,13 +81,7 @@ dofile (mobf_modpath .. "/mgen_rasterized/mgen_raster.lua")
 dofile (mobf_modpath .. "/mgen_jordan4ibanez/mgen_jordan4ibanez.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "1.9.15"
-
-LOGLEVEL_INFO     = "verbose"
-LOGLEVEL_NOTICE   = "info"
-LOGLEVEL_WARNING  = "action"
-LOGLEVEL_ERROR    = "error"
-LOGLEVEL_CRITICAL = "error"
+mobf_version = "2.0.0"
 
 --! @brief define tools used for more than one mob
 function mobf_init_basic_tools()	

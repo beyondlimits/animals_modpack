@@ -19,15 +19,18 @@
 -------------------------------------------------------------------------------
 
 --! @class fighting
---! @brief melee and distance attack features
-fighting = {}
-fighting.on_death_callbacks = {}
-
---!@}
 
 --! @brief factor added to mob melee combat range to get its maximum agression radius
 MOBF_AGRESSION_FACTOR = 5
 
+--!@}
+
+--! @brief fighting class reference
+fighting = {}
+
+--! @brief user defined on death callback
+--! @memberof fighting
+fighting.on_death_callbacks = {}
 
 -------------------------------------------------------------------------------
 -- name: register_on_death_callback(callback)
@@ -69,9 +72,10 @@ end
 --
 --! @brief move a mob backward if it's punched
 --! @memberof fighting
+--! @private
 --
 --! @param entity mobbeing punched
---! @param hitter object doing last punch
+--! @param dir direction to push back
 -------------------------------------------------------------------------------
 function fighting.push_back(entity,dir)
 	--get some base information
@@ -80,7 +84,7 @@ function fighting.push_back(entity,dir)
 	local dir_rad = mobf_calc_yaw(dir.x,dir.z)
 	local posdelta = mobf_calc_vector_components(dir_rad,0.5)
 	
-	--push back mob	
+	--push back mob
 	local new_pos = {
 		x=mob_basepos.x + posdelta.x,
 		y=mob_basepos.y,
@@ -871,5 +875,4 @@ function fighting.sun_damage_handler(entity,now)
 			end
 		end
 	end
-	
 end

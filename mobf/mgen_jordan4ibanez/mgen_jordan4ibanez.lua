@@ -11,7 +11,7 @@
 --! @author Sapier
 --! @date 2012-08-09
 --
---! @defgroup mgen_jordan4ibanez a velocity based movement generator
+--! @defgroup mgen_jordan4ibanez MGEN: a velocity based movement generator
 --! @brief A movement generator creating simple random movement
 --! @ingroup framework_int
 --! @{ 

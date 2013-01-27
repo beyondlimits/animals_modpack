@@ -11,7 +11,7 @@
 --! @author Sapier
 --! @date 2012-08-09
 --
---! @defgroup mgen_path_based Path based movement generator (NOT COMPLETED)
+--! @defgroup mgen_path_based MGEN: Path based movement generator (NOT COMPLETED)
 --! @ingroup framework_int
 --! @{ 
 -- Contact sapier a t gmx net

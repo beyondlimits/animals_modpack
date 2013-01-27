@@ -62,7 +62,7 @@ function registerMovementGen(name,generator)
 	if movement_generators[name] == nil then
 		movement_generators[name] = generator
 		
-		print ("\tRegistering movement generator ".. name)
+		minetest.log(LOGLEVEL_NOTICE,"\tRegistering movement generator ".. name)
 		if generator.initilize ~= nil then
 			generator.initialize()
 		end

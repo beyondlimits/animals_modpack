@@ -58,7 +58,6 @@ end
 --! @ingroup mobf
 --
 --! @param entity entity to be ridden
---! @param player player riding
 -------------------------------------------------------------------------------
 function mobf_ride.dettache_player(entity)
 
@@ -258,7 +257,6 @@ end
 --! @ingroup mobf
 --
 --! @param entity entity to be ridden
---! @param player player riding
 -------------------------------------------------------------------------------
 function mobf_ride.init(entity)
 	local data = {

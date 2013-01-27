@@ -11,7 +11,7 @@
 --! @author Sapier
 --! @date 2012-08-09
 --
---! @defgroup mgen_follow Follow movement generator
+--! @defgroup mgen_raster MGEN: raster based movement generator
 --! @brief A movement generator creating movement that creates a rasterized 
 --! random movement
 --! @ingroup framework_int

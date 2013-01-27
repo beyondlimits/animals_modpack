@@ -16,7 +16,8 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
-
+--! @addtogroup predev_env_sets
+--! @{
 mobf_env_placable_items = {
 	"default:rail",
 	"default:ladder",
@@ -32,4 +33,5 @@ mobf_env_plants = {
 	"default:apple"
 	
 }
+--@}
 --@}

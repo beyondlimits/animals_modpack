@@ -524,3 +524,5 @@ function mob_state.prepare_states(mob)
 		table.insert(mob.states,default_state)
 	end
 end
+
+--!@}

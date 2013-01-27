@@ -12,7 +12,7 @@
 --! @date 2012-08-09
 --
 --
---! @defgroup mgen_probab Probabilistic movement generator
+--! @defgroup mgen_probab MGEN: probabilistic movement generator
 --! @brief A movement generator trying to create a random movement
 --! @ingroup framework_int
 --! @{ 
