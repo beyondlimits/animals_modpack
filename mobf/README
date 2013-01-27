@@ -163,6 +163,7 @@ Changes 2.0.0
 -fix price update bug in trader
 -new cow textures
 -improve sheep model
+-fix crash on teleport of wolf
 
 Changes 1.9.15
 -fixed crash when mob got spawned at unloaded pos
