@@ -1,4 +1,6 @@
-local version = "0.0.10"
+local version = "0.0.11"
+
+minetest.log("action","MOD: animal_fish_blue_white loading ...")
 
 local selectionbox_fish_blue_white = {-0.25, -0.25, -0.25, 0.25, 0.25, 0.25}
 
@@ -98,6 +100,6 @@ fish_blue_white_prototype = {
 
 
 --register with animals mod
-print ("Adding mob "..fish_blue_white_prototype.name)
+minetest.log("action","\tadding mob "..fish_blue_white_prototype.name)
 mobf_add_mob(fish_blue_white_prototype)
-print ("animal_fish_blue_white mod version " .. version .. " loaded")
+minetest.log("action","MOD: animal_fish_blue_white mod version " .. version .. " loaded")
