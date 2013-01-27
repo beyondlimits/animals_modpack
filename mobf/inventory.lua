@@ -18,11 +18,8 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
---! @class mob_inventory
---! @brief inventory features
-mob_inventory = {}
 
---!@}
+mob_inventory = {}
 mob_inventory.trader_inventories = {}
 mob_inventory.formspecs = {}
 
@@ -31,7 +28,7 @@ mob_inventory.formspecs = {}
 -- name: allow_move(inv, from_list, from_index, to_list, to_index, count, player)
 --
 --! @brief check if there is enough at payroll
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param inv inventory reference
 --! @param from_list name of list elements taken 
@@ -63,7 +60,7 @@ end
 -- name: allow_put(inv, listname, index, stack, player)
 --
 --! @brief check if there is enough at payroll
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param inv inventory reference
 --! @param listname name of list changed
@@ -88,7 +85,7 @@ end
 -- name: allow_take(inv, listname, index, stack, player)
 --
 --! @brief check if there is enough at payroll
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param inv inventory reference
 --! @param listname name of list changed
@@ -113,7 +110,7 @@ end
 -- name: on_move(inv, from_list, from_index, to_list, to_index, count, player)
 --
 --! @brief check if there is enough at payroll
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param inv inventory reference
 --! @param from_list name of list elements taken 
@@ -135,13 +132,13 @@ function mob_inventory.on_move(inv, from_list, from_index, to_list, to_index, co
 		
 		local elements = moved.get_count(moved)
 		
-		if elements > 1 then
-			moved = moved.take_item(moved,elements-1)
-			inv.set_stack(inv,from_list, from_index, moved)
-			inv.set_stack(inv,to_list, to_index, moved)
-		else
-			inv.set_stack(inv,from_list, from_index, moved)
-		end
+		--if elements > 1 then
+		--	moved = moved.take_item(moved,elements-1)
+		--	inv.set_stack(inv,from_list, from_index, moved)
+		--	inv.set_stack(inv,to_list, to_index, moved)
+		--else
+		--	inv.set_stack(inv,from_list, from_index, moved)
+		--end
 		
 		local entity = mob_inventory.get_entity(inv)
 		
@@ -154,7 +151,7 @@ function mob_inventory.on_move(inv, from_list, from_index, to_list, to_index, co
 		dbg_mobf.trader_inv_lvl1("MOBF: good selected: " .. goodname)
 		
 		--get element put to selection
-		mob_inventory.fill_prices(entity,inv,goodname)
+		mob_inventory.fill_prices(entity,inv,goodname,moved.get_count(moved))
 		mob_inventory.update_takeaway(inv)
 	end
 end
@@ -163,7 +160,7 @@ end
 -- name: on_put(inv, listname, index, stack, player)
 --
 --! @brief check if there is enough at payroll
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param inv inventory reference
 --! @param listname name of list changed
@@ -190,7 +187,7 @@ end
 -- name: on_take(inv, listname, index, stack, player)
 --
 --! @brief check if there is enough at payroll
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param inv inventory reference
 --! @param listname name of list changed
@@ -234,7 +231,7 @@ end
 -- name: update_takeaway(inv)
 --
 --! @brief update content of takeaway
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param inv to update
 -------------------------------------------------------------------------------
@@ -256,7 +253,7 @@ end
 -- name: check_pay(inv)
 --
 --! @brief check if there is enough at payroll
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param inv inventory to do check
 --! @param paynow true/false if it's called to pay or not
@@ -311,7 +308,7 @@ end
 -- name: init_detached_inventories(entity,now)
 --
 --! @brief initialize dynamic data required by harvesting
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param entity mob to initialize harvest dynamic data
 -------------------------------------------------------------------------------
@@ -380,7 +377,7 @@ end
 -- name: config_check(entity)
 --
 --! @brief check if mob is configured as trader
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param entity mob being checked
 --! @return true/false if trader or not
@@ -397,7 +394,7 @@ end
 -- name: register_formspec(name,formspec)
 --
 --! @brief check if mob is configured as trader
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param name name of formspec to register
 --! @param formspec formspec definition
@@ -418,7 +415,7 @@ end
 -- name: callback(entity,player,now)
 --
 --! @brief callback handler for harvest by player
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param entity mob being harvested
 --! @param player player harvesting
@@ -453,7 +450,7 @@ end
 -- name: get_entity(inv)
 --
 --! @brief find entity linked to inventory
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param inv name of inventory
 -------------------------------------------------------------------------------
@@ -480,19 +477,20 @@ end
 -- name: fill_prices(entity,inventory,goodname)
 --
 --! @brief fill price fields
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param entity to look for prices
 --! @param inventory to set prices
 --! @param goodname name of good to set prices for
+--! @param count number of elements
 -------------------------------------------------------------------------------
-function mob_inventory.fill_prices(entity,inventory,goodname)
+function mob_inventory.fill_prices(entity,inventory,goodname,count)
 
 	--get price info from entity
 	local good = nil
 	
 	for i=1,#entity.data.trader_inventory.goods,1 do
-		local stackstring = goodname .. " 1"
+		local stackstring = goodname .." " .. count
 		dbg_mobf.trader_inv_lvl3("MOBF: comparing \"" .. stackstring .. "\" to \"" 
 			.. entity.data.trader_inventory.goods[i][1] .. "\"")
 		if entity.data.trader_inventory.goods[i][1] == stackstring then
@@ -503,6 +501,9 @@ function mob_inventory.fill_prices(entity,inventory,goodname)
 	if good ~= nil then
 		inventory.set_stack(inventory,"price_1", 1, good[2])
 		inventory.set_stack(inventory,"price_2", 1, good[3])
+	else
+		inventory.set_stack(inventory,"price_1", 1, nil)
+		inventory.set_stack(inventory,"price_2", 1, nil)
 	end
 end
 
@@ -510,7 +511,7 @@ end
 -- name: add_goods(entity,trader_inventory)
 --
 --! @brief fill inventory with mobs goods
---! @memberof mob_inventory
+--! @ingroup mob_inventory
 --
 --! @param entity to look for prices
 --! @param trader_inventory to put goods
@@ -525,3 +526,5 @@ function mob_inventory.add_goods(entity,trader_inventory)
 	end
 
 end
+
+--!@}
