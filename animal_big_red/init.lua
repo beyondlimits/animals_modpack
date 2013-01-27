@@ -1,8 +1,24 @@
-local version = "0.0.16"
+-------------------------------------------------------------------------------
+-- Mob Framework Mod by Sapier
+-- 
+-- You may copy, use, modify or do nearly anything except removing this
+-- copyright notice. 
+-- And of course you are NOT allow to pretend you have written it.
+--
+--! @file init.lua
+--! @brief big_red implementation
+--! @copyright Sapier
+--! @author Sapier
+--! @date 2013-01-27
+--
+-- Contact sapier a t gmx net
+-------------------------------------------------------------------------------
+minetest.log("action","MOD: animal_big_red mod loading ...")
+local version = "0.0.17"
 
 local big_red_groups = {
-                        not_in_creative_inventory=1
-                    }
+						not_in_creative_inventory=1
+						}
 
 local selectionbox_big_red = {-0.75, -1.9, -0.75, 0.75, 1.9, 0.75}
 
@@ -22,7 +38,7 @@ big_red_prototype = {
 					groups = big_red_groups,
 					envid="on_ground_1",
 				},
-		movement =  {
+		movement = {
 					default_gen="probab_mov_gen",
 					min_accel=0.2,
 					max_accel=0.4,
@@ -55,7 +71,7 @@ big_red_prototype = {
 					self_destruct = nil,
 					},
 		
-		spawning = {		
+		spawning = {
 					rate=0.01,
 					density=1000,
 					algorithm="shadows_spawner",
@@ -129,6 +145,6 @@ big_red_prototype = {
 
 
 --register with animals mod
-print ("Adding mob "..big_red_prototype.name)
+minetest.log("action","\tadding mob "..big_red_prototype.name)
 mobf_add_mob(big_red_prototype)
-print ("animal_big_red mod version " .. version .. " loaded")
+minetest.log("action","MOD: animal_big_red mod         version " .. version .. " loaded")

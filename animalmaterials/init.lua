@@ -1,3 +1,19 @@
+-------------------------------------------------------------------------------
+-- Mob Framework Mod by Sapier
+-- 
+-- You may copy, use, modify or do nearly anything except removing this
+-- copyright notice. 
+-- And of course you are NOT allow to pretend you have written it.
+--
+--! @file init.lua
+--! @brief animalmaterials
+--! @copyright Sapier
+--! @author Sapier
+--! @date 2013-01-27
+--
+-- Contact sapier a t gmx net
+-------------------------------------------------------------------------------
+minetest.log("action","MOD: animalmaterials loading ...")
 local version = "0.0.15"
 
 
@@ -280,4 +296,4 @@ minetest.register_craftitem("animalmaterials:scale_blue", {
 	stack_max=25
 })
 
-print("animalmaterials mod version " .. version .. " loaded")
+minetest.log("action","MOD: animalmaterials mod version " .. version .. " loaded")

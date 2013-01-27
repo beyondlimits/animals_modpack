@@ -226,7 +226,7 @@ function mob_npc_spawn_building(mob_name,mob_transform,spawning_data,environment
 		
 		function(name,pos,min_y,max_y)
 			
-			if math.random() < 0.25 then
+			if math.random() < 0.05 then
 				local blueprint = mob_npc_houses[math.random(1,#mob_npc_houses)]
 				
 				if building_spawner.builder(pos,blueprint,mob_name .."__default") then

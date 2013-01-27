@@ -1,4 +1,21 @@
-local version = "0.0.10"
+-------------------------------------------------------------------------------
+-- Mob Framework Mod by Sapier
+-- 
+-- You may copy, use, modify or do nearly anything except removing this
+-- copyright notice. 
+-- And of course you are NOT allow to pretend you have written it.
+--
+--! @file init.lua
+--! @brief gull implementation
+--! @copyright Sapier
+--! @author Sapier
+--! @date 2013-01-27
+--
+-- Contact sapier a t gmx net
+-------------------------------------------------------------------------------
+minetest.log("action","MOD: animal_gull loading ...")
+
+local version = "0.0.11"
 
 local gull_groups = {
 						not_in_creative_inventory=1
@@ -67,6 +84,6 @@ gull_prototype = {
 
 
 --register with animals mod
-print ("Adding mob "..gull_prototype.name)
+minetest.log("action","\tadding mob "..gull_prototype.name)
 mobf_add_mob(gull_prototype)
-print ("animal_gull mod version " .. version .. " loaded")
+minetest.log("action","MOD: animal_gull mod            version " .. version .. " loaded")

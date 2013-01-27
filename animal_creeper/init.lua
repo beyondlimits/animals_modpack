@@ -1,15 +1,31 @@
-local version = "0.0.14"
+-------------------------------------------------------------------------------
+-- Mob Framework Mod by Sapier
+-- 
+-- You may copy, use, modify or do nearly anything except removing this
+-- copyright notice. 
+-- And of course you are NOT allow to pretend you have written it.
+--
+--! @file init.lua
+--! @brief boombomb implementation
+--! @copyright Sapier
+--! @author Sapier
+--! @date 2013-01-27
+--
+-- Contact sapier a t gmx net
+-------------------------------------------------------------------------------
+minetest.log("action","MOD: animal_creeper mod loading ...")
+
+local version = "0.0.15"
 
 local creeper_groups = {
-                        not_in_creative_inventory=1
-                    }
+						not_in_creative_inventory=1
+						}
+						
 local selectionbox_creeper = {-1, -1, -1, 1, 1, 1}
-
-local modpath = minetest.get_modpath("animal_creeper")
 
 creeper_prototype = {
 		name="creeper",
-		modname="animal_creeper", 
+		modname="animal_creeper",
 	
 		generic = {
 					description="BoomBomb",
@@ -90,8 +106,7 @@ creeper_prototype = {
 			}
 		}
 
-
 --register with animals mod
-print ("Adding mob "..creeper_prototype.name)
+minetest.log("action","\tadding mob "..creeper_prototype.name)
 mobf_add_mob(creeper_prototype)
-print ("animal_creeper mod version " .. version .. " loaded")
+minetest.log("action","MOD: animal_creeper mod         version " .. version .. " loaded")

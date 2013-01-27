@@ -1,3 +1,20 @@
+-------------------------------------------------------------------------------
+-- Mob Framework Mod by Sapier
+-- 
+-- You may copy, use, modify or do nearly anything except removing this
+-- copyright notice. 
+-- And of course you are NOT allow to pretend you have written it.
+--
+--! @file init.lua
+--! @brief rat implementation
+--! @copyright Sapier
+--! @author Sapier
+--! @date 2013-01-27
+--
+-- Contact sapier a t gmx net
+-------------------------------------------------------------------------------
+minetest.log("action","MOD: animal_rat loading ...")
+
 local version = "0.0.8"
 
 local selectionbox_rat = {-0.2, -0.0625, -0.2, 0.2, 0.125, 0.2}
@@ -81,7 +98,7 @@ rat_prototype = {
 
 
 
---register with animals mod
-print ("Adding "..rat_prototype.name)
-animals_add_animal(rat_prototype)
-print ("animal_rat mod version " .. version .. " loaded")
+--register mod
+minetest.log("action","\tadding "..rat_prototype.name)
+mobf_add_mob(rat_prototype)
+minetest.log("action","MOD: animal_rat mod             version " .. version .. " loaded")

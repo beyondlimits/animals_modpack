@@ -94,7 +94,7 @@ function harvesting.callback(entity,player,now)
 				player:get_inventory():add_item("main", 
 					entity.data.modname ..":"..entity.data.name.." 1")
 			end
-			spawning.remove(entity)
+			spawning.remove(entity, "cought")
 			return true
 		end
 	end

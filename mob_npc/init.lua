@@ -1,5 +1,21 @@
-local version = "0.0.7"
+-------------------------------------------------------------------------------
+-- Mob Framework Mod by Sapier
+-- 
+-- You may copy, use, modify or do nearly anything except removing this
+-- copyright notice. 
+-- And of course you are NOT allow to pretend you have written it.
+--
+--! @file init.lua
+--! @brief npc implementation
+--! @copyright Sapier
+--! @author Sapier
+--! @date 2013-01-27
+--
+-- Contact sapier a t gmx net
+-------------------------------------------------------------------------------
+minetest.log("action","MOD: mob_npc mod loading ...")
 
+local version = "0.0.8"
 local npc_groups = {
 						not_in_creative_inventory=1
 					}
@@ -147,8 +163,8 @@ npc_trader_prototype = {
 		}
 		
 --register with animals mod
-print ("Adding mob "..npc_trader_prototype.name)
+minetest.log("action","\tadding mob "..npc_trader_prototype.name)
 mobf_add_mob(npc_trader_prototype)
-print ("Adding mob "..npc_prototype.name)
+minetest.log("action","\tadding mob "..npc_prototype.name)
 mobf_add_mob(npc_prototype)
-print ("mob_npc mod version " .. version .. " loaded")
+minetest.log("action","MOD: mob_npc mod                version " .. version .. " loaded")

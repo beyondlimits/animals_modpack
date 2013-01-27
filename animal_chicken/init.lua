@@ -1,4 +1,20 @@
-local version = "0.0.14"
+-------------------------------------------------------------------------------
+-- Mob Framework Mod by Sapier
+-- 
+-- You may copy, use, modify or do nearly anything except removing this
+-- copyright notice. 
+-- And of course you are NOT allow to pretend you have written it.
+--
+--! @file init.lua
+--! @brief chicken implementation
+--! @copyright Sapier
+--! @author Sapier
+--! @date 2013-01-27
+--
+-- Contact sapier a t gmx net
+-------------------------------------------------------------------------------
+minetest.log("action","MOD: animal_chicken mod loading ...")
+local version = "0.0.15"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
@@ -197,42 +213,42 @@ rooster_prototype = {
 			},
 		}
 
-chick_m_prototype = {   
-        name="chick_m",
-        modname="animal_chicken",
-    
-        generic = {
-                    description="Chick - male",
-                    base_health=5,
-                    kill_result="animalmaterials:feather 1",
-                    armor_groups= {
-                        fleshy=3,
-                    },
-                    groups = chicken_groups,
-                    envid = "meadow"
-                },
-        movement =  {
-                    min_accel=0.02,
-                    max_accel=0.05,
-                    max_speed=0.2,
-                    min_speed=0.05,
-                    pattern="stop_and_go",
-                    canfly = false,
-                    },      
-        catching = {
-                    tool="animalmaterials:lasso",
-                    consumed=true,
-                    },
-        auto_transform = {
-                    result="animal_chicken:rooster__default",
-                    delay=600,
-                    },
-        spawning = {
-                    rate=0.001,
-                    density=50,
-                    algorithm="none",
-                    height=1
-                    },
+chick_m_prototype = {
+		name="chick_m",
+		modname="animal_chicken",
+		
+		generic = {
+				description="Chick - male",
+				base_health=5,
+				kill_result="animalmaterials:feather 1",
+				armor_groups= {
+					fleshy=3,
+				},
+				groups = chicken_groups,
+				envid = "meadow"
+				},
+		movement =  {
+				min_accel=0.02,
+				max_accel=0.05,
+				max_speed=0.2,
+				min_speed=0.05,
+				pattern="stop_and_go",
+				canfly = false,
+				},
+		catching = {
+				tool="animalmaterials:lasso",
+				consumed=true,
+				},
+		auto_transform = {
+				result="animal_chicken:rooster__default",
+				delay=600,
+				},
+		spawning = {
+				rate=0.001,
+				density=50,
+				algorithm="none",
+				height=1
+				},
 		animation = {
 				walk = {
 					start_frame = 1,
@@ -275,42 +291,41 @@ chick_m_prototype = {
 		}
 
 chick_f_prototype = {   
-        name="chick_f",
-        modname="animal_chicken",
-    
-        generic = {
-                    description="Chick - female",
-                    base_health=5,
-                    kill_result="animalmaterials:feather 1",
-                    armor_groups= {
-                        fleshy=3,
-                    },
-                    groups = chicken_groups,
-                    envid = "meadow"
-                },
-        movement =  {
-                    min_accel=0.02,
-                    max_accel=0.05,
-                    max_speed=0.2,
-                    min_speed=0.05,
-                    pattern="stop_and_go",
-                    canfly = false,
-                    },      
-        harvest        = nil,
-        catching = {
-                    tool="animalmaterials:lasso",
-                    consumed=true,
-                    },
-        auto_transform = {
-                    result="animal_chicken:chicken__default",
-                    delay=600,
-                    },
-        spawning = {
-                    rate=0.001,
-                    density=50,
-                    algorithm="none",
-                    height=1
-                    },
+		name="chick_f",
+		modname="animal_chicken",
+		
+		generic = {
+				description="Chick - female",
+				base_health=5,
+				kill_result="animalmaterials:feather 1",
+				armor_groups= {
+					fleshy=3,
+				},
+				groups = chicken_groups,
+				envid = "meadow"
+				},
+		movement =  {
+				min_accel=0.02,
+				max_accel=0.05,
+				max_speed=0.2,
+				min_speed=0.05,
+				pattern="stop_and_go",
+				canfly = false,
+				},
+		catching = {
+				tool="animalmaterials:lasso",
+				consumed=true,
+				},
+		auto_transform = {
+				result="animal_chicken:chicken__default",
+				delay=600,
+				},
+		spawning = {
+				rate=0.001,
+				density=50,
+				algorithm="none",
+				height=1
+				},
 		animation = {
 				walk = {
 					start_frame = 1,
@@ -354,12 +369,12 @@ chick_f_prototype = {
 
 
 --register with animals mod
-print ("Adding animal "..chicken_prototype.name)
-animals_add_animal(chicken_prototype)
-print ("Adding animal "..chick_m_prototype.name)
-animals_add_animal(chick_m_prototype)
-print ("Adding animal "..chick_f_prototype.name)
-animals_add_animal(chick_f_prototype)
-print ("Adding animal "..rooster_prototype.name)
-animals_add_animal(rooster_prototype)
-print ("animal_chicken mod version " .. version .. " loaded")
+minetest.log("action","\tadding animal "..chicken_prototype.name)
+mobf_add_mob(chicken_prototype)
+minetest.log("action","\tadding animal "..chick_m_prototype.name)
+mobf_add_mob(chick_m_prototype)
+minetest.log("action","\tadding animal "..chick_f_prototype.name)
+mobf_add_mob(chick_f_prototype)
+minetest.log("action","\tadding animal "..rooster_prototype.name)
+mobf_add_mob(rooster_prototype)
+minetest.log("action","MOD: animal_chicken mod         version " .. version .. " loaded")

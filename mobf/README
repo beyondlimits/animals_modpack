@@ -149,7 +149,11 @@ Changelog:
 Changes 1.9.15
 -fixed crash when mob got spawned at unloaded pos
 -make mobf_version command available to all users
-
+-reduce chance for trader building by factor 5
+-code cleanup
+-add support for tracing mob removal reason
+-add clownfish mesh
+-fix fish blue white swiming in wrong direction
 
 Changes 1.9.14
 -add vombie 3d mesh

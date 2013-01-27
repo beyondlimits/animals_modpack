@@ -1,4 +1,21 @@
-local version = "0.0.11"
+-------------------------------------------------------------------------------
+-- Mob Framework Mod by Sapier
+-- 
+-- You may copy, use, modify or do nearly anything except removing this
+-- copyright notice. 
+-- And of course you are NOT allow to pretend you have written it.
+--
+--! @file init.lua
+--! @brief wolf implementation
+--! @copyright Sapier
+--! @author Sapier
+--! @date 2013-01-27
+--
+-- Contact sapier a t gmx net
+-------------------------------------------------------------------------------
+minetest.log("action","MOD: mob_wolf loading ...")
+
+local version = "0.0.12"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
@@ -6,7 +23,7 @@ local wolf_groups = {
 
 local selectionbox_wolf = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
 
-wolf_prototype = {   
+wolf_prototype = {
 		name="wolf",
 		modname="animal_wolf",
 	
@@ -48,7 +65,7 @@ wolf_prototype = {
 					self_destruct 	= nil,
 					},
 		
-		spawning = {		
+		spawning = {
 					rate=0.002,
 					density=800,
 					algorithm="forrest_mapgen",
@@ -193,8 +210,8 @@ tamed_wolf_prototype = {
 			}
 		}
 		
-print ("Adding mob "..wolf_prototype.name)
+minetest.log("action","\tadding mob "..wolf_prototype.name)
 mobf_add_mob(wolf_prototype)
-print ("Adding mob "..tamed_wolf_prototype.name)
+minetest.log("action","\tadding mob "..tamed_wolf_prototype.name)
 mobf_add_mob(tamed_wolf_prototype)
-print ("animal_wolf mod version " .. version .. " loaded")
+minetest.log("action","MOD: animal_wolf mod            version " .. version .. " loaded")

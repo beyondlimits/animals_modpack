@@ -55,7 +55,7 @@ function spawning.remove_uninitialized(entity, staticdata)
 			entity.dynamic_data.spawning = {}
 			entity.dynamic_data.spawning.spawnpoint = permanent_data.spawnpoint
 
-			spawning.remove(entity)
+			spawning.remove(entity,"remove uninitialized")
 		end
 	else
 		dbg_mobf.spawning_lvl1("MOBF: remove uninitialized entity=" .. tostring(entity))
@@ -72,12 +72,21 @@ end
 --! @memberof spawning
 --
 --! @param entity mob to remove
+--! @param reason text to log as reason for removal
 -------------------------------------------------------------------------------
-function spawning.remove(entity)
-	dbg_mobf.spawning_lvl3("MOBF: --> remove " .. printpos(entity.object:getpos()))
+function spawning.remove(entity,reason)
+	local pos = entity.object:getpos()
+	dbg_mobf.spawning_lvl3("MOBF: --> remove " .. printpos(pos))
 	if entity ~= nil then
 		entity.removed = true
 		dbg_mobf.spawning_lvl1("MOBF: remove entity=" .. tostring(entity))
+		if minetest.setting_getbool("mobf_log_removed_entities") then
+			if reason == nil then
+				reason = "unknown"
+			end
+			minetest.log(LOGLEVEL_NOTICE,"MOBF: removing " .. entity.data.name ..
+				" at " .. printpos(pos) .. " due to: " .. reason)
+		end
 		entity.object:remove()
 	else
 		minetest.log(LOGLEVEL_ERROR,"Trying to delete an an non existant mob")
@@ -126,7 +135,9 @@ function spawning.check_population_density(entity,now)
 	if entity == nil or
 		entity.dynamic_data == nil or
 		entity.dynamic_data.spawning == nil then
-		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!! " .. entity.data.name .. " pop dense check called for entity with missing spawn data entity=" .. tostring(entity))
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!! " .. entity.data.name .. 
+			" pop dense check called for entity with missing spawn data entity=" .. 
+			tostring(entity))
 		return
 	end
 
@@ -171,8 +182,10 @@ function spawning.check_population_density(entity,now)
 										true)
 	if  mob_count > 5 then
 		entity.removed = true
-		minetest.log(LOGLEVEL_WARNING,"MOBF: Too many ".. mob_count .. " ".. entity.data.name.." at one place dying: " ..tostring(entity.dynamic_data.spawning.player_spawned))
-		spawning.remove(entity)
+		minetest.log(LOGLEVEL_WARNING,"MOBF: Too many ".. mob_count .. " ".. 
+			entity.data.name.." at one place dying: " ..
+			tostring(entity.dynamic_data.spawning.player_spawned))
+		spawning.remove(entity, "population density check")
 	else
 		dbg_mobf.spawning_lvl3("Density ok only "..mob_count.." mobs around")
 	end
@@ -192,16 +205,19 @@ end
 --! @return entity added or nil on error
 -------------------------------------------------------------------------------
 function spawning.replace_entity(entity,name,preserve)
-	dbg_mobf.spawning_lvl3("MOBF: --> replace_entity(".. entity.data.name .. "|" .. name .. ")")
+	dbg_mobf.spawning_lvl3("MOBF: --> replace_entity("
+		.. entity.data.name .. "|" .. name .. ")")
 	
 	if minetest.registered_entities[name] == nil then
-		minetest.log(LOGLEVEL_ERROR,"MOBF: replace_entity: Bug no "..name.." is registred")
+		minetest.log(LOGLEVEL_ERROR,"MOBF: replace_entity: Bug no "
+			..name.." is registred")
 		return nil
 	end
 	
 	-- avoid switching to same entity
 	if entity.name == name then
-		minetest.log(LOGLEVEL_INFO,"MOBF: not replacing " .. name .. " by entity of same type!")
+		minetest.log(LOGLEVEL_INFO,"MOBF: not replacing " .. name .. 
+			" by entity of same type!")
 		return nil
 	end
 	
@@ -229,7 +245,7 @@ function spawning.replace_entity(entity,name,preserve)
 	entity.dynamic_data = nil
 	
 	--removing is done after exiting lua!
-	spawning.remove(entity)
+	spawning.remove(entity,"replaced")
 
 	local newobject = minetest.env:add_entity(pos,name)
 	local newentity = mobf_find_entity(newobject)
@@ -237,12 +253,15 @@ function spawning.replace_entity(entity,name,preserve)
 	if newentity ~= nil then
 		if newentity.dynamic_data ~= nil then
 			dbg_mobf.spawning_lvl2("MOBF: replace_entity: " ..  name .. 
-							" added at " .. printpos(newentity.dynamic_data.spawning.spawnpoint))
+							" added at " .. 
+							printpos(newentity.dynamic_data.spawning.spawnpoint))
 			newentity.dynamic_data = temporary_dynamic_data
 			newentity.object:set_hp(health)
 			newentity.object:setyaw(entity_orientation)
 		else
-			minetest.log(LOGLEVEL_ERROR,"MOBF: replace_entity: dynamic data not set for "..name.." maybe delayed activation?")
+			minetest.log(LOGLEVEL_ERROR,
+				"MOBF: replace_entity: dynamic data not set for "..name..
+				" maybe delayed activation?")
 			newentity.dyndata_delayed = {
 				data = temporary_dynamic_data,
 				health = health,
@@ -250,7 +269,8 @@ function spawning.replace_entity(entity,name,preserve)
 			}
 		end
 	else
-		minetest.log(LOGLEVEL_ERROR,"MOBF: replace_entity 4 : Bug no "..name.." has been created")
+		minetest.log(LOGLEVEL_ERROR,
+			"MOBF: replace_entity 4 : Bug no "..name.." has been created")
 	end
 	dbg_mobf.spawning_lvl3("MOBF: <-- replace_entity")
 	return newentity
@@ -277,7 +297,7 @@ function spawning.lifecycle(entity,now)
 		if current_age > 0 and 
 			current_age > lifetime then
 			dbg_mobf.spawning_lvl1("MOBF: removing animal due to limited lifetime")
-			spawning.remove(entity)
+			spawning.remove(entity," limited mob lifetime")
 			return false
 		end
 	else
@@ -328,16 +348,22 @@ function spawning.spawn_and_check(name,suffix,pos,text)
 		local newentity = mobf_find_entity(newobject)
 		
 		if newentity == nil then
-			dbg_mobf.spawning_lvl3("MOBF BUG!!! no " .. name.." entity has been created by " .. text .. "!")
-			mobf_bug_warning(LOGLEVEL_ERROR,"BUG!!! no " .. name.." entity has been created by " .. text .. "!")
+			dbg_mobf.spawning_lvl3("MOBF BUG!!! no " .. name..
+				" entity has been created by " .. text .. "!")
+			mobf_bug_warning(LOGLEVEL_ERROR,"BUG!!! no " .. name..
+				" entity has been created by " .. text .. "!")
 		else
-			dbg_mobf.spawning_lvl2("MOBF: spawning "..name.." entity by " .. text .. " at position ".. printpos(pos))
-			minetest.log(LOGLEVEL_INFO,"MOBF: spawning "..name.." entity by " .. text .. " at position ".. printpos(pos))
+			dbg_mobf.spawning_lvl2("MOBF: spawning "..name.." entity by " .. 
+				text .. " at position ".. printpos(pos))
+			minetest.log(LOGLEVEL_INFO,"MOBF: spawning "..name.." entity by " .. 
+				text .. " at position ".. printpos(pos))
 			return newentity
 		end
 	else
-		dbg_mobf.spawning_lvl3("MOBF BUG!!! no "..name.." object has been created by " .. text .. "!")
-		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!! no "..name.." object has been created by " .. text .. "!")
+		dbg_mobf.spawning_lvl3("MOBF BUG!!! no "..name..
+			" object has been created by " .. text .. "!")
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!! no "..name..
+			" object has been created by " .. text .. "!")
 	end
 	
 	return nil
@@ -355,7 +381,8 @@ end
 -------------------------------------------------------------------------------
 function spawning.get_center(min,max,current_step,interval)
 
-	dbg_mobf.spawning_lvl3("MOBF: get_center params: " .. min .. " " .. max .. " " .. current_step .. " " .. interval )
+	dbg_mobf.spawning_lvl3("MOBF: get_center params: " .. min .. " " .. max .. 
+		" " .. current_step .. " " .. interval )
 	local abs_min = min + interval * (current_step-1)
 	local abs_max = abs_min + interval
 	
@@ -397,62 +424,64 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 
 	local starttime = mobf_get_time_ms()
 	
-    local min_x = MIN(minp.x,maxp.x)
-    local min_y = MIN(minp.y,maxp.x)
-    local min_z = MIN(minp.z,maxp.z)
-    
-    local max_x = MAX(minp.x,maxp.x)
-    local max_y = MAX(minp.y,maxp.y)
-    local max_z = MAX(minp.z,maxp.z)
-    
-    
-    local xdivs = math.floor(((max_x - min_x) / spawndata.density) +1)
-    local zdivs = math.floor(((max_z - min_z) / spawndata.density) +1)
-    
-    dbg_mobf.spawning_lvl3("MOBF: X: " .. min_x .. "-->" .. max_x) 
-    dbg_mobf.spawning_lvl3("MOBF: Z: " .. min_z .. "-->" .. max_z)
-    dbg_mobf.spawning_lvl3("MOBF: Y: " .. min_y .. "-->" .. max_y)
-    dbg_mobf.spawning_lvl3("MOBF: generating in " .. xdivs .. " | " .. zdivs .. " chunks")
-    
-    for i = 1, xdivs,1 do
-    for j = 1, zdivs,1 do
-    
-	local x_center,x_delta = spawning.get_center(min_x,max_x,i,spawndata.density)
-	local z_center,z_delta = spawning.get_center(min_z,max_z,j,spawndata.density)
-    
-    local surface_center = mobf_get_surface(x_center,z_center,min_y,max_y)
-    
-    local centerpos = {x=x_center,y=surface_center,z=z_center}
-    
-    dbg_mobf.spawning_lvl3("MOBF: center is (" .. x_center .. "," .. z_center .. ") --> (".. x_delta .."," .. z_delta .. ")")
-    
-    --check if there is already a mob of same type within area
-    if surface_center  then
-    	local mobs_around = mobf_spawner_around(name,centerpos,spawndata.density)
-    	if mobs_around == 0 then
-	    	dbg_mobf.spawning_lvl3("no " .. name .. " within range of " .. spawndata.density .. " around " ..printpos(centerpos))
-	        for i= 0, maxtries do
-	            local x_try = math.random(-x_delta,x_delta)
-	            local z_try = math.random(-z_delta,z_delta)
-	            
-	            local pos = { x= x_center + x_try,
-	                           z= z_center + z_try }
-	            
-	            --do place spawners in center of block
-	            pos.x = math.floor(pos.x + 0.5)
-	            pos.z = math.floor(pos.z + 0.5)
-	            
-	            if spawnfunc(name,pos,min_y,max_y,spawndata) then
-	            	break
-	            end
-	        end --for -> 5
-        end --mob around
-    else
-    	dbg_mobf.spawning_lvl3("MOBF: didn't find surface for " ..printpos(centerpos))
-    end --surface_center
-    end -- for z divs
-    end -- for x divs
-    dbg_mobf.spawning_lvl3("magen ended")
+	local min_x = MIN(minp.x,maxp.x)
+	local min_y = MIN(minp.y,maxp.x)
+	local min_z = MIN(minp.z,maxp.z)
+	
+	local max_x = MAX(minp.x,maxp.x)
+	local max_y = MAX(minp.y,maxp.y)
+	local max_z = MAX(minp.z,maxp.z)
+	
+	
+	local xdivs = math.floor(((max_x - min_x) / spawndata.density) +1)
+	local zdivs = math.floor(((max_z - min_z) / spawndata.density) +1)
+	
+	dbg_mobf.spawning_lvl3("MOBF: X: " .. min_x .. "-->" .. max_x) 
+	dbg_mobf.spawning_lvl3("MOBF: Z: " .. min_z .. "-->" .. max_z)
+	dbg_mobf.spawning_lvl3("MOBF: Y: " .. min_y .. "-->" .. max_y)
+	dbg_mobf.spawning_lvl3("MOBF: generating in " .. xdivs .. " | " .. zdivs .. " chunks")
+	
+	for i = 1, xdivs,1 do
+	for j = 1, zdivs,1 do
+	
+		local x_center,x_delta = spawning.get_center(min_x,max_x,i,spawndata.density)
+		local z_center,z_delta = spawning.get_center(min_z,max_z,j,spawndata.density)
+		
+		local surface_center = mobf_get_surface(x_center,z_center,min_y,max_y)
+		
+		local centerpos = {x=x_center,y=surface_center,z=z_center}
+		
+		dbg_mobf.spawning_lvl3("MOBF: center is (" .. x_center .. "," .. z_center .. ")"
+			.."  --> (".. x_delta .."," .. z_delta .. ")")
+		
+		--check if there is already a mob of same type within area
+		if surface_center  then
+			local mobs_around = mobf_spawner_around(name,centerpos,spawndata.density)
+			if mobs_around == 0 then
+				dbg_mobf.spawning_lvl3("no " .. name .. " within range of " .. 
+					spawndata.density .. " around " ..printpos(centerpos))
+				for i= 0, maxtries do
+					local x_try = math.random(-x_delta,x_delta)
+					local z_try = math.random(-z_delta,z_delta)
+					
+					local pos = { x= x_center + x_try,
+									z= z_center + z_try }
+					
+					--do place spawners in center of block
+					pos.x = math.floor(pos.x + 0.5)
+					pos.z = math.floor(pos.z + 0.5)
+					
+					if spawnfunc(name,pos,min_y,max_y,spawndata) then
+						break
+					end
+				end	--for -> 5
+			end --mob around
+		else
+			dbg_mobf.spawning_lvl3("MOBF: didn't find surface for " ..printpos(centerpos))
+		end --surface_center
+	end -- for z divs
+	end -- for x divs
+	dbg_mobf.spawning_lvl3("magen ended")
 end
 
 ------------------------------------------------------------------------------
@@ -484,61 +513,61 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 
 	local starttime = mobf_get_time_ms()
 	
-    local min_x = MIN(minp.x,maxp.x)
-    local min_y = MIN(minp.y,maxp.x)
-    local min_z = MIN(minp.z,maxp.z)
-    
-    local max_x = MAX(minp.x,maxp.x)
-    local max_y = MAX(minp.y,maxp.y)
-    local max_z = MAX(minp.z,maxp.z)
-    
-    
-    local xdivs = math.floor(((max_x - min_x) / density) +1)
-    local zdivs = math.floor(((max_z - min_z) / density) +1)
-    
-    dbg_mobf.spawning_lvl3("MOBF: X: " .. min_x .. "-->" .. max_x) 
-    dbg_mobf.spawning_lvl3("MOBF: Z: " .. min_z .. "-->" .. max_z)
-    dbg_mobf.spawning_lvl3("MOBF: Y: " .. min_y .. "-->" .. max_y)
-    dbg_mobf.spawning_lvl3("MOBF: generating in " .. xdivs .. " | " .. zdivs .. " chunks")
-    
-    for i = 1, xdivs,1 do
-    for j = 1, zdivs,1 do
-    
+	local min_x = MIN(minp.x,maxp.x)
+	local min_y = MIN(minp.y,maxp.x)
+	local min_z = MIN(minp.z,maxp.z)
+	
+	local max_x = MAX(minp.x,maxp.x)
+	local max_y = MAX(minp.y,maxp.y)
+	local max_z = MAX(minp.z,maxp.z)
+	
+	
+	local xdivs = math.floor(((max_x - min_x) / density) +1)
+	local zdivs = math.floor(((max_z - min_z) / density) +1)
+	
+	dbg_mobf.spawning_lvl3("MOBF: X: " .. min_x .. "-->" .. max_x) 
+	dbg_mobf.spawning_lvl3("MOBF: Z: " .. min_z .. "-->" .. max_z)
+	dbg_mobf.spawning_lvl3("MOBF: Y: " .. min_y .. "-->" .. max_y)
+	dbg_mobf.spawning_lvl3("MOBF: generating in " .. xdivs .. " | " .. zdivs .. " chunks")
+	
+	for i = 1, xdivs,1 do
+	for j = 1, zdivs,1 do
+	
 	local x_center,x_delta = spawning.get_center(min_x,max_x,i,density)
 	local z_center,z_delta = spawning.get_center(min_z,max_z,j,density)
-    
-    local surface_center = surfacefunc(x_center,z_center,min_y,max_y)
-    
-    local centerpos = {x=x_center,y=surface_center,z=z_center}
-    
-    dbg_mobf.spawning_lvl3("MOBF: center is (" .. x_center .. "," .. z_center .. ") --> (".. x_delta .."," .. z_delta .. ")")
-    
-    --check if there is already a mob of same type within area
-    if surface_center  then
-    	local mobs_around = mobf_mob_around(name,secondary_name,centerpos,density,true)
-    	if mobs_around == 0 then
-	    	dbg_mobf.spawning_lvl3("no " .. name .. " within range of " .. density .. " around " ..printpos(centerpos))
-	        for i= 0, maxtries, 1 do
-	            local x_try = math.random(-x_delta,x_delta)
-	            local z_try = math.random(-z_delta,z_delta)
-	            
-	            local pos = { x= x_center + x_try,
-	                           z= z_center + z_try }
-	                           
-	            pos.y = surfacefunc(pos.x,pos.z,min_y,max_y)
-	            
-	            if pos.y and spawnfunc(name,pos,min_y,max_y) then
-	            	break
-	            end
-	        end --for -> 5
-        end --mob around
-    else
-    	dbg_mobf.spawning_lvl3("MOBF: didn't find surface for " ..printpos(centerpos))
-    end --surface_center
-    end -- for z divs
-    end -- for x divs
-    mobf_warn_long_fct(starttime,"on_mapgen" .. name,"mapgen")
-    dbg_mobf.spawning_lvl3("magen ended")
+	
+	local surface_center = surfacefunc(x_center,z_center,min_y,max_y)
+	
+	local centerpos = {x=x_center,y=surface_center,z=z_center}
+	
+	dbg_mobf.spawning_lvl3("MOBF: center is (" .. x_center .. "," .. z_center .. ") --> (".. x_delta .."," .. z_delta .. ")")
+	
+	--check if there is already a mob of same type within area
+	if surface_center  then
+		local mobs_around = mobf_mob_around(name,secondary_name,centerpos,density,true)
+		if mobs_around == 0 then
+			dbg_mobf.spawning_lvl3("no " .. name .. " within range of " .. density .. " around " ..printpos(centerpos))
+				i= 0, maxtries, 1 do
+				local x_try = math.random(-x_delta,x_delta)
+				local z_try = math.random(-z_delta,z_delta)
+				
+				local pos = { x= x_center + x_try,
+								z= z_center + z_try }
+				
+				pos.y = surfacefunc(pos.x,pos.z,min_y,max_y)
+				
+				if pos.y and spawnfunc(name,pos,min_y,max_y) then
+					break
+				end
+			end --for -> 5
+		end --mob around
+	else
+		dbg_mobf.spawning_lvl3("MOBF: didn't find surface for " ..printpos(centerpos))
+	end --surface_center
+	end -- for z divs
+	end -- for x divs
+	mobf_warn_long_fct(starttime,"on_mapgen" .. name,"mapgen")
+	dbg_mobf.spawning_lvl3("magen ended")
 end
 
 ------------------------------------------------------------------------------
@@ -605,7 +634,6 @@ function spawning.register_cleanup_spawner(mobname)
 				self.object:remove()
 			end
 		})
-
 end
 
 --include spawn algorithms

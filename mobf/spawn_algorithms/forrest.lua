@@ -73,10 +73,10 @@ function mobf_spawn_in_forrest(mob_name,mob_transform,spawning_data,environment)
 				
 					if node_above.name == "air" then
 						--print("Find mobs of same type around:"..mob_name.. " pop dens: ".. population_density)
-                    if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
+					if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
 
 							if minetest.env:find_node_near(pos, 3, { "default:leaves",
-							                                         "default:tree"} ) ~= nil then
+																	"default:tree"} ) ~= nil then
 
 								local newobject = minetest.env:add_entity(pos_above,mob_name .. "__default")
 
@@ -108,22 +108,26 @@ function mobf_spawn_in_forrest_mapgen(mob_name,mob_transform,spawning_data,envir
 			
 			--check if there s enough space above to place mob
 			if mobf_air_above(pos,spawning_data.height) then
-				dbg_mobf.spawning_lvl3("enough air above " ..printpos(centerpos) .. " minimum is: " .. spawning_data.height )
+				dbg_mobf.spawning_lvl3("enough air above " ..printpos(centerpos) 
+				.. " minimum is: " .. spawning_data.height )
 				
 				if minetest.env:find_node_near(pos, 3, { "default:leaves",
-						                                         "default:tree"} ) ~= nil or
-				   minetest.env:find_node_near(pos, 3, growing_trees_nodes ) ~= nil then
-	                local spawnpos = {x=pos.x,y=pos.y+1,z=pos.z}
-	                spawning.spawn_and_check(name,"__default",spawnpos,"in_forrest_mapgen")
+														"default:tree"} ) ~= nil or
+					minetest.env:find_node_near(pos, 3, growing_trees_nodes ) ~= nil then
+					local spawnpos = {x=pos.x,y=pos.y+1,z=pos.z}
+					spawning.spawn_and_check(name,"__default",spawnpos,"in_forrest_mapgen")
 					return true
 				end -- forrest nodes
+			else
+				dbg_mobf.spawning_lvl3("not enough air above " ..printpos(centerpos) 
+				.. " for mob ".. name .. " minimum is: " .. spawning_data.height )
 			end -- air_above
 			return false
 		end,
 		mobf_get_sunlight_surface,
 		5)
-    end) --register mapgen
- end --end spawn algo
+	end) --register mapgen
+end --end spawn algo
 
 --!@}
 

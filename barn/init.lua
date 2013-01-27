@@ -1,4 +1,20 @@
-local version = "0.0.8"
+-------------------------------------------------------------------------------
+-- Mob Framework Mod by Sapier
+-- 
+-- You may copy, use, modify or do nearly anything except removing this
+-- copyright notice. 
+-- And of course you are NOT allow to pretend you have written it.
+--
+--! @file init.lua
+--! @brief barn implementation
+--! @copyright Sapier
+--! @author Sapier
+--! @date 2013-01-27
+--
+-- Contact sapier a t gmx net
+-------------------------------------------------------------------------------
+minetest.log("action","MOD: barn mod loading ...")
+local version = "0.0.9"
 
 local modpath = minetest.get_modpath("barn")
 
@@ -342,4 +358,4 @@ minetest.register_entity(":barn:barn_small_empty_ent",
 		
 		})
 	
-print("barn mod version " .. version .. " loaded")
+minetest.log("action","MOD: barn mod version " .. version .. " loaded")

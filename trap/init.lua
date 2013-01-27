@@ -1,8 +1,6 @@
 local version = "0.0.2"
 
-
-
-
+minetest.log("action","MOD: trap mod loading ...")
 
 minetest.register_craftitem("trap:undead", {
 			description = "Trap for undead mobs",
@@ -86,4 +84,4 @@ minetest.register_node("trap:cought_vombie", {
 		light_source = 2,
 	})
 	
-print("trap mod version " .. version .. " loaded")
+minetest.log("action","MOD: trap mod                    version " .. version .. " loaded")

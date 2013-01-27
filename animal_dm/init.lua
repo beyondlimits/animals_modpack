@@ -1,12 +1,26 @@
-local version = "0.0.14"
+-------------------------------------------------------------------------------
+-- Mob Framework Mod by Sapier
+-- 
+-- You may copy, use, modify or do nearly anything except removing this
+-- copyright notice. 
+-- And of course you are NOT allow to pretend you have written it.
+--
+--! @file init.lua
+--! @brief dungeonmaster implementation
+--! @copyright Sapier
+--! @author Sapier
+--! @date 2013-01-27
+--
+-- Contact sapier a t gmx net
+-------------------------------------------------------------------------------
+minetest.log("action","MOD: animal_dm loading ...")
+local version = "0.0.15"
 
 local dm_groups = {
                         not_in_creative_inventory=1
                     }
 
 local selectionbox_dm = {-0.75, -1, -0.75, 0.75, 1, 0.75}
-
-local modpath = minetest.get_modpath("animal_dm")
 
 dm_prototype = {   
 		name="dm",
@@ -139,8 +153,8 @@ local modpath = minetest.get_modpath("animal_dm")
 dofile (modpath .. "/vault.lua")
 
 --register with animals mod
-print ("Adding animal "..dm_prototype.name)
+minetest.log("action", "adding mob "..dm_prototype.name)
 if mobf_add_mob(dm_prototype) then
 	dofile (modpath .. "/vault.lua")
 end
-print ("animal_dm mod version " .. version .. " loaded")
+minetest.log("action","MOD: animal_dm mod              version " .. version .. " loaded")

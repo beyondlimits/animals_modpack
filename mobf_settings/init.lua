@@ -13,9 +13,10 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+minetest.log("action","MOD: mobf_settings mod loading ... ")
 
 mobf_settings = {}
-mobf_settings.version = "0.0.16"
+mobf_settings.version = "0.0.17"
 mobf_settings.max_list_page_num = 5
 mobf_settings.buttons = {}
 mobf_settings.menubutton = "button_exit[11,9.5;2,0.5;main; Exit]"
@@ -464,5 +465,6 @@ mobf_settings.register_config_button("mobf_animal_spawning_secondary","Secondary
 mobf_settings.register_config_button("mobf_delete_disabled_mobs","Deletion if disabled mob entities",false)
 mobf_settings.register_config_button("mobf_log_bug_warnings","Show noisy bug warnings",false)
 mobf_settings.register_config_button("vombie_3d_burn_animation_enabled","Vombie 3d burn animation",false)
+mobf_settings.register_config_button("mobf_log_removed_entities","Log all removed mobs",false)
 
-print("mod mobf_settings "..mobf_settings.version.." loaded")
+minetest.log("action","MOD: mobf_settings mod           version "..mobf_settings.version.." loaded")

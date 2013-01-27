@@ -1,4 +1,6 @@
-local version = "0.0.16"
+local version = "0.0.17"
+
+minetest.log("action","MOD: loading animal_vombie ... ")
 
 local vombie_groups = {
 						not_in_creative_inventory=1
@@ -177,6 +179,6 @@ vombie_prototype = {
 
 
 --register with animals mod
-print ("Adding mob "..vombie_prototype.name)
+minetest.log("action","\tadding mob "..vombie_prototype.name)
 mobf_add_mob(vombie_prototype)
-print ("animal_vombie mod version " .. version .. " loaded")
+minetest.log("action","MOD: animal_vombie mod          version " .. version .. " loaded")

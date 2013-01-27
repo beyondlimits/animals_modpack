@@ -182,7 +182,7 @@ function fighting.hit(entity,player)
 				--todo check if spawning a stack is possible
 				minetest.env:add_item(mob_pos,result)
 			end
-			spawning.remove(entity)
+			spawning.remove(entity, "killed")
 		else
 			dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name 
 				.. " custom on kill handler superseeds generic handling")
@@ -657,7 +657,7 @@ function fighting.self_destruct_handler(entity,now)
 				else
 					minetest.log(LOGLEVEL_NOTICE,"MOBF: self destruct without fire isn't really impressive!")
 				end
-				spawning.remove(entity)
+				spawning.remove(entity, "self destruct")
 				return true
 			end
 		end
@@ -857,7 +857,7 @@ function fighting.sun_damage_handler(entity,now)
 				if entity.object:get_hp() <= 0 then
 				--if entity.dynamic_data.generic.health <= 0 then
 					dbg_mobf.fighting_lvl2("Mob ".. entity.data.name .. " died of sun")
-					spawning.remove(entity)
+					spawning.remove(entity,"died by sun")
 					return
 				end
 				entity.dynamic_data.combat.ts_last_sun_damage = now

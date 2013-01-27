@@ -176,7 +176,7 @@ function mgen_follow.callback(entity,now)
 			local newpos = environment.get_suitable_pos_same_level(basepos,1,entity,true)
 			
 			if newpos == nil then
-				spawning.remove(entity)
+				spawning.remove(entity,"mgen_follow poscheck")
 			else
 				newpos.y = newpos.y - (entity.collisionbox[2] + 0.49)
 				entity.object:moveto(newpos)

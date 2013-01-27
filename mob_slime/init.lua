@@ -13,8 +13,8 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
-
-local version = "0.0.7"
+minetest.log("action","MOD: mob_slime mod loading ...")
+local version = "0.0.8"
 
 local selectionbox_slime_L = {-0.5, -0.4, -0.5,  0.5,0.4,0.5}
 local selectionbox_slime_M = {-0.3, -0.2, -0.3,  0.3,0.2,0.3}
@@ -442,10 +442,10 @@ local prototype_mob_slime_M = {
 			},
 	}
 	
-print ("Adding mob "..prototype_mob_slime_L.name)
+minetest.log("action","\tadding mob "..prototype_mob_slime_L.name)
 mobf_add_mob(prototype_mob_slime_L)
-print ("Adding mob "..prototype_mob_slime_M.name)
+minetest.log("action","\tadding mob "..prototype_mob_slime_M.name)
 mobf_add_mob(prototype_mob_slime_M)
-print ("Adding mob "..prototype_mob_slime_S.name)
+minetest.log("action","\tadding mob "..prototype_mob_slime_S.name)
 mobf_add_mob(prototype_mob_slime_S)
-print ("mob_slime mod version " .. version .. " loaded")
+minetest.log("action","MOD: mob_slime mod              version " .. version .. " loaded")

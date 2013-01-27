@@ -476,7 +476,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 			else
 				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way out of water, for mob at: " .. printpos(movement_state.basepos) .. " drowning " .. dump(entity.dynamic_data.movement.last_pos_in_env))
 				abort_processing = true
-				spawning.remove(entity)
+				spawning.remove(entity, "mgen probab watercheck")
 			end
 			
 			handled = true
@@ -505,7 +505,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 			entity.dynamic_data.good_surface = movement_state.now
 			if entity.object:get_hp() <= 0 then
 				abort_processing = true
-				spawning.remove(entity)
+				spawning.remove(entity, "mgen probab surfacecheck")
 			end
 			
 			movement_state.force_change = true
@@ -553,7 +553,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 			else
 				minetest.log(LOGLEVEL_WARNING,"MOBF: mob " .. entity.data.name .. " was within solid block, removed")
 				abort_processing = true
-				spawning.remove(entity)
+				spawning.remove(entity, "mgen probab solidblockcheck")
 			end
 		end
 		

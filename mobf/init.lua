@@ -22,6 +22,8 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
+print("MOD: mobf loading ...")
+
 --! @brief runtime data required to be setup once on start
 mobf_rtd = {
 	--!is mob running with fire support
@@ -73,7 +75,7 @@ dofile (mobf_modpath .. "/mgen_rasterized/mgen_raster.lua")
 dofile (mobf_modpath .. "/mgen_jordan4ibanez/mgen_jordan4ibanez.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "1.9.14"
+mobf_version = "1.9.15"
 
 LOGLEVEL_INFO     = "verbose"
 LOGLEVEL_NOTICE   = "info"
@@ -157,8 +159,7 @@ function mobf_init_framework()
 		give_to_singleplayer = true
 	})
 
-	print("mob framework mod "..mobf_version.." loaded starttime is:" 
-		.. mobf_get_time_ms())
+	print("MOD: mob framework mod "..mobf_version.." loaded")
 end
 
 --! @brief initialize mod dependencys
