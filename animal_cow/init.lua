@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_cow mod loading ...")
-local version = "0.0.17"
+local version = "0.0.18"
 
 local cow_groups = {
 						not_in_creative_inventory=1
