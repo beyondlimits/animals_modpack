@@ -21,6 +21,7 @@
 -------------------------------------------------------------------------------
 
 mob_state = {}
+mob_state.default_state_time = 30
 
 -------------------------------------------------------------------------------
 -- name: initialize(entity,now)
@@ -391,6 +392,11 @@ end
 --! @return a random value around typical_state_time
 -------------------------------------------------------------------------------
 function mob_state.getTimeToNextState(typical_state_time)
+
+	if typical_state_time == nil then
+		mobf_bug_warning(LOGLEVEL_WARNING,"MOBF MOB BUG!!! missing typical state time!")
+		typical_state_time = mob_state.default_state_time
+	end
 
 	local u1 = 2 * math.random() -1
 	local u2 = 2 * math.random() -1

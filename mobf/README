@@ -157,6 +157,10 @@ mobf_delete_disabled_mobs = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.0.3
+-fixed crash on typical state time not available
+-fixed bug mob_slime typical state time not set
+
 Changes 2.0.2
 -fix crash with invalid targetpos in follow movgen
 
