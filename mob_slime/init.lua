@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_slime mod loading ...")
-local version = "0.0.8"
+local version = "0.0.9"
 
 local selectionbox_slime_L = {-0.5, -0.4, -0.5,  0.5,0.4,0.5}
 local selectionbox_slime_M = {-0.3, -0.2, -0.3,  0.3,0.2,0.3}
@@ -202,6 +202,7 @@ local prototype_mob_slime_L = {
 				name = "default",
 				movgen = "none",
 				chance = 0,
+				typical_state_time = 300,
 				graphics_3d = {
 					visual = "mesh",
 					mesh = "mob_slime_slime.b3d",
@@ -210,6 +211,7 @@ local prototype_mob_slime_L = {
 					visual_size= {x=1,y=1,z=1},
 					},
 				},
+
 			},
 	}
 	
@@ -317,6 +319,7 @@ local prototype_mob_slime_S = {
 				name = "default",
 				movgen = "none",
 				chance = 0,
+				typical_state_time = 300,
 				graphics_3d = {
 					visual = "mesh",
 					mesh = "mob_slime_slime.b3d",
@@ -431,6 +434,7 @@ local prototype_mob_slime_M = {
 				name = "default",
 				movgen = "none",
 				chance = 0,
+				typical_state_time = 300,
 				graphics_3d = {
 					visual = "mesh",
 					mesh = "mob_slime_slime.b3d",
