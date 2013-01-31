@@ -509,14 +509,12 @@ function mobf.register_entity(name, graphics, mob)
 				local starttime = mobf_get_time_ms()
 				for i = 1, #self.on_rightclick_hooks, 1 do
 					if self.on_rightclick_hooks[i](self,clicker) then
-						break
+						return true
 					end
 					mobf_warn_long_fct(starttime,"callback nr " .. i,"callback_or_" 
 						.. self.data.name .. "_" .. i)
 				end
-				
-				--tesrcode only
-				--mobf_ride.attache_player(self,clicker)
+					return false
 				end,
 
 		--do basic mob initialization on activation

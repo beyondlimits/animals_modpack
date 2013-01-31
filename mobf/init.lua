@@ -70,6 +70,7 @@ dofile (mobf_modpath .. "/api.lua")
 dofile (mobf_modpath .. "/debug.lua")
 dofile (mobf_modpath .. "/mob_state.lua")
 dofile (mobf_modpath .. "/inventory.lua")
+dofile (mobf_modpath .. "/mob_preserve.lua")
 
 --include spawning support
 dofile (mobf_modpath .. "/spawning.lua")
@@ -81,7 +82,7 @@ dofile (mobf_modpath .. "/mgen_rasterized/mgen_raster.lua")
 dofile (mobf_modpath .. "/mgen_jordan4ibanez/mgen_jordan4ibanez.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "2.0.3"
+mobf_version = "2.0.80"
 
 --! @brief define tools used for more than one mob
 function mobf_init_basic_tools()	
@@ -143,6 +144,9 @@ function mobf_init_framework()
 
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing debug hooks..")
 	mobf_debug.init()
+	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing mob preservation..")
+	mob_preserve.init()
 	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize mobf supplied modules..")
 	mobf_init_modules()

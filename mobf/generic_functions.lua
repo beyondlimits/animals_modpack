@@ -899,10 +899,65 @@ end
 --! @param value to evaluate
 -------------------------------------------------------------------------------
 function mobf_assert_backtrace(value)
-	if minetest.assert_backtrace ~= nil then
-		minetest.assert_backtrace(value)
-	else
+	if value == false then
+		print(debug.traceback("Current Callstack:\n"))
 		assert(value)
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_set_world_setting(name,value)
+--
+--! @brief save a setting dedicated to a single world only
+--
+--! @param name key to use for storage
+--! @param value to save
+-------------------------------------------------------------------------------
+function mobf_set_world_setting(name,value)
+	minetest.setting_set(name,value)
+
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_get_world_setting(name,value)
+--
+--! @brief read a setting dedicated to a single world only
+--
+--! @param name key to use for storage
+-------------------------------------------------------------------------------
+function mobf_get_world_setting(name)
+	return minetest.setting_get(name)
+end
+-------------------------------------------------------------------------------
+-- name: mobf_fixed_size_string(text,length)
+--
+--! @brief make a text fixed length
+--
+--! @param text text to enforce lenght
+--! @param lenght lenght to enforce
+--!
+--! @return text with exactly lenght characters
+-------------------------------------------------------------------------------
+function mobf_fixed_size_string(text,length)
+	mobf_assert_backtrace(length ~= nil)
+	
+	local current_length = string.len(text)
+	
+	if current_length == nil then 
+		current_length = 0
+		text = ""
+	end
+	
+	if current_length < length then
+		
+		while current_length < length do
+			text = text .. " "
+			current_length = current_length +1
+		end
+		
+		return text
+	else
+		return string.sub(text,1,length)
 	end
 end
 --!@}

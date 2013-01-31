@@ -54,6 +54,8 @@ function spawning.remove_uninitialized(entity, staticdata)
 			entity.dynamic_data = {}
 			entity.dynamic_data.spawning = {}
 			entity.dynamic_data.spawning.spawnpoint = permanent_data.spawnpoint
+			entity.dynamic_data.spawning.player_spawned = permanent_data.playerspawned
+			entity.dynamic_data.spawning.spawner = permanent_data.spawner
 
 			spawning.remove(entity,"remove uninitialized")
 		end
@@ -87,6 +89,7 @@ function spawning.remove(entity,reason)
 			minetest.log(LOGLEVEL_NOTICE,"MOBF: removing " .. entity.data.name ..
 				" at " .. printpos(pos) .. " due to: " .. reason)
 		end
+		mob_preserve.handle_remove(entity,reason)
 		entity.object:remove()
 	else
 		minetest.log(LOGLEVEL_ERROR,"Trying to delete an an non existant mob")
@@ -108,10 +111,11 @@ end
 function spawning.init_dynamic_data(entity,now)
 
 	local data = {
-		player_spawned = false,
-		ts_dense_check = now,
-		spawnpoint = entity.object:getpos(),
+		player_spawned     = false,
+		ts_dense_check     = now,
+		spawnpoint         = entity.object:getpos(),
 		original_spawntime = now,
+		spawner            = nil,
 	}
 	
 	entity.removed = false
@@ -626,6 +630,8 @@ end
 --
 --! @brief register an entity to cleanup spawners
 --! @memberof spawning
+--
+--! @param mobname mobname to create cleanup
 -------------------------------------------------------------------------------
 function spawning.register_cleanup_spawner(mobname)
 	minetest.register_entity(mobname .. "_spawner",
