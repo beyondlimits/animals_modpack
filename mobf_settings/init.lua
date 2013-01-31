@@ -16,7 +16,7 @@
 minetest.log("action","MOD: mobf_settings mod loading ... ")
 
 mobf_settings = {}
-mobf_settings.version = "0.0.17"
+mobf_settings.version = "0.0.18"
 mobf_settings.max_list_page_num = 5
 mobf_settings.buttons = {}
 mobf_settings.menubutton = "button_exit[11,9.5;2,0.5;main; Exit]"
@@ -462,9 +462,10 @@ minetest.register_chatcommand("mobf_settings",
 mobf_settings.register_config_button("mobf_disable_animal_spawning","Animal spawning",true)
 mobf_settings.register_config_button("mobf_disable_3d_mode","3D mode",true)
 mobf_settings.register_config_button("mobf_animal_spawning_secondary","Secondary spawning algorithm",false)
-mobf_settings.register_config_button("mobf_delete_disabled_mobs","Deletion if disabled mob entities",false)
+mobf_settings.register_config_button("mobf_delete_disabled_mobs","Delete disabled mob entities",false)
 mobf_settings.register_config_button("mobf_log_bug_warnings","Show noisy bug warnings",false)
 mobf_settings.register_config_button("vombie_3d_burn_animation_enabled","Vombie 3d burn animation",false)
 mobf_settings.register_config_button("mobf_log_removed_entities","Log all removed mobs",false)
+mobf_settings.register_config_button("mobf_grief_protection","Disallow mob stealing",false)
 
 minetest.log("action","MOD: mobf_settings mod           version "..mobf_settings.version.." loaded")
