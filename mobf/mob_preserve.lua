@@ -133,7 +133,7 @@ function mob_preserve.get_formspec(name,pagenum)
 	mobf_assert_backtrace(name ~= nil)
 	mobf_assert_backtrace(pagenum ~= nil)
 	
-	local isadmin = minetest.check_player_privs(name, {mobfw_admin=true})
+	local isadmin = minetest.check_player_privs(name, {mobfw_admin=true}) or minetest.is_singleplayer()
 	
 	local min_entry_number = pagenum * mob_preserve.entrys_per_page +1
 	
