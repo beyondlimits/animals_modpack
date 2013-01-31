@@ -914,8 +914,11 @@ end
 --! @param value to save
 -------------------------------------------------------------------------------
 function mobf_set_world_setting(name,value)
-	minetest.setting_set(name,value)
 
+	--TODO replace by lua supported world settings storage
+	local worldid = minetest.get_worldpath()
+	local access_name = "mobf_" .. worldid .. "_ " .. name
+	minetest.setting_set(access_name,value)
 end
 
 -------------------------------------------------------------------------------
@@ -926,7 +929,11 @@ end
 --! @param name key to use for storage
 -------------------------------------------------------------------------------
 function mobf_get_world_setting(name)
-	return minetest.setting_get(name)
+
+	--TODO replace by lua supported world settings storage
+	local worldid = minetest.get_worldpath()	
+	local access_name = "mobf_" .. worldid .. "_ " .. name
+	return minetest.setting_get(access_name)
 end
 -------------------------------------------------------------------------------
 -- name: mobf_fixed_size_string(text,length)
