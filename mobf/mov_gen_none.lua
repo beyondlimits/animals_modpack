@@ -34,15 +34,28 @@ mgen_none.name = "none"
 --! @param now current time
 -------------------------------------------------------------------------------
 function mgen_none.callback(entity,now)
-    local pos = entity.getbasepos(entity)
-    local speed = entity.object:getvelocity()
-    local default_y_acceleration = environment.get_default_gravity(pos,
-                                            entity.environment.media,
-                                            entity.data.movement.canfly)
-                                            
-    entity.object:setacceleration({x=0,y=default_y_acceleration,z=0})
-    entity.object:setvelocity({x=0,y=speed.y,z=0})
-    
+	mobf_assert_backtrace(entity ~= nil)
+	
+	local pos = entity.getbasepos(entity)
+
+	local current_state = environment.pos_is_ok(pos,entity)
+	
+	if current_state == "in_water" or
+		current_state == "in_air" or
+		current_state == "above_water" then
+		spawning.remove(entity, "mgen none envcheck")
+		return
+	end
+	
+	local speed = entity.object:getvelocity()
+	local default_y_acceleration = environment.get_default_gravity(pos,
+													entity.environment.media,
+													entity.data.movement.canfly)
+	
+	entity.object:setacceleration({x=0,y=default_y_acceleration,z=0})
+	entity.object:setvelocity({x=0,y=speed.y,z=0})
+	
+	
 end
 
 -------------------------------------------------------------------------------
