@@ -151,6 +151,9 @@ function mobf_init_framework()
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize mobf supplied modules..")
 	mobf_init_modules()
 	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Register rightclick button handler..")
+	minetest.register_on_player_receive_fields(mobf.rightclick_button_handler)
+	
 	-- initialize luatrace if necessary
 	if mobf_rtd.luatrace_enabled then
 		luatrace = require("luatrace")
@@ -331,21 +334,21 @@ function mobf_init_modules()
 				
 				
 	--on rightclick callbacks
-	--Note debug needs to be registred FIRST!
-	mobf.register_on_rightclick_callback({
-			name = "debugcallback",
-			handler		= mobf_debug.rightclick_callback,
-			configcheck	= function(entity)
-					return true
-				end
-			})
-			
 	mobf.register_on_rightclick_callback({
 			name = "tradercallback",
+			visiblename = "Trade",
 			handler		= mob_inventory.trader_callback,
 			configcheck	= mob_inventory.config_check
 			})
-			
+	mobf.register_on_rightclick_callback({
+			name = "debugcallback",
+			visiblename = "Show debuginfo",
+			handler		= mobf_debug.rightclick_callback,
+			configcheck	= function(entity)
+					return true
+				end,
+			privs = {mobfw_admin=true}
+			})
 
 end
 

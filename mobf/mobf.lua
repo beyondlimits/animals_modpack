@@ -64,7 +64,8 @@ function mobf.init_on_step_callbacks(entity,now)
 	entity.on_step_hooks = {}
 	
 	if #mobf.on_step_callbacks > 32 then
-		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: " .. #mobf.on_step_callbacks 
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: " 
+			.. #mobf.on_step_callbacks 
 			.. " incredible high number of onstep callbacks registred!")
 	end
 
@@ -77,15 +78,18 @@ function mobf.init_on_step_callbacks(entity,now)
 				.. mobf.on_step_callbacks[i].name)
 			table.insert(entity.on_step_hooks,mobf.on_step_callbacks[i].handler)
 			if type(mobf.on_step_callbacks[i].init) == "function" then
-				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") executing init function for " 
+				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ")"
+					.." executing init function for " 
 					.. mobf.on_step_callbacks[i].name)
 				mobf.on_step_callbacks[i].init(entity,now)
 			else
-				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") no init function defined")
+				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ")"
+					.." no init function defined")
 			end
 		else
 			dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") callback " 
-				.. mobf.on_step_callbacks[i].name .. " disabled due to config check")
+				.. mobf.on_step_callbacks[i].name 
+				.. " disabled due to config check")
 		end
 	end
 
@@ -161,15 +165,18 @@ function mobf.init_on_punch_callbacks(entity,now)
 			table.insert(entity.on_punch_hooks,mobf.on_punch_callbacks[i].handler)
 			
 			if type(mobf.on_punch_callbacks[i].init) == "function" then
-				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") executing init function for " 
+				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ")"
+					.." executing init function for " 
 					.. mobf.on_punch_callbacks[i].name)
 				mobf.on_punch_callbacks[i].init(entity,now)
 			else
-				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") no init function defined")
+				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ")"
+					.." no init function defined")
 			end
 		else
 			dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") callback " 
-				.. mobf.on_punch_callbacks[i].name .. " disabled due to config check")
+				.. mobf.on_punch_callbacks[i].name 
+				.. " disabled due to config check")
 		end
 	end
 end
@@ -187,24 +194,28 @@ function mobf.init_on_rightclick_callbacks(entity,now)
 	entity.on_rightclick_hooks = {}
 
 	dbg_mobf.mobf_core_lvl2("MOBF: initializing " .. #mobf.on_rightclick_callbacks 
-		..  " on_rightclick callbacks for " .. entity.data.name .. " entity=" .. tostring(entity))
+		..  " on_rightclick callbacks for " .. entity.data.name 
+		.. " entity=" .. tostring(entity))
 	for i = 1, #mobf.on_rightclick_callbacks , 1 do
 		if mobf.on_rightclick_callbacks[i].configcheck(entity) and
 			type(mobf.on_rightclick_callbacks[i].handler) == "function" then
 			dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") enabling callback " 
 				.. mobf.on_rightclick_callbacks[i].name)
-			table.insert(entity.on_rightclick_hooks,mobf.on_rightclick_callbacks[i].handler)
+			table.insert(entity.on_rightclick_hooks,mobf.on_rightclick_callbacks[i])
 			
 			if type(mobf.on_rightclick_callbacks[i].init) == "function" then
-				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") executing init function for " 
+				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ")" 
+					.. " executing init function for " 
 					.. mobf.on_rightclick_callbacks[i].name)
 				mobf.on_rightclick_callbacks[i].init(entity,now)
 			else
-				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") no init function defined")
+				dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ")" 
+					.. "no init function defined")
 			end
 		else
 			dbg_mobf.mobf_core_lvl2("MOBF:	(" .. i .. ") callback " 
-				.. mobf.on_rightclick_callbacks[i].name .. " disabled due to config check")
+				.. mobf.on_rightclick_callbacks[i].name 
+				.. " disabled due to config check")
 		end
 	end
 end
@@ -262,7 +273,8 @@ function mobf.activate_handler(self,staticdata)
 	
 	
 	if current_node == nil then
-		minetest.log(LOGLEVEL_ERROR,"MOBF: trying to activate mob in nil node! removing")
+		minetest.log(LOGLEVEL_ERROR,
+			"MOBF: trying to activate mob in nil node! removing")
 		
 		spawning.remove_uninitialized(self,staticdata)
 		return
@@ -336,7 +348,8 @@ function mobf.activate_handler(self,staticdata)
 	end
 	
 	
-	local current_state = mob_state.get_state_by_name(self,self.dynamic_data.state.current)
+	local current_state = mob_state.get_state_by_name(self,
+												self.dynamic_data.state.current)
 	local default_state = mob_state.get_state_by_name(self,"default")
 	
 	if self.dynamic_data.state.current == nil then
@@ -346,18 +359,24 @@ function mobf.activate_handler(self,staticdata)
 	
 	--initialize move gen
 	if current_state.movgen ~= nil then
-		dbg_mobf.mobf_core_lvl1("MOBF: setting movegen to: " .. current_state.movgen)
-		self.dynamic_data.current_movement_gen = getMovementGen(current_state.movgen)
+		dbg_mobf.mobf_core_lvl1(
+			"MOBF: setting movegen to: " .. current_state.movgen)
+		self.dynamic_data.current_movement_gen = 
+										getMovementGen(current_state.movgen)
 	else
-		dbg_mobf.mobf_core_lvl1("MOBF: setting movegen to: " .. default_state.movgen)
-		self.dynamic_data.current_movement_gen = getMovementGen(default_state.movgen)
+		dbg_mobf.mobf_core_lvl1(
+			"MOBF: setting movegen to: " .. default_state.movgen)
+		self.dynamic_data.current_movement_gen = 
+										getMovementGen(default_state.movgen)
 	end
 	
 	if current_state.animation ~= nil then
-		dbg_mobf.mobf_core_lvl1("MOBF: setting animation to: " .. current_state.animation)
+		dbg_mobf.mobf_core_lvl1(
+			"MOBF: setting animation to: " .. current_state.animation)
 		graphics.set_animation(self,current_state.animation)
 	else
-		dbg_mobf.mobf_core_lvl1("MOBF: setting animation to: " .. dump(default_state.animation))
+		dbg_mobf.mobf_core_lvl1(
+			"MOBF: setting animation to: " .. dump(default_state.animation))
 		graphics.set_animation(self,default_state.animation)
 	end
 		
@@ -469,8 +488,10 @@ function mobf.register_entity(name, graphics, mob)
 				
 				if #self.on_step_hooks > 32 then
 					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: " 
-						.. tostring(self) .. " incredible high number of onstep hooks! "
-						.. #self.on_step_hooks .. " ohlist: " .. tostring(self.on_step_hooks))
+						.. tostring(self) 
+						.. " incredible high number of onstep hooks! "
+						.. #self.on_step_hooks .. " ohlist: " 
+						.. tostring(self.on_step_hooks))
 				end
 				
 				--dynamic modules
@@ -499,23 +520,13 @@ function mobf.register_entity(name, graphics, mob)
 							time_from_last_punch, tool_capabilities, dir) then
 						return
 					end
-					mobf_warn_long_fct(starttime,"callback nr " .. i,"callback_op_" 
-						.. self.data.name .. "_" .. i)
+					mobf_warn_long_fct(starttime,"callback nr " .. i,
+						"callback_op_".. self.data.name .. "_" .. i)
 				end
 				end,
 
-		--rightclick is only used for debug reasons by now
-			on_rightclick = function(self, clicker)
-				local starttime = mobf_get_time_ms()
-				for i = 1, #self.on_rightclick_hooks, 1 do
-					if self.on_rightclick_hooks[i](self,clicker) then
-						return true
-					end
-					mobf_warn_long_fct(starttime,"callback nr " .. i,"callback_or_" 
-						.. self.data.name .. "_" .. i)
-				end
-					return false
-				end,
+		--rightclick handler
+			on_rightclick = mobf.rightclick_handler,
 
 		--do basic mob initialization on activation
 			on_activate = function(self,staticdata)
@@ -530,7 +541,9 @@ function mobf.register_entity(name, graphics, mob)
 					entity_at_loaded_pos(pos) then
 						mobf.activate_handler(self,staticdata)
 					else
-						minetest.log(LOGLEVEL_INFO,"MOBF: animal activated at invalid position .. delaying activation")
+						minetest.log(LOGLEVEL_INFO,
+							"MOBF: animal activated at invalid position .. " ..
+							"delaying activation")
 						self.dynamic_data.last_static_data = staticdata
 					end
 				end,
@@ -571,6 +584,108 @@ function mobf.register_entity(name, graphics, mob)
 end
 
 -------------------------------------------------------------------------------
+-- name: rightclick_handler(entity,clicker)
+--
+--! @brief handle rightclick of mob
+--! @ingroup mobf
+--
+--! @param entity
+--! @param clicker
+--
+--! @return true/false if handled or not
+-------------------------------------------------------------------------------
+function mobf.rightclick_handler(entity,clicker)
+	local starttime = mobf_get_time_ms()
+	
+	if #entity.on_rightclick_hooks > 1 then
+		
+		--get rightclick storage id
+		local storage_id = mobf_global_data_store(entity)
+		local y_pos = 0.25
+		local buttons = ""
+		
+		local playername = clicker:get_player_name()
+		
+		for i = 1, #entity.on_rightclick_hooks, 1 do
+			if entity.on_rightclick_hooks[i].privs == nil or
+				minetest.check_player_privs(playername, 
+					entity.on_rightclick_hooks[i].privs) or
+				minetest.is_singleplayer() then
+				
+				local callback_storage_id = 
+					mobf_global_data_store(entity.on_rightclick_hooks[i].handler)
+				buttons = buttons .. "button_exit[0," .. y_pos .. ";2.5,0.5;" ..
+					"mobfrightclick_" .. storage_id .. "_" ..
+					callback_storage_id .. ";" .. 
+					entity.on_rightclick_hooks[i].visiblename .. "]"
+					
+				y_pos = y_pos + 0.75
+			end
+		end
+		
+		local y_size = y_pos
+		local formspec = "size[2.5," .. y_size .. "]" ..
+				buttons
+		
+		if playername ~= nil then
+			--TODO start form close timer
+			minetest.show_formspec(playername,"mobf_rightclick:main",formspec)
+		end
+		return true
+	end
+	
+	if #entity.on_rightclick_hooks == 1 then
+		entity.on_rightclick_hooks[1].handler(entity,clicker)
+		return true
+	end
+	
+	return false
+end
+
+-------------------------------------------------------------------------------
+-- name: rightclick_button_handler(entity,clicker)
+--
+--! @brief handle button clicks as result of rightclick of mob
+--! @ingroup mobf
+--
+--! @param entity
+--! @param clicker
+--
+--! @return true/false if handled or not
+-------------------------------------------------------------------------------
+function mobf.rightclick_button_handler(player, formname, fields)
+
+	if formname == "mobf_rightclick:main" then	
+		for k,v in pairs(fields) do
+			local parts = string.split(k,"_")
+			
+			if parts[1] == "mobfrightclick" then
+				local entity_store_id = parts[2]
+				local callback_store_id = parts[3]
+				
+				dbg_mobf.mobf_core_lvl1("MOBF: rightclick button handler got: "
+						.. dump(fields) .. " parted to: " .. dump(parts))
+				
+				local entity = mobf_global_data_get(entity_store_id)
+				local callback = mobf_global_data_get(callback_store_id)
+				
+				if entity ~= nil and
+					callback ~= nil then
+					callback(entity,player)
+				else
+					dbg_mobf.mobf_core_lvl1("MOBF: unable to do callback: " 
+						.. dump(entity) .. " " .. dump(callback))
+				end
+			end
+		end
+		return true
+	end
+	return false
+end
+
+
+
+-------------------------------------------------------------------------------
 -- name: register_mob_item(mob)
 --
 --! @brief add mob item for catchable mobs
@@ -588,18 +703,23 @@ function mobf.register_mob_item(name,modname,description)
 			if pointed_thing.type == "node" then
 				local pos = pointed_thing.above
 				
-				local entity = spawning.spawn_and_check(modname..":"..name,"__default",pos,"item_spawner")
+				local entity = 
+					spawning.spawn_and_check(modname..":"..name,"__default",
+												pos,"item_spawner")
 
 				if entity ~= nil then
 					entity.dynamic_data.spawning.player_spawned = true
 						
 					if placer:is_player(placer) then
-						minetest.log(LOGLEVEL_INFO,"MOBF: mob placed by " .. placer:get_player_name(placer))
-						entity.dynamic_data.spawning.spawner = placer:get_player_name(placer)
+						minetest.log(LOGLEVEL_INFO,"MOBF: mob placed by " 
+							.. placer:get_player_name(placer))
+						entity.dynamic_data.spawning.spawner = 
+							placer:get_player_name(placer)
 					end
 						
 					if entity.data.generic.custom_on_place_handler ~= nil then
-						entity.data.generic.custom_on_place_handler(entity, placer, pointed_thing)
+						entity.data.generic.custom_on_place_handler(entity, 
+														placer, pointed_thing)
 					end
 
 					item:take_item()
@@ -636,7 +756,8 @@ function mobf.blacklisthandling(mob)
 		if minetest.registered_entities[mob.modname.. ":"..mob.name] == nil and
 			environment_list[mob.generic.envid] ~= nil and
 			mobf_spawn_algorithms[mob.spawning.algorithm] ~= nil and
-			type(mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup) == "function" then
+			type(mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup) 
+															== "function" then
 			
 			mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup(mob.modname.. ":" .. mob.name)
 			
@@ -672,8 +793,10 @@ function mobf.blacklisthandling(mob)
 
 	
 	if blacklisted == nil then
-		minetest.log(LOGLEVEL_INFO,"MOBF: " .. mob.modname.. ":"..mob.name .. " was blacklisted")
+		minetest.log(LOGLEVEL_INFO,"MOBF: " .. mob.modname.. 
+			":"..mob.name .. " was blacklisted")
 	else
-		minetest.log(LOGLEVEL_ERROR,"MOBF: " .. mob.modname.. ":"..mob.name .. " already known not registering mob with same name!")
+		minetest.log(LOGLEVEL_ERROR,"MOBF: " .. mob.modname.. 
+			":"..mob.name .. " already known not registering mob with same name!")
 	end
 end
