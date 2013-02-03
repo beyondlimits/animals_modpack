@@ -29,6 +29,9 @@
 --! @retval scalar value, distance
 -------------------------------------------------------------------------------
 function mobf_calc_distance(pos1,pos2)
+	mobf_assert_backtrace(pos1 ~= nil)
+	mobf_assert_backtrace(pos2 ~= nil)
+	
 	return math.sqrt( 	math.pow(pos1.x-pos2.x,2) + 
 				math.pow(pos1.y-pos2.y,2) +
 				math.pow(pos1.z-pos2.z,2))
@@ -44,7 +47,7 @@ end
 --! @return scalar value, distance
 -------------------------------------------------------------------------------
 function mobf_calc_distance_2d(pos1,pos2)
-	return math.sqrt( 	math.pow(pos1.x-pos2.x,2) + 
+	return math.sqrt( math.pow(pos1.x-pos2.x,2) + 
 				math.pow(pos1.z-pos2.z,2))
 end
 
