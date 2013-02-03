@@ -365,8 +365,8 @@ function mgen_follow.checkspeed(entity)
 
 	local current_velocity = entity.object:getvelocity()
 
-	local xzspeed = math.sqrt(math.pow(current_velocity.x,2)+
-	                          math.pow(current_velocity.z,2))
+	local xzspeed = 
+		mobf_calc_scalar_speed(current_velocity.x,current_velocity.z)
 
 	if (xzspeed > entity.data.movement.max_speed) then
 	

@@ -1053,4 +1053,20 @@ function mobf_global_data_cleanup(id)
 		mobf_global_data.last_cleanup = mobf_get_current_time()
 	end
 end
+
+-------------------------------------------------------------------------------
+-- name: mobf_calc_scalar_speed(speedx,speedz)
+--
+--! @brief calculate scalar speed
+--
+--! @param speedx speed in direction x
+--! @param speedz speed in direction z
+--
+--! @return scalar speed value
+-------------------------------------------------------------------------------
+function mobf_calc_scalar_speed(speedx,speedz)
+	return math.sqrt(math.pow(speedx,2)+
+	                          math.pow(speedz,2))
+end
+
 --!@}
