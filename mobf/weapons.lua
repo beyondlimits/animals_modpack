@@ -28,6 +28,7 @@ local weapons_spacer = {} --unused to fix lua doxygen bug only
 function mobf_init_weapons()
 	minetest.register_entity(":mobf:fireball_entity", MOBF_FIREBALL_ENTITY)
 	minetest.register_entity(":mobf:plasmaball_entity", MOBF_PLASMABALL_ENTITY)
+	minetest.register_entity(":mobf:arrow_entity", MOBF_ARROW_ENTITY)
 end
 
 -------------------------------------------------------------------------------
@@ -324,4 +325,122 @@ function MOBF_PLASMABALL_ENTITY.on_step(self, dtime)
 		self.created + self.lifetime < mobf_get_current_time() then
 		self.object:remove()
 	end
+end
+
+--------------------------------------------------------------------------------
+-- Code Below is by far extent taken from throwing mod by PilzAdam
+--------------------------------------------------------------------------------
+
+minetest.register_node("mobf:arrow_box", {
+	drawtype = "nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			-- Shaft
+			{-6.5/17, -1.5/17, -1.5/17, 6.5/17, 1.5/17, 1.5/17},
+			--Spitze
+			{-4.5/17, 2.5/17, 2.5/17, -3.5/17, -2.5/17, -2.5/17},
+			{-8.5/17, 0.5/17, 0.5/17, -6.5/17, -0.5/17, -0.5/17},
+			--Federn
+			{6.5/17, 1.5/17, 1.5/17, 7.5/17, 2.5/17, 2.5/17},
+			{7.5/17, -2.5/17, 2.5/17, 6.5/17, -1.5/17, 1.5/17},
+			{7.5/17, 2.5/17, -2.5/17, 6.5/17, 1.5/17, -1.5/17},
+			{6.5/17, -1.5/17, -1.5/17, 7.5/17, -2.5/17, -2.5/17},
+			
+			{7.5/17, 2.5/17, 2.5/17, 8.5/17, 3.5/17, 3.5/17},
+			{8.5/17, -3.5/17, 3.5/17, 7.5/17, -2.5/17, 2.5/17},
+			{8.5/17, 3.5/17, -3.5/17, 7.5/17, 2.5/17, -2.5/17},
+			{7.5/17, -2.5/17, -2.5/17, 8.5/17, -3.5/17, -3.5/17},
+		}
+	},
+	tiles = {"mobf_arrow.png", "mobf_arrow.png", "mobf_arrow_back.png",
+			"mobf_arrow_front.png", "mobf_arrow_2.png", "mobf_arrow.png"},
+	groups = {not_in_creative_inventory=1},
+})
+
+
+--! @class MOBF_ARROW_ENTITY
+--! @ingroup weapons
+--! @brief a arrow entity
+MOBF_ARROW_ENTITY={
+	physical = false,
+	timer=0,
+	visual = "wielditem",
+	visual_size = {x=0.1, y=0.1},
+	textures = {"mobf:arrow_box"},
+	lastpos={},
+	collisionbox = {0,0,0,0,0,0},
+	
+	velocity =6,
+	damage   =2,
+	gravity  =9.81,
+}
+
+
+-------------------------------------------------------------------------------
+-- name: MOBF_ARROW_ENTITY.on_step = function(self, dtime)
+--
+--! @brief onstep callback for arrow
+--! @memberof MOBF_ARROW_ENTITY
+--! @private
+--
+--! @param self arrow itself
+--! @param dtime time since last callback
+-------------------------------------------------------------------------------
+MOBF_ARROW_ENTITY.on_step = function(self, dtime)
+	self.timer=self.timer+dtime
+	local pos = self.object:getpos()
+	local node = minetest.env:get_node(pos)
+
+	if self.timer>0.2 then
+		local objs = minetest.env:get_objects_inside_radius({x=pos.x,y=pos.y,z=pos.z}, 2)
+		for k, obj in pairs(objs) do
+			if obj:get_luaentity() ~= nil and
+				obj ~= self.owner then
+				if obj:get_luaentity().name ~= "mobf:arrow_entity" and 
+					obj:get_luaentity().name ~= "__builtin:item" then
+					obj:punch(self.object, 1.0, {
+						full_punch_interval=1.0,
+						groupcaps={
+							fleshy={times={	[1]=1/(self.damage-2), 
+											[2]=1/(self.damage-1), 
+											[3]=1/self.damage}},
+							snappy={times={	[1]=1/(self.damage-2), 
+											[2]=1/(self.damage-1), 
+											[3]=1/self.damage}},
+						}
+					}, nil)
+					self.object:remove()
+				end
+			else
+				--punch a player
+				obj:punch(self.object, 1.0, {
+					full_punch_interval=1.0,
+					groupcaps={
+						fleshy={times={	[1]=1/(self.damage-2), 
+										[2]=1/(self.damage-1), 
+										[3]=1/self.damage}},
+						snappy={times={	[1]=1/(self.damage-2), 
+										[2]=1/(self.damage-1), 
+										[3]=1/self.damage}},
+					}
+				}, nil)
+				self.object:remove()
+			end
+		end
+	end
+
+	if self.lastpos.x~=nil then
+		if node.name ~= "air" then
+			minetest.env:add_item(self.lastpos, 'mobf:arrow')
+			self.object:remove()
+		end
+	end
+	self.lastpos={x=pos.x, y=pos.y, z=pos.z}
+end
+	
+local mods = minetest.get_modnames()
+if mobf_contains(mods,"throwing") then
+	print("throwing mod found2!")
+	minetest.register_alias("mobf:arrow", "throwing:arrow")
 end
