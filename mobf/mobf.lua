@@ -342,8 +342,6 @@ function mobf.activate_handler(self,staticdata)
 			minetest.log(LOGLEVEL_INFO,"MOBF: setting current state to: " 
 				.. retval.state)
 			self.dynamic_data.state.current = retval.state
-			
-
 		end
 	end
 	
@@ -352,10 +350,15 @@ function mobf.activate_handler(self,staticdata)
 												self.dynamic_data.state.current)
 	local default_state = mob_state.get_state_by_name(self,"default")
 	
-	if self.dynamic_data.state.current == nil then
+	if self.dynamic_data.state.current == nil or
+		(current_state.state_mode ~= "auto" and
+		 current_state.state_mode ~= nil) then
 		current_state = default_state
+		self.dynamic_data.state.current = "default"
 	end
 	
+	dbg_mobf.mobf_core_lvl2("MOBF: " .. self.data.name .. " restoring state: " 
+								.. current_state.name)
 	
 	--initialize move gen
 	if current_state.movgen ~= nil then
