@@ -248,17 +248,24 @@ function mobf_debug.rightclick_callback(entity,player)
 	if entity.dynamic_data.current_movement_gen.name == "follow_mov_gen" then
 			local basepos  = entity.getbasepos(entity)
 			local targetpos = entity.dynamic_data.spawning.spawnpoint	
-			if entity.dynamic_data.movement.guardspawnpoint ~= true then
+			if entity.dynamic_data.movement.guardspawnpoint ~= true and
+				entity.dynamic_data.movement.target ~= nil then
 				targetpos = entity.dynamic_data.movement.target:getpos()
 			end
-			print("MOBF: \t\tmovement state:              " .. mgen_follow.identify_movement_state(basepos,targetpos) )
+			if targetpos ~= nil then
+				print("MOBF: \t\tmovement state:              " .. mgen_follow.identify_movement_state(basepos,targetpos) )
+			else
+				print("MOBF: \t\tmovement state:              invalid")
+			end
+			print("MOBF: \t\tguard spawnpoint:            " .. dump(entity.dynamic_data.movement.guardspawnpoint))
 	end
 	print("MOBF: \tTime to state change:        " .. entity.dynamic_data.state.time_to_next_change .. " seconds")
 	print("MOBF: \tCurrent environmental state: " .. environment.pos_is_ok(entity.getbasepos(entity),entity))
 	print("MOBF: \tCurrent accel:               " .. printpos(entity.object:getacceleration()))
 	print("MOBF: \tCurrent speed:               " .. printpos(entity.object:getvelocity()))
 	if entity.dynamic_data.combat ~= nil then
-	print("MOBF: \tCurrent target:              " .. fighting.get_target_name(entity.dynamic_data.combat.target))
+	print("MOBF: \tCurrent combat target:       " .. fighting.get_target_name(entity.dynamic_data.combat.target))
+	
 	end
 	return false
 end
