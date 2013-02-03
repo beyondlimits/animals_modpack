@@ -47,6 +47,9 @@ mgen_follow.name = "follow_mov_gen"
 --!          "unknown"
 -------------------------------------------------------------------------------
 function mgen_follow.identify_movement_state(ownpos,targetpos)
+	mobf_assert_backtrace(ownpos ~= nil)
+	mobf_assert_backtrace(targetpos ~= nil)
+	
 	local same_height_delta = 0.1
 	
 	local los = mobf_line_of_sight(ownpos,targetpos)
