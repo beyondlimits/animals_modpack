@@ -156,6 +156,12 @@ local mob_template = {
 		--! @brief [OPTIONAL] is mob sensitive to sun?
 		sun_sensitive=true,
 		
+		--! @brief [OPTIONAL] attacks hostile mobs
+		attack_hostile_mobs=false,
+		
+		--! @brief [UNUSED] attacks hostile mobs
+		--attack_friendly_mobs=false,
+		
 		--! @brief [OPTIONAL] configuration of meele attack				
 		melee = {
 			--! @brief [MANDATORY] maximum damage mob does per hit
@@ -171,7 +177,9 @@ local mob_template = {
 			attack="some_entity",
 			--! @brief [MANDATORY] distance to issue an attack
 			range=10,
-			--! @brief [MANDATORY] minimum time between two attacks			
+			--! @brief [OPTIONAL] minimum range of distance attack (should be > range of melee attack)
+			min_range = 3,
+			--! @brief [MANDATORY] minimum time between two attacks
 			speed=2,
 			},
 			

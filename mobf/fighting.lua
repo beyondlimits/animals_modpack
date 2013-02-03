@@ -520,19 +520,35 @@ function fighting.get_target(entity)
 
 		for i,v in ipairs(objectlist) do
 		
-			local playername = v.get_player_name(v)
-	
-			if playername ~= nil and
-				playername ~= "" then
-				count = count + 1
-				table.insert(possible_targets,v)
-				dbg_mobf.fighting_lvl3(playername .. " is next to a mob of type "
-					.. entity.data.name);
+			if v:is_player() then
+				local playername = v:get_player_name()
+				
+				--don't attack spawner
+				if entity.dynamic_data.spawning.spawner == nil or 
+					entity.dynamic_data.spawning.spawner ~= playername then
+						count = count + 1
+						table.insert(possible_targets,v)
+						dbg_mobf.fighting_lvl2("MOBF: " .. playername .. 
+							" is next to a mob of type ".. entity.data.name)
+				else
+					dbg_mobf.fighting_lvl2("MOBF: " .. entity.data.name .. 
+							" not attacking: " .. playername .. " is spwaner")
+				end
+			else
+				if entity.data.combat.attack_hostile_mobs then
+					if	v.data ~= nil and
+						v.data.combat ~= nil and
+						v.data.combat.starts_attack then
+						
+						table.insert(possible_targets,v)
+						dbg_mobf.fighting_lvl3(v.data.name .. " is next to a mob of type "
+							.. entity.data.name)
+					end
+				end
 			end
-
 		end
-		dbg_mobf.fighting_lvl3("Found ".. count .. " objects within attack range of "
-			.. entity.data.name)
+		dbg_mobf.fighting_lvl2("MOBF: found ".. count .. " objects within" ..
+										" attack range of " .. entity.data.name)
 	end
 
 
