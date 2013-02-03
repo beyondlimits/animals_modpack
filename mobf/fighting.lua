@@ -115,41 +115,35 @@ end
 --! @param entity mob being hit
 --! @param player player/object hitting the mob
 -------------------------------------------------------------------------------
-function fighting.hit(entity,player)
+function fighting.hit(entity,attacker)
 
+	--execute user defined on_hit_callback
 	if entity.data.generic.on_hit_callback ~= nil and
-			entity.data.generic.on_hit_callback(entity,player) == true
+			entity.data.generic.on_hit_callback(entity,attacker) == true
 		then
 		dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name .. " custom on hit handler superseeds generic handling")
 		return
 	end
 	
-	--TODO calculate damage by players weapon
-	--local damage = 1
-
-	--dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name .. " about to take ".. damage .. " damage")
-	--entity.dynamic_data.generic.health = entity.dynamic_data.generic.health	 - damage
-
-	--entity.object:set_hp(entity.object:get_hp() - damage )
-	
-
 	--get some base information
-	local mob_pos = entity.object:getpos()
+	local mob_pos     = entity.object:getpos()
 	local mob_basepos = entity.getbasepos(entity)
-	local playerpos = player:getpos()
-	local dir = mobf_get_direction(playerpos,mob_basepos)
+	local targetpos   = attacker:getpos()
+	local dir         = mobf_get_direction(targetpos,mob_basepos)
 	
-	--update mob orientation
+	--look towards attacker
 	if entity.mode == "3d" then
 		entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)+math.pi)
 	else
 		entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)-math.pi)
 	end
 	
+	--play hit sound
 	if entity.data.sound ~= nil then
 		sound.play(mob_pos,entity.data.sound.hit);
 	end
 	
+	--push mob back
 	fighting.push_back(entity,dir)
 
 	-- make it die
@@ -163,23 +157,23 @@ function fighting.hit(entity,player)
 		
 		--call on kill callback and superseed normal on kill handling
 		if entity.data.generic.on_kill_callback == nil or
-			entity.data.generic.on_kill_callback(entity,player) == false
+			entity.data.generic.on_kill_callback(entity,attacker) == false
 			then
 			
 			if entity.data.sound ~= nil then
 				sound.play(mob_pos,entity.data.sound.die);
 			end
 			
-			if player:is_player() then 
+			if attacker:is_player() then 
 				if type(result) == "table" then
 					for i=1,#result, 1 do
-						if player:get_inventory():room_for_item("main", result[i]) then
-							player:get_inventory():add_item("main", result[i])
+						if attacker:get_inventory():room_for_item("main", result[i]) then
+							attacker:get_inventory():add_item("main", result[i])
 						end
 					end
 				else
-					if player:get_inventory():room_for_item("main", result) then
-						player:get_inventory():add_item("main", result)
+					if attacker:get_inventory():room_for_item("main", result) then
+						attacker:get_inventory():add_item("main", result)
 					end
 				end
 			else
@@ -202,22 +196,65 @@ function fighting.hit(entity,player)
 		dbg_mobf.fighting_lvl2("MOBF: mob with chance of fighting back attacked")
 		--either the mob hasn't been attacked by now or a new player joined fight
 		
-		local playername = player.get_player_name(player)
-		
-		if entity.dynamic_data.combat.target ~= playername then
+		if entity.dynamic_data.combat.target ~= attacker then
 			dbg_mobf.fighting_lvl2("MOBF: new player started fight")
 			--calculate chance of mob fighting back
 			if math.random() < entity.data.combat.angryness then
-					dbg_mobf.fighting_lvl2("MOBF: fighting back player "..playername)
-					entity.dynamic_data.combat.target = playername
+					local attackername = fighting.get_target_name(attacker)
+					dbg_mobf.fighting_lvl2("MOBF: fighting back player "..attackername)
+					entity.dynamic_data.combat.target = attacker
 					
-					fighting.switch_to_combat_state(entity,mobf_get_current_time(),player)
+					fighting.switch_to_combat_state(entity,mobf_get_current_time(),attacker)
 			end	
 		end
-
 	end
-
 end
+
+-------------------------------------------------------------------------------
+-- name: identify_combat_state(entity,target,distance) 
+--
+--! @brief identify combat state to use
+--! @memberof fighting
+--! @private
+--
+--! @param entity mob to find state for
+--! @param distance distance to target
+--
+--! @return state tu use
+-------------------------------------------------------------------------------
+function fighting.identify_combat_state(entity,target,distance)
+
+	mobf_assert_backtrace(entity ~= nil)
+	mobf_assert_backtrace(target ~= nil)
+
+	local combat_melee    = mob_state.get_state_by_name(entity,"combat_melee")
+	local combat_distance = mob_state.get_state_by_name(entity,"combat_distance")
+	local combat_generic  = mob_state.get_state_by_name(entity,"combat")
+	
+	if distance == nil then
+		local mob_pos    = entity.object:getpos()
+		local targetpos  = target:getpos()
+		distance   = mobf_calc_distance(mob_pos,targetpos)
+	end
+	
+	if combat_melee ~= nil and
+		distance < entity.data.combat.melee.range then
+		return combat_melee
+	end
+	
+	if combat_distance and
+		entity.data.combat.distance ~= nil and
+		distance < entity.data.combat.distance.range and
+		(entity.data.combat.distance.min_range == nil or
+		distance > entity.data.combat.distance.min_range) then
+		
+		-- distance within mele range
+		return combat_distance
+	end	
+
+	return combat_generic
+end
+
 -------------------------------------------------------------------------------
 -- name: switch_to_combat_state(entity,now,target) 
 --
@@ -230,13 +267,16 @@ end
 --! @param target the target to attack
 -------------------------------------------------------------------------------
 function fighting.switch_to_combat_state(entity,now,target)
-	local combat_state = mob_state.get_state_by_name(entity,"combat")
 	
+	mobf_assert_backtrace(entity ~= nil)
+	
+	--precheck
 	if target == nil then
 		dbg_mobf.fighting_lvl2("MOBF: no target for combat state change specified")
 		return
 	end
 	
+	local combat_state = fighting.identify_combat_state(entity,target)
 	if combat_state == nil then
 		dbg_mobf.fighting_lvl2("MOBF: no special combat state")
 		return
@@ -259,7 +299,7 @@ function fighting.switch_to_combat_state(entity,now,target)
 	end
 	
 	--save old movement data to use on switching back
-	entity.dynamic_data.movement.backup = backup
+	entity.dynamic_data.combat.movement_backup = backup
 		
 	--set target
 	entity.dynamic_data.movement.target = target
@@ -285,8 +325,9 @@ end
 function fighting.restore_previous_state(entity,now)
 
 	--check if ther is anything we can restore
-	if entity.dynamic_data.movement.backup ~= nil then
-		local backup = entity.dynamic_data.movement.backup
+	if entity.dynamic_data.combat.movement_backup ~= nil then
+		local backup = entity.dynamic_data.combat.movement_backup
+		
 		
 		local newentity = nil
 		if backup.current_state ~= nil then
@@ -305,12 +346,44 @@ function fighting.restore_previous_state(entity,now)
 		entity.dynamic_data.movement = backup
 		
 		--make sure all remaining data is deleted
-		entity.dynamic_data.movement.backup = nil
-		entity.dynamic_data.movement.current_state = nil
+		entity.dynamic_data.combat.movement_backup = nil
 	end
 	
 	--make sure state is unlocked
 	mob_state.lock(entity,false)
+end
+
+-------------------------------------------------------------------------------
+-- name: restore_previous_state(entity,now) 
+--
+--! @brief check if mob is within range of target
+--! @memberof fighting
+--! @private
+--
+--! @param entity mob 
+--! @param distance to target
+-------------------------------------------------------------------------------
+function fighting.in_range(entity,distance)
+	if (entity.data.combat.melee == nil or
+		distance > entity.data.combat.melee.range) and
+		(entity.data.combat.distance == nil or 
+		distance > entity.data.combat.distance.range) then
+		
+		if entity.data.combat.melee ~= nil or
+			entity.data.combat.distance ~= nil then
+			dbg_mobf.fighting_lvl2("MOBF: distance="..distance)
+			
+			if entity.data.combat.melee ~= nil then
+				dbg_mobf.fighting_lvl2("MOBF: melee="..entity.data.combat.melee.range)
+			end
+			if  entity.data.combat.distance ~= nil then
+				dbg_mobf.fighting_lvl2("MOBF: distance="..entity.data.combat.distance.range)
+			end
+		end
+		return false
+	end
+	
+	return true
 end
 
 -------------------------------------------------------------------------------
@@ -326,34 +399,39 @@ function fighting.combat(entity,now)
 	
 	--handle self destruct mobs
 	if fighting.self_destruct_handler(entity,now) then
-		return
+		return false
 	end	
 
 	if entity.dynamic_data.combat ~= nil and
-		entity.dynamic_data.combat.target ~= "" then		
-
-		dbg_mobf.fighting_lvl1("MOBF: attacking player: "..entity.dynamic_data.combat.target)
-
-		local player = minetest.env:get_player_by_name(entity.dynamic_data.combat.target)
-
-
+		entity.dynamic_data.combat.target ~= nil then
+		
 		--check if target is still valid
-		if player == nil then
-			dbg_mobf.fighting_lvl3("MOBF: not a valid player")
+		if not entity.dynamic_data.combat.target:is_player() and
+			entity.dynamic_data.combat.target.data == nil then
+			
+			dbg_mobf.fighting_lvl3("MOBF: not a valid target")
 			
 			-- switch back to default movement gen
 			fighting.restore_previous_state(entity,now)
 			
 			--there is no player by that name, stop attack
-			entity.dynamic_data.combat.target = ""
-			return
+			entity.dynamic_data.combat.target = nil
+			return true
 		end
 		
-		--calculate some basic data
-		local mob_pos = entity.object:getpos()
-		local playerpos = player:getpos()
-		local distance = mobf_calc_distance(mob_pos,playerpos)
+		local  targetname = 
+			fighting.get_target_name(entity.dynamic_data.combat.target)
 		
+			
+		dbg_mobf.fighting_lvl1("MOBF: attacking player: "
+											..targetname)
+		
+		--calculate some basic data
+		local mob_pos    = entity.object:getpos()
+		local targetpos  = entity.dynamic_data.combat.target:getpos()
+		local distance   = mobf_calc_distance(mob_pos,targetpos)
+		
+		--initiate self destruct
 		fighting.self_destruct_trigger(entity,distance,now)
 
 		--find out if player is next to mob
@@ -367,55 +445,57 @@ function fighting.combat(entity,now)
 			fighting.restore_previous_state(entity,now)
 			
 			--there is no player by that name, stop attack
-			entity.dynamic_data.combat.target = ""
-			return
+			entity.dynamic_data.combat.target = nil
+			return true
 		end
 
 		--is mob near enough for any attack attack?
-		if  (entity.data.combat.melee == nil or
-			distance > entity.data.combat.melee.range) and
-			(entity.data.combat.distance == nil or 
-			distance > entity.data.combat.distance.range) then
-			
-			if entity.data.combat.melee ~= nil or
-				entity.data.combat.distance ~= nil then
-				dbg_mobf.fighting_lvl2("MOBF: distance="..distance)
-				
-				
-				if entity.data.combat.melee ~= nil then
-					dbg_mobf.fighting_lvl2("MOBF: melee="..entity.data.combat.melee.range)
-				end
-				if  entity.data.combat.distance ~= nil then
-					dbg_mobf.fighting_lvl2("MOBF: distance="..entity.data.combat.distance.range)
-				end
+		if not fighting.in_range(entity,distance) then
+			return true
+		end
+		
+		--check if state needs to be switched
+		local required_state = fighting.identify_combat_state(entity,
+									entity.dynamic_data.combat.target,distance)
+		
+		if required_state ~= nil then
+			local newentity = mob_state.change_state(entity,required_state)
+
+			--if we just changed entity abort this handler
+			if newentity ~= nil then
+				return false
 			end
-			return
 		end
 
-		if fighting.melee_attack_handler(entity,player,now,distance) == false then
-			
-			if fighting.distance_attack_handler(entity,playerpos,mob_pos,now,distance) then
+
+		--check if melee attack can be done
+		if fighting.melee_attack_handler(entity,
+					entity.dynamic_data.combat.target,now,distance) == false then
+			--check if distance attack can be done
+			if fighting.distance_attack_handler(entity,
+											targetpos,mob_pos,now,distance) then
 	
 				-- mob did an attack so give chance to stop attack
-
-				local rand_value = math.random()								
+				local rand_value = math.random()
 
 				if  rand_value > entity.data.combat.angryness then
 					dbg_mobf.fighting_lvl2("MOBF: rand=".. rand_value 
 						.. " angryness=" .. entity.data.combat.angryness)
 					dbg_mobf.fighting_lvl2("MOBF: " .. entity.data.name .. " " 
-						.. now .. " random aborting attack at player "
-						..entity.dynamic_data.combat.target)
-					entity.dynamic_data.combat.target = ""
+						.. now .. " random aborting attack at "
+						..targetname)
+					entity.dynamic_data.combat.target = nil
 				end
 			end		
 		end
 	end
 		
 	--fight against generic enemy "sun"
-	fighting.sun_damage_handler(entity,now)
+	if fighting.sun_damage_handler(entity,now) then
+		return false
+	end
 	
-
+	return true
 end
 
 -------------------------------------------------------------------------------
@@ -440,7 +520,7 @@ function fighting.get_target(entity)
 
 		for i,v in ipairs(objectlist) do
 		
-			local playername = v.get_player_name(v)			
+			local playername = v.get_player_name(v)
 	
 			if playername ~= nil and
 				playername ~= "" then
@@ -512,8 +592,7 @@ function fighting.aggression(entity,now)
 
 	--mob is specified as self attacking
 	if entity.data.combat.starts_attack and 
-		(entity.dynamic_data.combat.target == nil or
-		entity.dynamic_data.combat.target == "") then
+		entity.dynamic_data.combat.target == nil then
 		dbg_mobf.fighting_lvl3("MOBF: ".. entity.data.name .. " " .. now
 			.. " aggressive mob, is it time to attack?")
 		if entity.dynamic_data.combat.ts_last_aggression_chance + 1 < now then
@@ -528,17 +607,20 @@ function fighting.aggression(entity,now)
 				local target = fighting.get_target(entity)
 				
 				if target ~= nil then
-					local targetname = target.get_player_name(target)
+					
+					if target ~= entity.dynamic_data.combat.target then
 
-					if targetname ~= entity.dynamic_data.combat.target then
-
-						entity.dynamic_data.combat.target = targetname		
+						entity.dynamic_data.combat.target = target
 						
-						fighting.switch_to_combat_state(entity,now,target)			
+						fighting.switch_to_combat_state(entity,now,target)
+						
+						local targetname = fighting.get_target_name(target)
 						
 						dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name .. " "
-							.. now .. " starting attack at player: " ..targetname)
-						minetest.log(LOGLEVEL_INFO,"MOBF: starting attack at player "..targetname)
+									.. now .. " starting attack at player: " 
+									..targetname)
+						minetest.log(LOGLEVEL_INFO,
+								"MOBF: starting attack at player "..targetname)
 					end
 				end
 			end
@@ -556,14 +638,13 @@ end
 --! @param now current time
 -------------------------------------------------------------------------------
 function fighting.init_dynamic_data(entity,now)
-	local targetstring = ""
 	local data = {
 		ts_last_sun_damage			= now,
-		ts_last_attack     			= now,
+		ts_last_attack				= now,
 		ts_last_aggression_chance 	= now,
-		ts_self_destruct_triggered  = -1,
+		ts_self_destruct_triggered	= -1,
 		
-		target             = targetstring,
+		target						= nil,
 	}	
 	
 	entity.dynamic_data.combat = data
@@ -582,21 +663,21 @@ end
 --! @return true/false if handled or not
 -------------------------------------------------------------------------------
 function fighting.self_destruct_trigger(entity,distance,now)
-		if entity.data.combat ~= nil and
-		   entity.data.combat.self_destruct ~= nil then
+	if entity.data.combat ~= nil and
+		entity.data.combat.self_destruct ~= nil then
 
-			dbg_mobf.fighting_lvl1("MOBF: checking for self destruct trigger " ..  
-									distance .. " " .. 
-									entity.dynamic_data.combat.ts_self_destruct_triggered .. 
-									" " .. now)
+		dbg_mobf.fighting_lvl1("MOBF: checking for self destruct trigger " ..
+						distance .. " " .. 
+						entity.dynamic_data.combat.ts_self_destruct_triggered ..
+						" " .. now)
 
-			--trigger self destruct			
-			if distance <= entity.data.combat.self_destruct.range and
-				entity.dynamic_data.combat.ts_self_destruct_triggered == -1 then
-				dbg_mobf.fighting_lvl2("MOBF: self destruct triggered")
-				entity.dynamic_data.combat.ts_self_destruct_triggered = now
-			end
+		--trigger self destruct
+		if distance <= entity.data.combat.self_destruct.range and
+			entity.dynamic_data.combat.ts_self_destruct_triggered == -1 then
+			dbg_mobf.fighting_lvl2("MOBF: self destruct triggered")
+			entity.dynamic_data.combat.ts_self_destruct_triggered = now
 		end
+	end
 end
 -------------------------------------------------------------------------------
 -- name: self_destruct_handler(entity) 
@@ -610,62 +691,62 @@ end
 --! @return true/false if handled or not
 -------------------------------------------------------------------------------
 function fighting.self_destruct_handler(entity,now)
-		--self destructing mob?
-		if entity.data.combat ~= nil and
-		   entity.data.combat.self_destruct ~= nil then
-		   
+	--self destructing mob?
+	if entity.data.combat ~= nil and
+		entity.data.combat.self_destruct ~= nil then
 
-		   
-		   local pos = entity.object:getpos()
+		local pos = entity.object:getpos()
 
-			dbg_mobf.fighting_lvl1("MOBF: checking for self destruct imminent")
-			--do self destruct
-			if 	entity.dynamic_data.combat.ts_self_destruct_triggered > 0 and
-				entity.dynamic_data.combat.ts_self_destruct_triggered + 
-				entity.data.combat.self_destruct.delay
-				<= now then
-				
-				dbg_mobf.fighting_lvl2("MOBF: executing self destruct")
-				
-				if entity.data.sound ~= nil then		
-					sound.play(pos,entity.data.sound.self_destruct);		
-				end
-				
-				mobf_do_area_damage(pos,nil,
-										entity.data.combat.self_destruct.damage,
-										entity.data.combat.self_destruct.range)
-
-				--TODO determine block removal by damage and remove blocks
-				mobf_do_node_damage(pos,{},
-								entity.data.combat.self_destruct.node_damage_range,
-								1 - 1/entity.data.combat.self_destruct.node_damage_range)
-								
-				if mobf_rtd.fire_enabled then
-					--Add fire
-					for i=pos.x-entity.data.combat.self_destruct.range/2, 
-							pos.x+entity.data.combat.self_destruct.range/2, 1 do
-					for j=pos.y-entity.data.combat.self_destruct.range/2, 
-							pos.y+entity.data.combat.self_destruct.range/2, 1 do
-					for k=pos.z-entity.data.combat.self_destruct.range/2, 
-							pos.z+entity.data.combat.self_destruct.range/2, 1 do
-					
-						local current = minetest.env:get_node({x=i,y=j,z=k})
-						
-						if (current.name == "air") then
-							minetest.env:set_node({x=i,y=j,z=k}, {name="fire:basic_flame"})
-						end
-					
-					end
-					end
-					end	
-				else
-					minetest.log(LOGLEVEL_NOTICE,"MOBF: self destruct without fire isn't really impressive!")
-				end
-				spawning.remove(entity, "self destruct")
-				return true
+		dbg_mobf.fighting_lvl1("MOBF: checking for self destruct imminent")
+		--do self destruct
+		if 	entity.dynamic_data.combat.ts_self_destruct_triggered > 0 and
+			entity.dynamic_data.combat.ts_self_destruct_triggered + 
+			entity.data.combat.self_destruct.delay
+			<= now then
+			
+			dbg_mobf.fighting_lvl2("MOBF: executing self destruct")
+			
+			if entity.data.sound ~= nil then		
+				sound.play(pos,entity.data.sound.self_destruct);		
 			end
+			
+			mobf_do_area_damage(pos,nil,
+									entity.data.combat.self_destruct.damage,
+									entity.data.combat.self_destruct.range)
+
+			--TODO determine block removal by damage and remove blocks
+			mobf_do_node_damage(pos,{},
+							entity.data.combat.self_destruct.node_damage_range,
+							1 - 1/entity.data.combat.self_destruct.node_damage_range)
+							
+			if mobf_rtd.fire_enabled then
+				--Add fire
+				for i=pos.x-entity.data.combat.self_destruct.range/2, 
+						pos.x+entity.data.combat.self_destruct.range/2, 1 do
+				for j=pos.y-entity.data.combat.self_destruct.range/2, 
+						pos.y+entity.data.combat.self_destruct.range/2, 1 do
+				for k=pos.z-entity.data.combat.self_destruct.range/2, 
+						pos.z+entity.data.combat.self_destruct.range/2, 1 do
+				
+					local current = minetest.env:get_node({x=i,y=j,z=k})
+					
+					if (current.name == "air") then
+						minetest.env:set_node({x=i,y=j,z=k}, 
+											{name="fire:basic_flame"})
+					end
+				
+				end
+				end
+				end	
+			else
+				minetest.log(LOGLEVEL_NOTICE,
+					"MOBF: self destruct without fire isn't really impressive!")
+			end
+			spawning.remove(entity, "self destruct")
+			return true
 		end
-		return false
+	end
+	return false
 end
 
 -------------------------------------------------------------------------------
@@ -681,47 +762,50 @@ end
 --! @param distance distance to player
 --! @return true/false if handled or not
 -------------------------------------------------------------------------------
-function fighting.melee_attack_handler(entity,player,now,distance)
+function fighting.melee_attack_handler(entity,target,now,distance)
 
-		if entity.data.combat.melee == nil then
-			dbg_mobf.fighting_lvl2("MOBF: no meele attack specified")
-			return false
-		end
-
-		local time_of_next_attack_chance = entity.dynamic_data.combat.ts_last_attack 
-												+ entity.data.combat.melee.speed
-		--check if mob is ready to attack
-		if now <  time_of_next_attack_chance then
-			dbg_mobf.fighting_lvl1("MOBF: to early for meele attack " .. 
-									now .. " >= " .. time_of_next_attack_chance)
-			return false
-		end
-		
-		if distance <= entity.data.combat.melee.range
-			then
-
-			--save time of attack
-			entity.dynamic_data.combat.ts_last_attack = now
-			
-			if entity.data.sound ~= nil then		
-				sound.play(entity.object:getpos(),entity.data.sound.melee);		
-			end
-
-			--calculate damage to be done
-			local damage_done = math.floor(math.random(0,entity.data.combat.melee.maxdamage)) + 1
-
-			local player_health = player:get_hp()
-
-			--do damage
-			player:set_hp(player_health -damage_done)
-
-			dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name .. 
-									" doing melee attack damage=" .. damage_done)
-			return true
-		end
-		dbg_mobf.fighting_lvl1("MOBF: not within meele range " .. 
-									distance .. " > " .. entity.data.combat.melee.range) 
+	if entity.data.combat.melee == nil then
+		dbg_mobf.fighting_lvl2("MOBF: no meele attack specified")
 		return false
+	end
+
+	local time_of_next_attack_chance = entity.dynamic_data.combat.ts_last_attack 
+											+ entity.data.combat.melee.speed
+	--check if mob is ready to attack
+	if now <  time_of_next_attack_chance then
+		dbg_mobf.fighting_lvl1("MOBF: to early for meele attack " .. 
+								now .. " >= " .. time_of_next_attack_chance)
+		return false
+	end
+	
+	if distance <= entity.data.combat.melee.range
+		then
+
+		--save time of attack
+		entity.dynamic_data.combat.ts_last_attack = now
+		
+		if entity.data.sound ~= nil then		
+			sound.play(entity.object:getpos(),entity.data.sound.melee);
+		end
+
+		--calculate damage to be done
+		local damage_done = 
+			math.floor(math.random(0,entity.data.combat.melee.maxdamage)) + 1
+
+		--TODO call punch instead of manually setting health
+		local target_health = target:get_hp()
+
+		--do damage
+		target:set_hp(target_health -damage_done)
+
+		dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name .. 
+							" doing melee attack damage=" .. damage_done)
+
+		return true
+	end
+	dbg_mobf.fighting_lvl1("MOBF: not within meele range " .. 
+							distance .. " > " .. entity.data.combat.melee.range) 
+	return false
 end
 
 
@@ -733,13 +817,13 @@ end
 --! @private
 --
 --! @param entity mob to do action
---! @param playerpos position of target
+--! @param targetpos position of target
 --! @param mob_pos position of mob
 --! @param now current time
 --! @param distance distance between target and player
 --! @return true/false if handled or not
 -------------------------------------------------------------------------------
-function fighting.distance_attack_handler(entity,playerpos,mob_pos,now,distance)
+function fighting.distance_attack_handler(entity,targetpos,mob_pos,now,distance)
 		if 	entity.data.combat.distance == nil then
 			dbg_mobf.fighting_lvl2("MOBF: no distance attack specified")
 			return false
@@ -758,7 +842,8 @@ function fighting.distance_attack_handler(entity,playerpos,mob_pos,now,distance)
 		if	distance <= entity.data.combat.distance.range
 			then
 			
-			dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name .. " doing distance attack")
+			dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name .. 
+											" doing distance attack")
 			
 			--save time of attack
 			entity.dynamic_data.combat.ts_last_attack = now
@@ -767,7 +852,7 @@ function fighting.distance_attack_handler(entity,playerpos,mob_pos,now,distance)
 												y=mob_pos.y+1,
 												z=mob_pos.z
 												},
-												playerpos)
+												targetpos)
 												
 			if entity.data.sound ~= nil then		
 				sound.play(mob_pos,entity.data.sound.distance);		
@@ -791,7 +876,8 @@ function fighting.distance_attack_handler(entity,playerpos,mob_pos,now,distance)
 									z=dir.z*thrown_entity.velocity
 									}
 	
-				dbg_mobf.fighting_lvl2("MOBF: throwing with velocity: " .. printpos(vel_trown))
+				dbg_mobf.fighting_lvl2("MOBF: throwing with velocity: " .. 
+															printpos(vel_trown))
 	
 				newobject:setvelocity(vel_trown)
 	
@@ -800,12 +886,14 @@ function fighting.distance_attack_handler(entity,playerpos,mob_pos,now,distance)
 	
 				dbg_mobf.fighting_lvl2("MOBF: distance attack issued")
 			else
-				minetest.log(LOGLEVEL_ERROR, "MOBF: unable to find entity for distance attack")
+				minetest.log(LOGLEVEL_ERROR, 
+							"MOBF: unable to find entity for distance attack")
 			end
 			return true
 		end
 		dbg_mobf.fighting_lvl1("MOBF: not within distance range " .. 
-								distance .. " > " .. entity.data.combat.distance.range) 
+								distance .. " > " .. 
+								entity.data.combat.distance.range) 
 		return false
 end
 
@@ -819,19 +907,22 @@ end
 --
 --! @param entity mob to do action
 --! @param now current time
+--
+--! @return true/false if killed or not
 -------------------------------------------------------------------------------
 function fighting.sun_damage_handler(entity,now)
 	if entity.data.combat ~= nil and
 		entity.data.combat.sun_sensitive then
 
 		local pos = entity.object:getpos()
-		local current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
+		local current_state = mob_state.get_state_by_name(entity,
+											entity.dynamic_data.state.current)
 		local current_light = minetest.env:get_node_light(pos)
 			
 		if current_light == nil then
 			minetest.log(LOGLEVEL_ERROR,"MOBF: Bug!!! didn't get a light value for "
 				.. printpos(pos))
-			return
+			return false
 		end
 		--check if mob is in sunlight
 		if ( current_light > LIGHT_MAX) then
@@ -862,12 +953,13 @@ function fighting.sun_damage_handler(entity,now)
 				--if entity.dynamic_data.generic.health <= 0 then
 					dbg_mobf.fighting_lvl2("Mob ".. entity.data.name .. " died of sun")
 					spawning.remove(entity,"died by sun")
-					return
+					return true
 				end
 				entity.dynamic_data.combat.ts_last_sun_damage = now
 			end
 		else
-			--use last sun damage to avoid setting animation over and over even if nothing changed
+			--use last sun damage to avoid setting animation over and over 
+			--even if nothing changed
 			if entity.dynamic_data.combat.ts_last_sun_damage ~= -1 and
 				current_state.animation ~= nil then
 				graphics.set_animation(entity,current_state.animation)
@@ -875,4 +967,24 @@ function fighting.sun_damage_handler(entity,now)
 			end
 		end
 	end
+	
+	return false
+end
+
+
+function fighting.get_target_name(target)
+	if target == nil then
+		return "invalid"
+	end
+
+	if target:is_player() then
+		return target:get_player_name()
+	else
+		if target.data ~= nil and
+			target.data.name ~= nil then
+			return "MOB: " .. attacker.data.name
+		end
+	end
+	
+	return "unknown"
 end
