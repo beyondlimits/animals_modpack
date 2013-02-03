@@ -290,6 +290,7 @@ function fighting.switch_to_combat_state(entity,now,target)
 	--backup dynamic movement data
 	local backup = entity.dynamic_data.movement
 	backup.current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
+	dbg_mobf.fighting_lvl2("MOBF: backing up state: " .. backup.current_state.name)
 	
 	--switch state
 	local newentity = mob_state.change_state(entity,combat_state)
@@ -331,6 +332,7 @@ function fighting.restore_previous_state(entity,now)
 		
 		local newentity = nil
 		if backup.current_state ~= nil then
+			dbg_mobf.fighting_lvl2("MOBF: restore state: " .. backup.current_state.name)
 			newentity = mob_state.change_state(entity,backup.current_state)
 		else
 			minetest.log(LOGLEVEL_WARNING,"MOBF: unable to restore previous state switching to default")
@@ -406,17 +408,20 @@ function fighting.combat(entity,now)
 		entity.dynamic_data.combat.target ~= nil then
 		
 		--check if target is still valid
-		if not entity.dynamic_data.combat.target:is_player() and
-			entity.dynamic_data.combat.target.data == nil then
-			
-			dbg_mobf.fighting_lvl3("MOBF: not a valid target")
-			
-			-- switch back to default movement gen
-			fighting.restore_previous_state(entity,now)
-			
-			--there is no player by that name, stop attack
-			entity.dynamic_data.combat.target = nil
-			return true
+		if not entity.dynamic_data.combat.target:is_player() then
+			local target_entity = entity.dynamic_data.combat.target:get_luaentity()
+		
+			if target_entity == nil or
+				target_entity.data == nil then
+				dbg_mobf.fighting_lvl3("MOBF: not a valid target")
+				
+				-- switch back to default movement gen
+				fighting.restore_previous_state(entity,now)
+				
+				--there is no player by that name, stop attack
+				entity.dynamic_data.combat.target = nil
+				return true
+			end
 		end
 		
 		local  targetname = 
@@ -425,20 +430,36 @@ function fighting.combat(entity,now)
 			
 		dbg_mobf.fighting_lvl1("MOBF: attacking player: "
 											..targetname)
-		
+											
+
 		--calculate some basic data
 		local mob_pos    = entity.object:getpos()
 		local targetpos  = entity.dynamic_data.combat.target:getpos()
 		local distance   = mobf_calc_distance(mob_pos,targetpos)
+		local dir        = mobf_get_direction(targetpos,mob_pos)
+		
+		--look towards target
+		if entity.mode == "3d" then
+			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)+math.pi)
+		else
+			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)-math.pi)
+		end
 		
 		--initiate self destruct
 		fighting.self_destruct_trigger(entity,distance,now)
 
+		local range = entity.data.combat.melee.range * MOBF_AGRESSION_FACTOR
+		
+		if entity.data.combat.distance ~= nil and
+			entity.data.combat.distance.range > range then
+			range = entity.data.combat.distance.range
+		end
+		
 		--find out if player is next to mob
-		if distance > entity.data.combat.melee.range * MOBF_AGRESSION_FACTOR then
+		if distance > range then
 			dbg_mobf.fighting_lvl2("MOBF: " .. entity.data.name .. " player >" 
-				.. entity.dynamic_data.combat.target .. "< to far away " 
-				.. distance .. " > " .. (entity.data.combat.melee.range * MOBF_AGRESSION_FACTOR ) 
+				.. targetname .. "< to far away " .. distance .. " > "
+				.. range
 				.. " stopping attack")
 			
 			--switch back to default movement gen
@@ -513,8 +534,16 @@ function fighting.get_target(entity)
 	local possible_targets = {}
 
 	if entity.data.combat.melee.range > 0 then
-		local objectlist = minetest.env:get_objects_inside_radius(entity.object:getpos(),
-								entity.data.combat.melee.range*MOBF_AGRESSION_FACTOR)
+	
+		local range = entity.data.combat.melee.range*MOBF_AGRESSION_FACTOR
+		
+		if entity.data.combat.distance ~= nil and
+			entity.data.combat.distance.range > range then
+			range = entity.data.combat.distance.range
+		end
+	
+		local objectlist = minetest.env:get_objects_inside_radius(
+												entity.object:getpos(),range)
 
 		local count = 0
 
@@ -532,16 +561,25 @@ function fighting.get_target(entity)
 							" is next to a mob of type ".. entity.data.name)
 				else
 					dbg_mobf.fighting_lvl2("MOBF: " .. entity.data.name .. 
-							" not attacking: " .. playername .. " is spwaner")
+							" not attacking: " .. playername .. " is spawner")
 				end
 			else
 				if entity.data.combat.attack_hostile_mobs then
-					if	v.data ~= nil and
-						v.data.combat ~= nil and
-						v.data.combat.starts_attack then
+					dbg_mobf.fighting_lvl2("MOBF: " .. entity.data.name .. 
+							" trying to attack hostile mobs too")
+							
+					local target_entity = v:get_luaentity()
+					if	target_entity ~= nil and
+						target_entity ~= entity and
+						target_entity.data ~= nil and
+						target_entity.data.combat ~= nil and
+						target_entity.data.combat.starts_attack and
+						target_entity.dynamic_data.spawning.spawner ~=
+						entity.dynamic_data.spawning.spawner then
 						
 						table.insert(possible_targets,v)
-						dbg_mobf.fighting_lvl3(v.data.name .. " is next to a mob of type "
+						dbg_mobf.fighting_lvl3(target_entity.data.name 
+							.. " is next to a mob of type "
 							.. entity.data.name)
 					end
 				end
@@ -855,7 +893,9 @@ function fighting.distance_attack_handler(entity,targetpos,mob_pos,now,distance)
 			return false
 		end
 		
-		if	distance <= entity.data.combat.distance.range
+		if	distance <= entity.data.combat.distance.range and
+			(entity.data.combat.distance.min_range == nil or
+			distance > entity.data.combat.distance.min_range)
 			then
 			
 			dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name .. 
@@ -886,16 +926,23 @@ function fighting.distance_attack_handler(entity,targetpos,mob_pos,now,distance)
 			--TODO add random disturbance based on accuracy
 
 			if thrown_entity ~= nil then
-				local vel_trown = {
+				local vel_thrown = {
 									x=dir.x*thrown_entity.velocity,
 									y=dir.y*thrown_entity.velocity + math.random(0,0.25),
 									z=dir.z*thrown_entity.velocity
 									}
+									
+				if entity.data.combat.distance.balistic == true then
+					local current_scalar_speed = 
+						mobf_calc_scalar_speed(vel_thrown.x,vel_thrown.z)
+					vel_thrown.y = 
+						(distance/current_scalar_speed) * (9.81/2.1)
+				end
 	
 				dbg_mobf.fighting_lvl2("MOBF: throwing with velocity: " .. 
-															printpos(vel_trown))
+															printpos(vel_thrown))
 	
-				newobject:setvelocity(vel_trown)
+				newobject:setvelocity(vel_thrown)
 	
 				newobject:setacceleration({x=0, y=-thrown_entity.gravity, z=0})
 				thrown_entity.owner = entity.object
@@ -962,7 +1009,7 @@ function fighting.sun_damage_handler(entity,now)
 				entity.object:set_hp(entity.object:get_hp() - damage)
 				
 				if entity.data.sound ~= nil then		
-					sound.play(mob_pos,entity.data.sound.sun_damage);		
+					sound.play(mob_pos,entity.data.sound.sun_damage);
 				end
 
 				if entity.object:get_hp() <= 0 then
@@ -987,7 +1034,17 @@ function fighting.sun_damage_handler(entity,now)
 	return false
 end
 
-
+-------------------------------------------------------------------------------
+-- name: get_target_name(target) 
+--
+--! @brief get name of target
+--! @memberof fighting
+--! @private
+--
+--! @param target to get name for
+--
+--! @return name of target
+-------------------------------------------------------------------------------
 function fighting.get_target_name(target)
 	if target == nil then
 		return "invalid"
@@ -996,9 +1053,10 @@ function fighting.get_target_name(target)
 	if target:is_player() then
 		return target:get_player_name()
 	else
-		if target.data ~= nil and
-			target.data.name ~= nil then
-			return "MOB: " .. attacker.data.name
+		local target_entity = target:get_luaentity()
+		if target_entity.data ~= nil and
+			target_entity.data.name ~= nil then
+			return "MOB: " .. target_entity.data.name
 		end
 	end
 	
