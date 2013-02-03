@@ -202,9 +202,11 @@ function fighting.hit(entity,attacker)
 			if math.random() < entity.data.combat.angryness then
 					local attackername = fighting.get_target_name(attacker)
 					dbg_mobf.fighting_lvl2("MOBF: fighting back player "..attackername)
-					entity.dynamic_data.combat.target = attacker
 					
-					fighting.switch_to_combat_state(entity,mobf_get_current_time(),attacker)
+					if entity.dynamic_data.combat.target == nil then
+						fighting.switch_to_combat_state(entity,mobf_get_current_time(),attacker)
+					end
+					entity.dynamic_data.combat.target = attacker
 			end	
 		end
 	end
@@ -276,6 +278,10 @@ function fighting.switch_to_combat_state(entity,now,target)
 		return
 	end
 	
+	local current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
+	
+	mobf_assert_backtrace(current_state.state_mode ~= "combat")
+	
 	local combat_state = fighting.identify_combat_state(entity,target)
 	if combat_state == nil then
 		dbg_mobf.fighting_lvl2("MOBF: no special combat state")
@@ -289,6 +295,10 @@ function fighting.switch_to_combat_state(entity,now,target)
 
 	--backup dynamic movement data
 	local backup = entity.dynamic_data.movement
+	
+	--create new movement data
+	entity.dynamic_data.movement = {}
+	
 	backup.current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
 	dbg_mobf.fighting_lvl2("MOBF: backing up state: " .. backup.current_state.name)
 	
@@ -338,6 +348,8 @@ function fighting.restore_previous_state(entity,now)
 			minetest.log(LOGLEVEL_WARNING,"MOBF: unable to restore previous state switching to default")
 			newentity = mob_state.change_state(entity,mob_state.get_state_by_name(entity,"default"))
 		end
+		
+		backup.current_state = nil
 			
 			
 		if newentity ~= nil then
@@ -346,6 +358,12 @@ function fighting.restore_previous_state(entity,now)
 		
 		--restore old movement data
 		entity.dynamic_data.movement = backup
+		
+		--don't restore old movement target if not valid anymore
+		if entity.dynamic_data.movement.target == nil or
+			entity.dynamic_data.movement.target:getpos() == nil then
+			entity.dynamic_data.movement.target = nil
+		end
 		
 		--make sure all remaining data is deleted
 		entity.dynamic_data.combat.movement_backup = nil
@@ -409,17 +427,26 @@ function fighting.combat(entity,now)
 		
 		--check if target is still valid
 		if not entity.dynamic_data.combat.target:is_player() then
+		
+			
 			local target_entity = entity.dynamic_data.combat.target:get_luaentity()
+			local target_pos    = entity.dynamic_data.combat.target:getpos()
+		
+			--print("MOBF: target is not player checking if stil valid: " 
+			--		.. dump(target_entity) .. " " .. dump(target_pos))
 		
 			if target_entity == nil or
-				target_entity.data == nil then
-				dbg_mobf.fighting_lvl3("MOBF: not a valid target")
+				target_entity.data == nil or
+				target_pos == nil then
 				
 				-- switch back to default movement gen
 				fighting.restore_previous_state(entity,now)
 				
 				--there is no player by that name, stop attack
 				entity.dynamic_data.combat.target = nil
+				
+				dbg_mobf.fighting_lvl1("MOBF: not a valid target: " 
+					.. dump(entity.dynamic_data.combat.target))
 				return true
 			end
 		end
@@ -846,12 +873,26 @@ function fighting.melee_attack_handler(entity,target,now,distance)
 		local damage_done = 
 			math.floor(math.random(0,entity.data.combat.melee.maxdamage)) + 1
 
-		--TODO call punch instead of manually setting health
-		local target_health = target:get_hp()
+		--TODO call punch instead of manually setting health for player too
+		if target:is_player() then
+			local target_health = target:get_hp()
 
-		--do damage
-		target:set_hp(target_health -damage_done)
-
+			--do damage
+			target:set_hp(target_health -damage_done)
+		else
+			target:punch(entity.object, 1.0, {
+							full_punch_interval=1.0,
+							groupcaps={
+								fleshy={times={	[1]=1/(damage_done-2), 
+												[2]=1/(damage_done-1), 
+												[3]=1/damage_done}},
+								snappy={times={	[1]=1/(damage_done-2), 
+												[2]=1/(damage_done-1), 
+												[3]=1/damage_done}},
+							}
+						}, nil)
+		end
+		
 		dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name .. 
 							" doing melee attack damage=" .. damage_done)
 
@@ -946,6 +987,10 @@ function fighting.distance_attack_handler(entity,targetpos,mob_pos,now,distance)
 	
 				newobject:setacceleration({x=0, y=-thrown_entity.gravity, z=0})
 				thrown_entity.owner = entity.object
+				
+				if entity.data.sound ~= nil then
+					sound.play(mob_pos,entity.data.sound.shoot_distance);
+				end
 	
 				dbg_mobf.fighting_lvl2("MOBF: distance attack issued")
 			else
