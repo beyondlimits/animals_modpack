@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_wolf loading ...")
 
-local version = "0.0.12"
+local version = "0.0.13"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
@@ -39,7 +39,6 @@ wolf_prototype = {
 					envid="on_ground_2"
 				},
 		movement =  {
-					default_gen="follow_mov_gen",
 					canfly=false,
 					guardspawnpoint = true,
 					teleportdelay = 60,
@@ -92,7 +91,7 @@ wolf_prototype = {
 		states = {
 				{
 					name = "default",
-					movgen = "none",
+					movgen = "follow_mov_gen",
 					typical_state_time = 30,
 					chance = 0,
 					animation = "stand",
