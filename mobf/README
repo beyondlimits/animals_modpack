@@ -157,6 +157,9 @@ mobf_delete_disabled_mobs = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.0.4
+-fixed bug trader selling without pay if price1 or price 2 not set
+
 Changes 2.0.3
 -fixed crash on typical state time not available
 -fixed bug mob_slime typical state time not set
