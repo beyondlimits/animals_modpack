@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_archer mod loading ...")
 
-local version = "0.0.1"
+local version = "0.0.2"
 local archer_groups = {
 						not_in_creative_inventory=1
 					}
@@ -42,7 +42,10 @@ archer_prototype = {
 					pattern="stop_and_go",
 					canfly=false,
 					},
-		
+		catching = {
+					tool="animalmaterials:contract",
+					consumed=true,
+					},
 		spawning = {
 					rate=0,
 					density=0,
@@ -119,6 +122,13 @@ archer_prototype = {
 					end_frame = 250,
 					},
 			},
+		sound = {
+				shoot_distance = {
+					name="mob_archer_shoot",
+					gain = 0.5,
+					max_hear_distance = 17,
+					},
+				},
 		}
 
 minetest.log("action","\tadding mob "..archer_prototype.name)
