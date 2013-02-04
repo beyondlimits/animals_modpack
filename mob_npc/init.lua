@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_npc mod loading ...")
 
-local version = "0.0.9"
+local version = "0.0.10"
 local npc_groups = {
 						not_in_creative_inventory=1
 					}
@@ -165,6 +165,8 @@ npc_trader_prototype = {
 							{ "default:ladder 12", "default:mese_crystal 1", "default:stone 5"},
 							{ "default:paper 12", "default:mese_crystal 2", "default:stone 10"},
 							{ "default:chest 1", "default:mese_crystal 2", "default:stone 10"},
+							{ "mob_archer:archer 1","default:mese_crystal 10",nil},
+							{ "mob_guard:guard 1","default:mese_crystal 10",nil},
 						},
 				random_names = { "Hans","Franz","Xaver","Fritz","Thomas","Martin"},
 			}
