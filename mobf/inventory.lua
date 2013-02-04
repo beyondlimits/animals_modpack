@@ -268,9 +268,11 @@ function mob_inventory.check_pay(inv,paynow)
 	local price1 = inv.get_stack(inv,"price_1", 1)
 	local price2 = inv.get_stack(inv,"price_2", 1)
 	
-	if price1.get_name(price1) == name then
-		local price = price1.get_count(price1)
-		if price <= count then
+	dbg_mobf.trader_inv_lvl1("MOBF: p1 " .. dump(price1) .. " " .. dump(price1:get_name()))
+	if price1:get_name() == name then
+		local price = price1:get_count()
+		if price > 0 and
+			price <= count then
 			if paynow then
 				now_at_pay.take_item(now_at_pay,price)
 				inv.set_stack(inv,"pay",1,now_at_pay)
@@ -285,9 +287,11 @@ function mob_inventory.check_pay(inv,paynow)
 		end
 	end
 		
-	if price1.get_name(price2) == name then
-		local price = price1.get_count(price2)
-		if price <= count then
+	dbg_mobf.trader_inv_lvl1("MOBF: p2 " .. dump(price1) .. " " .. dump(price2:get_name()))
+	if price2:get_name() == name then
+		local price = price2:get_count()
+		if price > 0 and
+			price <= count then
 			if paynow then
 				now_at_pay.take_item(now_at_pay,price)
 				inv.set_stack(inv,"pay",1,now_at_pay)
