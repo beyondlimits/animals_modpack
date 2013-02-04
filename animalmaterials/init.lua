@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animalmaterials loading ...")
-local version = "0.0.15"
+local version = "0.0.16"
 
 
 animalmaterialsdata = {}
@@ -99,6 +99,19 @@ minetest.register_craftitem("animalmaterials:saddle", {
 	image = "animalmaterials_saddle.png",
 	stack_max=1
 })
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- contract
+--
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+minetest.register_craftitem("animalmaterials:contract", {
+	description = "Contract",
+	image = "animalmaterials_contract.png",
+	stack_max=10,
+})
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- meat
