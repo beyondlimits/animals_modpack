@@ -410,7 +410,7 @@ function environment.pos_is_ok(pos,entity,dont_do_jumpcheck)
 	
 	--
 	if retval == "temp_ok" then
-		dbg_mobf.environment_lvl2("MOBF: \tin environment")
+		dbg_mobf.environment_lvl3("MOBF: \tin environment")
 		local ground_distance = mobf_ground_distance(pos,entity.environment.media)
 		
 		--following return codes are only usefull for non flying
@@ -543,6 +543,7 @@ function environment.fix_base_pos(entity, center_to_bottom)
 				dbg_mobf.environment_lvl2("MOBF: fixing y position of " .. entity.data.name 
 					.. " got distance " .. center_to_bottom .. " moving to " ..printpos(pos))
 				entity.object:moveto(pos)
+				entity.dynamic_data.spawning.spawnpoint = pos
 			end
 		end
 	end
