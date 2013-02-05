@@ -165,4 +165,24 @@ function mobf_calc_yaw(x,z)
 	return direction
 end
 
+-------------------------------------------------------------------------------
+-- name: mobf_assert_backtrace(value)
+--
+--! @brief assert in case value is false
+--
+--! @param heightdiff height difference between shooter and target
+--! @param time time to reach target
+--! @param acceleration acceleration set for object
+--
+--! @return y-velocity at start
+-------------------------------------------------------------------------------
+function mobf_balistic_start_speed(heightdiff,time,acceleration)
+	mobf_assert_backtrace(heightdiff ~= nil)
+	mobf_assert_backtrace(time ~= nil)
+	mobf_assert_backtrace(time ~= nil)
+	mobf_assert_backtrace(acceleration ~= nil)
+	
+	return (heightdiff - (acceleration/2) * (time*time)) / time	
+end
+
 --!@}
