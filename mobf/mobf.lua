@@ -393,7 +393,7 @@ function mobf.activate_handler(self,staticdata)
 	end
 
 	--initialize height level
-	pos = environment.fix_base_pos(self, self.collisionbox[2] * -1)
+	environment.fix_base_pos(self, self.collisionbox[2] * -1)
 
 	--custom on activate handler
 	if (self.data.generic.custom_on_activate_handler ~= nil) then
