@@ -116,6 +116,8 @@ end
 --! @param player player/object hitting the mob
 -------------------------------------------------------------------------------
 function fighting.hit(entity,attacker)
+	mobf_assert_backtrace(entity ~= nil)
+	mobf_assert_backtrace(attacker ~= nil)
 
 	--execute user defined on_hit_callback
 	if entity.data.generic.on_hit_callback ~= nil and
@@ -239,6 +241,8 @@ function fighting.identify_combat_state(entity,target,distance)
 		distance   = mobf_calc_distance(mob_pos,targetpos)
 	end
 	
+	dbg_mobf.fighting_lvl2("MOBF: Identify combat state, mob: " .. entity.data.name .. " distance: " .. distance)
+	
 	if combat_melee ~= nil and
 		distance < entity.data.combat.melee.range then
 		return combat_melee
@@ -339,6 +343,7 @@ function fighting.restore_previous_state(entity,now)
 	if entity.dynamic_data.combat.movement_backup ~= nil then
 		local backup = entity.dynamic_data.combat.movement_backup
 		
+		mobf_assert_backtrace(backup.current_state ~= "combat")
 		
 		local newentity = nil
 		if backup.current_state ~= nil then
@@ -427,8 +432,6 @@ function fighting.combat(entity,now)
 		
 		--check if target is still valid
 		if not entity.dynamic_data.combat.target:is_player() then
-		
-			
 			local target_entity = entity.dynamic_data.combat.target:get_luaentity()
 			local target_pos    = entity.dynamic_data.combat.target:getpos()
 		
@@ -496,11 +499,6 @@ function fighting.combat(entity,now)
 			entity.dynamic_data.combat.target = nil
 			return true
 		end
-
-		--is mob near enough for any attack attack?
-		if not fighting.in_range(entity,distance) then
-			return true
-		end
 		
 		--check if state needs to be switched
 		local required_state = fighting.identify_combat_state(entity,
@@ -514,7 +512,11 @@ function fighting.combat(entity,now)
 				return false
 			end
 		end
-
+		
+		--is mob near enough for any attack attack?
+		if not fighting.in_range(entity,distance) then
+			return true
+		end
 
 		--check if melee attack can be done
 		if fighting.melee_attack_handler(entity,
@@ -532,6 +534,8 @@ function fighting.combat(entity,now)
 					dbg_mobf.fighting_lvl2("MOBF: " .. entity.data.name .. " " 
 						.. now .. " random aborting attack at "
 						..targetname)
+					-- switch back to default movement gen
+					fighting.restore_previous_state(entity,now)
 					entity.dynamic_data.combat.target = nil
 				end
 			end		
@@ -670,10 +674,13 @@ function fighting.aggression(entity,now)
 	if entity.data.combat == nil then
 		return
 	end
+	
+	local current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
 
 	--mob is specified as self attacking
 	if entity.data.combat.starts_attack and 
-		entity.dynamic_data.combat.target == nil then
+		entity.dynamic_data.combat.target == nil and
+		current_state.state_mode ~= "combat" then
 		dbg_mobf.fighting_lvl3("MOBF: ".. entity.data.name .. " " .. now
 			.. " aggressive mob, is it time to attack?")
 		if entity.dynamic_data.combat.ts_last_aggression_chance + 1 < now then
@@ -952,7 +959,7 @@ function fighting.distance_attack_handler(entity,targetpos,mob_pos,now,distance)
 												targetpos)
 												
 			if entity.data.sound ~= nil then		
-				sound.play(mob_pos,entity.data.sound.distance);		
+				sound.play(mob_pos,entity.data.sound.distance);
 			end
 				
 			local newobject=minetest.env:add_entity({	x=mob_pos.x+dir.x,
@@ -964,20 +971,27 @@ function fighting.distance_attack_handler(entity,targetpos,mob_pos,now,distance)
 
 			local thrown_entity = mobf_find_entity(newobject)
 
-			--TODO add random disturbance based on accuracy
-
 			if thrown_entity ~= nil then
 				local vel_thrown = {
-									x=dir.x*thrown_entity.velocity,
-									y=dir.y*thrown_entity.velocity + math.random(0,0.25),
-									z=dir.z*thrown_entity.velocity
+									x=dir.x*thrown_entity.velocity + math.random(0,0.05),
+									y=dir.y*thrown_entity.velocity,
+									z=dir.z*thrown_entity.velocity + math.random(0,0.05),
 									}
 									
 				if entity.data.combat.distance.balistic == true then
+					--this isn't an exact calculation but just something to make
+					--it not too perfect
+					local height_diff = targetpos.y - mob_pos.y
 					local current_scalar_speed = 
 						mobf_calc_scalar_speed(vel_thrown.x,vel_thrown.z)
-					vel_thrown.y = 
-						(distance/current_scalar_speed) * (9.81/2.1)
+					local time_to_target = (distance/current_scalar_speed)
+					
+					local y_vel = mobf_balistic_start_speed(
+											height_diff -1,
+											time_to_target,
+											-thrown_entity.gravity)
+
+					vel_thrown.y = y_vel + math.random(0,0.25)
 				end
 	
 				dbg_mobf.fighting_lvl2("MOBF: throwing with velocity: " .. 
