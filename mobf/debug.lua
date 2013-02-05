@@ -263,9 +263,11 @@ function mobf_debug.rightclick_callback(entity,player)
 	print("MOBF: \tCurrent environmental state: " .. environment.pos_is_ok(entity.getbasepos(entity),entity))
 	print("MOBF: \tCurrent accel:               " .. printpos(entity.object:getacceleration()))
 	print("MOBF: \tCurrent speed:               " .. printpos(entity.object:getvelocity()))
+	print("MOBF: \tSpawnpoint:                  " .. printpos(entity.dynamic_data.spawning.spawnpoint))
+	print("MOBF: \tSpawner:                     " .. dump(entity.dynamic_data.spawning.spawner))
+	print("MOBF: \tCurrent pos:                 " .. printpos(entity.object:getpos()))
 	if entity.dynamic_data.combat ~= nil then
 	print("MOBF: \tCurrent combat target:       " .. fighting.get_target_name(entity.dynamic_data.combat.target))
-	
 	end
 	return false
 end
