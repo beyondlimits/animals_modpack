@@ -131,8 +131,6 @@ function mgen_follow.callback(entity,now)
 
 	dbg_mobf.fmovement_lvl3("MOBF: Follow mgen callback called")
 	
-
-	
 	if entity == nil then
 		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: called movement gen without entity!")
 		return
@@ -193,12 +191,17 @@ function mgen_follow.callback(entity,now)
 		entity.dynamic_data.movement.guardspawnpoint then
 		dbg_mobf.fmovement_lvl3("MOBF:   Target available")
 		--calculate distance to target
-		local targetpos = entity.dynamic_data.spawning.spawnpoint
+		local targetpos = nil
 		
-		
-		if entity.dynamic_data.movement.guardspawnpoint ~= true then
-			dbg_mobf.fmovement_lvl3("MOBF:   moving target selected")
+		if entity.dynamic_data.movement.target ~= nil then
+			dbg_mobf.fmovement_lvl3("MOBF:   have moving target")
 			targetpos = entity.dynamic_data.movement.target:getpos()
+		end
+		
+		if targetpos == nil and
+			entity.dynamic_data.movement.guardspawnpoint == true then
+			dbg_mobf.fmovement_lvl3("MOBF:   non target selected")
+			targetpos = entity.dynamic_data.spawning.spawnpoint	
 		end
 		
 		if targetpos == nil then
@@ -232,7 +235,8 @@ function mgen_follow.callback(entity,now)
 		end
 		
 		--check if mob needs to move towards target
-		dbg_mobf.fmovement_lvl3("MOBF: max distance is set to : " .. max_distance)
+		dbg_mobf.fmovement_lvl3("MOBF: max distance is set to : " 
+									.. max_distance .. " dist: " .. distance)
 		if distance > max_distance then
 		
 			if mgen_follow.handleteleport(entity,now,targetpos) then
@@ -289,7 +293,7 @@ function mgen_follow.callback(entity,now)
 		else
 			dbg_mobf.fmovement_lvl3("MOBF:   next to target")
 			entity.object:setvelocity({x=0,y=0,z=0})
-			entity.object:setacceleration({x=0,y=0,z=0})
+			entity.object:setacceleration({x=0,y=yaccel,z=0})
 			entity.dynamic_data.movement.last_next_to_target = now
 			
 			
@@ -302,7 +306,7 @@ function mgen_follow.callback(entity,now)
 			end
 		end
 	
-	else	
+	else
 		--TODO evaluate if this is an error case	
 	end
 end
