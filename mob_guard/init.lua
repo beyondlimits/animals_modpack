@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_guard mod loading ...")
 
-local version = "0.0.1"
+local version = "0.0.2"
 local guard_groups = {
 						not_in_creative_inventory=1
 					}
@@ -44,6 +44,7 @@ guard_prototype = {
 					pattern="stop_and_go",
 					canfly=false,
 					follow_speedup=10,
+					max_distance=0.2,
 					},
 		catching = {
 					tool="animalmaterials:contract",
