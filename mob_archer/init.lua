@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_archer mod loading ...")
 
-local version = "0.0.2"
+local version = "0.0.3"
 local archer_groups = {
 						not_in_creative_inventory=1
 					}
@@ -35,12 +35,15 @@ archer_prototype = {
 					envid="on_ground_1",
 				},
 		movement =  {
+					guardspawnpoint = true,
+					teleportdelay = 60,
 					min_accel=0.3,
 					max_accel=0.7,
 					max_speed=1.5,
 					min_speed=0.01,
 					pattern="stop_and_go",
 					canfly=false,
+					max_distance=0.1,
 					},
 		catching = {
 					tool="animalmaterials:contract",
@@ -90,7 +93,7 @@ archer_prototype = {
 				},
 				{ 
 				name = "default",
-				movgen = "none",
+				movgen = "follow_mov_gen",
 				typical_state_time = 180,
 				chance = 1.00,
 				animation = "stand",
