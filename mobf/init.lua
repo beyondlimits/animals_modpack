@@ -76,6 +76,7 @@ dofile (mobf_modpath .. "/debug.lua")
 dofile (mobf_modpath .. "/mob_state.lua")
 dofile (mobf_modpath .. "/inventory.lua")
 dofile (mobf_modpath .. "/mob_preserve.lua")
+dofile (mobf_modpath .. "/path.lua")
 
 --include spawning support
 dofile (mobf_modpath .. "/spawning.lua")
@@ -153,12 +154,15 @@ function mobf_init_framework()
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing mob preservation..")
 	mob_preserve.init()
 	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize path handling subsystem..")
+	mobf_path.init()
+	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize mobf supplied modules..")
 	mobf_init_modules()
 	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Register rightclick button handler..")
 	minetest.register_on_player_receive_fields(mobf.rightclick_button_handler)
-	
+		
 	-- initialize luatrace if necessary
 	if mobf_rtd.luatrace_enabled then
 		luatrace = require("luatrace")
