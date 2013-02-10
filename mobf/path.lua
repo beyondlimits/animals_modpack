@@ -230,8 +230,6 @@ function mobf_path.show_add_point_menu(playername,pathnames,point)
 				"field[0.25," .. (y_pos + 1) .. ";4.5,0.5;new_path_name;;]" ..
 				"button_exit[1.5," .. (y_pos + 1.5) .. ";1.5,0.5;mobfpath:addnew:" ..
 				storage_id .. ";new path]"
-				
-	print("Formspec: " .. formspec)
 	
 	--show formspec
 	minetest.show_formspec(playername,"mobf:path:path_name_menu",formspec)
@@ -251,6 +249,7 @@ function mobf_path.button_handler(player, formname, fields)
 	mobf_assert_backtrace(playername ~= nil)
 	
 	if formname == "mobf:path:path_name_menu" then
+		dbg_mobf.path_lvl2("MOBF: Path marker rightclick path selected")
 		for k,v in pairs(fields) do
 			local parts = string.split(k,":")
 			
@@ -271,7 +270,30 @@ function mobf_path.button_handler(player, formname, fields)
 		return true
 	end
 	
+	if formname == "mobf:path:add_path_to_entity" then
+		dbg_mobf.path_lvl2("MOBF: Adding path to an entity")
+		for k,v in pairs(fields) do
+			local parts = string.split(k,":")
+			if parts[1] == "mobfpath" then
+				local entity = mobf_global_data_get(parts[2])
+				local pathname = parts[3]
+				
+				if entity ~= nil and
+					pathname ~= nil and
+					mobf_rtd.path_data.users[playername].paths[pathname] ~= nil and
+					entity.data.patrol ~= nil then
+					
+					--switch to guard state
+					 mobf_path.switch_patrol(entity,playername,pathname)
+					
+				end
+			end
+		end
+		return true
+	end
+	
 	if formname == "mobf:path:management_menu" then
+		dbg_mobf.path_lvl2("MOBF: Path management menu button")
 		for k,v in pairs(fields) do
 			local data = mobf_path.parse_button_name(k)
 			
@@ -301,19 +323,42 @@ function mobf_path.button_handler(player, formname, fields)
 				
 				if data.buttonid == "show_points" then
 					for i,v in ipairs(mobf_rtd.path_data.users[data.ownername].paths[data.pathname].points) do
-						spawning.spawn_and_check("mobf:path_marker_entity","",
+						local objects = minetest.env:get_objects_inside_radius(v,0.5)
+						
+						dbg_mobf.path_lvl3("MOBF: got " .. #objects .. 
+							" around pos checking for marker")
+						local found = false;
+						for i=1,#objects,1 do
+							local luaentity = objects[i]:get_luaentity()
+							dbg_mobf.path_lvl3("MOBF: checking: " .. dump(luaentity))
+							if luaentity.name == "mobf:path_marker_entity" then
+								found = true
+								break
+							end
+						end
+						
+						local node_at = minetest.env:get_node(v)
+						
+						if not found and 
+							node_at.name ~= nil and
+							node_at.name ~= "ignore" then
+							spawning.spawn_and_check("mobf:path_marker_entity","",
 												v,"mark_path")
+						end
 					end
 				end
 				
 				if data.buttonid == "delete_path" then
+					dbg_mobf.path_lvl1("MOBF: delete path issued: " 
+						.. data.pathname .. " owner: " .. data.ownername)
 					mobf_rtd.path_data.users[data.ownername].paths[data.pathname] = nil
 					mobf_path.save()
 					data.pathname = nil
 					data.ownername = nil
 				end
 				
-				print("Got button click with id: " .. data.buttonid)
+				dbg_mobf.path_lvl3("MOBF: Got button click with id: " .. 
+									data.buttonid)
 				mobf_path.show_manage_menu(playername,data)
 			end
 		end
@@ -342,17 +387,18 @@ function mobf_path.get_pathlist(playername,isadmin)
 	if isadmin then
 		for local_playername,userdata in pairs(mobf_rtd.path_data.users) do
 			for pathname,path in pairs(userdata.paths) do
-				print("Adding path: " .. pathname .. " data:" .. dump(path))
+				dbg_mobf.path_lvl3("MOBF: Adding path: " .. pathname .. 
+					" data:" .. dump(path))
 				local toadd = {
 					ownername = local_playername,
 					pathname = pathname
 				}
-				print("Adding path entry: " .. dump(toadd))
+				dbg_mobf.path_lvl3("MOBF: Adding path entry: " .. dump(toadd))
 				table.insert(retval,toadd)
 			end
 		end
 	else
-		for pathname,path in pairs(mobf_rtd.path_data.users[playername]) do
+		for pathname,path in pairs(mobf_rtd.path_data.users[playername].paths) do
 			local toadd = {
 				ownername = playername,
 				pathname = pathname
@@ -376,22 +422,17 @@ end
 -------------------------------------------------------------------------------
 function mobf_path.point_labels(playername,pathname)
 	local retval = ""
-	local current_y = 2.25
+	local current_y = 2.15
 	local current_x = 6
 	
 	for i,v in ipairs(mobf_rtd.path_data.users[playername].paths[pathname].points) do
 	
-		if i == 26 then 
-			current_y = 2.25
-			current_x = 8
-		end
-		
-		if i == 51 then 
-			current_y = 2.25
-			current_x = 8
+		if i == 21 then 
+			current_y = 2.15
+			current_x = 9
 		end
 			
-		if i <= 76 then
+		if i <= 40 then
 			retval = retval .. 
 				"label[" .. current_x .. "," .. current_y .. ";".. 
 					mobf_fixed_size_string(i .. ": ",5) .. printpos(v) .. "]"
@@ -399,7 +440,7 @@ function mobf_path.point_labels(playername,pathname)
 			--TODO add error maximum point count exceeded
 		end
 		
-		current_y = current_y + 0.25
+		current_y = current_y + 0.35
 	end
 
 	return retval
@@ -421,7 +462,8 @@ end
 --! @return number of paths added,text
 -------------------------------------------------------------------------------
 function mobf_path.path_buttons(paths,startindex, playername,data,isadmin)
-	print("MOBF: path_buttons start index: " .. startindex .. " table contains " .. #paths .. " entries")
+	dbg_mobf.path_lvl3("MOBF: path_buttons start index: " .. startindex .. 
+									" table contains " .. #paths .. " entries")
 	local current_index = 1
 	local retval = ""
 	local ystart = 1.75
@@ -435,13 +477,15 @@ function mobf_path.path_buttons(paths,startindex, playername,data,isadmin)
 		if current_index >= startindex and
 			current_index <= startindex + 10 then
 			
-			print("Creating button for: " .. dump(value))
+			dbg_mobf.path_lvl3("MOBF: Creating button for: " .. dump(value))
 			
 			data.pathname = value.pathname
 			data.ownername = value.ownername
 			
 			retval = retval ..
-				"button[0," .. ystart .. ";3,0.5;" .. mobf_path.make_button_name("pathbtn",data) .. ";" .. value.pathname .. "]"
+				"button[0," .. ystart .. ";3,0.5;" .. 
+					mobf_path.make_button_name("pathbtn",data) .. ";" .. 
+					value.pathname .. "]"
 				
 			if isadmin ~= nil then
 				retval = retval ..
@@ -494,11 +538,13 @@ function mobf_path.show_manage_menu(playername,data)
 	
 	if data.pagenum > 1 then
 		formspec = formspec ..
-			"button[10.75,0;1,0.5;" .. mobf_path.make_button_name("prev_page",data) .. "; <- ]"
+			"button[10.75,0;1,0.5;" .. 
+				mobf_path.make_button_name("prev_page",data) .. "; <- ]"
 	end
 	if data.pagenum < #all_paths / 10 then
 		formspec = formspec ..
-			"button[12,0;1,0.5;" .. mobf_path.make_button_name("next_page",data) .. "; -> ]"
+			"button[12,0;1,0.5;" .. 
+				mobf_path.make_button_name("next_page",data) .. "; -> ]"
 	end
 	formspec = formspec .. 
 			"label[12.75,9.75;" .. data.pagenum .. "]" ..
@@ -522,18 +568,24 @@ function mobf_path.show_manage_menu(playername,data)
 			"label[9,1;" .. data.ownername .. "]"
 			if not mobf_rtd.path_data.users[data.ownername].paths[data.pathname].locked then
 				formspec = formspec ..
-				"button[11.25,1.125;1.25,0.5;" .. mobf_path.make_button_name("lock_path",data) .. ";lock]"
+				"button[11.25,1.125;1.25,0.5;" .. 
+					mobf_path.make_button_name("lock_path",data) .. ";lock]" ..
+				"button[6,9.5;2,0.5;" .. 
+					mobf_path.make_button_name("delete_path",data) .. ";delete]"
 			else
 				formspec = formspec ..
-				"button[11.25,1.125;1.25,0.5;" .. mobf_path.make_button_name("unlock_path",data) .. ";unlock]"
+				"button[11.25,1.125;1.25,0.5;" .. 
+					mobf_path.make_button_name("unlock_path",data) .. ";unlock]"
 			end
 			
 			formspec = formspec ..
-				"button[6,9.5;2,0.5;" .. mobf_path.make_button_name("delete_path",data) .. ";delete]" ..
-				"button[8.5,9.5;2,0.5;" .. mobf_path.make_button_name("show_points",data) .. ";show points]" ..
-				"button[10.5,9.5;2,0.5;" .. mobf_path.make_button_name("unused",data) .. ";unused]"
+				"button[8.5,9.5;2,0.5;" .. 
+					mobf_path.make_button_name("show_points",data) .. ";show points]" ..
+				"button[10.5,9.5;2,0.5;" .. 
+					mobf_path.make_button_name("unused",data) .. ";unused]"
 				
-			formspec = formspec .. mobf_path.point_labels(data.ownername,data.pathname)
+			formspec = formspec .. 
+				mobf_path.point_labels(data.ownername,data.pathname)
 	end
 	
 	--show formspec
@@ -597,4 +649,150 @@ function mobf_path.parse_button_name(datastring)
 	end 
 	
 	return data
+end
+
+-------------------------------------------------------------------------------
+-- name: mob_rightclick_callback(entity,player)
+--
+--! @brief do rightclick action
+--! @ingroup mobf_path
+--
+--! @param entity mobf rightclicked
+--! @param player issuing rightclick
+-------------------------------------------------------------------------------
+
+function mobf_path.mob_rightclick_callback(entity,player)
+
+	if entity.dynamic_data.patrol_state_before ~= nil then
+		mobf_path.switch_patrol(entity,nil,nil)
+	else
+		local buttons = ""
+		local y_pos = 0.25
+		local storage_id = mobf_global_data_store(entity)
+		local playername = player:get_player_name()
+		
+		local pathlist = mobf_path.get_pathlist(playername,false)
+		
+		dbg_mobf.path_lvl2("MOBF: Pathlist contains: " .. dump(pathlist))
+		
+		for i = 1, #pathlist, 1 do
+			buttons = buttons .. "button_exit[0," .. y_pos .. ";4.5,0.5;" ..
+					"mobfpath:" .. storage_id ..
+					":" .. pathlist[i].pathname .. ";" .. pathlist[i].pathname .. "]"
+				y_pos = y_pos + 0.75
+		end
+		
+		local y_size = y_pos - 0.25
+		local formspec = "size[4.5," .. y_size .. "]" ..
+					buttons
+		
+		--show formspec
+		minetest.show_formspec(playername,"mobf:path:add_path_to_entity",formspec)
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: config_check(entity)
+--
+--! @brief check if mob is configured as trader
+--! @ingroup mobf_path
+--
+--! @param entity mob being checked
+--! @return true/false if trader or not
+-------------------------------------------------------------------------------
+function mobf_path.config_check(entity)
+	if entity.data.patrol ~= nil then
+		return true
+	end
+	
+	return false
+end
+
+-------------------------------------------------------------------------------
+-- name: buttontext(entity)
+--
+--! @brief return text for rightclick button
+--! @ingroup mobf_path
+--
+--! @param entity to get text for
+--! @return buttonname
+-------------------------------------------------------------------------------
+function mobf_path.buttontext(entity)
+	if entity.dynamic_data.patrol_state_before == nil then
+		return "Select path"
+	end
+	
+	return "Disable path"
+end
+
+-------------------------------------------------------------------------------
+-- name: switch_patrol(entity,points)
+--
+--! @brief check if mob is configured as trader
+--! @ingroup mobf_path
+--
+--! @param entity mob being switched
+--! @param points points to use for patroling
+-------------------------------------------------------------------------------
+function mobf_path.switch_patrol(entity,pathowner,pathname)
+	if pathowner ~= nil and
+		pathname ~= nil and
+		entity.data.patrol.state ~= nil then
+		
+		if entity.dynamic_data.patrol_state_before == nil then
+		
+			if entity.dynamic_data.state.current ~= entity.data.patrol.state then
+				entity.dynamic_data.patrol_state_before = entity.dynamic_data.state.current
+			else
+				entity.dynamic_data.patrol_state_before = "default"
+			end
+			mob_state.lock(entity,true)
+		end
+		local new_state = mob_state.get_state_by_name(entity,entity.data.patrol.state)
+		
+		mobf_assert_backtrace(new_state ~= nil)
+		mob_state.change_state(entity,new_state)
+		entity.dynamic_data.p_movement.pathowner = pathowner
+		entity.dynamic_data.p_movement.pathname = pathname
+		entity.dynamic_data.p_movement.path = 
+			mobf_rtd.path_data.users[pathowner].paths[pathname].points
+		entity.dynamic_data.p_movement.next_path_index = 1
+	else
+		if entity.dynamic_data.patrol_state_before ~= nil then
+			local new_state = mob_state.get_state_by_name(entity,entity.dynamic_data.patrol_state_before)
+		
+			mobf_assert_backtrace(new_state ~= nil)
+			mob_state.change_state(entity,new_state)
+			entity.dynamic_data.patrol_state_before = nil
+			mob_state.lock(entity,false)
+		end
+	end
+end
+
+
+-------------------------------------------------------------------------------
+-- name: getpoints(owner,name)
+--
+--! @brief get a path by owner and name
+--! @ingroup mobf_path
+--
+--! @param owner of path
+--! @param name of path
+--! @return list of points
+-------------------------------------------------------------------------------
+function mobf_path.getpoints(pathowner,pathname)
+	if mobf_rtd.path_data.users[pathowner] == nil then
+		print("MOBF: no paths for " .. dump(pathowner) .. " found")
+		return nil
+	end
+	
+	if mobf_rtd.path_data.users[pathowner].paths[pathname] == nil then
+		print(
+			"MOBF: no path " .. dump(pathname) .. 
+			" found for owner " .. pathowner ..
+			" have paths: " .. dump(mobf_rtd.path_data.users[pathowner].paths))
+		return nil
+	end
+
+	return mobf_rtd.path_data.users[pathowner].paths[pathname].points
 end

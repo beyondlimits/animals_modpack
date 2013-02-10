@@ -86,6 +86,7 @@ dofile (mobf_modpath .. "/mgen_probab/main_probab.lua")
 dofile (mobf_modpath .. "/mgen_follow/main_follow.lua")
 dofile (mobf_modpath .. "/mgen_rasterized/mgen_raster.lua")
 dofile (mobf_modpath .. "/mgen_jordan4ibanez/mgen_jordan4ibanez.lua")
+dofile (mobf_modpath .. "/mgen_pathbased/main.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
 mobf_version = "2.0.80"
@@ -349,6 +350,7 @@ function mobf_init_modules()
 			handler		= mob_inventory.trader_callback,
 			configcheck	= mob_inventory.config_check
 			})
+			
 	mobf.register_on_rightclick_callback({
 			name = "debugcallback",
 			visiblename = "Show debuginfo",
@@ -359,6 +361,12 @@ function mobf_init_modules()
 			privs = {mobfw_admin=true}
 			})
 
+	mobf.register_on_rightclick_callback({
+			name = "pathcallback",
+			visiblename = mobf_path.buttontext,
+			handler		= mobf_path.mob_rightclick_callback,
+			configcheck	= mobf_path.config_check
+			})
 end
 
 mobf_init_framework()
