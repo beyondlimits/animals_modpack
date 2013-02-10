@@ -416,9 +416,9 @@ function mob_inventory.register_formspec(name,formspec)
 end
 
 -------------------------------------------------------------------------------
--- name: callback(entity,player,now)
+-- name: trader_callback(entity,player)
 --
---! @brief callback handler for harvest by player
+--! @brief callback handler for inventory by rightclick
 --! @ingroup mob_inventory
 --
 --! @param entity mob being harvested
