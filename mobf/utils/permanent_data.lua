@@ -112,10 +112,47 @@ function mobf_deserialize_permanent_entity_data(staticdata)
 		end_pos = string.find(staticdata,";",start_pos)
 		
 		if end_pos ~= nil then
-			dbg_mobf.permanent_store_lvl1("MOBF: Found: ".. string.sub(staticdata,start_pos,end_pos-1).. " as sevemth element")
+			dbg_mobf.permanent_store_lvl1("MOBF: Found: ".. string.sub(staticdata,start_pos,end_pos-1).. " as seventh element")
 			retval.state = string.sub(staticdata,start_pos,end_pos-1)
 			if retval.state == "" then
 				retval.state = nil
+			end
+		else
+			return retval
+		end
+		
+		start_pos = end_pos +1
+		end_pos = string.find(staticdata,";",start_pos)
+		
+		if end_pos ~= nil then
+			dbg_mobf.permanent_store_lvl1("MOBF: Found: ".. string.sub(staticdata,start_pos,end_pos-1).. " as eigth element")
+			retval.pathindex_raw = string.sub(staticdata,start_pos,end_pos-1)
+			retval.pathindex = tonumber(retval.pathindex_raw)
+		else
+			return retval
+		end
+		
+		start_pos = end_pos +1
+		end_pos = string.find(staticdata,";",start_pos)
+		
+		if end_pos ~= nil then
+			dbg_mobf.permanent_store_lvl1("MOBF: Found: ".. string.sub(staticdata,start_pos,end_pos-1).. " as nineth element")
+			retval.pathowner = string.sub(staticdata,start_pos,end_pos-1)
+			if retval.pathowner == "" then
+				retval.pathowner = nil
+			end
+		else
+			return retval
+		end
+		
+		start_pos = end_pos +1
+		end_pos = string.find(staticdata,";",start_pos)
+		
+		if end_pos ~= nil then
+			dbg_mobf.permanent_store_lvl1("MOBF: Found: ".. string.sub(staticdata,start_pos,end_pos-1).. " as tenth element")
+			retval.pathname = string.sub(staticdata,start_pos,end_pos-1)
+			if retval.pathname == "" then
+				retval.pathname = nil
 			end
 		else
 			return retval
@@ -163,6 +200,24 @@ function mobf_serialize_permanent_entity_data(entity)
 				"MOBF: deactivating entity without spawntime setting current time")
 		end
 		
+		local pathowner = ""
+		local pathname  = ""
+		local pathindex = ""
+		
+		if entity.dynamic_data.p_movement ~= nil then
+			if entity.dynamic_data.p_movement.pathowner ~= nil then
+				pathowner = entity.dynamic_data.p_movement.pathowner
+			end
+			
+			if entity.dynamic_data.p_movement.pathname ~= nil then
+				pathname = entity.dynamic_data.p_movement.pathname
+			end
+			
+			if entity.dynamic_data.p_movement.next_path_index ~= nil then
+				pathindex = "" .. entity.dynamic_data.p_movement.next_path_index
+			end
+		end
+		
 		local serialized = playerspawned ..
 		";" ..entity.dynamic_data.spawning.spawnpoint.x ..
 		";" ..entity.dynamic_data.spawning.spawnpoint.y ..
@@ -170,6 +225,9 @@ function mobf_serialize_permanent_entity_data(entity)
 		";" ..entity.dynamic_data.spawning.original_spawntime ..
 		";" ..spawner ..
 		";" ..state ..
+		";" ..pathindex ..
+		";" ..pathowner ..
+		";" ..pathname ..
 		";"
 		
 		
