@@ -352,9 +352,15 @@ function mobf.activate_handler(self,staticdata)
 	
 	if self.dynamic_data.state.current == nil or
 		(current_state.state_mode ~= "auto" and
-		 current_state.state_mode ~= nil) then
+		current_state.state_mode ~= "user_def" and
+		current_state.state_mode ~= nil) then
 		current_state = default_state
 		self.dynamic_data.state.current = "default"
+	end
+	
+	--user defined states are locked per definition
+	if current_state.state_mode == "user_def" then
+		mob_state.lock(self,true)
 	end
 	
 	dbg_mobf.mobf_core_lvl2("MOBF: " .. self.data.name .. " restoring state: " 
@@ -385,7 +391,8 @@ function mobf.activate_handler(self,staticdata)
 		
 	mobf_assert_backtrace(self.dynamic_data.current_movement_gen ~= nil)
 
-	self.dynamic_data.current_movement_gen.init_dynamic_data(self,now)
+	--initialize movegen entity,current time, permanent data
+	self.dynamic_data.current_movement_gen.init_dynamic_data(self,now,retval)
 	
 	--initialize armor groups
 	if self.data.generic.armor_groups ~= nil then
@@ -619,8 +626,15 @@ function mobf.rightclick_handler(entity,clicker)
 					mobf_global_data_store(entity.on_rightclick_hooks[i].handler)
 				buttons = buttons .. "button_exit[0," .. y_pos .. ";2.5,0.5;" ..
 					"mobfrightclick_" .. storage_id .. "_" ..
-					callback_storage_id .. ";" .. 
-					entity.on_rightclick_hooks[i].visiblename .. "]"
+					callback_storage_id .. ";"
+					
+					if type(entity.on_rightclick_hooks[i].visiblename) == "function" then
+						buttons = buttons .. 
+							entity.on_rightclick_hooks[i].visiblename(entity) .. "]"
+					else
+						buttons = buttons .. 
+							entity.on_rightclick_hooks[i].visiblename .. "]"
+					end
 					
 				y_pos = y_pos + 0.75
 			end
