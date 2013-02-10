@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_guard mod loading ...")
 
-local version = "0.0.2"
+local version = "0.0.3"
 local guard_groups = {
 						not_in_creative_inventory=1
 					}
@@ -68,6 +68,10 @@ guard_prototype = {
 						},
 					self_destruct = nil,
 					},
+		patrol = {
+					state = "patrol",
+					cycle_path = true,
+				},
 		states = {
 				{ 
 				name = "combat_melee",
@@ -91,7 +95,7 @@ guard_prototype = {
 				typical_state_time = 180,
 				chance = 1.00,
 				animation = "stand",
-				atate_mode = "auto",
+				state_mode = "auto",
 				graphics_3d = {
 					visual = "mesh",
 					mesh = "mob_guard_guard.b3d",
@@ -99,6 +103,14 @@ guard_prototype = {
 					collisionbox = {-0.3,-1.0,-0.3, 0.3,0.8,0.3},
 					visual_size= {x=1, y=1},
 					},
+				},
+				{ 
+				name = "patrol",
+				movgen = "mgen_path",
+				typical_state_time = 9999,
+				chance = 0.0,
+				animation = "walk",
+				state_mode = "user_def",
 				},
 			},
 		animation = {
