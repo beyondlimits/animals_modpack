@@ -245,12 +245,17 @@ function mobf_debug.rightclick_callback(entity,player)
 	print("MOBF: " .. entity.data.name .. " is alive for " .. lifetime .. " seconds")
 	print("MOBF: \tCurrent state:               " .. entity.dynamic_data.state.current )
 	print("MOBF: \tCurrent movgen:              " .. entity.dynamic_data.current_movement_gen.name )
-	if entity.dynamic_data.current_movement_gen.name == "follow_mov_gen" then
+	if entity.dynamic_data.current_movement_gen.name == "follow_mov_gen" or
+		entity.dynamic_data.current_movement_gen.name == "mgen_path" then
 			local basepos  = entity.getbasepos(entity)
-			local targetpos = entity.dynamic_data.spawning.spawnpoint	
-			if entity.dynamic_data.movement.guardspawnpoint ~= true and
-				entity.dynamic_data.movement.target ~= nil then
-				targetpos = entity.dynamic_data.movement.target:getpos()
+			
+			local targetpos = entity.dynamic_data.spawning.spawnpoint
+			if entity.dynamic_data.movement.target ~= nil then 
+				if not mobf_is_pos(entity.dynamic_data.movement.target) then
+					targetpos = entity.dynamic_data.movement.target:getpos()
+				else
+					targetpos = entity.dynamic_data.movement.target
+				end
 			end
 			if targetpos ~= nil then
 				print("MOBF: \t\tmovement state:              " .. mgen_follow.identify_movement_state(basepos,targetpos) )
@@ -258,6 +263,12 @@ function mobf_debug.rightclick_callback(entity,player)
 				print("MOBF: \t\tmovement state:              invalid")
 			end
 			print("MOBF: \t\tguard spawnpoint:            " .. dump(entity.dynamic_data.movement.guardspawnpoint))
+			print("MOBF: \t\ttarget:                      " .. dump(entity.dynamic_data.movement.target))
+	end
+	if entity.dynamic_data.current_movement_gen.name == "mgen_path" then
+			print("MOBF: \t\tpath index:                  " .. entity.dynamic_data.p_movement.next_path_index)
+			print("MOBF: \t\tpath:                        " .. dump(entity.dynamic_data.p_movement.path))
+			print("MOBF: \t\tdistance to next point:      " .. p_mov_gen.distance_to_next_point(entity,entity.object:getpos()))
 	end
 	print("MOBF: \tTime to state change:        " .. entity.dynamic_data.state.time_to_next_change .. " seconds")
 	print("MOBF: \tCurrent environmental state: " .. environment.pos_is_ok(entity.getbasepos(entity),entity))
