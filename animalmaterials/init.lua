@@ -296,4 +296,19 @@ minetest.register_craftitem("animalmaterials:scale_blue", {
 	stack_max=25
 })
 
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- recipes
+--
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+minetest.register_craft({
+	output = "wool:white",
+	recipe = {
+		{"animalmaterials:feather","animalmaterials:feather","animalmaterials:feather"},
+		{"animalmaterials:feather", "animalmaterials:feather","animalmaterials:feather"},
+		{"animalmaterials:feather","animalmaterials:feather","animalmaterials:feather"},
+	}
+)
+
 minetest.log("action","MOD: animalmaterials mod version " .. version .. " loaded")
