@@ -298,10 +298,13 @@ function fighting.switch_to_combat_state(entity,now,target)
 	mob_state.lock(entity,true)
 
 	--backup dynamic movement data
-	local backup = entity.dynamic_data.movement
+	local backup = {}
+	backup.movement   = entity.dynamic_data.movement
+	backup.p_movement = entity.dynamic_data.p_movement
 	
 	--create new movement data
 	entity.dynamic_data.movement = {}
+	entity.dynamic_data.p_movement = {}
 	
 	backup.current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
 	dbg_mobf.fighting_lvl2("MOBF: backing up state: " .. backup.current_state.name)
@@ -356,17 +359,18 @@ function fighting.restore_previous_state(entity,now)
 		
 		backup.current_state = nil
 			
-			
 		if newentity ~= nil then
 			entity = newentity
 		end
 		
 		--restore old movement data
-		entity.dynamic_data.movement = backup
+		entity.dynamic_data.movement = backup.movement
+		entity.dynamic_data.p_movement = backup.p_movement
 		
 		--don't restore old movement target if not valid anymore
 		if entity.dynamic_data.movement.target == nil or
-			entity.dynamic_data.movement.target:getpos() == nil then
+			(not mobf_is_pos(entity.dynamic_data.movement.target) and
+			entity.dynamic_data.movement.target:getpos() == nil) then
 			entity.dynamic_data.movement.target = nil
 		end
 		
@@ -505,12 +509,24 @@ function fighting.combat(entity,now)
 									entity.dynamic_data.combat.target,distance)
 		
 		if required_state ~= nil then
+			local mov_target = entity.dynamic_data.movement.target
+			dbg_mobf.fighting_lvl3("MOBF: mov target before state switch: " .. 
+				dump(mov_target))
 			local newentity = mob_state.change_state(entity,required_state)
 
 			--if we just changed entity abort this handler
 			if newentity ~= nil then
+				newentity.dynamic_data.movement.target = mov_target
+				dbg_mobf.fighting_lvl3(
+					"MOBF: (1) mov target after state switch: " .. 
+					dump(newentity.dynamic_data.movement.target))
 				return false
 			end
+			
+			--preserve movement target
+			entity.dynamic_data.movement.target = mov_target
+			dbg_mobf.fighting_lvl3("MOBF: (2) mov target after state switch: " 
+				.. dump(entity.dynamic_data.movement.target))
 		end
 		
 		--is mob near enough for any attack attack?
