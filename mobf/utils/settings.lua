@@ -29,10 +29,13 @@
 -------------------------------------------------------------------------------
 function mobf_set_world_setting(name,value)
 
-	--TODO replace by lua supported world settings storage
-	local worldid = minetest.get_worldpath()
-	local access_name = "mobf:" .. worldid .. ": " .. name
-	minetest.setting_set(access_name,value)
+	if minetest.world_setting_set == nil then
+		local worldid = minetest.get_worldpath()
+		local access_name = "mobf:" .. worldid .. ": " .. name
+		minetest.setting_set(access_name,value)
+	else
+		minetest.world_setting_set(name,value)
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -44,10 +47,13 @@ end
 -------------------------------------------------------------------------------
 function mobf_get_world_setting(name)
 
-	--TODO replace by lua supported world settings storage
-	local worldid = minetest.get_worldpath()	
-	local access_name = "mobf:" .. worldid .. ": " .. name
-	return minetest.setting_get(access_name)
+	if minetest.world_setting_get == nil then
+		local worldid = minetest.get_worldpath()	
+		local access_name = "mobf:" .. worldid .. ": " .. name
+		return minetest.setting_get(access_name)
+	else
+		return minetest.world_setting_get(name)
+	end
 end
 
 
