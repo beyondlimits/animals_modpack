@@ -634,6 +634,41 @@ function mobf_pos_is_same(pos1,pos2)
 end
 
 -------------------------------------------------------------------------------
+-- name: mobf_is_pos(value)
+--
+--! @brief check if a given value is a position
+--
+--! @param value to check
+--
+--! @return true/false
+-------------------------------------------------------------------------------
+function mobf_is_pos(value)
+
+	if value == nil or
+		type(value) ~= "table" then
+		return false
+	end
+	
+	if value.x == nil or
+		tonumber(value.x) == nil then
+		return false
+	end
+	
+	if value.y == nil or
+		tonumber(value.y) == nil then
+		return false
+	end
+	
+	if value.z == nil or
+		tonumber(value.z) == nil then
+		return false
+	end
+	
+	
+	return true
+end
+
+-------------------------------------------------------------------------------
 -- name: mobf_assert_backtrace(value)
 --
 --! @brief assert in case value is false
@@ -646,5 +681,7 @@ function mobf_assert_backtrace(value)
 		assert(value)
 	end
 end
+
+
 
 --!@}
