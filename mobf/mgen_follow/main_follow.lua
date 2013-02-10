@@ -107,6 +107,26 @@ function mgen_follow.handleteleport(entity,now,targetpos)
 
 		if (entity.dynamic_data.movement.teleportsupport) and
 			time_since_next_to_target > entity.data.movement.teleportdelay then
+			
+			--check targetpos try to playe above if not valid
+			local maxoffset = 5
+			local current_offset = 0
+			while (not environment.possible_pos(entity,{
+												x=targetpos.x,
+												y=targetpos.y + current_offset,
+												z=targetpos.z
+												})) and
+				current_offset < maxoffset do
+				print("MOBF: teleport target within block trying above: " .. current_offset)
+				current_offset = current_offset +1
+			end
+			
+			targetpos.y = targetpos.y + current_offset
+			
+			--adjust to collisionbox of mob
+			if entity.collisionbox[2] < -0.5 then
+				targetpos.y = targetpos.y - (entity.collisionbox[2] + 0.49)
+			end
 
 			entity.object:setvelocity({x=0,y=0,z=0})
 			entity.object:setacceleration({x=0,y=0,z=0})
@@ -195,7 +215,12 @@ function mgen_follow.callback(entity,now)
 		
 		if entity.dynamic_data.movement.target ~= nil then
 			dbg_mobf.fmovement_lvl3("MOBF:   have moving target")
-			targetpos = entity.dynamic_data.movement.target:getpos()
+			
+			if not mobf_is_pos(entity.dynamic_data.movement.target) then
+				targetpos = entity.dynamic_data.movement.target:getpos()
+			else
+				targetpos = entity.dynamic_data.movement.target
+			end
 		end
 		
 		if targetpos == nil and
