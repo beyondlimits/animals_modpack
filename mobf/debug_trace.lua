@@ -50,17 +50,21 @@ dbg_mobf = {
 	pmovement_lvl2			= function () end,
 	pmovement_lvl3			= function () end,
 	
-	fmovement_lvl1  		= function () end,
-	fmovement_lvl2  		= function () end,
-	fmovement_lvl3  		= function () end,
+	fmovement_lvl1			= function () end,
+	fmovement_lvl2			= function () end,
+	fmovement_lvl3			= function () end,
 	
-	fighting_lvl1   		= function () end,
-	fighting_lvl2   		= function () end,
-	fighting_lvl3   		= function () end,
+	path_mov_lvl1			= function () end,
+	path_mov_lvl2			= function () end,
+	path_mov_lvl3			= function () end,
 	
-	environment_lvl1 		= function () end,
-	environment_lvl2 		= function () end,
-	environment_lvl3 		= function () end,
+	fighting_lvl1			= function () end,
+	fighting_lvl2			= function () end,
+	fighting_lvl3			= function () end,
+	
+	environment_lvl1		= function () end,
+	environment_lvl2		= function () end,
+	environment_lvl3		= function () end,
 	
 	harvesting_lvl1			= function () end,
 	harvesting_lvl2			= function () end,
@@ -97,4 +101,8 @@ dbg_mobf = {
 	ride_lvl1				= function () end,
 	ride_lvl2				= function () end,
 	ride_lvl3				= function () end,
+	
+	path_lvl1				= function () end,
+	path_lvl2				= function () end,
+	path_lvl3				= function () end,
 }
