@@ -71,7 +71,8 @@ function mob_preserve.handle_remove(entity,reason)
 
 	if reason ~= "cought" and
 		reason ~= "killed" and
-		reason ~= "died by sun" then
+		reason ~= "died by sun" and
+		reason ~= "replaced" then
 		
 		if entity.dynamic_data.spawning.player_spawned then
 			local toset = {}
