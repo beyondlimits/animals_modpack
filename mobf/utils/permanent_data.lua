@@ -30,13 +30,13 @@
 
 function mobf_deserialize_permanent_entity_data(staticdata)
 
---	local deserialized = minetest.deserialize(staticdata)
+	local deserialized = minetest.deserialize(staticdata)
 	
---	if deserialized ~= nil and
---		deserialized.version ~= nil then
---		--print("DEBUG: deserialized -> " ..dump(deserialized))
---		return deserialized
---	end
+	if deserialized ~= nil and
+		deserialized.version ~= nil then
+		--print("DEBUG: deserialized -> " ..dump(deserialized))
+		return deserialized
+	end
 
 	--old style serialized static data
 	local retval = {spawnpoint={x=0,y=0,z=0},playerspawned=false,original_spawntime=-1,state="default"}
@@ -176,18 +176,6 @@ function mobf_serialize_permanent_entity_data(entity)
 		entity.dynamic_data ~= nil and
 		entity.dynamic_data.spawning ~= nil then
 		
-		local playerspawned = "false"
-		
-		if entity.dynamic_data.spawning.player_spawned then
-			playerspawned = "true"
-		end
-		
-		local spawner = ""
-		
-		if entity.dynamic_data.spawning.spawner ~= nil then
-			spawner = entity.dynamic_data.spawning.spawner
-		end
-		
 		local state = "default"
 		if entity.dynamic_data.state ~= nil and 
 			entity.dynamic_data.state.current ~= nil then
@@ -218,27 +206,18 @@ function mobf_serialize_permanent_entity_data(entity)
 			end
 		end
 		
-		local serialized = playerspawned ..
-		";" ..entity.dynamic_data.spawning.spawnpoint.x ..
-		";" ..entity.dynamic_data.spawning.spawnpoint.y ..
-		";" ..entity.dynamic_data.spawning.spawnpoint.z ..
-		";" ..entity.dynamic_data.spawning.original_spawntime ..
-		";" ..spawner ..
-		";" ..state ..
-		";" ..pathindex ..
-		";" ..pathowner ..
-		";" ..pathname ..
-		";"
-		
-		
-		--local toserialize = {
-		--						spawnpoint = entity.dynamic_data.spawning.spawnpoint,
-		--					 	playerspawned = entity.dynamic_data.spawning.player_spawned,
-		--					 	original_spawntime = entity.dynamic_data.spawning.original_spawntime,
-		--					 	spawner = entity.dynamic_data.spawning.spawner,
-		--					 	version = 2
-		--					 }
-		--local serialized = minetest.serialize(toserialize)
+		local toserialize = {
+								spawnpoint = entity.dynamic_data.spawning.spawnpoint,
+								playerspawned = entity.dynamic_data.spawning.player_spawned,
+								original_spawntime = entity.dynamic_data.spawning.original_spawntime,
+								spawner = entity.dynamic_data.spawning.spawner,
+								version = 3,
+								state = state,
+								pathindex = pathindex,
+								pathowner = pathowner,
+								pathname = pathname,
+							}
+		local serialized = minetest.serialize(toserialize)
 		--print("DEBUG: serialized -> " .. serialized)
 		return serialized
 	else
