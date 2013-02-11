@@ -117,8 +117,11 @@ end
 --! @return current time in seconds
 -------------------------------------------------------------------------------
 function mobf_get_current_time()
-	return os.time(os.date('*t'))
-	--return minetest.get_time()
+	if minetest.get_time ~= nil then
+		return minetest.get_time()
+	else
+		return os.time(os.date('*t'))
+	end
 end
 
 -------------------------------------------------------------------------------
