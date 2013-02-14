@@ -159,6 +159,7 @@ function p_mov_gen.init_dynamic_data(entity,now,restored_data)
 		end
 		
 		if restored_data.pathindex ~= nil and
+			type(restored_data.pathindex) == "number" and
 			restored_data.pathindex > 0 and
 			data.path ~= nil and
 			restored_data.pathindex < #data.path then
