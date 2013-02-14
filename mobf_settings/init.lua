@@ -16,9 +16,11 @@
 minetest.log("action","MOD: mobf_settings mod loading ... ")
 
 mobf_settings = {}
-mobf_settings.version = "0.0.18"
+mobf_settings.version = "0.0.19"
 mobf_settings.max_list_page_num = 5
 mobf_settings.buttons = {}
+mobf_settings.buttons[1] = {}
+mobf_settings.buttons[2] = {}
 mobf_settings.menubutton = "button_exit[11,9.5;2,0.5;main; Exit]"
 mobf_settings.formspechandler = function(player,formspec)
 			name = player:get_player_name()
@@ -171,41 +173,61 @@ function mobf_settings.get_known_animals_form(page)
 			.."label[0.5,2.5;-------------------------------------------]"
 			.."label[6.5,2.5;----------------------------------------]"
 		
-		local y_pos = 3.75
-		
-		for i=1,#mobf_settings.buttons,1 do
-			local current_setting = minetest.setting_getbool(mobf_settings.buttons[i].value)
-			
-			if mobf_settings.buttons[i].inverted then
-				if not current_setting then
-					retval = retval .. "button[0.5,".. y_pos .. ";6,0.5;" .. 
-					"en_" .. mobf_settings.buttons[i].value .. ";" .. 
-					mobf_settings.buttons[i].text .. " is enabled]"
-				else
-					retval = retval .. "button[0.5,".. y_pos .. ";6,0.5;" .. 
-					"dis_" .. mobf_settings.buttons[i].value .. ";" .. 
-					mobf_settings.buttons[i].text .. " is disabled]"
-				end
-			
-			else
-				if current_setting then
-					retval = retval .. "button[0.5,".. y_pos .. ";6,0.5;" .. 
-					"dis_" .. mobf_settings.buttons[i].value .. ";" .. 
-					mobf_settings.buttons[i].text .. " is enabled]"
-				else
-					retval = retval .. "button[0.5,".. y_pos .. ";6,0.5;" .. 
-					"en_" .. mobf_settings.buttons[i].value .. ";" .. 
-					mobf_settings.buttons[i].text .. " is disabled]"
-				end
-			end
-			
-			y_pos = y_pos + 0.75
-		end
+			retval = retval .. mobf_settings.draw_buttons(mobf_settings.buttons[1],0.5)
+			retval = retval .. mobf_settings.draw_buttons(mobf_settings.buttons[2],6.5)
 		
 		return retval
 	end
 	
 	return ""
+end
+
+------------------------------------------------------------------------------
+-- name: draw_buttons
+--
+--! @brief get formspec for button drawing
+--! @ingroup mobf_settings
+--
+--! @param buttons buttons to show
+--! @param xpos pos to show buttons at
+--!
+--! @return formspec for button list
+-------------------------------------------------------------------------------
+function mobf_settings.draw_buttons(buttons,xpos)
+	local retval = ""
+	
+	local y_pos = 3.75
+		
+	for i=1,#buttons,1 do
+		local current_setting = minetest.setting_getbool(buttons[i].value)
+		
+		if buttons[i].inverted then
+			if not current_setting then
+				retval = retval .. "button[" .. xpos .. ",".. y_pos .. ";6,0.5;" .. 
+				"en_" .. buttons[i].value .. ";" .. 
+				buttons[i].text .. " is enabled]"
+			else
+				retval = retval .. "button[" .. xpos .. ",".. y_pos .. ";6,0.5;" .. 
+				"dis_" .. buttons[i].value .. ";" .. 
+				buttons[i].text .. " is disabled]"
+			end
+		
+		else
+			if current_setting then
+				retval = retval .. "button[" .. xpos .. ",".. y_pos .. ";6,0.5;" .. 
+				"dis_" .. buttons[i].value .. ";" .. 
+				buttons[i].text .. " is enabled]"
+			else
+				retval = retval .. "button[" .. xpos .. ",".. y_pos .. ";6,0.5;" .. 
+				"en_" .. buttons[i].value .. ";" .. 
+				buttons[i].text .. " is disabled]"
+			end
+		end
+		
+		y_pos = y_pos + 0.75
+	end
+
+	return retval
 end
 
 ------------------------------------------------------------------------------
@@ -297,19 +319,21 @@ function mobf_settings.handle_config_changed_button(fields)
 	local config_setting = nil
 	local enable  = false
 
-	for i=1,#mobf_settings.buttons,1 do
-		local fieldname = "en_" .. mobf_settings.buttons[i].value
-		if fields[fieldname] ~= nil then
-			config_setting = mobf_settings.buttons[i]
-			enable = true
-			break
-		end
-		
-		fieldname = "dis_" .. mobf_settings.buttons[i].value
-		if fields[fieldname] ~= nil then
-			config_setting = mobf_settings.buttons[i]
-			enable = false
-			break
+	for j=1,2,1 do
+		for i=1,#mobf_settings.buttons[j],1 do
+			local fieldname = "en_" .. mobf_settings.buttons[j][i].value
+			if fields[fieldname] ~= nil then
+				config_setting = mobf_settings.buttons[j][i]
+				enable = true
+				break
+			end
+			
+			fieldname = "dis_" .. mobf_settings.buttons[j][i].value
+			if fields[fieldname] ~= nil then
+				config_setting = mobf_settings.buttons[j][i]
+				enable = false
+				break
+			end
 		end
 	end
 
@@ -406,7 +430,7 @@ end
 --! @param inverted invert enable/disable text on button
 --
 -------------------------------------------------------------------------------
-function mobf_settings.register_config_button(configvalue,buttontext,inverted)
+function mobf_settings.register_config_button(index,configvalue,buttontext,inverted)
 
 	local toadd = {
 					value		= configvalue,
@@ -414,7 +438,7 @@ function mobf_settings.register_config_button(configvalue,buttontext,inverted)
 					inverted	= inverted,
 					}
 	
-	table.insert(mobf_settings.buttons,toadd)
+	table.insert(mobf_settings.buttons[index],toadd)
 end
 
 ------------------------------------------------------------------------------
@@ -459,13 +483,14 @@ minetest.register_chatcommand("mobf_settings",
 ------------------------------------------------------------------------------
 -- register mobf_settings buttons
 ------------------------------------------------------------------------------
-mobf_settings.register_config_button("mobf_disable_animal_spawning","Animal spawning",true)
-mobf_settings.register_config_button("mobf_disable_3d_mode","3D mode",true)
-mobf_settings.register_config_button("mobf_animal_spawning_secondary","Secondary spawning algorithm",false)
-mobf_settings.register_config_button("mobf_delete_disabled_mobs","Delete disabled mob entities",false)
-mobf_settings.register_config_button("mobf_log_bug_warnings","Show noisy bug warnings",false)
-mobf_settings.register_config_button("vombie_3d_burn_animation_enabled","Vombie 3d burn animation",false)
-mobf_settings.register_config_button("mobf_log_removed_entities","Log all removed mobs",false)
-mobf_settings.register_config_button("mobf_grief_protection","Disallow mob stealing",false)
+mobf_settings.register_config_button(1,"mobf_disable_animal_spawning","Animal spawning",true)
+mobf_settings.register_config_button(1,"mobf_disable_3d_mode","3D mode",true)
+mobf_settings.register_config_button(1,"mobf_animal_spawning_secondary","Secondary spawning algorithm",false)
+mobf_settings.register_config_button(1,"mobf_delete_disabled_mobs","Delete disabled mob entities",false)
+mobf_settings.register_config_button(1,"mobf_log_bug_warnings","Show noisy bug warnings",false)
+mobf_settings.register_config_button(1,"vombie_3d_burn_animation_enabled","Vombie 3d burn animation",false)
+mobf_settings.register_config_button(1,"mobf_log_removed_entities","Log all removed mobs",false)
+mobf_settings.register_config_button(1,"mobf_grief_protection","Disallow mob stealing",false)
+mobf_settings.register_config_button(2,"mobf_lifebar","lifebar",false)
 
 minetest.log("action","MOD: mobf_settings mod           version "..mobf_settings.version.." loaded")
