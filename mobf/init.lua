@@ -60,6 +60,7 @@ dofile (mobf_modpath .. "/utils/tracing.lua")
 dofile (mobf_modpath .. "/utils/geometry.lua")
 dofile (mobf_modpath .. "/utils/text.lua")
 dofile (mobf_modpath .. "/utils/permanent_data.lua")
+dofile (mobf_modpath .. "/lifebar.lua")
 dofile (mobf_modpath .. "/environment.lua")
 dofile (mobf_modpath .. "/movement_generic.lua")
 dofile (mobf_modpath .. "/graphics.lua")
@@ -157,6 +158,9 @@ function mobf_init_framework()
 	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize path handling subsystem..")
 	mobf_path.init()
+	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize lifebar subsystem..")
+	mobf_lifebar.init()
 	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize mobf supplied modules..")
 	mobf_init_modules()

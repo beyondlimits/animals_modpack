@@ -1,0 +1,148 @@
+-------------------------------------------------------------------------------
+-- Mob Framework Mod by Sapier
+-- 
+-- You may copy, use, modify or do nearly anything except removing this
+-- copyright notice. 
+-- And of course you are NOT allow to pretend you have written it.
+--
+--! @file lifebar.lua
+--! @brief mobf_lifebar implementation
+--! @copyright Sapier
+--! @author Sapier
+--! @date 2013-02-14
+--
+--! @defgroup mobf_lifebar
+--! @brief lifebar implements a visible lifebar showing health of a mob abov
+--!        its head
+--
+--
+-- Contact sapier a t gmx net
+-------------------------------------------------------------------------------
+
+
+
+mobf_lifebar = {}
+
+
+-------------------------------------------------------------------------------
+-- name: init()
+--
+--! @brief register lifebar entity
+--! @ingroup mobf_lifebar
+-------------------------------------------------------------------------------
+function mobf_lifebar.init()
+	print("MOBF: adding lifebar entity")
+	minetest.register_entity(":mobf:lifebar",
+		{
+			physical        = false,
+			collisionbox    = { 0,0,0,0,0,0 },
+			visual          = "sprite",
+			textures        = { "mobf_lb_64.png" },
+			visual_size     = {x=1,y=0.2},
+			groups = { immortal=1, },
+			is_visible = true,
+			initial_sprite_basepos = {x=0, y=0},
+			
+			lifetime = 0,
+			initialized = false,
+
+			on_step = function (self,dtime) 
+					if not self.initialized then
+						self.lifetime = self.lifetime + dtime
+						
+						if self.lifetime > 1 then
+							print("MOBF: lifebar not attached deleting")
+							self.object:remove()
+						end
+					end
+				end
+			
+		})
+end
+
+-------------------------------------------------------------------------------
+-- name: add(entity)
+--
+--! @brief add a lifebat to an entity
+--! @ingroup mobf_lifebar
+--
+--! @param entity entity to add lifebar
+--
+--! @return reference to lifebar added
+-------------------------------------------------------------------------------
+function mobf_lifebar.add(entity)
+	local pos = entity.object:getpos()
+	local BS = 10
+	pos.y = pos.y + entity.collisionbox[5] + 0.1
+
+	local lifebar = minetest.env:add_entity(pos,"mobf:lifebar")
+	
+	if lifebar ~= nil then
+
+		lifebar:set_attach(entity.object,"",{x=0,y=(entity.collisionbox[5] + 0.1) * BS,z=0},{x=0,y=-90,z=0})
+		
+		local luaentity = lifebar:get_luaentity()
+		if luaentity ~= nil then
+			print("MOBF: marking lifebar as initialized")
+			luaentity.initialized = true
+		else
+			print("MOBF: unable to create lifebar entity")
+		end
+	end
+	
+	return lifebar
+end
+
+
+-------------------------------------------------------------------------------
+-- name: del(lifebar)
+--
+--! @brief delete a lifebar
+--! @ingroup mobf_lifebar
+--
+--! @param lifebar lifebar do telete
+-------------------------------------------------------------------------------
+function mobf_lifebar.del(lifebar)
+	if lifebar ~= nil then
+		lifebar:set_detach()
+		lifebar:remove()
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: set(lifebar,value)
+--
+--! @brief set value of a lifebar
+--! @ingroup mobf_lifebar
+--
+--! @param lifebar lifebar do update
+--! @param value (0-1) value of lifebar
+-------------------------------------------------------------------------------
+function mobf_lifebar.set(lifebar,value)
+	if lifebar ~= nil then
+		local modifiername = mobf_lifebar.get_imagename(value)
+		print("MOBF: got modifier " .. modifiername .. " for value " .. value)
+		lifebar:settexturemod(modifiername)
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: get_imagename(value)
+--
+--! @brief calculate imagename from value
+--! @ingroup mobf_lifebar
+--
+--! @param value to get image for
+-------------------------------------------------------------------------------
+function mobf_lifebar.get_imagename(value)
+	
+	local number = math.floor((value*32) +0.5)
+	
+	print("MOBF: calculated number: " .. number )
+
+	if number < 5 then 
+		return "^mobf_lb_0" .. number * 2 .. ".png"
+	else
+		return "^mobf_lb_" .. number * 2 .. ".png"
+	end
+end

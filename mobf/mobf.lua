@@ -407,6 +407,12 @@ function mobf.activate_handler(self,staticdata)
 		self.data.generic.custom_on_activate_handler(self)
 	end
 	
+	--add lifebar
+	if minetest.setting_getbool("mobf_lifebar") then
+		self.lifebar = mobf_lifebar.add(self)
+		mobf_lifebar.set(self.lifebar,self.object:get_hp()/self.hp_max)
+	end
+	
 	self.dynamic_data.initialized = true
 end
 

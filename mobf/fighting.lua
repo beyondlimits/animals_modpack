@@ -148,8 +148,11 @@ function fighting.hit(entity,attacker)
 	--push mob back
 	fighting.push_back(entity,dir)
 
+	--update lifebar
+	mobf_lifebar.set(entity.lifebar,entity.object:get_hp()/entity.hp_max)
+
 	-- make it die
-	if entity.object:get_hp() < 1 then
+	if entity.object:get_hp() < 0.5 then
 	--if entity.dynamic_data.generic.health < 1 then
 		local result = entity.data.generic.kill_result
 		if type(entity.data.generic.kill_result) == "function" then
@@ -187,7 +190,7 @@ function fighting.hit(entity,attacker)
 			dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name 
 				.. " custom on kill handler superseeds generic handling")
 		end
-		
+		mobf_lifebar.del(entity.lifebar)
 		return
 	end
 
@@ -846,6 +849,7 @@ function fighting.self_destruct_handler(entity,now)
 				minetest.log(LOGLEVEL_NOTICE,
 					"MOBF: self destruct without fire isn't really impressive!")
 			end
+			mobf_lifebar.del(entity.lifebar)
 			spawning.remove(entity, "self destruct")
 			return true
 		end
@@ -1082,6 +1086,7 @@ function fighting.sun_damage_handler(entity,now)
 					..damage .." damage because of sun")
 				
 				entity.object:set_hp(entity.object:get_hp() - damage)
+				mobf_lifebar.set(entity.lifebar,entity.object:get_hp()/entity.hp_max)
 				
 				if entity.data.sound ~= nil then		
 					sound.play(mob_pos,entity.data.sound.sun_damage);
@@ -1090,6 +1095,7 @@ function fighting.sun_damage_handler(entity,now)
 				if entity.object:get_hp() <= 0 then
 				--if entity.dynamic_data.generic.health <= 0 then
 					dbg_mobf.fighting_lvl2("Mob ".. entity.data.name .. " died of sun")
+					mobf_lifebar.del(entity.lifebar)
 					spawning.remove(entity,"died by sun")
 					return true
 				end
