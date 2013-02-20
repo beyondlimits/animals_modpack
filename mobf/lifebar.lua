@@ -31,7 +31,6 @@ mobf_lifebar = {}
 --! @ingroup mobf_lifebar
 -------------------------------------------------------------------------------
 function mobf_lifebar.init()
-	print("MOBF: adding lifebar entity")
 	minetest.register_entity(":mobf:lifebar",
 		{
 			physical        = false,
@@ -83,10 +82,10 @@ function mobf_lifebar.add(entity)
 		
 		local luaentity = lifebar:get_luaentity()
 		if luaentity ~= nil then
-			print("MOBF: marking lifebar as initialized")
+			dbg_mobf.lifebar_lvl3("MOBF: marking lifebar as initialized")
 			luaentity.initialized = true
 		else
-			print("MOBF: unable to create lifebar entity")
+			dbg_mobf.lifebar_lvl3("MOBF: unable to create lifebar entity")
 		end
 	end
 	
@@ -121,7 +120,7 @@ end
 function mobf_lifebar.set(lifebar,value)
 	if lifebar ~= nil then
 		local modifiername = mobf_lifebar.get_imagename(value)
-		print("MOBF: got modifier " .. modifiername .. " for value " .. value)
+		dbg_mobf.lifebar_lvl2("MOBF: got modifier " .. modifiername .. " for value " .. value)
 		lifebar:settexturemod(modifiername)
 	end
 end
@@ -138,7 +137,7 @@ function mobf_lifebar.get_imagename(value)
 	
 	local number = math.floor((value*32) +0.5)
 	
-	print("MOBF: calculated number: " .. number )
+	dbg_mobf.lifebar_lvl2("MOBF: calculated number: " .. number )
 
 	if number < 5 then 
 		return "^mobf_lb_0" .. number * 2 .. ".png"

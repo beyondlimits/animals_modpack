@@ -105,4 +105,8 @@ dbg_mobf = {
 	path_lvl1				= function () end,
 	path_lvl2				= function () end,
 	path_lvl3				= function () end,
+	
+	lifebar_lvl1			= function () end,
+	lifebar_lvl2			= function () end,
+	lifebar_lvl3			= function () end,
 }
