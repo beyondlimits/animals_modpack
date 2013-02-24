@@ -126,6 +126,26 @@ function mobf_debug.list_active_mobs(name,param)
 end
 
 -------------------------------------------------------------------------------
+-- name: mob_count(name,param)
+--
+--! @brief count active mobs
+--
+--! @param name name of player
+--! @param param parameters received
+------------------------------------------------------------------------------
+function mobf_debug.mob_count(name,param)
+	
+	local count = 1
+	for index,value in pairs(minetest.luaentities) do 
+		if value.data ~= nil and value.data.name ~= nil then
+			count = count +1
+		end
+	end
+	
+	minetest.chat_send_player(name,"Active mobs: " .. count)
+end
+
+-------------------------------------------------------------------------------
 -- name: add_tools(name,param)
 --
 --! @brief add toolset for testing
@@ -211,6 +231,15 @@ function mobf_debug.init()
 								minetest.chat_send_player(name,"MOBF version: " .. mobf_version)
 							end 
 		})
+		
+	minetest.register_chatcommand("mobf_count",
+		{
+			params		= "",
+			description = "number of active mobs" ,
+			privs		= {},
+			func		= mobf_debug.mob_count
+		})
+
 
 	if mobf_rtd.luatrace_enabled then
 		minetest.register_chatcommand("traceon",
