@@ -50,7 +50,7 @@ function mobf_lifebar.init()
 						self.lifetime = self.lifetime + dtime
 						
 						if self.lifetime > 1 then
-							print("MOBF: lifebar not attached deleting")
+							dbg_mobf.lifebar_lvl3("MOBF: lifebar not attached deleting")
 							self.object:remove()
 						end
 					end
