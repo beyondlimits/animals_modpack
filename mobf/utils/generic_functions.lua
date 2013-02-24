@@ -97,6 +97,18 @@ function MAX(a,b)
 end
 
 -------------------------------------------------------------------------------
+-- name: DELTA(a,b)
+--
+--! @brief delta of two numbers
+--
+--! @param a number 1
+--! @param b number 2
+--! @return delta
+-------------------------------------------------------------------------------
+function DELTA(a,b)
+	return math.abs(a-b)
+end
+-------------------------------------------------------------------------------
 -- name: mobf_is_walkable(node)
 --
 --! @brief check if walkable flag is set for a node

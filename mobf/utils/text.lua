@@ -51,6 +51,10 @@ end
 function mobf_fixed_size_string(text,length)
 	mobf_assert_backtrace(length ~= nil)
 	
+	if text == nil then
+		text="nil"
+	end
+	
 	local current_length = string.len(text)
 	
 	if current_length == nil then 
