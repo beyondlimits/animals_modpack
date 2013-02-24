@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_guard mod loading ...")
 
-local version = "0.0.3"
+local version = "0.0.2"
 local guard_groups = {
 						not_in_creative_inventory=1
 					}
