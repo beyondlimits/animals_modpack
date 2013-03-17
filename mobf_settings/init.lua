@@ -16,7 +16,7 @@
 minetest.log("action","MOD: mobf_settings mod loading ... ")
 
 mobf_settings = {}
-mobf_settings.version = "0.0.17"
+mobf_settings.version = "0.0.18"
 mobf_settings.max_list_page_num = 5
 mobf_settings.buttons = {}
 mobf_settings.menubutton = "button_exit[11,9.5;2,0.5;main; Exit]"
@@ -35,7 +35,7 @@ mobf_settings_debug = function () end
 -------------------------------------------------------------------------------
 function mobf_settings.save()
 	if not minetest.is_singleplayer() then
-		minetest.settings_save()
+		minetest.setting_save()
 	end
 	--singleplayer saves automaticaly
 end

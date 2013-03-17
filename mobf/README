@@ -157,6 +157,9 @@ mobf_delete_disabled_mobs = true/false
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.0.5
+-fix bug in mobf_settings using settings_save instead of mobf_setting_save 
+
 Changes 2.0.4
 -fixed bug trader selling without pay if price1 or price 2 not set
 
