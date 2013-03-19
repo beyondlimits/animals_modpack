@@ -78,8 +78,6 @@ dofile (mobf_modpath .. "/mob_state.lua")
 dofile (mobf_modpath .. "/inventory.lua")
 dofile (mobf_modpath .. "/mob_preserve.lua")
 dofile (mobf_modpath .. "/path.lua")
-dofile (mobf_modpath .. "/pathfinder_v1/debug_path.lua")
-dofile (mobf_modpath .. "/pathfinder_v1/shortest_path.lua")
 
 --include spawning support
 dofile (mobf_modpath .. "/spawning.lua")
