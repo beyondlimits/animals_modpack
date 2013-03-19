@@ -642,6 +642,117 @@ function spawning.register_cleanup_spawner(mobname)
 		})
 end
 
+
+------------------------------------------------------------------------------
+-- name: setup_algorithm(mob)
+-- @function [parent=#spawning] setup_algorithm
+--
+--! @brief set up a specific algorithm for a mob
+--! @memberof spawning
+--
+--! @param primary_name name of mob
+--! @param secondary_name name of mob (when harvested)
+--! @param parameters spawning parameters
+--! @param envid identifyer for environment of mob
+-------------------------------------------------------------------------------
+function spawning.setup_algorithm(primary_name,secondary_name,parameters,envid)
+	
+	if type(parameters) == "table" then
+
+		if mobf_spawn_algorithms[parameters.algorithm] ~= nil and
+			type(mobf_spawn_algorithms[parameters.algorithm].register_spawn) == "function" then
+			
+			mobf_spawn_algorithms[parameters.algorithm].register_spawn(
+								primary_name,
+								secondary_name,
+								parameters,
+								environment_list[envid])
+		end
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: register_mob(mob)
+-- @function [parent=#spawning] register_mob
+--
+--! @brief initialize spawn algorithms for a mob
+--! @memberof spawning
+--
+--! @param mob definition
+-------------------------------------------------------------------------------
+function spawning.register_mob(mob)
+	--spawn mechanism handling
+	if not minetest.setting_getbool("mobf_disable_animal_spawning") then
+		--register spawn callback to world
+		if environment_list[mob.generic.envid] ~= nil then
+			local secondary_name = ""		
+			if mob.harvest ~= nil then
+				secondary_name = mob.harvest.transforms_to
+			end
+			
+			dbg_mobf.spawning_lvl3("MOBGF: Environment to use: " .. tostring(mob.generic.envid))
+			
+			if mobf_spawn_algorithms[mob.spawning.algorithm] == nil then
+				if type(mob.spawning.primary_algorithms) == "table" then
+					for i=1 , #mob.spawning.primary_algorithms , 1 do
+						spawning.setup_algorithm(
+								mob.modname..":"..mob.name,
+								secondary_name,
+								mob.spawning.primary_algorithms[i],
+								mob.generic.envid)
+					end
+				else
+					dbg_mobf.spawning_lvl2("MOBF: " .. mob.name 
+						.. " no primary spawn algorithm defined! ")
+				end
+			
+				if minetest.setting_getbool("mobf_animal_spawning_secondary") then
+					if type(mob.spawning.secondary_algorithms) == "table" then
+						for i=1 , #mob.spawning.secondary_algorithms , 1 do
+							spawning.setup_algorithm(
+									mob.modname..":"..mob.name,
+									secondary_name,
+									mob.spawning.secondary_algorithms[i],
+									mob.generic.envid)
+						end
+					end
+				end
+			else
+				minetest.log(LOGLEVEL_WARNING,"MOBF: legacy spawning declaration"
+						.. " for mob: " .. mob.name
+						.. "!!! plz update to new way of defining spawn"
+						.. " algorithms")
+				if mobf_spawn_algorithms[mob.spawning.algorithm] ~= nil and
+					type(mobf_spawn_algorithms[mob.spawning.algorithm].register_spawn) == "function" then
+					mobf_spawn_algorithms[mob.spawning.algorithm].register_spawn(mob.modname..":"..mob.name,
+																		secondary_name,
+																		mob.spawning,
+																		environment_list[mob.generic.envid])
+				else
+					dbg_mobf.spawning_lvl2("MOBF: " .. mob.name 
+						.. " no primary spawn algorithm defined: " 
+						.. tostring(mob.spawning.algorithm))
+				end
+				
+				if minetest.setting_getbool("mobf_animal_spawning_secondary") then
+					if mob.spawning.algorithm_secondary ~= nil and 
+						type(mobf_spawn_algorithms[mob.spawning.algorithm_secondary].register_spawn) == "function" then
+						mobf_spawn_algorithms[mob.spawning.algorithm_secondary].register_spawn(mob.modname..":"..mob.name,
+																	secondary_name,
+																	mob.spawning,
+																	environment_list[mob.generic.envid])
+					end
+				end
+			end
+		else
+			minetest.log(LOGLEVEL_ERROR,"MOBF: specified mob >" .. mob.name 
+				.. "< without environment!")
+		end
+	else
+		dbg_mobf.spawning_lvl3("MOBF: MOB spawning disabled!")
+	end
+end
+
 --include spawn algorithms
 dofile (mobf_modpath .. "/spawn_algorithms/at_night.lua")
 dofile (mobf_modpath .. "/spawn_algorithms/forrest.lua")
