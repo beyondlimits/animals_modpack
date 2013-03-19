@@ -557,12 +557,17 @@ function movement_gen.fix_current_pos(entity,movement_state)
 		local current_pos = mobf_round_pos(movement_state.basepos);
 		local current_node = minetest.env:get_node( current_pos );
 		
+		local walkable = false
+		if minetest.registered_nodes[current_node.name] then
+			walkable = minetest.registered_nodes[current_node.name].walkable
+		end
+		
 		dbg_mobf.movement_lvl3( "MOBF: Mob collided with "..
 			tostring( current_pos.x )..":"..
 			tostring( current_pos.y )..":"..
 			tostring( current_pos.z ).." Nodename:"..
 			tostring( current_node.name ).." walkable:"..
-			tostring( minetest.registered_nodes[current_node.name].walkable ))
+			tostring( walkable ))
 		
 		if not mobf_is_walkable(current_node) then
 			local targetpos = 

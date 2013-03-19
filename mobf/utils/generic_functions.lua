@@ -355,7 +355,8 @@ function mobf_line_of_sight(pos1,pos2)
 		local node = minetest.env:get_node(tocheck)
 
 
-		if minetest.registered_nodes[node.name].sunlight_propagates ~= true then
+		if minetest.registered_nodes[node.name] == nil or 
+			minetest.registered_nodes[node.name].sunlight_propagates ~= true then
 			line_of_sight = false
 			break
 		end
@@ -532,7 +533,6 @@ end
 --! @return y value of surface or nil
 -------------------------------------------------------------------------------
 function mobf_get_sunlight_surface(x,z, min_y, max_y)
-
     for runy = min_y, max_y,1 do
         local pos = { x=x,y=runy, z=z }
         local node_to_check = minetest.env:get_node(pos)
@@ -557,6 +557,11 @@ end
 --! @return y value of surface or nil
 -------------------------------------------------------------------------------
 function mobf_get_surface(x,z, min_y, max_y)
+
+	mobf_assert_backtrace(min_y ~= nil)
+	mobf_assert_backtrace(max_y ~= nil)
+	mobf_assert_backtrace(x ~= nil)
+	mobf_assert_backtrace(z ~= nil)
 
 	local last_node = minetest.env:get_node({ x=x,y=min_y, z=z })
 
