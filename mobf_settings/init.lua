@@ -37,7 +37,7 @@ mobf_settings_debug = function () end
 -------------------------------------------------------------------------------
 function mobf_settings.save()
 	if not minetest.is_singleplayer() then
-		minetest.settings_save()
+		minetest.setting_save()
 	end
 	--singleplayer saves automaticaly
 end
