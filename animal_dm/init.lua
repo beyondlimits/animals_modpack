@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_dm loading ...")
-local version = "0.0.15"
+local version = "0.0.16"
 
 local dm_groups = {
                         not_in_creative_inventory=1
