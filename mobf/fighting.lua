@@ -79,10 +79,10 @@ end
 -------------------------------------------------------------------------------
 function fighting.push_back(entity,dir)
 	--get some base information
-	local mob_pos = entity.object:getpos()
+	local mob_pos     = entity.object:getpos()
 	local mob_basepos = entity.getbasepos(entity)
-	local dir_rad = mobf_calc_yaw(dir.x,dir.z)
-	local posdelta = mobf_calc_vector_components(dir_rad,0.5)
+	local dir_rad     = mobf_calc_yaw(dir.x,dir.z)
+	local posdelta    = mobf_calc_vector_components(dir_rad,0.5)
 	
 	--push back mob
 	local new_pos = {
@@ -132,13 +132,6 @@ function fighting.hit(entity,attacker)
 	local mob_basepos = entity.getbasepos(entity)
 	local targetpos   = attacker:getpos()
 	local dir         = mobf_get_direction(targetpos,mob_basepos)
-	
-	--look towards attacker
-	if entity.mode == "3d" then
-		entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)+math.pi)
-	else
-		entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)-math.pi)
-	end
 	
 	--play hit sound
 	if entity.data.sound ~= nil then
@@ -198,6 +191,14 @@ function fighting.hit(entity,attacker)
 	-- fight back
 	if entity.data.combat ~= nil and
 		entity.data.combat.angryness > 0 then
+			--look towards attacker
+			
+		if entity.mode == "3d" then
+			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)+math.pi)
+		else
+			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)-math.pi)
+		end
+	
 		dbg_mobf.fighting_lvl2("MOBF: mob with chance of fighting back attacked")
 		--either the mob hasn't been attacked by now or a new player joined fight
 		
@@ -213,6 +214,35 @@ function fighting.hit(entity,attacker)
 					end
 					entity.dynamic_data.combat.target = attacker
 			end	
+		end
+	else
+		--make non agressive animals run away
+		
+		local flee_state = mob_state.get_state_by_name(entity,"flee")
+		
+		--if there's no dedicated flee state try walking
+		if flee_state == nil then
+			flee_state = mob_state.get_state_by_name(entity,"walking")
+		end
+		
+		if flee_state ~= nil then
+			local dir_rad     = mobf_calc_yaw(dir.x,dir.z)
+			local fleevelocity     = mobf_calc_vector_components(dir_rad,
+											entity.data.movement.max_accel*2)
+			
+			local current_accel    = entity.object:getacceleration()
+			local current_velocity = entity.object:getvelocity()
+			
+			mob_state.change_state(entity,flee_state)
+			
+			entity.object:setvelocity({x=0,y=current_velocity.y,z=0})
+			entity.object:setacceleration({
+											x=fleevelocity.x,
+											y=current_accel.y,
+											z=fleevelocity.z}
+										)
+		else
+			dbg_mobf.fighting_lvl2("MOBF: unable to run away no matching state (flee/walking) defined ")
 		end
 	end
 end
