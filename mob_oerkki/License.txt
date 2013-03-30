@@ -1,0 +1,7 @@
+Licenses
+
+CC0
+	models/oerkki.blend (ueberi)
+
+Everything not mentioned:
+	CC-BY-SA, Author sapier
