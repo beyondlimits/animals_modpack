@@ -139,7 +139,12 @@ tamed_wolf_prototype = {
 					--before placer is known to entity
 					custom_on_place_handler = function(entity, placer, pointed_thing)
 						if placer:is_player(placer) then
-							entity.dynamic_data.movement.target = placer
+							if entity.dynamic_data ~= nil and
+								entity.dynamic_data.movement ~= nil  then
+								entity.dynamic_data.movement.target = placer
+							else
+								print("ANIMAL tamed wolf: unable to set owner maybe wolf has been already deleted")
+							end
 						end
 					end,
 					custom_on_activate_handler = function(entity)
