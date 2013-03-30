@@ -105,6 +105,21 @@ creeper_prototype = {
 				},
 			}
 		}
+		
+		--compatibility code
+minetest.register_entity("animal_creeper:creeper_spawner",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
+	
+		local pos = self.object:getpos();
+		minetest.env:add_entity(pos,"animal_creeper:creeper_spawner_at_night")
+		self.object:remove()
+	end,
+})
 
 --register with animals mod
 minetest.log("action","\tadding mob "..creeper_prototype.name)
