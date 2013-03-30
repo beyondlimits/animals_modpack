@@ -129,36 +129,63 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 				
 			if gametime > 0.25 and
 				gametime < 0.75 then
+				dbg_mobf.spawning_lvl3("MOBF: wrong time for at night spawner")
 				return
 			end
-		
+			
 			local pos = self.object:getpos()
+			
+			local newpos = {}
+			local max_offset = 0.4*self.spawner_mob_spawndata.density
+			
+			newpos.x = math.floor(pos.x + 
+						math.random(0,max_offset) +
+						0.5)
+			newpos.z = math.floor(pos.z + 
+						math.random(0,max_offset) +
+						0.5)
+			newpos.y = mobf_get_surface(newpos.x,newpos.z,pos.y-5, pos.y+5)
+			
 			local good = true
+			local reason = "unknown"
 			
 			dbg_mobf.spawning_lvl3("MOBF: " .. dump(self.spawner_mob_env))
 			
+			if newpos.y == nil then
+				good = false
+				reason = "no height found for random pos"
+				newpos.y = 0
+			end
+			
 			--check if own position is good
-			local pos_below = {x=pos.x,y=pos.y-1,z=pos.z}
+			local pos_below = {x=newpos.x,y=newpos.y-1,z=newpos.z}
 			local node_below = minetest.env:get_node(pos_below)
 			
-			
-			if not mobf_contains(at_night_surfaces,node_below.name) then
+			if good and not mobf_contains(at_night_surfaces,node_below.name) then
+				reason = "wrong surface"
 				good = false
 			end
 			
 			--check if there s enough space above to place mob
-			if mobf_air_above(pos_below,self.spawner_mob_spawndata.height) ~= true then
+			if good and mobf_air_above(pos_below,self.spawner_mob_spawndata.height) ~= true then
+				reason = "so low"
 				good = false
 			end
 			
+			local light_day = minetest.env:get_node_light(newpos,0.5)
+			local light_midnight = minetest.env:get_node_light(newpos,0.0)
+			
 			--check if area is in day/night cycle
-			if minetest.env:get_node_light(pos,0.5) ~= LIGHT_MAX +1 or
-				minetest.env:get_node_light(pos,0.0) > 7 then
+			if good and (light_day ~= LIGHT_MAX +1 or
+				light_midnight > 7) then
+				reason = "wrong light: " .. light_day .. " " .. light_midnight
 				good = false
 			end
 				
 			if not good then
-				dbg_mobf.spawning_lvl2("MOBF: not spawning spawner for " .. self.spawner_mob_name .. " somehow got to bad place")
+				dbg_mobf.spawning_lvl2("MOBF: not spawning " 
+				.. self.spawner_mob_name .. " spawner somehow got to bad place: " 
+				.. reason)
 				--TODO try to move spawner to better place
 				
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
@@ -184,7 +211,8 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
 				dbg_mobf.spawning_lvl2("MOBF: not spawning " .. self.spawner_mob_name .. " there's a mob around")
 			end
-		end)
+		end,
+		"_at_night")
 		
 	--add mob spawner on map generation
 	minetest.register_on_generated(function(minp, maxp, seed)
@@ -208,10 +236,18 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 					local node_above = minetest.env:get_node(pos_above)
 					if not mobf_contains({"air"},node_above.name) then
 						dbg_mobf.spawning_lvl3("MOBF: node above ain't air but: " .. node_above.name)
-						return
+						return false
 					end
 					
-					spawning.spawn_and_check(name,"_spawner",pos_above,"at_night_spawner")
+					local light_day = minetest.get_node_light(pos_above,0.5)
+					
+					if light_day ~= (LIGHT_MAX +1) then
+						dbg_mobf.spawning_lvl3("MOBF: node above ain't in sunlight")
+						return false
+					end
+					
+					dbg_mobf.spawning_lvl2("MOBF: adding spawner for mob: " .. name .. " " .. light_day)
+					spawning.spawn_and_check(name,"_spawner_at_night",pos_above,"at_night_spawner")
 					return true
 				else
 					dbg_mobf.spawning_lvl3("MOBF: didn't find surface for " .. name .. " spawner at " ..printpos(pos))

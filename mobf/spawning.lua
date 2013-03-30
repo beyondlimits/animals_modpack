@@ -352,15 +352,15 @@ function spawning.spawn_and_check(name,suffix,pos,text)
 		local newentity = mobf_find_entity(newobject)
 		
 		if newentity == nil then
-			dbg_mobf.spawning_lvl3("MOBF BUG!!! no " .. name..
+			dbg_mobf.spawning_lvl3("MOBF BUG!!! no " .. name.. suffix ..
 				" entity has been created by " .. text .. "!")
-			mobf_bug_warning(LOGLEVEL_ERROR,"BUG!!! no " .. name..
+			mobf_bug_warning(LOGLEVEL_ERROR,"BUG!!! no " .. name.. suffix ..
 				" entity has been created by " .. text .. "!")
 		else
-			dbg_mobf.spawning_lvl2("MOBF: spawning "..name.." entity by " .. 
-				text .. " at position ".. printpos(pos))
-			minetest.log(LOGLEVEL_INFO,"MOBF: spawning "..name.." entity by " .. 
-				text .. " at position ".. printpos(pos))
+			dbg_mobf.spawning_lvl2("MOBF: spawning "..name.. suffix ..
+				" entity by " .. text .. " at position ".. printpos(pos))
+			minetest.log(LOGLEVEL_INFO,"MOBF: spawning "..name.. suffix .. 
+				" entity by " .. text .. " at position ".. printpos(pos))
 			return newentity
 		end
 	else
@@ -586,11 +586,15 @@ end
 --! @param spawndata spawning information to use
 --! @param environment what environment is good for mob
 --! @param spawnfunc function to call for spawning
+--! @param suffix to add
 --
 --! @return
 -------------------------------------------------------------------------------
-function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,environment,spawnfunc)
-	minetest.register_entity(mobname .. "_spawner",
+function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,environment,spawnfunc,suffix)
+	if suffix == nil then
+		suffix = ""
+	end
+	minetest.register_entity(mobname .. "_spawner" .. suffix,
 		 {
 			physical        = false,
 			collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
@@ -604,7 +608,19 @@ function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,en
 				
 				if self.spawner_time_passed < 0 then
 					local starttime = mobf_get_time_ms()
-					spawnfunc(self)
+					
+					local mobcount = mobf_mob_around(self.spawner_mob_name,
+										self.spawner_mob_transform,
+										self.object:getpos(),
+										1.5,true)
+					
+					--check if mob is already at spawner pos
+					if mobcount == 0 then
+						spawnfunc(self)
+					else
+						dbg_mobf.spawning_lvl3("MOBF: not spawning " .. self.spawner_mob_name .. " due to mob being to near " .. mobcount)
+					end
+					
 					mobf_warn_long_fct(starttime,"spawnfunc " .. self.spawner_mob_name,"spawnfunc")
 				end
 			end,
@@ -661,7 +677,10 @@ function spawning.setup_algorithm(primary_name,secondary_name,parameters,envid)
 
 		if mobf_spawn_algorithms[parameters.algorithm] ~= nil and
 			type(mobf_spawn_algorithms[parameters.algorithm].register_spawn) == "function" then
-			
+			dbg_mobf.spawning_lvl2("MOBF: algorithm: " .. parameters.algorithm)
+			dbg_mobf.spawning_lvl2("MOBF: " .. dump(primary_name) .. " " ..
+				dump(secondary_name) .. " " .. dump(parameters) .. " " ..
+				dump(envid))
 			mobf_spawn_algorithms[parameters.algorithm].register_spawn(
 								primary_name,
 								secondary_name,
@@ -690,9 +709,10 @@ function spawning.register_mob(mob)
 				secondary_name = mob.harvest.transforms_to
 			end
 			
-			dbg_mobf.spawning_lvl3("MOBGF: Environment to use: " .. tostring(mob.generic.envid))
+			dbg_mobf.spawning_lvl3("MOBF: Environment to use: " .. tostring(mob.generic.envid))
 			
-			if mobf_spawn_algorithms[mob.spawning.algorithm] == nil then
+			if mob.spawning.algorithm == nil then
+				dbg_mobf.spawning_lvl2("MOBF: Register spawning algorithms")
 				if type(mob.spawning.primary_algorithms) == "table" then
 					for i=1 , #mob.spawning.primary_algorithms , 1 do
 						spawning.setup_algorithm(

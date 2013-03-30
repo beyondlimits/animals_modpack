@@ -114,6 +114,7 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 		function(self)
 			local pos = self.object:getpos()
 			local good = true
+			local reason = "unknown"
 			
 			dbg_mobf.spawning_lvl3("MOBF: " .. dump(self.spawner_mob_env))
 			
@@ -124,21 +125,26 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 			
 			if not mobf_contains({ "default:stone","default:gravel","default:dirt" },node_below.name) then
 				good = false
+				reson = "wrong surface"
 			end
 			
 			--check if there s enough space above to place mob
 			if mobf_air_above(pos_below,self.spawner_mob_spawndata.height) ~= true then
 				good = false
+				reason = "to low"
 			end
 			
 			for i=0.0,1,0.1 do
 				if minetest.env:get_node_light(pos,i) > 6 then
 					good = false
+					reason = "to much light"
 				end
 			end
 			
 			if not good then
-				dbg_mobf.spawning_lvl2("MOBF: not spawning spawner for " .. self.spawner_mob_name .. " somehow got to bad place")
+				dbg_mobf.spawning_lvl2("MOBF: shadows: not spawning for " 
+				.. self.spawner_mob_name .. " somehow got to bad place: "..
+				reason)
 				--TODO try to move spawner to better place
 				
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
@@ -154,7 +160,7 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
 			else
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
-				dbg_mobf.spawning_lvl2("MOBF: not spawning " .. self.spawner_mob_name .. " there's a mob around")
+				dbg_mobf.spawning_lvl2("MOBF: shadows: not spawning " .. self.spawner_mob_name .. " there's a mob around")
 			end
 		end)
 
