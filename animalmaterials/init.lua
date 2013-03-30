@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animalmaterials loading ...")
-local version = "0.0.16"
+local version = "0.0.17"
 
 
 animalmaterialsdata = {}
@@ -308,5 +308,20 @@ minetest.register_craftitem("animalmaterials:scale_blue", {
 	image = "animalmaterials_scale_blue.png",
 	stack_max=25
 })
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- recipes
+--
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+minetest.register_craft({
+  output = "wool:white",
+  recipe = {
+    {"animalmaterials:feather","animalmaterials:feather","animalmaterials:feather"},
+    {"animalmaterials:feather", "animalmaterials:feather","animalmaterials:feather"},
+    {"animalmaterials:feather","animalmaterials:feather","animalmaterials:feather"},
+  }
+) 
 
 minetest.log("action","MOD: animalmaterials mod version " .. version .. " loaded")
