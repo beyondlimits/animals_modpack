@@ -239,7 +239,7 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 						return false
 					end
 					
-					local light_day = minetest.get_node_light(pos_above,0.5)
+					local light_day = minetest.env:get_node_light(pos_above,0.5)
 					
 					if light_day ~= (LIGHT_MAX +1) then
 						dbg_mobf.spawning_lvl3("MOBF: node above ain't in sunlight")
