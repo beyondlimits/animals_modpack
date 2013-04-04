@@ -62,6 +62,7 @@ dofile (mobf_modpath .. "/utils/text.lua")
 dofile (mobf_modpath .. "/utils/permanent_data.lua")
 dofile (mobf_modpath .. "/lifebar.lua")
 dofile (mobf_modpath .. "/environment.lua")
+dofile (mobf_modpath .. "/attention.lua")
 dofile (mobf_modpath .. "/movement_generic.lua")
 dofile (mobf_modpath .. "/graphics.lua")
 dofile (mobf_modpath .. "/movement_gen_registry.lua")
@@ -240,20 +241,19 @@ function mobf_init_modules()
 				end
 				})
 				
-	--attack hook
+	--attention hook
 	mobf.register_on_step_callback({
-			name = "aggression",
-			handler = fighting.aggression,
-			init = nil, -- already done by fighting.combat
+			name = "attention",
+			handler = attention.callback,
+			init = attention.init_dynamic_data,
 			configcheck = function(entity)
-					if entity.data.combat ~= nil then
+					if entity.data.attention ~= nil or
+						entity.data.combat ~= nil then
 						return true
 					end
 					return false
 				end
 				})
-		
-
 
 	--workaround for shortcomings in spawn algorithm
 	mobf.register_on_step_callback({
@@ -301,7 +301,6 @@ function mobf_init_modules()
 					return true
 				end
 				})
-
 
 	--custom hook
 	mobf.register_on_step_callback({

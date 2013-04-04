@@ -190,9 +190,10 @@ function fighting.hit(entity,attacker)
 	--dbg_mobf.fighting_lvl2("MOBF: attack chance is ".. entity.data.combat.angryness)
 	-- fight back
 	if entity.data.combat ~= nil and
-		entity.data.combat.angryness > 0 then
-			--look towards attacker
-			
+		(entity.data.combat.can_fight or
+		entity.data.combat.angryness > 0) then
+		
+		--face attacker
 		if entity.mode == "3d" then
 			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)+math.pi)
 		else
@@ -202,19 +203,8 @@ function fighting.hit(entity,attacker)
 		dbg_mobf.fighting_lvl2("MOBF: mob with chance of fighting back attacked")
 		--either the mob hasn't been attacked by now or a new player joined fight
 		
-		if entity.dynamic_data.combat.target ~= attacker then
-			dbg_mobf.fighting_lvl2("MOBF: new player started fight")
-			--calculate chance of mob fighting back
-			if math.random() < entity.data.combat.angryness then
-					local attackername = fighting.get_target_name(attacker)
-					dbg_mobf.fighting_lvl2("MOBF: fighting back player "..attackername)
-					
-					if entity.dynamic_data.combat.target == nil then
-						fighting.switch_to_combat_state(entity,mobf_get_current_time(),attacker)
-					end
-					entity.dynamic_data.combat.target = attacker
-			end	
-		end
+		
+		fighting.set_target(entity,attacker)
 	else
 		--make non agressive animals run away
 		
@@ -259,8 +249,9 @@ end
 --
 --! @return state tu use
 -------------------------------------------------------------------------------
-function fighting.identify_combat_state(entity,target,distance)
+function fighting.identify_combat_state(entity,distance)
 
+	target = entity.dynamic_data.combat.target
 	mobf_assert_backtrace(entity ~= nil)
 	mobf_assert_backtrace(target ~= nil)
 
@@ -319,7 +310,7 @@ function fighting.switch_to_combat_state(entity,now,target)
 	
 	mobf_assert_backtrace(current_state.state_mode ~= "combat")
 	
-	local combat_state = fighting.identify_combat_state(entity,target)
+	local combat_state = fighting.identify_combat_state(entity)
 	if combat_state == nil then
 		dbg_mobf.fighting_lvl2("MOBF: no special combat state")
 		return
@@ -351,9 +342,6 @@ function fighting.switch_to_combat_state(entity,now,target)
 	
 	--save old movement data to use on switching back
 	entity.dynamic_data.combat.movement_backup = backup
-		
-	--set target
-	entity.dynamic_data.movement.target = target
 	
 	--make sure a fighting mob ain't teleporting to target
 	entity.dynamic_data.movement.teleportsupport = false
@@ -361,6 +349,10 @@ function fighting.switch_to_combat_state(entity,now,target)
 	--make sure we do follow our target
 	entity.dynamic_data.movement.guardspawnpoint = false
 	
+	--set target
+	entity.dynamic_data.movement.target = target
+	--set attack target
+	entity.dynamic_data.combat.target = target
 end
 
 -------------------------------------------------------------------------------
@@ -416,7 +408,7 @@ function fighting.restore_previous_state(entity,now)
 end
 
 -------------------------------------------------------------------------------
--- name: restore_previous_state(entity,now) 
+-- name: in_range(entity,now) 
 --
 --! @brief check if mob is within range of target
 --! @memberof fighting
@@ -522,7 +514,7 @@ function fighting.combat(entity,now)
 			range = entity.data.combat.distance.range
 		end
 		
-		--find out if player is next to mob
+		--find out if attacker is next to mob
 		if distance > range then
 			dbg_mobf.fighting_lvl2("MOBF: " .. entity.data.name .. " player >" 
 				.. targetname .. "< to far away " .. distance .. " > "
@@ -538,8 +530,7 @@ function fighting.combat(entity,now)
 		end
 		
 		--check if state needs to be switched
-		local required_state = fighting.identify_combat_state(entity,
-									entity.dynamic_data.combat.target,distance)
+		local required_state = fighting.identify_combat_state(entity,distance)
 		
 		if required_state ~= nil then
 			local mov_target = entity.dynamic_data.movement.target
@@ -568,8 +559,7 @@ function fighting.combat(entity,now)
 		end
 
 		--check if melee attack can be done
-		if fighting.melee_attack_handler(entity,
-					entity.dynamic_data.combat.target,now,distance) == false then
+		if fighting.melee_attack_handler(entity,now,distance) == false then
 			--check if distance attack can be done
 			if fighting.distance_attack_handler(entity,
 											targetpos,mob_pos,now,distance) then
@@ -707,86 +697,6 @@ function fighting.get_target(entity)
 
 end
 
-
--------------------------------------------------------------------------------
--- name: aggression(entity) 
---
---! @brief start attack in case of agressive mob
---! @memberof fighting
---
---! @param entity mob to do action
---! @param now current time
--------------------------------------------------------------------------------
-function fighting.aggression(entity,now)
-
-	--if no combat data is specified don't do anything
-	if entity.data.combat == nil then
-		return
-	end
-	
-	local current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
-
-	--mob is specified as self attacking
-	if entity.data.combat.starts_attack and 
-		entity.dynamic_data.combat.target == nil and
-		current_state.state_mode ~= "combat" then
-		dbg_mobf.fighting_lvl3("MOBF: ".. entity.data.name .. " " .. now
-			.. " aggressive mob, is it time to attack?")
-		if entity.dynamic_data.combat.ts_last_aggression_chance + 1 < now then
-			dbg_mobf.fighting_lvl3("MOBF: ".. entity.data.name .. " " .. now
-				.. " lazzy time over try to find an enemy")
-			entity.dynamic_data.combat.ts_last_aggression_chance = now
-
-			if math.random() < entity.data.combat.angryness then
-
-				dbg_mobf.fighting_lvl3("MOBF: ".. entity.data.name .. " " .. now
-					.. " really is angry")
-				local target = fighting.get_target(entity)
-				
-				if target ~= nil then
-					
-					if target ~= entity.dynamic_data.combat.target then
-
-						entity.dynamic_data.combat.target = target
-						
-						fighting.switch_to_combat_state(entity,now,target)
-						
-						local targetname = fighting.get_target_name(target)
-						
-						dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name .. " "
-									.. now .. " starting attack at player: " 
-									..targetname)
-						minetest.log(LOGLEVEL_INFO,
-								"MOBF: starting attack at player "..targetname)
-					end
-				end
-			end
-		end
-	end
-end
-
--------------------------------------------------------------------------------
--- name: fighting.init_dynamic_data(entity) 
---
---! @brief initialize all dynamic data on activate
---! @memberof fighting
---
---! @param entity mob to do action
---! @param now current time
--------------------------------------------------------------------------------
-function fighting.init_dynamic_data(entity,now)
-	local data = {
-		ts_last_sun_damage			= now,
-		ts_last_attack				= now,
-		ts_last_aggression_chance 	= now,
-		ts_self_destruct_triggered	= -1,
-		
-		target						= nil,
-	}	
-	
-	entity.dynamic_data.combat = data
-end
-
 -------------------------------------------------------------------------------
 -- name: self_destruct_trigger(entity,distance) 
 --
@@ -895,12 +805,11 @@ end
 --! @private
 --
 --! @param entity mob to do action
---! @param player player to attack
 --! @param now current time
 --! @param distance distance to player
 --! @return true/false if handled or not
 -------------------------------------------------------------------------------
-function fighting.melee_attack_handler(entity,target,now,distance)
+function fighting.melee_attack_handler(entity,now,distance)
 
 	if entity.data.combat.melee == nil then
 		dbg_mobf.fighting_lvl2("MOBF: no meele attack specified")
@@ -918,6 +827,8 @@ function fighting.melee_attack_handler(entity,target,now,distance)
 	
 	if distance <= entity.data.combat.melee.range
 		then
+		
+		local target = entity.dynamic_data.combat.target
 
 		--save time of attack
 		entity.dynamic_data.combat.ts_last_attack = now
@@ -1085,6 +996,7 @@ end
 function fighting.sun_damage_handler(entity,now)
 	if entity.data.combat ~= nil and
 		entity.data.combat.sun_sensitive then
+		mobf_assert_backtrace(entity.dynamic_data.combat ~= nil)
 
 		local pos = entity.object:getpos()
 		local current_state = mob_state.get_state_by_name(entity,
@@ -1172,4 +1084,60 @@ function fighting.get_target_name(target)
 	end
 	
 	return "unknown"
+end
+
+-------------------------------------------------------------------------------
+-- name: set_tatget(entity,target) 
+--
+--! @brief decide if only switching target or state
+--! @memberof fighting
+--! @private
+--
+--! @param entity entity to update
+--! @param target to set
+-------------------------------------------------------------------------------
+function fighting.set_target(entity,target)
+
+	if entity.dynamic_data.combat.target ~= nil then
+		dbg_mobf.fighting_lvl2("MOBF: switching attack target")
+		--set target
+		entity.dynamic_data.movement.target = target
+		--set attack target
+		entity.dynamic_data.combat.target = target
+	else
+		if entity.dynamic_data.combat.target ~= target then
+			dbg_mobf.fighting_lvl2("MOBF: initial attack")
+			--calculate chance of mob fighting back
+			if math.random() < entity.data.combat.angryness then
+					local attackername = fighting.get_target_name(target)
+					dbg_mobf.fighting_lvl2("MOBF: fighting back player "..attackername)
+					
+					if entity.dynamic_data.combat.target == nil then
+						fighting.switch_to_combat_state(entity,mobf_get_current_time(),target)
+					end
+			end	
+		end
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: fighting.init_dynamic_data(entity) 
+--
+--! @brief initialize all dynamic data on activate
+--! @memberof fighting
+--
+--! @param entity mob to do action
+--! @param now current time
+-------------------------------------------------------------------------------
+function fighting.init_dynamic_data(entity,now)
+	local data = {
+		ts_last_sun_damage			= now,
+		ts_last_attack				= now,
+		ts_last_aggression_chance 	= now,
+		ts_self_destruct_triggered	= -1,
+		
+		target						= nil,
+	}	
+	
+	entity.dynamic_data.combat = data
 end

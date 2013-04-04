@@ -474,6 +474,8 @@ function mob_inventory.trader_callback(entity,player)
 				mobf_calc_yaw(direction.x,direction.z)+math.pi/2)
 		end
 	
+		attention.increase_attention_level(entity,player,10)
+
 		if minetest.show_formspec(playername,
 					"formspec_" .. unique_entity_id,
 					mob_inventory.formspecs["formspec_" .. unique_entity_id]) 

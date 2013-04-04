@@ -109,4 +109,8 @@ dbg_mobf = {
 	lifebar_lvl1			= function () end,
 	lifebar_lvl2			= function () end,
 	lifebar_lvl3			= function () end,
+	
+	attention_lvl1			= function () end,
+	attention_lvl2			= function () end,
+	attention_lvl3			= function () end,
 }

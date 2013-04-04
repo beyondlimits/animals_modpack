@@ -110,7 +110,40 @@ function graphics.update_orientation(entity,now,dtime)
 			end
 		end
 	end
-
+	
+	-- make mobs face a specific player
+	-- TODO move from dynamics data inventory to somewhere else
+	
+	if entity.dynamic_data.attention ~= nil and
+		entity.data.attention ~= nil and
+		entity.dynamic_data.attention.current_value >
+		entity.data.attention.watch_threshold then
+		
+		local direction = mobf_get_direction(entity.object:getpos(),
+								entity.dynamic_data.attention.most_relevant_target:getpos())
+	
+		if entity.mode == "3d" then
+			entity.object:setyaw(
+				mobf_calc_yaw(direction.x,direction.z)-math.pi/2)
+		else
+			entity.object:setyaw(
+				mobf_calc_yaw(direction.x,direction.z)+math.pi/2)
+		end
+		
+		entity.dynamic_data.inventory.last_updated = 
+			entity.dynamic_data.inventory.last_updated + dtime
+			
+		if entity.dynamic_data.inventory.last_updated > 60 then
+			-- TODO check if distance to far
+			entity.dynamic_data.inventory.target = nil
+			entity.dynamic_data.inventory.last_updated = 0
+		end
+	end
+	
+	if	entity.dynamic_data.inventory ~= nil and
+		entity.dynamic_data.inventory.target ~= nil then
+		
+	end
 end
 
 -------------------------------------------------------------------------------
