@@ -182,7 +182,7 @@ function mob_state.callback(entity,now,dstep)
 		--fill table with available states
 		for i=1, #entity.data.states, 1 do
 			if entity.data.states[i].custom_preconhandler == nil or
-				entity.data.states[i].custom_preconhandler() and
+				entity.data.states[i].custom_preconhandler(entity,entity.data.states[i]) and
 				--ignore states that are not supposed to be switched to 
 				--by automatic state change handling e.g. fighting states or
 				--manual set states
