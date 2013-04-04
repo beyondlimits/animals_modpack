@@ -345,6 +345,7 @@ function mobf.activate_handler(self,staticdata)
 		end
 	end
 	
+	self.dynamic_data.custom_persistent = retval.custom_persistent
 	
 	local current_state = mob_state.get_state_by_name(self,
 												self.dynamic_data.state.current)

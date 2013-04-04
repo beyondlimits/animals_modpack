@@ -216,6 +216,7 @@ function mobf_serialize_permanent_entity_data(entity)
 								pathindex = pathindex,
 								pathowner = pathowner,
 								pathname = pathname,
+								custom_persistent = entity.dynamic_data.custom_persistent,
 							}
 		local serialized = minetest.serialize(toserialize)
 		--print("DEBUG: serialized -> " .. serialized)
