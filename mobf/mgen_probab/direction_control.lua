@@ -187,7 +187,7 @@ function direction_control.precheck_movement(entity,movement_state,pos_predicted
 		pos_predicted_state ~= "above_limit" and
 		pos_predicted_state ~= "below_limit" then
 
-		-- mob would walk onto water
+		-- mob would walk onto water or drop
 		if movement_state.changed == false and 
 			( pos_predicted_state == "above_water" or
 			  pos_predicted_state == "drop" or
