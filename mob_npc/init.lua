@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_npc mod loading ...")
 
-local version = "0.0.10"
+local version = "0.0.11"
 local npc_groups = {
 						not_in_creative_inventory=1
 					}
@@ -150,6 +150,19 @@ npc_trader_prototype = {
 					end_frame   = 79,
 					},
 			},
+		attention = {
+				hear_distance = 3,
+				hear_distance_value = 0.5,
+				view_angle = nil,
+				own_view_valuen = 0,
+				remote_view = false,
+				remote_view_value = 0,
+				attention_distance_value = 0.2,
+				watch_threshold = 2,
+				attack_threshold = nil,
+				attention_distance = 7.5,
+				attention_max = 10,
+		},
 		trader_inventory = {
 				goods = {
 							{ "default:mese 1", "default:dirt 99", "default:cobble 50"},
