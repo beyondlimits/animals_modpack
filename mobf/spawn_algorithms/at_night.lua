@@ -168,7 +168,7 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 			
 			--check if there s enough space above to place mob
 			if good and mobf_air_above(pos_below,self.spawner_mob_spawndata.height) ~= true then
-				reason = "so low"
+				reason = "to low"
 				good = false
 			end
 			
