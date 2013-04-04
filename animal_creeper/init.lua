@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_creeper mod loading ...")
 
-local version = "0.0.15"
+local version = "0.0.16"
 
 local creeper_groups = {
 						not_in_creative_inventory=1
