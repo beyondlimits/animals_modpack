@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_archer mod loading ...")
 
-local version = "0.0.3"
+local version = "0.0.4"
 local archer_groups = {
 						not_in_creative_inventory=1
 					}
@@ -29,7 +29,7 @@ archer_prototype = {
 					base_health=40,
 					kill_result="",
 					armor_groups= {
-						fleshy=3,
+						fleshy=75,
 					},
 					groups = archer_groups,
 					envid="on_ground_1",

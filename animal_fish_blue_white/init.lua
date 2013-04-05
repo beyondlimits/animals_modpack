@@ -1,4 +1,4 @@
-local version = "0.0.11"
+local version = "0.0.12"
 
 minetest.log("action","MOD: animal_fish_blue_white loading ...")
 
@@ -33,7 +33,7 @@ fish_blue_white_prototype = {
 					base_health=5,
 					kill_result=fish_blue_white_drop,
 					armor_groups= {
-						fleshy=3,
+						fleshy=80,
 					},
 					groups = fish_blue_white_groups,
 					envid="shallow_waters",

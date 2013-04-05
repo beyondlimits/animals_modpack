@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_ostrich mod loading ...")
-local version = "0.0.3"
+local version = "0.0.4"
 
 local ostrich_groups = {
 						not_in_creative_inventory=1
@@ -44,7 +44,7 @@ ostrich_f_prototype = {
 					base_health=10,
 					kill_result=ostrich_drop,
 					armor_groups= {
-						fleshy=3,
+						fleshy=90,
 					},
 					groups = ostrich_groups,
 					envid = "meadow"
@@ -124,7 +124,7 @@ ostrich_m_prototype = {
 					base_health=11,
 					kill_result=ostrich_drop,
 					armor_groups= {
-						fleshy=3,
+						fleshy=90,
 					},
 					groups = ostrich_groups,
 					envid = "meadow"

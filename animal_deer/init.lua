@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_deer mod loading ... ")
 
-local version = "0.0.10"
+local version = "0.0.11"
 
 local deer_groups = {
 						not_in_creative_inventory=1
@@ -32,7 +32,7 @@ deer_prototype = {
 					base_health=25,
 					kill_result="animalmaterials:meat_venison 2",
 					armor_groups= {
-						fleshy=3,
+						fleshy=75,
 					},
 					groups = deer_groups,
 					envid="meadow",

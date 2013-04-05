@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_dm loading ...")
-local version = "0.0.16"
+local version = "0.0.17"
 
 local dm_groups = {
                         not_in_creative_inventory=1
@@ -31,8 +31,8 @@ dm_prototype = {
 					base_health=10,
 					kill_result="",
 					armor_groups= {
-						fleshy=1,
-						deamon=1,
+						fleshy=5,
+						deamon=10,
 					},
 					groups = dm_groups,
 					envid="simple_air"

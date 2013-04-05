@@ -33,7 +33,7 @@ npc_prototype = {
 					base_health=40,
 					kill_result="",
 					armor_groups= {
-						fleshy=3,
+						fleshy=90,
 					},
 					groups = npc_groups,
 					envid="on_ground_1",
@@ -97,7 +97,7 @@ npc_trader_prototype = {
 					base_health=200,
 					kill_result="",
 					armor_groups= {
-						fleshy=3,
+						fleshy=60,
 					},
 					groups = npc_groups,
 					envid="on_ground_1",
@@ -154,7 +154,7 @@ npc_trader_prototype = {
 				hear_distance = 3,
 				hear_distance_value = 0.5,
 				view_angle = nil,
-				own_view_valuen = 0,
+				own_view_value = 0,
 				remote_view = false,
 				remote_view_value = 0,
 				attention_distance_value = 0.2,

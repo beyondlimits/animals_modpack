@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.0.22"
+local version = "0.0.23"
 
 local sheep_groups = {
 						sheerable=1,
@@ -35,7 +35,7 @@ sheep_prototype = {
 					base_health=10,
 					kill_result="animalmaterials:meat_lamb 2",
 					armor_groups= {
-						fleshy=3,
+						fleshy=85,
 					},
 					groups = sheep_groups,
 					envid="meadow",
@@ -156,7 +156,7 @@ lamb_prototype = {
 					base_health=3,
 					kill_result="animalmaterials:meat_lamb 1",
 					armor_groups= {
-						fleshy=3,
+						fleshy=85,
 					},
 					envid="meadow",
 				},
@@ -267,7 +267,7 @@ sheep_naked_prototype = {
 					base_health=10,
 					kill_result="animalmaterials:meat_lamb 2",
 					armor_groups= {
-						fleshy=3,
+						fleshy=85,
 					},
 					envid="meadow"
 				},

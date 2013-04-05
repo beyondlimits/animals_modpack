@@ -1,4 +1,4 @@
-local version = "0.0.18"
+local version = "0.0.20"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -75,8 +75,8 @@ vombie_prototype = {
 					base_health=8,
 					kill_result=vombie_drop,
 					armor_groups= {
-						fleshy=3,
-						daemon=1,
+						fleshy=95,
+						daemon=30,
 					},
 					groups = vombie_groups,
 					envid="on_ground_1",

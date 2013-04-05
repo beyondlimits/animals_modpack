@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_cow mod loading ...")
-local version = "0.0.18"
+local version = "0.0.19"
 
 local cow_groups = {
 						not_in_creative_inventory=1
@@ -33,7 +33,7 @@ cow_prototype = {
 					base_health=40,
 					kill_result="animalmaterials:meat_beef 5",
 					armor_groups= {
-						fleshy=2,
+						fleshy=60,
 					},
 					groups = cow_groups,
 					envid = "meadow"
@@ -133,7 +133,7 @@ steer_prototype = {
                     base_health=40,
                     kill_result="animalmaterials:meat_beef 5",
                     armor_groups= {
-                        fleshy=2,
+                        fleshy=60,
                     },
                     groups = cow_groups,
                     envid = "meadow"
@@ -227,7 +227,7 @@ baby_calf_f_prototype = {
 			base_health=40,
 			kill_result="animalmaterials:meat_beef 2",
 			armor_groups= {
-				fleshy=2,
+				fleshy=60,
 			},
 			groups = cow_groups,
 			envid = "meadow"
@@ -313,7 +313,7 @@ baby_calf_m_prototype = {
 				base_health=40,
 				kill_result="animalmaterials:meat_beef 2",
 				armor_groups= {
-					fleshy=2,
+					fleshy=60,
 				},
 				groups = cow_groups,
 				envid = "meadow"

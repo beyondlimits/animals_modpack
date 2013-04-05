@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_gull loading ...")
 
-local version = "0.0.11"
+local version = "0.0.12"
 
 local gull_groups = {
 						not_in_creative_inventory=1
@@ -32,7 +32,7 @@ gull_prototype = {
 					base_health=5,
 					kill_result="",
 					armor_groups= {
-						fleshy=3,
+						fleshy=85,
 					},
 					groups = gull_groups,
 					envid="flight_1",

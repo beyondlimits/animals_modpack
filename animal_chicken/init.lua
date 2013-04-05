@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_chicken mod loading ...")
-local version = "0.0.15"
+local version = "0.0.16"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
@@ -48,7 +48,7 @@ chicken_prototype = {
 					base_health=5,
 					kill_result=chicken_drop,
 					armor_groups= {
-						fleshy=3,
+						fleshy=90,
 					},
 					groups = chicken_groups,
 					envid = "meadow"
@@ -140,7 +140,7 @@ rooster_prototype = {
 					base_health=5,
 					kill_result=chicken_drop,
 					armor_groups= {
-						fleshy=3,
+						fleshy=90,
 					},
 					groups = chicken_groups,
 					envid = "meadow"
@@ -222,7 +222,7 @@ chick_m_prototype = {
 				base_health=5,
 				kill_result="animalmaterials:feather 1",
 				armor_groups= {
-					fleshy=3,
+					fleshy=90,
 				},
 				groups = chicken_groups,
 				envid = "meadow"
@@ -299,7 +299,7 @@ chick_f_prototype = {
 				base_health=5,
 				kill_result="animalmaterials:feather 1",
 				armor_groups= {
-					fleshy=3,
+					fleshy=90,
 				},
 				groups = chicken_groups,
 				envid = "meadow"

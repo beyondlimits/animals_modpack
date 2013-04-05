@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_big_red mod loading ...")
-local version = "0.0.17"
+local version = "0.0.18"
 
 local big_red_groups = {
 						not_in_creative_inventory=1
@@ -31,9 +31,9 @@ big_red_prototype = {
 					base_health=8,
 					kill_result="animalmaterials:meat_toxic 3",
 					armor_groups= {
-						fleshy=1,
-						cracky=1,
-						deamon=1,
+						fleshy=10,
+						cracky=10,
+						deamon=10,
 					},
 					groups = big_red_groups,
 					envid="on_ground_1",
