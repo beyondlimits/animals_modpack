@@ -129,20 +129,6 @@ function graphics.update_orientation(entity,now,dtime)
 			entity.object:setyaw(
 				mobf_calc_yaw(direction.x,direction.z)+math.pi/2)
 		end
-		
-		entity.dynamic_data.inventory.last_updated = 
-			entity.dynamic_data.inventory.last_updated + dtime
-			
-		if entity.dynamic_data.inventory.last_updated > 60 then
-			-- TODO check if distance to far
-			entity.dynamic_data.inventory.target = nil
-			entity.dynamic_data.inventory.last_updated = 0
-		end
-	end
-	
-	if	entity.dynamic_data.inventory ~= nil and
-		entity.dynamic_data.inventory.target ~= nil then
-		
 	end
 end
 

@@ -172,9 +172,9 @@ function attention.callback(entity,now)
 					local own_view = entity.object:getyaw()
 					
 					local min_yaw = own_view - entity.data.attention.view_angle/2
-					local max_yaq = own_view + entity.data.attention.view_angle/2
+					local max_yaw = own_view + entity.data.attention.view_angle/2
 					
-					local direction = mobf_calc_direction(own_pos,remote_pos)
+					local direction = mobf_get_direction(own_pos,remote_pos)
 					local yaw_to_target = mobf_calc_yaw(direction.x,direction.z)
 					
 					if yaw_to_target > min_yaw and
@@ -186,15 +186,25 @@ function attention.callback(entity,now)
 				
 				--does remote view angle matter
 				if entity.data.attention.remote_view == true then
-					local remote_view = objectlist[i]:get_yaw()
+					local remote_view = objectlist[i]:getyaw()
 					
-					local direction = mobf_calc_direction(own_pos,remote_pos)
-					local yaw_to_target = mobf_calc_yaw(direction.x,direction.z)
+					if objectlist[i]:is_player() then
+						remote_view = objectlist[i]:get_look_yaw()
+					end
 					
-					if yaw_to_target > direction - (math.pi/2) and
-						yaw_to_target < direction + (math.pi/2) then
+					if remote_view ~= nil then
+						local direction = mobf_get_direction(own_pos,remote_pos)
+						local yaw_to_target = mobf_calc_yaw(direction.x,direction.z)
 						
-						remote_view_addon = true
+						--TODO check for overflows
+						if remote_view > yaw_to_target - (math.pi/2) and
+							remote_view < yaw_to_target + (math.pi/2) then
+							
+							remote_view_addon = true
+						end
+					else
+						dbg_mobf.attention_lvl2(
+							"MOBF: unable to get yaw for obeject: "  ..table_id)
 					end
 				end 
 				

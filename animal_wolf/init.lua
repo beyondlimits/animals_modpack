@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_wolf loading ...")
 
-local version = "0.0.13"
+local version = "0.0.14"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
@@ -32,7 +32,7 @@ wolf_prototype = {
 					base_health=5,
 					kill_result="animalmaterials:fur 1",
 					armor_groups= {
-						fleshy=3,
+						fleshy=90,
 					},
 					groups = wolf_groups,
 					addoncatch = "animal_wolf:tamed_wolf",
@@ -52,7 +52,6 @@ wolf_prototype = {
 					consumed=true,
 					},
 		combat = {
-					angryness=1,
 					starts_attack=true,
 					sun_sensitive=false,
 					melee = {
@@ -88,6 +87,19 @@ wolf_prototype = {
 					end_frame   = 180,
 					},
 			},
+		attention = {
+				hear_distance = 5,
+				hear_distance_value = 20,
+				view_angle = nil,
+				own_view_value = 0,
+				remote_view = true,
+				remote_view_value = 0.3,
+				attention_distance_value = 0.2,
+				watch_threshold = 10,
+				attack_threshold = 20,
+				attention_distance = 10,
+				attention_max = 25,
+		},
 		states = {
 				{
 					name = "default",
@@ -131,7 +143,7 @@ tamed_wolf_prototype = {
 					base_health=10,
 					kill_result="animalmaterials:fur 1",
 					armor_groups= {
-						fleshy=3,
+						fleshy=90,
 					},
 					groups = wolf_groups,
 					envid="on_ground_2",
