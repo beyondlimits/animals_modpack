@@ -261,7 +261,8 @@ function mobf_path.button_handler(player, formname, fields)
 				end
 				
 				if point ~= nil and
-					pathname ~= nil then
+					pathname ~= nil and
+					pathname ~= "" then
 					mobf_path.add_point(playername,pathname,point)
 					mobf_path.save()
 				end
@@ -782,12 +783,12 @@ end
 -------------------------------------------------------------------------------
 function mobf_path.getpoints(pathowner,pathname)
 	if mobf_rtd.path_data.users[pathowner] == nil then
-		print("MOBF: no paths for " .. dump(pathowner) .. " found")
+		dbg_mobf.path_lvl2("MOBF: no paths for " .. dump(pathowner) .. " found")
 		return nil
 	end
 	
 	if mobf_rtd.path_data.users[pathowner].paths[pathname] == nil then
-		print(
+		dbg_mobf.path_lvl2(
 			"MOBF: no path " .. dump(pathname) .. 
 			" found for owner " .. pathowner ..
 			" have paths: " .. dump(mobf_rtd.path_data.users[pathowner].paths))
