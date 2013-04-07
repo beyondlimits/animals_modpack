@@ -41,7 +41,8 @@ function attention.aggression(entity,now)
 		return
 	end
 	
-	local current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
+	local current_state = 
+		mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
 
 	--mob is specified as self attacking
 	if entity.data.combat.starts_attack and 
@@ -137,7 +138,8 @@ function attention.callback(entity,now)
 	local own_pos = entity.object:getpos()
 	
 	--get list of all objects in attention range
-	local objectlist = minetest.env:get_objects_inside_radius(own_pos,attention_distance)
+	local objectlist = 
+		minetest.env:get_objects_inside_radius(own_pos,attention_distance)
 	
 	if #objectlist > 0 then
 		for i = 1 , #objectlist, 1 do
@@ -146,7 +148,8 @@ function attention.callback(entity,now)
 			if not objectlist[i]:is_player() then
 				local lua_entity = objectlist[i]:get_luaentity()
 				
-				if not lua_entity.draws_attention then
+				if lua_entity ~= nil and 
+					not lua_entity.draws_attention then
 					continue = false
 				end
 			end
