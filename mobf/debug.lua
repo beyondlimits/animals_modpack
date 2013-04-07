@@ -160,7 +160,7 @@ function mobf_debug.add_tools(name,param)
 		player:get_inventory():add_item("main", "animalmaterials:lasso 20")
 		player:get_inventory():add_item("main", "animalmaterials:net 20")
 		player:get_inventory():add_item("main", "animalmaterials:scissors 1")
-		player:get_inventory():add_item("main", "animalmaterials:glass 10")	
+		player:get_inventory():add_item("main", "vessels:drinking_glass 10")	
 	end
 
 end
