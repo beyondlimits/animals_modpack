@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_ostrich mod loading ...")
-local version = "0.0.4"
+local version = "0.0.5"
 
 local ostrich_groups = {
 						not_in_creative_inventory=1
@@ -62,13 +62,13 @@ ostrich_f_prototype = {
 					consumed=true,
 					},
 		random_drop = {
- 					result="animalmaterials:big_egg",
+ 					result="animalmaterials:egg_big",
  					min_delay=300,
  					chance=0.1
  					},
 		spawning = {
 					rate=0.001,
-					density=500,
+					density=600,
 					algorithm="willow_mapgen",
 					height=2
 					},
@@ -143,7 +143,7 @@ ostrich_m_prototype = {
 					},
 		spawning = {
 					rate=0.001,
-					density=500,
+					density=600,
 					algorithm="willow_mapgen",
 					height=2
 			},
