@@ -29,7 +29,7 @@ mobf_rtd = {
 	--!is mob running with fire support
 	fire_enabled			= false,
 	--!do we have luatrace
-	luatrace_enabled		= false,
+	luatrace_enabled		= true,
 	--!do we have inventory plus support
 	inventory_plus_enabled = false,
 	--!registry for movement patterns
@@ -48,6 +48,11 @@ LOGLEVEL_NOTICE   = "info"
 LOGLEVEL_WARNING  = "action"
 LOGLEVEL_ERROR    = "error"
 LOGLEVEL_CRITICAL = "error"
+
+-- initialize luatrace if necessary
+if mobf_rtd.luatrace_enabled then
+	luatrace = require("luatrace")
+end
 
 --include debug trace functions
 dofile (mobf_modpath .. "/debug_trace.lua")
@@ -168,11 +173,6 @@ function mobf_init_framework()
 	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Register rightclick button handler..")
 	minetest.register_on_player_receive_fields(mobf.rightclick_button_handler)
-		
-	-- initialize luatrace if necessary
-	if mobf_rtd.luatrace_enabled then
-		luatrace = require("luatrace")
-	end
 	
 	-- register privilege to change mobf settings
 	minetest.register_privilege("mobfw_admin", 
