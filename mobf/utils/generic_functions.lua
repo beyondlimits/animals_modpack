@@ -522,7 +522,7 @@ function mobf_above_water(pos)
 end
 
 -------------------------------------------------------------------------------
--- name: get_surface(x,z, min_y, max_y)
+-- name: get_sunlight_surface(x,z, min_y, max_y)
 --
 --! @brief get surface for x/z coordinates
 --
@@ -562,13 +562,15 @@ function mobf_get_surface(x,z, min_y, max_y)
 	mobf_assert_backtrace(max_y ~= nil)
 	mobf_assert_backtrace(x ~= nil)
 	mobf_assert_backtrace(z ~= nil)
+	
+	if type(minetest.env.get_surface) == "function" then	
+	return minetest.env:get_surface({x=x,y=min_y,z=z},max_y-min_y)
+	end
 
 	local last_node = minetest.env:get_node({ x=x,y=min_y, z=z })
-
     for runy = min_y+1, max_y,1 do
         local pos = { x=x,y=runy, z=z }
         local node_to_check = minetest.env:get_node(pos)
-        
         if node_to_check.name == "air" and
         	last_node.name ~= "air" and
         	last_node.mame ~= "ignore" then
