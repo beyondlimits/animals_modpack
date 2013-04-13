@@ -70,37 +70,79 @@ function mobf_debug.spawn_mob(name,param)
 	
 	local parameters = param:split(" ")
 	
-	if #parameters ~= 2 then
+	if #parameters ~= 1 and
+		#parameters ~= 2 then
 		mobf_debug.print_usage(name,"spawnmob")
 		return
 	end
 	
-	local pos_strings = parameters[2]:split(",")
-	
-	if #pos_strings ~= 3 then
-		mobf_debug.print_usage(name,"spawmob")
-		return
-	end
-
 	if mobf_is_known_mob(parameters[1]) ~= true then
 		mobf_debug.print_usage(name,"ukn_mob", ">"..parameters[1].."<") 
 		return true
 	end
+	
+	if #parameters == 2 then
+		local pos_strings = parameters[2]:split(",")
+		
+		if #pos_strings ~= 3 then
+			mobf_debug.print_usage(name,"spawmob")
+			return
+		end
+	
+		
+	
+		local spawnpoint = {
+							x=tonumber(pos_strings[1]),
+							y=tonumber(pos_strings[2]),
+							z=tonumber(pos_strings[3])
+							}
+	
+		if spawnpoint.x == nil or
+			spawnpoint.y == nil or
+			spawnpoint.z == nil then
+			mobf_debug.print_usage(name,"spawnmob")	
+			return
+		end
+		
+		spawning.spawn_and_check(parameters[1],"__default",spawnpoint,"mobf_debug_spawner")
+	else
+		--todo find random pos
 
-	local spawnpoint = {
-						x=tonumber(pos_strings[1]),
-						y=tonumber(pos_strings[2]),
-						z=tonumber(pos_strings[3])
-						}
-
-	if spawnpoint.x == nil or
-		spawnpoint.y == nil or
-		spawnpoint.z == nil then
-		mobf_debug.print_usage(name,"spawnmob")	
-		return
+		local player = minetest.env:get_player_by_name(name)
+		
+		if player == nil then
+		
+			return
+		end
+		
+		local pos = player:getpos()
+		
+		if pos == nil then
+			return
+		end
+		
+		local found = false
+		local maxtries = 10
+		
+		while (found == false) and (maxtries > 0) do
+			toadd = {}
+			toadd.x = pos.x + (math.random(20) -10)
+			toadd.z = pos.z + (math.random(20) -10)
+			
+			local y = mobf_get_surface(toadd.x,toadd.z,pos.y-10,pos.y+10)
+			
+			if y ~= nil then
+				toadd.y = y
+				if spawning.spawn_and_check(parameters[1],"__default",toadd,"mobf_debug_spawner") then
+					found = true
+				end
+			end
+			
+			maxtries = maxtries -1
+		end
 	end
 
-	spawning.spawn_and_check(parameters[1],"__default",spawnpoint,"mobf_debug_spawner")
+	
 end
 
 -------------------------------------------------------------------------------
@@ -193,7 +235,7 @@ function mobf_debug.init()
 	minetest.register_chatcommand("spawnmob",
 		{
 			params		= "<name> <pos>",
-			description = "spawn a mob at position" ,
+			description = "spawn a mob at position(optional)" ,
 			privs		= {mobfw_admin=true},
 			func		= mobf_debug.spawn_mob
 		})
@@ -247,15 +289,19 @@ function mobf_debug.init()
 				params		= "",
 				description = "start luatrace tracing" ,
 				privs		= {mobfw_admin=true},
-				func		= luatrace.tron()
+				func		= function()
+					luatrace.tron(nil)
+					end
 			})
 			
-		minetest.register_chatcommand("traceon",
+		minetest.register_chatcommand("traceoff",
 			{
 				params		= "",
 				description = "stop luatrace tracing" ,
 				privs		= {mobfw_admin=true},
-				func		= luatrace.troff()
+				func		= function()
+					luatrace.troff()
+					end
 			})
 	end
 end
