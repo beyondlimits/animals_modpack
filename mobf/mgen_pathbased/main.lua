@@ -247,10 +247,11 @@ function p_mov_gen.set_target(entity,target)
 			dbg_mobf.path_mov_lvl1("MOBF: haven't found a path to target")
 			return false
 		end
-		
-		print("found path to target: " .. dump(entity.dynamic_data.p_movement.path))
+
+		--a valid path has at least 2 positions
+		mobf_assert_backtrace(#entity.dynamic_data.p_movement.path > 1)
 		entity.dynamic_data.movement.target = 
-				entity.dynamic_data.p_movement.path[1]
+				entity.dynamic_data.p_movement.path[2]
 		return true
 	else
 		print(
