@@ -124,7 +124,7 @@ function graphics.update_orientation(entity,now,dtime)
 	
 		if entity.mode == "3d" then
 			entity.object:setyaw(
-				mobf_calc_yaw(direction.x,direction.z)-math.pi/2)
+				mobf_calc_yaw(direction.x,direction.z))
 		else
 			entity.object:setyaw(
 				mobf_calc_yaw(direction.x,direction.z)+math.pi/2)
