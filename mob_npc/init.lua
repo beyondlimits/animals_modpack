@@ -48,11 +48,15 @@ npc_prototype = {
 					},
 		
 		spawning = {
-					rate=0,
-					density=0,
-					algorithm="none",
-					height=2
-					},
+					primary_algorithms = {
+						{
+						rate=0,
+						density=0,
+						algorithm="none",
+						height=2
+						},
+					}
+				},
 		states = {
 				{ 
 				name = "walking",
@@ -113,11 +117,15 @@ npc_trader_prototype = {
 					},
 		
 		spawning = {
-					rate=0,
-					density=750,
-					algorithm="building_spawner",
-					height=2
-					},
+					primary_algorithms = {
+						{
+						rate=0,
+						density=750,
+						algorithm="building_spawner",
+						height=2
+						},
+					}
+				},
 		states = {
 				{ 
 				name = "default",

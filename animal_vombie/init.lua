@@ -113,13 +113,13 @@ vombie_prototype = {
 								height=2,
 								respawndelay=10,
 							},
---							{
---								rate=0.05,
---								density=300,
---								algorithm="shadows_spawner",
---								height=2,
---								respawndelay = 400,
---							},
+							{
+								rate=0.05,
+								density=300,
+								algorithm="shadows_spawner",
+								height=2,
+								respawndelay = 400,
+							},
 						},
 					},
 		sound = {

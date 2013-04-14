@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_guard mod loading ...")
 
-local version = "0.0.3"
+local version = "0.0.4"
 local guard_groups = {
 						not_in_creative_inventory=1
 					}
@@ -51,11 +51,15 @@ guard_prototype = {
 					consumed=true,
 					},
 		spawning = {
-					rate=0,
-					density=0,
-					algorithm="none",
-					height=2
-					},
+					primary_algorithms = {
+						{
+						rate=0,
+						density=0,
+						algorithm="none",
+						height=2
+						},
+					}
+				},
 		combat = {
 					angryness=0.99,
 					starts_attack=true,

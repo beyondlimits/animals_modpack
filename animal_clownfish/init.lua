@@ -58,11 +58,15 @@ clownfish_prototype = {
 					consumed=true,
 					},
 		spawning = {
-					rate=0.02,
-					density=350,
-					algorithm="in_shallow_water_spawner",
-					height=-1,
-					respawndelay = 60,
+					primary_algorithms = {
+							{
+							rate=0.02,
+							density=350,
+							algorithm="in_shallow_water_spawner",
+							height=-1,
+							respawndelay = 60,
+							}
+						}
 					},
 		animation = {
 				swim = {

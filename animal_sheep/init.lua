@@ -61,12 +61,16 @@ sheep_prototype = {
 					consumed=true,
 					},
 		spawning = {
-					rate=0.002,
-					density=50,
-					algorithm="willow_mapgen",
-					algorithm_secondary="willow",
-					height=2
-					},
+					primary_algorithms = {
+						{
+						rate=0.002,
+						density=50,
+						algorithm="willow_mapgen",
+						algorithm_secondary="willow",
+						height=2
+						},
+					}
+				},
 		sound = {
 					random = {
 								name="Mudchute_sheep_1",
@@ -178,11 +182,15 @@ lamb_prototype = {
 					delay=1800
 					},
 		spawning = {
-					rate=0,
-					density=0,
-					algorithm="none",
-					height=1
-					},
+					primary_algorithms = {
+						{
+						rate=0,
+						density=0,
+						algorithm="none",
+						height=1
+						},
+					}
+				},
 		sound = {
 					random = {
 								name="Mudchute_lamb_1",
@@ -288,11 +296,15 @@ sheep_naked_prototype = {
 					delay=300
 					},
 		spawning = {
-					rate=0,
-					density=0,
-					algorithm="none",
-					height=2
-					},
+					primary_algorithms = {
+						{
+						rate=0,
+						density=0,
+						algorithm="none",
+						height=2
+						},
+					}
+				},
 		sound = {
 					random = {
 								name="Mudchute_sheep_1",

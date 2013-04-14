@@ -1,4 +1,4 @@
-local version = "0.0.12"
+local version = "0.0.13"
 
 minetest.log("action","MOD: animal_fish_blue_white loading ...")
 
@@ -51,11 +51,15 @@ fish_blue_white_prototype = {
 					consumed=true,
 				},
 		spawning = {
-					rate=0.02,
-					density=150,
-					algorithm="in_shallow_water_spawner",
-					height=-1,
-					respawndelay = 60,
+					primary_algorithms = {
+						{
+							rate=0.02,
+							density=150,
+							algorithm="in_shallow_water_spawner",
+							height=-1,
+							respawndelay = 60,
+						},
+					}
 				},
 		animation = {
 				swim = {

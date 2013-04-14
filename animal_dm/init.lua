@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_dm loading ...")
-local version = "0.0.17"
+local version = "0.0.18"
 
 local dm_groups = {
                         not_in_creative_inventory=1
@@ -62,13 +62,17 @@ dm_prototype = {
 					self_destruct = nil,
 					},
 		
-		spawning = {		
-					rate=0.02,
-					density=750,
-					algorithm="shadows_spawner",
-					height=3,
-					respawndelay = 60,
-					},
+		spawning = {
+					primary_algorithms = {
+						{
+						rate=0.02,
+						density=750,
+						algorithm="shadows_spawner",
+						height=3,
+						respawndelay = 60,
+						},
+					}
+				},
 		sound = {
 					random = {
 								name="animal_dm_random_1",

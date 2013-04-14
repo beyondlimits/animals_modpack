@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_creeper mod loading ...")
 
-local version = "0.0.17"
+local version = "0.0.18"
 
 local creeper_groups = {
 						not_in_creative_inventory=1
@@ -64,12 +64,16 @@ creeper_prototype = {
 					},
 		
 		spawning = {
-					rate=0.02,
-					density=500,
-					algorithm="at_night_spawner",
-					height=2,
-					respawndelay=60,
-					},
+					primary_algorithms = {
+						{
+						rate=0.02,
+						density=500,
+						algorithm="at_night_spawner",
+						height=2,
+						respawndelay=60,
+						},
+					}
+				},
 		sound = {
 					random = {
 								name="animal_creeper_random_1",

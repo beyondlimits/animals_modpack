@@ -183,18 +183,22 @@ local prototype_mob_slime_L = {
 		},
 	--! @brief [MANDATORY] spawning configuration for mob
 	spawning = {
-		--! @brief [MANDATORY] rate this mob is spawned
-		rate=0.01,
-		--! @brief [MANDATORY] typical distance between two mobs of this type when spawend
-		density=50,
-		--! @brief [MANDATORY] identifyer of spawn algorithm
-		algorithm="deep_large_caves_spawner",
-		
-		--! @brief [ALGORITHM DEPENDENT] shadows minimum number of air blocks above pos
-		height = 4,
-		
-		min_depth = -100,
-		},
+				primary_algorithms = {
+					{
+					--! @brief [MANDATORY] rate this mob is spawned
+					rate=0.01,
+					--! @brief [MANDATORY] typical distance between two mobs of this type when spawend
+					density=50,
+					--! @brief [MANDATORY] identifyer of spawn algorithm
+					algorithm="deep_large_caves_spawner",
+					
+					--! @brief [ALGORITHM DEPENDENT] shadows minimum number of air blocks above pos
+					height = 4,
+					
+					min_depth = -100,
+					},
+				}
+			},
 	die = {
 			name="mob_slime_die",
 			gain = 0.7,
@@ -303,18 +307,22 @@ local prototype_mob_slime_S = {
 		},
 	--! @brief [MANDATORY] spawning configuration for mob
 	spawning = {
-		--! @brief [MANDATORY] rate this mob is spawned
-		rate=0.01,
-		--! @brief [MANDATORY] typical distance between two mobs of this type when spawend
-		density=50,
-		--! @brief [MANDATORY] identifyer of spawn algorithm
-		algorithm="none",
-		
-		--! @brief [ALGORITHM DEPENDENT] shadows minimum number of air blocks above pos
-		height = 4,
-		
-		min_depth = -100,
-		},
+				primary_algorithms = {
+					{
+					--! @brief [MANDATORY] rate this mob is spawned
+					rate=0.01,
+					--! @brief [MANDATORY] typical distance between two mobs of this type when spawend
+					density=50,
+					--! @brief [MANDATORY] identifyer of spawn algorithm
+					algorithm="none",
+					
+					--! @brief [ALGORITHM DEPENDENT] shadows minimum number of air blocks above pos
+					height = 4,
+					
+					min_depth = -100,
+					},
+				}
+			},
 	die = {
 		name="mob_slime_die",
 		gain = 0.3,
@@ -421,17 +429,21 @@ local prototype_mob_slime_M = {
 		},
 	--! @brief [MANDATORY] spawning configuration for mob
 	spawning = {
-		--! @brief [MANDATORY] rate this mob is spawned
-		rate=0.01,
-		--! @brief [MANDATORY] typical distance between two mobs of this type when spawend
-		density=50,
-		--! @brief [MANDATORY] identifyer of spawn algorithm
-		algorithm="none",
-		
-		--! @brief [ALGORITHM DEPENDENT] shadows minimum number of air blocks above pos
-		height = 4,
-		
-		min_depth = -100,
+			primary_algorithms = {
+				{
+				--! @brief [MANDATORY] rate this mob is spawned
+				rate=0.01,
+				--! @brief [MANDATORY] typical distance between two mobs of this type when spawend
+				density=50,
+				--! @brief [MANDATORY] identifyer of spawn algorithm
+				algorithm="none",
+				
+				--! @brief [ALGORITHM DEPENDENT] shadows minimum number of air blocks above pos
+				height = 4,
+				
+				min_depth = -100,
+				},
+			}
 		},
 	die = {
 		name="mob_slime_die",

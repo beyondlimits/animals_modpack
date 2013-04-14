@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_cow mod loading ...")
-local version = "0.0.19"
+local version = "0.0.20"
 
 local cow_groups = {
 						not_in_creative_inventory=1
@@ -59,11 +59,15 @@ cow_prototype = {
 					consumed=true,
 					},
 		spawning = {
-					rate=0.001,
-					density=200,
-					algorithm="big_willow_mapgen",
-					height=2
-					},
+					primary_algorithms = {
+						{
+						rate=0.001,
+						density=200,
+						algorithm="big_willow_mapgen",
+						height=2
+						},
+					}
+				},
 		sound = {
 					random = {
 								name="Mudchute_cow_1",
@@ -153,11 +157,15 @@ steer_prototype = {
                     consumed=true,
                     },
         spawning = {
-                    rate=0.001,
-                    density=200,
-                    algorithm="big_willow_mapgen",
-                    height=2
-                    },
+					primary_algorithms = {
+						{
+	                    rate=0.001,
+	                    density=200,
+	                    algorithm="big_willow_mapgen",
+	                    height=2
+	                    },
+	                }
+	           },
         sound = {
                     random = {
                                 name="Mudchute_cow_1",
@@ -250,11 +258,15 @@ baby_calf_f_prototype = {
 			delay=7200,
 			},
 		spawning = {
-			rate=0.001,
-			density=200,
-			algorithm="none",
-			height=2
-			},
+					primary_algorithms = {
+						{
+						rate=0.001,
+						density=200,
+						algorithm="none",
+						height=2
+						},
+					}
+				},
 		sound = {
 			random = {
 				name="Mudchute_cow_1",
@@ -335,10 +347,14 @@ baby_calf_m_prototype = {
 				delay=7200,
 				},
 		spawning = {
-				rate=0.001,
-				density=200,
-				algorithm="none",
-				height=2
+					primary_algorithms = {
+						{
+						rate=0.001,
+						density=200,
+						algorithm="none",
+						height=2
+						},
+					}
 				},
 		sound = {
 				random = {

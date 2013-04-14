@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_wolf loading ...")
 
-local version = "0.0.14"
+local version = "0.0.15"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
@@ -64,12 +64,15 @@ wolf_prototype = {
 					},
 		
 		spawning = {
-					rate=0.002,
-					density=800,
-					algorithm="forrest_mapgen",
-					height=2
+				primary_algorithms = {
+						{
+						rate=0.002,
+						density=800,
+						algorithm="forrest_mapgen",
+						height=2
+						},
 					},
-					
+				},
 		sound = {
 					random = nil,
 					},
@@ -90,10 +93,10 @@ wolf_prototype = {
 		attention = {
 				hear_distance = 5,
 				hear_distance_value = 20,
-				view_angle = nil,
-				own_view_value = 0,
-				remote_view = true,
-				remote_view_value = 0.3,
+				view_angle = math.pi/2,
+				own_view_value = 0.2,
+				remote_view = false,
+				remote_view_value = 0,
 				attention_distance_value = 0.2,
 				watch_threshold = 10,
 				attack_threshold = 20,
@@ -189,12 +192,15 @@ tamed_wolf_prototype = {
 					consumed=true,
 					},
 		spawning = {
-					rate=0.002,
-					density=150,
-					algorithm="none",
-					height=2
-					},
-					
+					primary_algorithms = {
+						{
+						rate=0.002,
+						density=150,
+						algorithm="none",
+						height=2
+						},
+					}
+				},
 		sound = {
 					random = nil,
 					},

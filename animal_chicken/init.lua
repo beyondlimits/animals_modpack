@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_chicken mod loading ...")
-local version = "0.0.16"
+local version = "0.0.17"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
@@ -71,11 +71,15 @@ chicken_prototype = {
  					chance=0.2
  					},
 		spawning = {
-					rate=0.001,
-					density=50,
-					algorithm="willow_mapgen",
-					height=1
-					},
+					primary_algorithms = {
+						{
+						rate=0.001,
+						density=75,
+						algorithm="willow_mapgen",
+						height=1
+						},
+					}
+				},
 		sound = {
 					random_drop = {
 						name="animal_chicken_eggdrop",
@@ -158,11 +162,15 @@ rooster_prototype = {
 					consumed=true,
 					},
 		spawning = {
-					rate=0.001,
-					density=50,
-					algorithm="willow_mapgen",
-					height=1
-			},
+				primary_algorithms = {
+						{
+							rate=0.001,
+							density=75,
+							algorithm="willow_mapgen",
+							height=1
+						}
+					}
+				},
 		sound = {
 					random = {
 						name="animal_chicken_random_rooster",
@@ -244,10 +252,14 @@ chick_m_prototype = {
 				delay=600,
 				},
 		spawning = {
-				rate=0.001,
-				density=50,
-				algorithm="none",
-				height=1
+					primary_algorithms = {
+						{
+						rate=0.001,
+						density=75,
+						algorithm="none",
+						height=1
+						},
+					}
 				},
 		animation = {
 				walk = {
@@ -321,10 +333,14 @@ chick_f_prototype = {
 				delay=600,
 				},
 		spawning = {
-				rate=0.001,
-				density=50,
-				algorithm="none",
-				height=1
+					primary_algorithms = {
+						{
+						rate=0.001,
+						density=75,
+						algorithm="none",
+						height=1
+						},
+					}
 				},
 		animation = {
 				walk = {

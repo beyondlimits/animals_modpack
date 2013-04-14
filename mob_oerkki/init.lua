@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_oerkki mod loading ...")
-local version = "0.0.2"
+local version = "0.0.3"
 
 local oerkki_groups = {
 						not_in_creative_inventory=1
@@ -66,12 +66,16 @@ oerkki_prototype = {
 					},
 		
 		spawning = {
-					rate=0.01,
-					density=750,
-					algorithm="shadows_spawner",
-					height=4,
-					respawndelay = 60,
-					},
+					primary_algorithms = {
+						{
+						rate=0.01,
+						density=750,
+						algorithm="shadows_spawner",
+						height=4,
+						respawndelay = 60,
+						},
+					}
+				},
 		sound = {
 			},
 		animation = {

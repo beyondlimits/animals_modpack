@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_big_red mod loading ...")
-local version = "0.0.18"
+local version = "0.0.19"
 
 local big_red_groups = {
 						not_in_creative_inventory=1
@@ -72,12 +72,16 @@ big_red_prototype = {
 					},
 		
 		spawning = {
-					rate=0.01,
-					density=1000,
-					algorithm="shadows_spawner",
-					height=4,
-					respawndelay = 60,
-					},
+					primary_algorithms = {
+						{
+						rate=0.01,
+						density=1000,
+						algorithm="shadows_spawner",
+						height=4,
+						respawndelay = 60,
+						},
+					}
+				},
 		sound = {
 			random = {
 					name="animal_big_red_random_1",
