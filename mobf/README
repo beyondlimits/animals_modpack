@@ -148,6 +148,18 @@ call /mobf_settings in game
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.0.81
+-fix ostrich meat and egg
+-use get_surface core function if available
+-add support for manually spawning mobs at random pos
+-fix luatrace support
+-fix lifebar not beeing deleted if mob is deleted
+-fix orientation onf 3d mobs
+-update spawning definitions
+-fix density for new spawning style
+-vombie now uses pathfinding (if available)
+-add set_target interface to movegens
+
 Changes 2.0.80
 -add anti theft support
 -add player mob preservation on error removal
