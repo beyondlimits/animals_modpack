@@ -343,8 +343,37 @@ function mobf_debug.rightclick_callback(entity,player)
 	if entity.dynamic_data.current_movement_gen.name == "mgen_path" then
 			print("MOBF: \t\tpath index:                  " .. entity.dynamic_data.p_movement.next_path_index)
 			print("MOBF: \t\tpath:                        " .. dump(entity.dynamic_data.p_movement.path))
+		if entity.dynamic_data.p_movement.path ~= nil then
+			for i,v in ipairs(entity.dynamic_data.p_movement.path) do
+				local objects = minetest.env:get_objects_inside_radius(v,0.5)
+				local found = false;
+				for i=1,#objects,1 do
+					local luaentity = objects[i]:get_luaentity()
+					if luaentity.name == "mobf:path_marker_entity" then
+						found = true
+						break
+					end
+				end
+				
+				local node_at = minetest.env:get_node(v)
+				
+				if not found and 
+					node_at.name ~= nil and
+					node_at.name ~= "ignore" then
+					spawning.spawn_and_check("mobf:path_marker_entity","",
+										v,"mark_path")
+				end
+			end
 			print("MOBF: \t\tdistance to next point:      " .. p_mov_gen.distance_to_next_point(entity,entity.object:getpos()))
+		end
 	end
+	
+	local predicted_pos = movement_generic.predict_next_block(
+			entity.getbasepos(entity),
+			entity.object:getvelocity(),
+			entity.object:getacceleration())
+	local pos_state  = environment.pos_is_ok(predicted_pos,entity)
+	
 	print("MOBF: \tTime to state change:        " .. entity.dynamic_data.state.time_to_next_change .. " seconds")
 	print("MOBF: \tCurrent environmental state: " .. environment.pos_is_ok(entity.getbasepos(entity),entity))
 	print("MOBF: \tCurrent accel:               " .. printpos(entity.object:getacceleration()))
@@ -352,6 +381,8 @@ function mobf_debug.rightclick_callback(entity,player)
 	print("MOBF: \tSpawnpoint:                  " .. printpos(entity.dynamic_data.spawning.spawnpoint))
 	print("MOBF: \tSpawner:                     " .. dump(entity.dynamic_data.spawning.spawner))
 	print("MOBF: \tCurrent pos:                 " .. printpos(entity.object:getpos()))
+	print("MOBF: \tPredicted pos:               " .. printpos(predicted_pos))
+	print("MOBF: \tPredicted state:             " .. pos_state)
 	if entity.dynamic_data.combat ~= nil then
 		print("MOBF: \tCurrent combat target:       " .. fighting.get_target_name(entity.dynamic_data.combat.target))
 	end
