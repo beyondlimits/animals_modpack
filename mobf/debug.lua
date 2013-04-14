@@ -132,7 +132,7 @@ function mobf_debug.spawn_mob(name,param)
 			local y = mobf_get_surface(toadd.x,toadd.z,pos.y-10,pos.y+10)
 			
 			if y ~= nil then
-				toadd.y = y
+				toadd.y = y +2
 				if spawning.spawn_and_check(parameters[1],"__default",toadd,"mobf_debug_spawner") then
 					found = true
 				end
@@ -353,7 +353,13 @@ function mobf_debug.rightclick_callback(entity,player)
 	print("MOBF: \tSpawner:                     " .. dump(entity.dynamic_data.spawning.spawner))
 	print("MOBF: \tCurrent pos:                 " .. printpos(entity.object:getpos()))
 	if entity.dynamic_data.combat ~= nil then
-	print("MOBF: \tCurrent combat target:       " .. fighting.get_target_name(entity.dynamic_data.combat.target))
+		print("MOBF: \tCurrent combat target:       " .. fighting.get_target_name(entity.dynamic_data.combat.target))
+	end
+	if entity.dynamic_data.attention ~= nil then
+		print("MOBF: \t Current attention table:")	
+		for k,v in pairs(entity.dynamic_data.attention.watched_objects) do
+			print("MOBF: \t\t " .. k .. ": " .. v.value)
+		end
 	end
 	return false
 end
