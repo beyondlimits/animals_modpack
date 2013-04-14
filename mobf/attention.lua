@@ -100,7 +100,6 @@ function attention.callback(entity,now)
 		return
 	end
 	
-	dbg_mobf.attention_lvl3("MOBF: attention callback native mode")
 	local top_attention_object = nil
 	local top_attention_value = 0
 	
@@ -124,8 +123,9 @@ function attention.callback(entity,now)
 	--reduce attention level for all objects
 	for k,v in pairs(entity.dynamic_data.attention.watched_objects) do
 		if v.value > reduction_value then
-			dbg_mobf.attention_lvl3("MOBF: preserving " .. k .. " for watchlist")
 			v.value = v.value - reduction_value
+			dbg_mobf.attention_lvl3("MOBF: preserving " .. k .. 
+				" for watchlist new value: " .. v.value)
 		else
 			entity.dynamic_data.attention.watched_objects[k] = nil
 			dbg_mobf.attention_lvl3("MOBF: removing " .. k .. " from watchlist")
@@ -269,14 +269,18 @@ function attention.callback(entity,now)
 		entity.dynamic_data.attention.most_relevant_target = top_attention_object
 		current_attention_value = top_attention_value
 	end
-	
-	if entity.dynamic_data.attention.attack_threshold ~= nil and
-		current_attention_value > entity.dynamic_data.attention.attack_threshold then
+	dbg_mobf.attention_lvl3("MOBF: " .. current_attention_value .. " " ..
+		dump(entity.data.attention.attack_threshold) .. " " ..
+		dump(entity.data.attention.watch_threshold))
+	if entity.data.attention.attack_threshold ~= nil and
+		current_attention_value > entity.data.attention.attack_threshold then
 		local current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
 		
 		--TODO add faction check
-		if entity.data.combat.starts_attack then 
-			fighting.set_target(entity.dynamic_data.attention.most_relevant_target)
+		if entity.data.combat.starts_attack then
+			dbg_mobf.attention_lvl3("MOBF: attack thhreshold exceeded starting attack of " .. 
+				dump(entity.dynamic_data.attention.most_relevant_target))
+			fighting.set_target(entity,entity.dynamic_data.attention.most_relevant_target)
 		end
 	else
 		if entity.data.attention.watch_threshold ~= nil and

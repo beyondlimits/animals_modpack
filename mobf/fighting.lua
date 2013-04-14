@@ -195,7 +195,7 @@ function fighting.hit(entity,attacker)
 		
 		--face attacker
 		if entity.mode == "3d" then
-			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)+math.pi)
+			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
 		else
 			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)-math.pi)
 		end
@@ -203,8 +203,9 @@ function fighting.hit(entity,attacker)
 		dbg_mobf.fighting_lvl2("MOBF: mob with chance of fighting back attacked")
 		--either the mob hasn't been attacked by now or a new player joined fight
 		
-		
-		fighting.set_target(entity,attacker)
+		if math.random() < entity.data.combat.angryness then
+			fighting.set_target(entity,attacker)
+		end
 	else
 		--make non agressive animals run away
 		
@@ -306,6 +307,9 @@ function fighting.switch_to_combat_state(entity,now,target)
 		return
 	end
 	
+	--set attack target
+	entity.dynamic_data.combat.target = target
+	
 	local current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
 	
 	mobf_assert_backtrace(current_state.state_mode ~= "combat")
@@ -351,8 +355,6 @@ function fighting.switch_to_combat_state(entity,now,target)
 	
 	--set target
 	entity.dynamic_data.movement.target = target
-	--set attack target
-	entity.dynamic_data.combat.target = target
 end
 
 -------------------------------------------------------------------------------
@@ -499,7 +501,7 @@ function fighting.combat(entity,now)
 		
 		--look towards target
 		if entity.mode == "3d" then
-			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)+math.pi)
+			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
 		else
 			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)-math.pi)
 		end
@@ -1087,7 +1089,7 @@ function fighting.get_target_name(target)
 end
 
 -------------------------------------------------------------------------------
--- name: set_tatget(entity,target) 
+-- name: set_target(entity,target) 
 --
 --! @brief decide if only switching target or state
 --! @memberof fighting
@@ -1098,6 +1100,8 @@ end
 -------------------------------------------------------------------------------
 function fighting.set_target(entity,target)
 
+	mobf_assert_backtrace(entity.dynamic_data ~= nil)
+
 	if entity.dynamic_data.combat.target ~= nil then
 		dbg_mobf.fighting_lvl2("MOBF: switching attack target")
 		--set target
@@ -1106,16 +1110,14 @@ function fighting.set_target(entity,target)
 		entity.dynamic_data.combat.target = target
 	else
 		if entity.dynamic_data.combat.target ~= target then
-			dbg_mobf.fighting_lvl2("MOBF: initial attack")
-			--calculate chance of mob fighting back
-			if math.random() < entity.data.combat.angryness then
-					local attackername = fighting.get_target_name(target)
-					dbg_mobf.fighting_lvl2("MOBF: fighting back player "..attackername)
-					
-					if entity.dynamic_data.combat.target == nil then
-						fighting.switch_to_combat_state(entity,mobf_get_current_time(),target)
-					end
-			end	
+			
+			local attackername = fighting.get_target_name(target)
+			dbg_mobf.fighting_lvl2("MOBF: initial attack at: "..attackername)
+			
+			if entity.dynamic_data.combat.target == nil then
+				fighting.switch_to_combat_state(entity,mobf_get_current_time(),target)
+			end
+
 		end
 	end
 end
