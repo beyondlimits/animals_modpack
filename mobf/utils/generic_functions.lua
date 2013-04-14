@@ -216,6 +216,8 @@ end
 function mobf_mob_around(mob_name,mob_transform,pos,range,ignore_playerspawned)
 	local count = 0
 	local objectcount = 0
+	
+	mobf_assert_backtrace(range ~= nil)
 
 	local objectlist = minetest.env:get_objects_inside_radius(pos,range)
 	

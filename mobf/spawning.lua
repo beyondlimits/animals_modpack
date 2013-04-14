@@ -119,6 +119,7 @@ function spawning.init_dynamic_data(entity,now)
 		spawnpoint         = entity.object:getpos(),
 		original_spawntime = now,
 		spawner            = nil,
+		density            = spawning.get_min_density(entity),
 	}
 	
 	entity.removed = false
@@ -182,10 +183,12 @@ function spawning.check_population_density(entity,now)
 		secondary_name = entity.data.harvest.transform_to
 	end
 
+	mobf_assert_backtrace(entity.dynamic_data.spawning.density ~= nil)
+
 	local mob_count = mobf_mob_around(entity.data.modname..":"..entity.data.name,
 										secondary_name,
 										entitypos,
-										entity.data.spawning.density,
+										entity.dynamic_data.spawning.density,
 										true)
 	if  mob_count > 5 then
 		entity.removed = true
@@ -690,6 +693,31 @@ function spawning.setup_algorithm(primary_name,secondary_name,parameters,envid)
 								parameters,
 								environment_list[envid])
 		end
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: get_min_density(entity)
+-- @function [parent=#spawning] get_min_density
+--
+--! @brief get minimum density for this mob
+--! @memberof spawning
+--
+--! @param mob entity
+-------------------------------------------------------------------------------
+function spawning.get_min_density(entity)
+	if type(entity.data.spawning.primary_algorithms) == "table" then
+		local density = nil
+		for i=1 , #entity.data.spawning.primary_algorithms , 1 do
+			if density == nil or
+				entity.data.spawning.primary_algorithms[i].density < density then
+				
+				density = entity.data.spawning.primary_algorithms[i].density
+			end
+		end
+		return density
+	else
+		return entity.data.spawning.density
 	end
 end
 
