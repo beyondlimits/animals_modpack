@@ -148,6 +148,9 @@ call /mobf_settings in game
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.0.82
+-disable luatrace
+
 Changes 2.0.81
 -fix ostrich meat and egg
 -use get_surface core function if available

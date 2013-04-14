@@ -29,7 +29,7 @@ mobf_rtd = {
 	--!is mob running with fire support
 	fire_enabled			= false,
 	--!do we have luatrace
-	luatrace_enabled		= true,
+	luatrace_enabled		= false,
 	--!do we have inventory plus support
 	inventory_plus_enabled = false,
 	--!registry for movement patterns
@@ -96,7 +96,7 @@ dofile (mobf_modpath .. "/mgen_jordan4ibanez/mgen_jordan4ibanez.lua")
 dofile (mobf_modpath .. "/mgen_pathbased/main.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "2.0.81"
+mobf_version = "2.0.82"
 
 --! @brief define tools used for more than one mob
 function mobf_init_basic_tools()	
