@@ -6,7 +6,7 @@ local vombie_groups = {
 						not_in_creative_inventory=1
 					}
 
-local selectionbox_vombie = {-0.3, -1.2, -0.5, 0.3, 1, 0.5}
+local selectionbox_vombie = {-0.3, -1.2, -0.3, 0.3, 1, 0.3}
 
 local modpath = minetest.get_modpath("animal_vombie")
 
@@ -183,7 +183,7 @@ vombie_prototype = {
 					typical_state_time = 9999,
 					chance = 0.0,
 					animation = "attack",
-					movgen="follow_mov_gen",
+					movgen="mgen_path",
 				},
 			}
 		}
