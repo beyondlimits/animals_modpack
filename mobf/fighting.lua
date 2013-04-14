@@ -354,7 +354,7 @@ function fighting.switch_to_combat_state(entity,now,target)
 	entity.dynamic_data.movement.guardspawnpoint = false
 	
 	--set target
-	entity.dynamic_data.movement.target = target
+	entity.dynamic_data.current_movement_gen.set_target(entity,target)
 end
 
 -------------------------------------------------------------------------------
@@ -451,7 +451,7 @@ end
 --! @param entity mob to do action
 --! @param now current time
 -------------------------------------------------------------------------------
-function fighting.combat(entity,now)
+function fighting.combat(entity,now,dtime)
 	
 	--handle self destruct mobs
 	if fighting.self_destruct_handler(entity,now) then
@@ -501,7 +501,7 @@ function fighting.combat(entity,now)
 		
 		--look towards target
 		if entity.mode == "3d" then
-			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
+			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)+math.pi)
 		else
 			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)-math.pi)
 		end
@@ -534,29 +534,28 @@ function fighting.combat(entity,now)
 		--check if state needs to be switched
 		local required_state = fighting.identify_combat_state(entity,distance)
 		
-		if required_state ~= nil then
-			local mov_target = entity.dynamic_data.movement.target
-			dbg_mobf.fighting_lvl3("MOBF: mov target before state switch: " .. 
-				dump(mov_target))
+		if required_state ~= nil and
+			required_state.name ~= entity.dynamic_data.state.current then
 			local newentity = mob_state.change_state(entity,required_state)
 
 			--if we just changed entity abort this handler
 			if newentity ~= nil then
-				newentity.dynamic_data.movement.target = mov_target
-				dbg_mobf.fighting_lvl3(
-					"MOBF: (1) mov target after state switch: " .. 
-					dump(newentity.dynamic_data.movement.target))
+				newentity.dynamic_data.current_movement_gen.set_target(newentity,target)
 				return false
 			end
 			
-			--preserve movement target
-			entity.dynamic_data.movement.target = mov_target
-			dbg_mobf.fighting_lvl3("MOBF: (2) mov target after state switch: " 
-				.. dump(entity.dynamic_data.movement.target))
+			--reset current attack target as movement target after state switch
+			entity.dynamic_data.current_movement_gen.set_target(entity,target)
 		end
 		
 		--is mob near enough for any attack attack?
 		if not fighting.in_range(entity,distance) then
+			if entity.dynamic_data.combat.reset_path_counter > 1.5 then 
+				entity.dynamic_data.current_movement_gen.set_target(entity,target)
+				entity.dynamic_data.combat.reset_path_counter = 0
+			end
+			entity.dynamic_data.combat.reset_path_counter = 
+				entity.dynamic_data.combat.reset_path_counter + dtime
 			return true
 		end
 
@@ -1104,8 +1103,10 @@ function fighting.set_target(entity,target)
 
 	if entity.dynamic_data.combat.target ~= nil then
 		dbg_mobf.fighting_lvl2("MOBF: switching attack target")
+		
 		--set target
-		entity.dynamic_data.movement.target = target
+		entity.dynamic_data.current_movement_gen.set_target(entity,target)
+		
 		--set attack target
 		entity.dynamic_data.combat.target = target
 	else
@@ -1139,6 +1140,7 @@ function fighting.init_dynamic_data(entity,now)
 		ts_self_destruct_triggered	= -1,
 		
 		target						= nil,
+		reset_path_counter			= 0,
 	}	
 	
 	entity.dynamic_data.combat = data
