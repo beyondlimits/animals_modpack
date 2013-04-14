@@ -90,6 +90,9 @@ function spawning.remove(entity,reason)
 				" at " .. printpos(pos) .. " due to: " .. reason)
 		end
 		mob_preserve.handle_remove(entity,reason)
+		if entity.lifebar ~= nil then
+			mobf_lifebar.del(entity.lifebar)
+		end
 		entity.object:remove()
 	else
 		minetest.log(LOGLEVEL_ERROR,"Trying to delete an an non existant mob")
