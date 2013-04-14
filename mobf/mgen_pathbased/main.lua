@@ -53,13 +53,24 @@ function p_mov_gen.callback(entity,now,dstep)
 	local handled = false
 	
 	if entity.dynamic_data.p_movement.path == nil then
-		dbg_mobf.path_mov_lvl1("MOBF: pathmov without path??????")
+		dbg_mobf.path_mov_lvl1(
+				"MOBF: path movement but mo path set!!")
 		return
 	end
 	
+	
+	local max_distance = entity.data.movement.max_distance
+	
+	if entity.dynamic_data.movement.max_distance ~= nil then
+		max_distance = entity.dynamic_data.movement.max_distance
+	end
+	
+	mobf_assert_backtrace(entity.dynamic_data.p_movement.next_path_index ~= nil)
+	mobf_assert_backtrace(max_distance ~= nil)
+	
 	--check if target is reached
 	if p_mov_gen.distance_to_next_point(entity,current_pos) 
-						< entity.data.movement.max_distance then
+						< max_distance then
 		dbg_mobf.path_mov_lvl1("MOBF: pathmov next to next point switching target")
 		local update_target = true
 		
@@ -67,7 +78,9 @@ function p_mov_gen.callback(entity,now,dstep)
 		if entity.dynamic_data.p_movement.next_path_index 
 				== #entity.dynamic_data.p_movement.path then
 				
-			if entity.data.patrol.cycle_path then
+			if entity.data.patrol ~= nil and
+				entity.data.patrol.cycle_path then
+				--0 is correct as it's incremented by one later
 				entity.dynamic_data.p_movement.next_path_index = 0
 			else
 				dbg_mobf.path_mov_lvl1("MOBF: cycle not set not updating point")
@@ -118,6 +131,8 @@ end
 -------------------------------------------------------------------------------
 function p_mov_gen.distance_to_next_point(entity,current_pos)
 	local index = entity.dynamic_data.p_movement.next_path_index
+	mobf_assert_backtrace(entity.dynamic_data.p_movement.path ~= nil)
+	mobf_assert_backtrace(index <= #entity.dynamic_data.p_movement.path)
 	return mobf_calc_distance_2d(current_pos,
 		entity.dynamic_data.p_movement.path[index])
 end
@@ -170,6 +185,86 @@ function p_mov_gen.init_dynamic_data(entity,now,restored_data)
 	entity.dynamic_data.p_movement = data
 	
 	mgen_follow.init_dynamic_data(entity,now)
+end
+
+-------------------------------------------------------------------------------
+-- name: set_target(entity,target)
+--
+--! @brief set target for movgen
+--! @memberof mgen_follow
+--! @private
+--
+--! @param entity mob to apply to
+--! @param target to set
+-------------------------------------------------------------------------------
+function p_mov_gen.set_target(entity,target)
+	mobf_assert_backtrace(target ~= nil)
+	
+	local current_pos = entity.getbasepos(entity)
+	local targetpos = nil
+	
+	if not mobf_is_pos(target) then
+		if target:is_player() then
+			targetpos = target:getpos()
+			targetpos.y = targetpos.y +0.5
+		else
+			if type(target.getbasepos) == "function" then
+				targetpos = target.getbasepos(target)
+			else
+				targetpos = target:getpos()
+			end
+		end
+	else
+		targetpos = target
+	end
+	
+	if targetpos == nil then
+		return false
+	end
+	
+	if entity.dynamic_data.p_movement.lasttargetpos ~= nil then
+		if mobf_pos_is_same(entity.dynamic_data.p_movement.lasttargetpos,
+			targetpos) then
+			return true
+		end
+	end
+	
+	entity.dynamic_data.p_movement.lasttargetpos = targetpos
+	
+	entity.dynamic_data.p_movement.path = nil
+	entity.dynamic_data.p_movement.next_path_index = 1
+	
+	--on target mode max distance is always 0.5
+	entity.dynamic_data.movement.max_distance = 0.5
+	
+	--try to find path on our own
+	if type(minetest.env.find_path) == "function" then
+		print("trying to find path to: " .. printpos(targetpos))
+		entity.dynamic_data.p_movement.path = 
+			minetest.env:find_path(current_pos,targetpos,5,1,1,nil)
+					
+		if entity.dynamic_data.p_movement.path == nil then
+			dbg_mobf.path_mov_lvl1("MOBF: haven't found a path to target")
+			return false
+		end
+		
+		print("found path to target: " .. dump(entity.dynamic_data.p_movement.path))
+		entity.dynamic_data.movement.target = 
+				entity.dynamic_data.p_movement.path[1]
+		return true
+	else
+		print(
+			"MOBF: no pathfinding support directly setting targetpos as path")
+			
+		entity.dynamic_data.p_movement.path = {}
+		
+		table.insert(entity.dynamic_data.p_movement.path,targetpos)
+		entity.dynamic_data.movement.target = 
+				entity.dynamic_data.p_movement.path[1]
+		return true
+	end
+	
+	return false
 end
 
 --register this movement generator

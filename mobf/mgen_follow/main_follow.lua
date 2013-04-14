@@ -298,7 +298,7 @@ function mgen_follow.callback(entity,now)
 				local predicted_pos = movement_generic.predict_next_block(basepos,current_velocity,accel_to_set)
 				local pos_state  = environment.pos_is_ok(predicted_pos,entity)
 				
-				if pos_state == "collision_jumpable" then			
+				if pos_state == "collision_jumpable" then
 					local pos_to_set = entity.object:getpos()
 					pos_to_set.y = pos_to_set.y + 1.1
 					entity.object:moveto(pos_to_set)
@@ -433,6 +433,20 @@ function mgen_follow.set_acceleration(entity,accel,speedup)
 								   z=accel.z*speedup})
 end
 
+-------------------------------------------------------------------------------
+-- name: set_target(entity,target)
+--
+--! @brief set target for movgen
+--! @memberof mgen_follow
+--! @private
+--
+--! @param entity mob to apply to
+--! @param target to set
+-------------------------------------------------------------------------------
+function mgen_follow.set_target(entity,target)
+	entity.dynamic_data.movement.target = target
+	return true
+end
 
 --register this movement generator
 registerMovementGen(mgen_follow.name,mgen_follow)

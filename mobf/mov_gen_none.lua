@@ -87,5 +87,19 @@ function mgen_none.init_dynamic_data(entity,now)
     entity.dynamic_data.movement = data
 end
 
+-------------------------------------------------------------------------------
+-- name: set_target(entity,target)
+--
+--! @brief set target for movgen
+--! @memberof mgen_follow
+--! @private
+--
+--! @param entity mob to apply to
+--! @param target to set
+-------------------------------------------------------------------------------
+function mgen_none.set_target(entity,target)
+	return false
+end
+
 --register this movement generator
 registerMovementGen(mgen_none.name,mgen_none)

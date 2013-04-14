@@ -394,8 +394,9 @@ function movement_gen.fix_to_slow(entity,movement_state)
 	
 	--this ain't perfect to avoid flying mobs standing in air 
 	--but it's a quick solution to fix most of the problems
-	if entity.data.movement.min_speed ~= nil and
-		xzspeed < entity.data.movement.min_speed then
+	if (entity.data.movement.min_speed ~= nil and
+		xzspeed < entity.data.movement.min_speed) or
+		xzspeed == nil then
 		
 		dbg_mobf.pmovement_lvl3("MOBF: too slow! vxz=" .. xzspeed)
 		--use normal speed change handling
@@ -617,6 +618,19 @@ function movement_gen.fix_current_pos(entity,movement_state)
 	return {	abort_processing=abort_processing,	 }
 end
 
+-------------------------------------------------------------------------------
+-- name: set_target(entity,target)
+--
+--! @brief set target for movgen
+--! @memberof movement_gen
+--! @private
+--
+--! @param entity mob to apply to
+--! @param target to set
+-------------------------------------------------------------------------------
+function movement_gen.set_target(entity,target)
+	return false
+end
 
 --register this movement generator
 registerMovementGen(movement_gen.name,movement_gen)
