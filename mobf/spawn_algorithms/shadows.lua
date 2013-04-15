@@ -135,7 +135,8 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 			end
 			
 			for i=0.0,1,0.1 do
-				if minetest.env:get_node_light(pos,i) > 6 then
+				local light_val = minetest.env:get_node_light(pos,i)
+				if light_val == nil or light_val > 6 then
 					good = false
 					reason = "to much light"
 				end
