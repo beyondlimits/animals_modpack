@@ -92,13 +92,13 @@ function mobf_spawn_at_night(mob_name,mob_transform,spawning_data,environment)
 						if minetest.env:get_node_light(pos_above,0.5) == LIGHT_MAX +1 and 
 							minetest.env:get_node_light(pos_above,0.0) < 7 and
 							minetest.env:get_node_light(pos_above) < 6 then
-
-							local newobject = minetest.env:add_entity(pos_above,mob_name .. "__default")
-
-							local newentity = mobf_find_entity(newobject)
-
-							if newentity == nil then
-								minetest.log(LOGLEVEL_ERROR,"MOBF: Bug!!! no "..mob_name.." has been created!")
+							
+							local entity = spawning.spawn_and_check(mob_name,"__default",pos_above,"at_night_spawner")
+							
+							if entity ~= nil and
+								entity.dynamic_data ~= nil and
+								entity.dynamic_data.spawning ~= nil then
+								entity.dynamic_data.spawning.spawner = "at_night"
 							end
 
 							minetest.log(LOGLEVEL_INFO,"MOBF Spawning "..mob_name.." at night at position "..printpos(pos))
@@ -205,7 +205,12 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 							   pos,
 							   self.spawner_mob_spawndata.density,true) < 2 then
 
-				spawning.spawn_and_check(self.spawner_mob_name,"__default",pos,"at_night_spawner_ent")
+				local entity = spawning.spawn_and_check(self.spawner_mob_name,"__default",pos,"at_night_spawner_ent")
+				if entity ~= nil and
+					entity.dynamic_data ~= nil and
+					entity.dynamic_data.spawning ~= nil then
+					entity.dynamic_data.spawning.spawner = "at_night_mapgen"
+				end
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
 			else
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay

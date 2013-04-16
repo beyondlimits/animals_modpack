@@ -565,7 +565,7 @@ function mobf_get_surface(x,z, min_y, max_y)
 	mobf_assert_backtrace(x ~= nil)
 	mobf_assert_backtrace(z ~= nil)
 	
-	if type(minetest.env.get_surface) == "function" then	
+	if type(minetest.env.get_surface) == "function" then
 	return minetest.env:get_surface({x=x,y=min_y,z=z},max_y-min_y)
 	end
 
