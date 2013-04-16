@@ -297,18 +297,19 @@ end
 -------------------------------------------------------------------------------
 function spawning.lifecycle(entity,now)
 
-	if entity.dynamic_data.spawning.original_spawntime ~= nil and
-		entity.data.spawning.lifetime ~= nil then
-	
-		local lifetime = entity.data.spawning.lifetime
+	if entity.dynamic_data.spawning.original_spawntime ~= nil then
+		if entity.data.spawning.lifetime ~= nil then
 		
-		local current_age = now - entity.dynamic_data.spawning.original_spawntime
-	
-		if current_age > 0 and 
-			current_age > lifetime then
-			dbg_mobf.spawning_lvl1("MOBF: removing animal due to limited lifetime")
-			spawning.remove(entity," limited mob lifetime")
-			return false
+			local lifetime = entity.data.spawning.lifetime
+			
+			local current_age = now - entity.dynamic_data.spawning.original_spawntime
+		
+			if current_age > 0 and 
+				current_age > lifetime then
+				dbg_mobf.spawning_lvl1("MOBF: removing animal due to limited lifetime")
+				spawning.remove(entity," limited mob lifetime")
+				return false
+			end
 		end
 	else
 		entity.dynamic_data.spawning.original_spawntime = now
