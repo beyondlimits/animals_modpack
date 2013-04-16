@@ -55,7 +55,8 @@ function attention.aggression(entity,now)
 				.. " lazzy time over try to find an enemy")
 			entity.dynamic_data.combat.ts_last_aggression_chance = now
 
-			if math.random() < entity.data.combat.angryness then
+			if  entity.data.combat.angryness ~= nil and
+				math.random() < entity.data.combat.angryness then
 
 				dbg_mobf.fighting_lvl3("MOBF: ".. entity.data.name .. " " .. now
 					.. " really is angry")

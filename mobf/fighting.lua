@@ -190,8 +190,10 @@ function fighting.hit(entity,attacker)
 	--dbg_mobf.fighting_lvl2("MOBF: attack chance is ".. entity.data.combat.angryness)
 	-- fight back
 	if entity.data.combat ~= nil and
-		(entity.data.combat.can_fight or
-		entity.data.combat.angryness > 0) then
+		(	entity.data.combat.can_fight or
+			(entity.data.combat.angryness ~= nil and entity.data.combat.angryness > 0)
+			
+		) then
 		
 		--face attacker
 		if entity.mode == "3d" then
@@ -568,7 +570,8 @@ function fighting.combat(entity,now,dtime)
 				-- mob did an attack so give chance to stop attack
 				local rand_value = math.random()
 
-				if  rand_value > entity.data.combat.angryness then
+				if  entity.data.combat.angryness ~= nil and
+					rand_value > entity.data.combat.angryness then
 					dbg_mobf.fighting_lvl2("MOBF: rand=".. rand_value 
 						.. " angryness=" .. entity.data.combat.angryness)
 					dbg_mobf.fighting_lvl2("MOBF: " .. entity.data.name .. " " 
