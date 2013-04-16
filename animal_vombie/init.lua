@@ -1,4 +1,4 @@
-local version = "0.0.20"
+local version = "0.0.21"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -46,6 +46,24 @@ function vombie_on_step_handler(entity,now,dtime)
 										"animal_vombie:vombie_flame")
 
 		--add particles
+	end
+	if entity.dynamic_data.spawning.spawner == "at_night" or
+		entity.dynamic_data.spawning.spawner == "at_night_mapgen" then
+		local current_time = minetest.env:get_timeofday()
+		if (current_time > 0.15) and
+			(current_time < 0.30) then
+			if entity.last_time ~= nil then
+				local last_step_size = dtime /  86400 -- (24*3600)
+				local time_step = current_time - entity.last_time
+				if time_step > last_step_size * 10 then
+					spawning.remove(entity)
+					--return false to abort procession of other hooks
+					return false
+				end
+			end
+		end
+		
+		entity.last_time = current_time
 	end
 end
 
