@@ -1,4 +1,4 @@
-local version = "0.0.21"
+local version = "0.0.22"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -29,7 +29,8 @@ function vombie_on_step_handler(entity,now,dtime)
 	local pos = entity.getbasepos(entity)
 	local current_light = minetest.env:get_node_light(pos)
 	
-	--print("vombie on step: current_light:" .. current_light .. " max light: " .. LIGHT_MAX .. " 3dmode:" .. dump(minetest.setting_getbool("disable_animals_3d_mode")))
+	--print("vombie on step: current_light:" .. current_light .. " max light: " 
+	--	.. LIGHT_MAX .. " 3dmode:" .. dump(minetest.setting_getbool("disable_animals_3d_mode")))
 
 	if current_light ~= nil and
 		current_light > LIGHT_MAX and
@@ -69,19 +70,20 @@ end
 
 function vombie_on_activate_handler(entity)
 
-        local pos = entity.object:getpos()
-        
-        local current_light = minetest.env:get_node_light(pos)
-            
-        if current_light == nil then
-            minetest.log(LOGLEVEL_ERROR,"ANIMALS: Bug!!! didn't get a light value for ".. printpos(pos))
-            return
-        end
-        --check if animal is in sunlight
-        if ( current_light > LIGHT_MAX) then
-            --don't spawn vombie in sunlight
-            spawning.remove(entity)
-        end
+	local pos = entity.object:getpos()
+	
+	local current_light = minetest.env:get_node_light(pos)
+	
+	if current_light == nil then
+		minetest.log(LOGLEVEL_ERROR,
+			"ANIMALS: Bug!!! didn't get a light value for ".. printpos(pos))
+		return
+	end
+	--check if animal is in sunlight
+	if ( current_light > LIGHT_MAX) then
+		--don't spawn vombie in sunlight
+		spawning.remove(entity)
+	end
 end
 
 vombie_prototype = {
@@ -133,10 +135,10 @@ vombie_prototype = {
 							},
 							{
 								rate=0.05,
-								density=300,
+								density=100,
 								algorithm="shadows_spawner",
 								height=2,
-								respawndelay = 400,
+								respawndelay = 300,
 							},
 						},
 					},
