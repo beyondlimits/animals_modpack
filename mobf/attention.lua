@@ -326,10 +326,14 @@ end
 function attention.increase_attention_level(entity,source,value)
 	table_id = tostring(source)
 	
-	if entity.dynamic_data.attention.watched_objects[table_id] == nil then
-		entity.dynamic_data.attention.watched_objects[table_id] =  { value = 0 }
-	end
+	if entity.dynamic_data.attention ~= nil then
+	
+		if entity.dynamic_data.attention.watched_objects[table_id] == nil then
+			entity.dynamic_data.attention.watched_objects[table_id] =  { value = 0 }
+		end
+				
+		entity.dynamic_data.attention.watched_objects[table_id].value = 
+			entity.dynamic_data.attention.watched_objects[table_id].value + value
 			
-	entity.dynamic_data.attention.watched_objects[table_id].value = 
-		entity.dynamic_data.attention.watched_objects[table_id].value + value
+	end
 end
