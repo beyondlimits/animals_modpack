@@ -205,7 +205,7 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 							   pos,
 							   self.spawner_mob_spawndata.density,true) < 2 then
 
-				local entity = spawning.spawn_and_check(self.spawner_mob_name,"__default",pos,"at_night_spawner_ent")
+				local entity = spawning.spawn_and_check(self.spawner_mob_name,"__default",newpos,"at_night_spawner_ent")
 				if entity ~= nil and
 					entity.dynamic_data ~= nil and
 					entity.dynamic_data.spawning ~= nil then
