@@ -243,19 +243,19 @@ function p_mov_gen.set_target(entity,target)
 		entity.dynamic_data.p_movement.path = 
 			minetest.env:find_path(current_pos,targetpos,5,1,1,nil)
 					
-		if entity.dynamic_data.p_movement.path == nil then
-			dbg_mobf.path_mov_lvl1("MOBF: haven't found a path to target")
-			return false
-		end
+		if entity.dynamic_data.p_movement.path ~= nil then
 
-		--a valid path has at least 2 positions
-		mobf_assert_backtrace(#entity.dynamic_data.p_movement.path > 1)
-		entity.dynamic_data.movement.target = 
-				entity.dynamic_data.p_movement.path[2]
-		return true
-	else
+			--a valid path has at least 2 positions
+			mobf_assert_backtrace(#entity.dynamic_data.p_movement.path > 1)
+			entity.dynamic_data.movement.target = 
+					entity.dynamic_data.p_movement.path[2]
+			return true
+		end
+	end
+	
+	if entity.dynamic_data.p_movement.path == nil then
 		print(
-			"MOBF: no pathfinding support directly setting targetpos as path")
+			"MOBF: no pathfinding support/ no path found directly setting targetpos as path")
 			
 		entity.dynamic_data.p_movement.path = {}
 		
