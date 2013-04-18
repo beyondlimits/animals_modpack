@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_dm loading ...")
-local version = "0.0.18"
+local version = "0.0.19"
 
 local dm_groups = {
                         not_in_creative_inventory=1
@@ -28,11 +28,11 @@ dm_prototype = {
 	
 		generic = {
 					description="Dungeonmaster (MOBF)",
-					base_health=10,
+					base_health=30,
 					kill_result="",
 					armor_groups= {
-						fleshy=5,
-						deamon=10,
+						fleshy=30,
+						deamon=40,
 					},
 					groups = dm_groups,
 					envid="simple_air"
