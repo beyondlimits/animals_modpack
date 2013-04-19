@@ -309,6 +309,6 @@ minetest.register_craft({
 		{"animalmaterials:feather", "animalmaterials:feather","animalmaterials:feather"},
 		{"animalmaterials:feather","animalmaterials:feather","animalmaterials:feather"},
 	}
-)
+})
 
 minetest.log("action","MOD: animalmaterials mod version " .. version .. " loaded")
