@@ -135,9 +135,10 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 			local max_tries = 5
 			
 			for try=1,max_tries,1 do
-			
+				
 				if newpos == nil then
 					newpos = {}
+					good = true
 					
 					local max_offset = 0.4*self.spawner_mob_spawndata.density
 					
@@ -192,7 +193,6 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 						newpos = nil
 					end
 				end
-			
 			end
 			
 			if good and mobf_mob_around(self.spawner_mob_name,

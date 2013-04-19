@@ -41,14 +41,18 @@ end
 --! @param damage damage to be done
 --! @param range range around pos
 -------------------------------------------------------------------------------
-function mobf_do_area_damage(pos,immune,damage,range)
+function mobf_do_area_damage(pos,immune,damage_groups,range)
 	--damage objects within inner blast radius
 	objs = minetest.env:get_objects_inside_radius(pos, range)
 	for k, obj in pairs(objs) do
 
 		--don't do damage to issuer
 		if obj ~= immune then
-			obj:set_hp(obj:get_hp()-damage)
+			--punch
+			obj:punch(nil, 1.0, {
+				full_punch_interval=1.0,
+				damage_groups = damage_groups,
+			}, nil)
 		end
 	end
 end
@@ -107,7 +111,12 @@ MOBF_FIREBALL_ENTITY = {
 	velocity = 3,
 	gravity = -0.01,
 
-	damage = 15,
+	damage_outer = {
+					fleshy=4,
+					},
+	damage_inner = {
+					fleshy=8,
+					},
 
 	owner = 0,
 	lifetime = 30,
@@ -196,10 +205,10 @@ function MOBF_FIREBALL_ENTITY.on_step(self, dtime)
 
 	if hit then
 		--damage objects within inner blast radius
-		mobf_do_area_damage(pos,self.owner,self.damage_range/4,self.damage/4)
+		mobf_do_area_damage(pos,self.owner,self.damage_range/4,self.damage_outer)
 
 		--damage all objects within blast radius
-		mobf_do_area_damage(pos,self.owner,self.damage_range/2,self.damage/2)		
+		mobf_do_area_damage(pos,self.owner,self.damage_range/2,self.damage_damage_inner)
 		
 		MOBF_FIREBALL_ENTITY.surfacefire(pos,self.damage_range)
 
@@ -233,7 +242,9 @@ MOBF_PLASMABALL_ENTITY = {
 	velocity = 4,
 	gravity = -0.001,
 
-	damage = 8,
+	damage = {
+			fleshy=4,
+			},
 
 	owner = 0,
 	lifetime = 30,
@@ -287,10 +298,10 @@ function MOBF_PLASMABALL_ENTITY.on_step(self, dtime)
 
 	if hit then
 		--damage objects within inner blast radius
-		mobf_do_area_damage(pos,self.owner,self.damage_range/4,self.damage/2)
+		mobf_do_area_damage(pos,self.owner,self.damage_range/4,self.damage)
 
 		--damage all objects within blast radius
-		mobf_do_area_damage(pos,self.owner,self.damage_range/2,self.damage/2)
+		mobf_do_area_damage(pos,self.owner,self.damage_range/2,self.damage)
 	end
 
 	-- vanish when hitting a node
@@ -372,7 +383,10 @@ MOBF_ARROW_ENTITY={
 	collisionbox = {0,0,0,0,0,0},
 	
 	velocity =6,
-	damage   =2,
+	damage_groups = {
+					fleshy=3,
+					daemon=1.5
+					},
 	gravity  =9.81,
 }
 
@@ -401,14 +415,7 @@ MOBF_ARROW_ENTITY.on_step = function(self, dtime)
 					obj:get_luaentity().name ~= "__builtin:item" then
 					obj:punch(self.object, 1.0, {
 						full_punch_interval=1.0,
-						groupcaps={
-							fleshy={times={	[1]=1/(self.damage-2), 
-											[2]=1/(self.damage-1), 
-											[3]=1/self.damage}},
-							snappy={times={	[1]=1/(self.damage-2), 
-											[2]=1/(self.damage-1), 
-											[3]=1/self.damage}},
-						}
+						damage_groups = self.damage_groups,
 					}, nil)
 					self.object:remove()
 				end
@@ -416,14 +423,7 @@ MOBF_ARROW_ENTITY.on_step = function(self, dtime)
 				--punch a player
 				obj:punch(self.object, 1.0, {
 					full_punch_interval=1.0,
-					groupcaps={
-						fleshy={times={	[1]=1/(self.damage-2), 
-										[2]=1/(self.damage-1), 
-										[3]=1/self.damage}},
-						snappy={times={	[1]=1/(self.damage-2), 
-										[2]=1/(self.damage-1), 
-										[3]=1/self.damage}},
-					}
+					damage_groups = self.damage_groups,
 				}, nil)
 				self.object:remove()
 			end
