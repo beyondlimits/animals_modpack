@@ -435,7 +435,11 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 	if maxtries == nil then
 		maxtries = 5
 	end
-
+	
+	local divs = 0
+	local attempts = 0
+	local spawned = 0
+	
 	local starttime = mobf_get_time_ms()
 	
 	local min_x = MIN(minp.x,maxp.x)
@@ -465,37 +469,49 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 		
 		local centerpos = {x=x_center,y=surface_center,z=z_center}
 		
-		dbg_mobf.spawning_lvl3("MOBF: center is (" .. x_center .. "," .. z_center .. ")"
+		if surface_center  == nil then
+			dbg_mobf.spawning_lvl2(
+				"MOBF: didn't find surface for " ..printpos(centerpos))
+			centerpos.y = min_y + ((max_y-min_y)/2)
+		end
+		
+		dbg_mobf.spawning_lvl3("MOBF: center is set to " ..
+			"(" .. x_center .. "," .. z_center .. ")"
 			.."  --> (".. x_delta .."," .. z_delta .. ")")
 		
 		--check if there is already a mob of same type within area
-		if surface_center  then
-			local mobs_around = mobf_spawner_around(name,centerpos,spawndata.density)
-			if mobs_around == 0 then
-				dbg_mobf.spawning_lvl3("no " .. name .. " within range of " .. 
-					spawndata.density .. " around " ..printpos(centerpos))
-				for i= 0, maxtries do
-					local x_try = math.random(-x_delta,x_delta)
-					local z_try = math.random(-z_delta,z_delta)
-					
-					local pos = { x= x_center + x_try,
-									z= z_center + z_try }
-					
-					--do place spawners in center of block
-					pos.x = math.floor(pos.x + 0.5)
-					pos.z = math.floor(pos.z + 0.5)
-					
-					if spawnfunc(name,pos,min_y,max_y,spawndata) then
-						break
-					end
-				end	--for -> 5
-			end --mob around
-		else
-			dbg_mobf.spawning_lvl3("MOBF: didn't find surface for " ..printpos(centerpos))
-		end --surface_center
+		local mobs_around = mobf_spawner_around(name,centerpos,spawndata.density)
+		if mobs_around == 0 then
+			dbg_mobf.spawning_lvl3("no " .. name .. " within range of " .. 
+				spawndata.density .. " around " ..printpos(centerpos))
+			
+			for i = 0, maxtries, 1 do
+				attempts = attempts +1
+				local x_try = math.random(-x_delta,x_delta)
+				local z_try = math.random(-z_delta,z_delta)
+				
+				local pos = { x= x_center + x_try,
+								z= z_center + z_try }
+				
+				--do place spawners in center of block
+				pos.x = math.floor(pos.x + 0.5)
+				pos.z = math.floor(pos.z + 0.5)
+				
+				if spawnfunc(name,pos,min_y,max_y,spawndata) then
+					spawned = spawned +1
+					break
+				end
+			end --for -> 5
+			
+			attempts = attempts + realtries
+		end --mob around
+		
+		divs = divs +1
 	end -- for z divs
 	end -- for x divs
-	dbg_mobf.spawning_lvl3("magen ended")
+	local max_available_tries = divs * maxtries
+	dbg_mobf.spawning_lvl2("MOBF: divide_mapgen I " ..
+			"(" .. divs .. "|" .. attempts .. "|" .. spawned .. "|" .. max_available_tries .. ")")
 end
 
 ------------------------------------------------------------------------------
@@ -524,6 +540,10 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 	if maxtries == nil then
 		maxtries = 5
 	end
+	
+	local divs = 0
+	local attempts = 0
+	local spawned = 0
 
 	local starttime = mobf_get_time_ms()
 	
@@ -547,21 +567,29 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 	for i = 1, xdivs,1 do
 	for j = 1, zdivs,1 do
 	
-	local x_center,x_delta = spawning.get_center(min_x,max_x,i,density)
-	local z_center,z_delta = spawning.get_center(min_z,max_z,j,density)
-	
-	local surface_center = surfacefunc(x_center,z_center,min_y,max_y)
-	
-	local centerpos = {x=x_center,y=surface_center,z=z_center}
-	
-	dbg_mobf.spawning_lvl3("MOBF: center is (" .. x_center .. "," .. z_center .. ") --> (".. x_delta .."," .. z_delta .. ")")
-	
-	--check if there is already a mob of same type within area
-	if surface_center  then
+		local x_center,x_delta = spawning.get_center(min_x,max_x,i,density)
+		local z_center,z_delta = spawning.get_center(min_z,max_z,j,density)
+		
+		local surface_center = surfacefunc(x_center,z_center,min_y,max_y)
+		
+		local centerpos = {x=x_center,y=surface_center,z=z_center}
+		
+		if surface_center  == nil then
+			dbg_mobf.spawning_lvl2(
+				"MOBF: didn't find surface for " ..printpos(centerpos))
+			centerpos.y = min_y + ((max_y-min_y)/2)
+		end
+		
+		dbg_mobf.spawning_lvl3("MOBF: center is (" .. x_center .. "," .. z_center .. ") --> (".. x_delta .."," .. z_delta .. ")")
+		
 		local mobs_around = mobf_mob_around(name,secondary_name,centerpos,density,true)
 		if mobs_around == 0 then
 			dbg_mobf.spawning_lvl3("no " .. name .. " within range of " .. density .. " around " ..printpos(centerpos))
-				i= 0, maxtries, 1 do
+			
+			local realtries = 0
+			
+			for i = 0, maxtries, 1 do
+				attempts = attempts +1
 				local x_try = math.random(-x_delta,x_delta)
 				local z_try = math.random(-z_delta,z_delta)
 				
@@ -571,17 +599,19 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 				pos.y = surfacefunc(pos.x,pos.z,min_y,max_y)
 				
 				if pos.y and spawnfunc(name,pos,min_y,max_y) then
+					spawned = spawned +1
 					break
 				end
 			end --for -> 5
 		end --mob around
-	else
-		dbg_mobf.spawning_lvl3("MOBF: didn't find surface for " ..printpos(centerpos))
-	end --surface_center
+
+		divs = divs +1
 	end -- for z divs
 	end -- for x divs
 	mobf_warn_long_fct(starttime,"on_mapgen" .. name,"mapgen")
-	dbg_mobf.spawning_lvl3("magen ended")
+	local max_available_tries = divs * maxtries
+	dbg_mobf.spawning_lvl2("MOBF: divide_mapgen II " ..
+			"(" .. divs .. "|" .. attempts .. "|" .. spawned .. "|" .. max_available_tries .. ")")
 end
 
 ------------------------------------------------------------------------------
