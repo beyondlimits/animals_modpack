@@ -382,9 +382,7 @@ end
 --! @return string containing data
 -------------------------------------------------------------------------------
 function mobf_path.get_pathlist(playername,isadmin)
-
 	local retval = {}
-	
 	if isadmin then
 		for local_playername,userdata in pairs(mobf_rtd.path_data.users) do
 			for pathname,path in pairs(userdata.paths) do
@@ -399,12 +397,15 @@ function mobf_path.get_pathlist(playername,isadmin)
 			end
 		end
 	else
-		for pathname,path in pairs(mobf_rtd.path_data.users[playername].paths) do
-			local toadd = {
-				ownername = playername,
-				pathname = pathname
-			}
-			table.insert(retval,toadd)
+		if playername ~= nil and
+			mobf_rtd.path_data.users[playername] ~= nil then
+			for pathname,path in pairs(mobf_rtd.path_data.users[playername].paths) do
+				local toadd = {
+					ownername = playername,
+					pathname = pathname
+				}
+				table.insert(retval,toadd)
+			end
 		end
 	end
 	
