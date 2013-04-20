@@ -350,7 +350,8 @@ function mobf_debug.rightclick_callback(entity,player)
 				local found = false;
 				for i=1,#objects,1 do
 					local luaentity = objects[i]:get_luaentity()
-					if luaentity.name == "mobf:path_marker_entity" then
+					if luaentity ~= nil and 
+						luaentity.name == "mobf:path_marker_entity" then
 						found = true
 						break
 					end
