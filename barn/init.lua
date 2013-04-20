@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: barn mod loading ...")
-local version = "0.0.9"
+local version = "0.0.10"
 
 local modpath = minetest.get_modpath("barn")
 
