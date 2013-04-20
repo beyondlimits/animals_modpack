@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animalmaterials loading ...")
-local version = "0.0.18"
+local version = "0.0.19"
 
 
 animalmaterialsdata = {}
@@ -321,6 +321,14 @@ minetest.register_craft({
     {"animalmaterials:feather","animalmaterials:feather","animalmaterials:feather"},
     {"animalmaterials:feather", "animalmaterials:feather","animalmaterials:feather"},
     {"animalmaterials:feather","animalmaterials:feather","animalmaterials:feather"},
+  }
+})
+
+minetest.register_craft({
+  output = "animalmaterials:contract",
+  recipe = {
+    {"default:paper"},
+    {"default:paper"},
   }
 }) 
 
