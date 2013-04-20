@@ -488,11 +488,12 @@ function mobf_settings.get_formspec(player,page)
 			.."label[5.5,0;MOBF " .. version .. "]"
 			.. pageform
 	else
+		local pageform = mobf_settings.get_main_settings_form("mobf_tools")
 		return "size[13,10]"
 			..mobf_settings.menubutton
-			.."button[0.5,0.75;3,0.5;mobf_tools; Tools ]"
-			.."label[0.5,2.0;You are not allowed to change any setting!]"
+			.."label[0.5,0.75;You are not allowed to change any setting!]"
 			.."label[5.5,0;MOBF " .. version .. "]"
+			..pageform
 	end
 
 end
@@ -623,7 +624,7 @@ minetest.register_chatcommand("mobf_settings",
 	{
 		params		= "",
 		description = "show mobf settings" ,
-		privs		= {mobfw_admin=true},
+		privs		= {},
 		func		= function(name,param)
 				local player = minetest.env:get_player_by_name(name)
 				mobf_settings.formspechandler(player,mobf_settings.get_formspec(player,"mobf_list_page1"))
@@ -647,6 +648,7 @@ mobf_settings.register_tool_button(1,"give_pathmaker_tool","Give pathmaker tool"
 	function(player)
 		player:get_inventory():add_item("main", "mobf:path_marker 1")	
 	end)
+	
 mobf_settings.register_tool_button(1,"show_mobstore","Show preserved mobs",
 	function(player)
 		local name = player:get_player_name()
