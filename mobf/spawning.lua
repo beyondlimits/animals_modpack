@@ -585,8 +585,6 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 		if mobs_around == 0 then
 			dbg_mobf.spawning_lvl3("no " .. name .. " within range of " .. density .. " around " ..printpos(centerpos))
 			
-			local realtries = 0
-			
 			for i = 0, maxtries, 1 do
 				attempts = attempts +1
 				local x_try = math.random(-x_delta,x_delta)
