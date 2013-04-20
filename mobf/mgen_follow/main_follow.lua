@@ -263,7 +263,8 @@ function mgen_follow.callback(entity,now)
 		dbg_mobf.fmovement_lvl3("MOBF: max distance is set to : " 
 									.. max_distance .. " dist: " .. distance)
 		if distance > max_distance then
-		
+			entity.dynamic_data.movement.was_moving_last_step = true
+			
 			if mgen_follow.handleteleport(entity,now,targetpos) then
 				return
 			end
@@ -316,18 +317,20 @@ function mgen_follow.callback(entity,now)
 			end
 		--nothing to do
 		else
-			dbg_mobf.fmovement_lvl3("MOBF:   next to target")
-			entity.object:setvelocity({x=0,y=0,z=0})
-			entity.object:setacceleration({x=0,y=yaccel,z=0})
-			entity.dynamic_data.movement.last_next_to_target = now
-			
-			
-			local dir = mobf_get_direction(basepos,targetpos)
-			--update mob orientation
-			if entity.mode == "3d" then
-				entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
-			else
-				entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
+			if entity.dynamic_data.movement.was_moving_last_step == true then
+				dbg_mobf.fmovement_lvl3("MOBF:   next to target")
+				entity.object:setvelocity({x=0,y=0,z=0})
+				entity.object:setacceleration({x=0,y=yaccel,z=0})
+				entity.dynamic_data.movement.last_next_to_target = now
+				
+				
+				local dir = mobf_get_direction(basepos,targetpos)
+				--update mob orientation
+				if entity.mode == "3d" then
+					entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
+				else
+					entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
+				end
 			end
 		end
 	
