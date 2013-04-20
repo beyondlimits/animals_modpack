@@ -133,6 +133,20 @@ function fighting.hit(entity,attacker)
 	local targetpos   = attacker:getpos()
 	local dir         = mobf_get_direction(targetpos,mob_basepos)
 	
+	
+	--don't attack spawner
+	if entity.dynamic_data.spawning.spawner ~= nil and
+		attacker:is_player() then
+		local playername = attacker:get_player_name()
+		if entity.dynamic_data.spawning.spawner == playername then
+			if entity.dynamic_data.state.current ~= "combat" then
+				local current_yaw = entity.object:getyaw()
+				entity.object:setyaw(current_yaw + math.pi/4)
+			end
+			return
+		end
+	end
+	
 	--play hit sound
 	if entity.data.sound ~= nil then
 		sound.play(mob_pos,entity.data.sound.hit);
