@@ -571,12 +571,17 @@ function movement_gen.fix_current_pos(entity,movement_state)
 			tostring( walkable ))
 		
 		if not mobf_is_walkable(current_node) then
-			local targetpos = 
+			local targetpos = entity.dynamic_data.movement.last_pos_in_env
+			
+			if targetpos == nil then
+				targetpos = 
 				environment.get_suitable_pos_same_level({x=current_pos.x,
 														y=current_pos.y,
 														z=current_pos.z},
 														1,
 														entity)
+			end
+			
 			if targetpos == nil then
 				local targetpos = 
 					environment.get_suitable_pos_same_level({x=current_pos.x,
