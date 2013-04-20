@@ -503,8 +503,6 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 					break
 				end
 			end --for -> 5
-			
-			attempts = attempts + realtries
 		end --mob around
 		
 		divs = divs +1
