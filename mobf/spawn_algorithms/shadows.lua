@@ -151,53 +151,57 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 					newpos.y = mobf_get_surface(newpos.x,newpos.z,pos.y-5, pos.y+5)
 				end
 				
-				dbg_mobf.spawning_lvl3("MOBF: " .. dump(self.spawner_mob_env))
-				
-				--check if own position is good
-				local pos_below = {x=pos.x,y=pos.y-1,z=pos.z}
-				local node_below = minetest.env:get_node(pos_below)
-				
-				
-				if not mobf_contains({	"default:stone",
-										"default:gravel",
-										"default:dirt" },node_below.name) then
+				if newpos.y == nil then
 					good = false
-					reson = "wrong surface"
-				end
-				
-				--check if there s enough space above to place mob
-				if mobf_air_above(pos_below,self.spawner_mob_spawndata.height) ~= true then
-					good = false
-					reason = "to low"
-				end
-				
-				for i=0.0,1,0.1 do
-					local light_val = minetest.env:get_node_light(pos,i)
-					if light_val == nil or light_val > 6 then
-						good = false
-						reason = "to much light"
-					end
-				end
-				
-				--this is first check
-				if not good and try == 1 then
-					dbg_mobf.spawning_lvl2("MOBF: shadows: not spawning for " 
-					.. self.spawner_mob_name .. " somehow got to bad place: "..
-					reason)
-					--TODO try to move spawner to better place
 				else
-					--abort if we found a valid pos
-					if good and try ~= 1 then
-						try = max_tries +1
+					dbg_mobf.spawning_lvl3("MOBF: " .. dump(self.spawner_mob_env))
+					
+					--check if own position is good
+					local pos_below = {x=newpos.x,y=newpos.y-1,z=newpos.z}
+					local node_below = minetest.env:get_node(pos_below)
+					
+					
+					if not mobf_contains({	"default:stone",
+											"default:gravel",
+											"default:dirt" },node_below.name) then
+						good = false
+						reson = "wrong surface"
+					end
+					
+					--check if there s enough space above to place mob
+					if mobf_air_above(pos_below,self.spawner_mob_spawndata.height) ~= true then
+						good = false
+						reason = "to low"
+					end
+					
+					for i=0.0,1,0.1 do
+						local light_val = minetest.env:get_node_light(pos,i)
+						if light_val == nil or light_val > 6 then
+							good = false
+							reason = "to much light"
+						end
+					end
+					
+					--this is first check
+					if not good and try == 1 then
+						dbg_mobf.spawning_lvl2("MOBF: shadows: not spawning for " 
+						.. self.spawner_mob_name .. " somehow got to bad place: "..
+						reason)
+						--TODO try to move spawner to better place
 					else
-						newpos = nil
+						--abort if we found a valid pos
+						if good and try ~= 1 then
+							try = max_tries +1
+						else
+							newpos = nil
+						end
 					end
 				end
 			end
 			
 			if good and mobf_mob_around(self.spawner_mob_name,
 							   self.spawner_mob_transform,
-							   pos,
+							   pos, -- this is intended we really want to know mobs around spawner not new pos
 							   self.spawner_mob_spawndata.density,true) == 0 then
 				spawning.spawn_and_check(
 					self.spawner_mob_name,"__default",newpos,"shadows_spawner_ent")

@@ -354,6 +354,7 @@ end
 -------------------------------------------------------------------------------
 function spawning.spawn_and_check(name,suffix,pos,text)
 	mobf_assert_backtrace(pos ~= nil)
+	mobf_assert_backtrace(pos.y ~= nil)
 	mobf_assert_backtrace(name ~= nil)
 	mobf_assert_backtrace(suffix ~= nil)
 	local newobject = minetest.env:add_entity(pos,name .. suffix)
