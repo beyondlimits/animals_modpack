@@ -139,6 +139,11 @@ Saddle
 
 <no reciep>
 
+Contract
+
+paper
+paper
+
 
 Settings: 
 -------------------------------------------------------------------------------
@@ -148,6 +153,20 @@ call /mobf_settings in game
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.0.83
+-reduce chance (small) animals flee through fences
+-fix invalid barn texture
+-update trader inventory
+-add support for player specified hireling orientation
+-fix non admin mobf settings
+-improve weapon balancing
+-fix (some) spawning algorithms not working as expected
+-add support for spawning mobs at random positions
+-fix pathfinding not defaulting back to old method on no path found
+-fix auto transform not working anymore
+-add detection of "bed" like time jump mods
+-fix various crashes
+
 Changes 2.0.82
 -disable luatrace
 
