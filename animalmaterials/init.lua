@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animalmaterials loading ...")
-local version = "0.0.19"
+local version = "0.0.20"
 
 
 animalmaterialsdata = {}
@@ -62,7 +62,7 @@ minetest.register_tool("animalmaterials:scissors", {
 	tool_capabilities = {
 		max_drop_level=0,
 		groupcaps={
-			wool  = {uses=20,maxlevel=1}
+			wool  = {uses=40,maxlevel=1}
 		}
 	},
 })
