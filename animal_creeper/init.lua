@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_creeper mod loading ...")
 
-local version = "0.0.18"
+local version = "0.0.19"
 
 local creeper_groups = {
 						not_in_creative_inventory=1
@@ -32,7 +32,8 @@ creeper_prototype = {
 					base_health=3,
 					kill_result="",
 					armor_groups= {
-						cracky=90,
+						monster=90,
+						fleshy=45
 					},
 					groups = creeper_groups,
 					envid="on_ground_1",

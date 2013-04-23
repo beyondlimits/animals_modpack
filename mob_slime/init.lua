@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_slime mod loading ...")
-local version = "0.0.10"
+local version = "0.0.11"
 
 local selectionbox_slime_L = {-0.5, -0.4, -0.5,  0.5,0.4,0.5}
 local selectionbox_slime_M = {-0.3, -0.2, -0.3,  0.3,0.2,0.3}
@@ -105,7 +105,7 @@ local prototype_mob_slime_L = {
 		
 		--! @brief [OPTIONAL] armor groups of mob
 		armor_groups = {
-						cracky=30,
+						fleshy=40,
 						deamon=30,
 					},
 		
@@ -245,7 +245,7 @@ local prototype_mob_slime_S = {
 		
 		--! @brief [OPTIONAL] armor groups of mob
 		armor_groups = {
-						cracky=30,
+						fleshy=40,
 						deamon=30,
 					},
 		
@@ -368,7 +368,7 @@ local prototype_mob_slime_M = {
 		
 		--! @brief [OPTIONAL] armor groups of mob
 		armor_groups = {
-						cracky=30,
+						fleshy=40,
 						deamon=30,
 					},
 		
