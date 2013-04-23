@@ -130,17 +130,20 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 			local newpos = pos
 			
 			local good = true
-			local reason = "unknown"
+			local reason = ""
 			
-			local max_tries = 5
+			local max_tries = 25
 			
 			for try=1,max_tries,1 do
 				
 				if newpos == nil then
+					
 					newpos = {}
 					good = true
 					
 					local max_offset = 0.4*self.spawner_mob_spawndata.density
+					
+					dbg_mobf.spawning_lvl2("MOBF: trying to get new random value, max_offset:" ..max_offset)
 					
 					newpos.x = math.floor(pos.x + 
 								math.random(0,max_offset) +
@@ -152,7 +155,9 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 				end
 				
 				if newpos.y == nil then
+					reason = reason .. ":no surface:" .. printpos(newpos) 
 					good = false
+					newpos = nil
 				else
 					dbg_mobf.spawning_lvl3("MOBF: " .. dump(self.spawner_mob_env))
 					
@@ -165,20 +170,20 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 											"default:gravel",
 											"default:dirt" },node_below.name) then
 						good = false
-						reson = "wrong surface"
+						reson = reason .. ":wrong surface"
 					end
 					
 					--check if there s enough space above to place mob
 					if mobf_air_above(pos_below,self.spawner_mob_spawndata.height) ~= true then
 						good = false
-						reason = "to low"
+						reason = reason .. ":to low"
 					end
 					
 					for i=0.0,1,0.1 do
 						local light_val = minetest.env:get_node_light(pos,i)
 						if light_val == nil or light_val > 6 then
 							good = false
-							reason = "to much light"
+							reason = reason .. ":to much light"
 						end
 					end
 					
@@ -208,7 +213,7 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 			else
 				dbg_mobf.spawning_lvl2("MOBF: shadows: not spawning " .. 
 					self.spawner_mob_name .. 
-					" there's a mob around or pos not ok: " .. dump(good))
+					" there's a mob around or pos not ok: " .. dump(good) .. " rsn: " .. dump(reason))
 			end
 			
 			self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
