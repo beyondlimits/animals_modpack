@@ -153,6 +153,10 @@ call /mobf_settings in game
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.0.84
+-fix armor groups to be compatible to default
+-fis shadow spawn algorithm to spawn more mobs below ground
+
 Changes 2.0.83
 -reduce chance (small) animals flee through fences
 -fix invalid barn texture
