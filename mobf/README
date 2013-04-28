@@ -153,6 +153,9 @@ call /mobf_settings in game
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.1.0
+-fix doxygen comments
+
 Changes 2.0.84
 -fix armor groups to be compatible to default
 -fis shadow spawn algorithm to spawn more mobs below ground
