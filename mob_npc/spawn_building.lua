@@ -2,6 +2,49 @@
 mob_npc_houses = {}
 building_spawner = {}
 
+blueprint_hut = {
+	size = { x= 5,z=4 },
+	walls = {
+	--cleanarea
+		{"air",{x=-1,y=1,z=-1},{x=6,y=1,z=6}},
+		{"air",{x=-1,y=2,z=-1},{x=6,y=2,z=6}},
+		{"air",{x=-1,y=3,z=-1},{x=6,y=3,z=6}},
+		{"air",{x=-1,y=4,z=-1},{x=6,y=4,z=6}},
+		{"air",{x=-1,y=5,z=-1},{x=6,y=5,z=6}},
+		{"air",{x=-1,y=6,z=-1},{x=6,y=6,z=6}},
+		
+	--floor
+		{"default:cobble",{x=0,y=0,z=0},{x=5,y=0,z=4}},
+		{"default:cobble",{x=0,y=0,z=-1},{x=2,y=0,z=-1}},
+		
+	--walls
+		{"default:tree",{x=0,y=1,z=0},{x=5,y=3,z=0}},
+		{"default:tree",{x=0,y=1,z=4},{x=5,y=2,z=4}},
+		{"default:tree",{x=5,y=1,z=0},{x=5,y=3,z=4}},
+		{"default:tree",{x=0,y=1,z=0},{x=0,y=3,z=4}},
+		
+	--roof
+		{"stairs:slab_wood",{x=0,y=4,z=-1},{x=5,y=4,z=2}},
+		{"default:wood",{x=0,y=3,z=3},{x=5,y=3,z=3}},
+		{"stairs:slab_wood",{x=0,y=3,z=4},{x=5,y=3,z=4}},
+		
+	--front_door
+		{"doors:door_wood_t_1",{x=1,y=2,z=0},{x=1,y=2,z=0}},
+		{"doors:door_wood_b_1",{x=1,y=1,z=0},{x=1,y=1,z=0}},
+		
+	--front_window
+		{"default:glass",{x=3,y=2,z=0},{x=4,y=2,z=0}},
+	--
+		{"default:wood",{x=3,y=1,z=1},{x=3,y=1,z=2}},
+		
+	--torches
+		{"default:torch",{x=2,y=2,z=1},{x=2,y=2,z=1}},
+	},
+	entities = {
+		{ {x=4,y=1,z=1},"mob_npc:npc_trader__default",math.pi }
+	}
+}
+
 blueprint_normalhouse = {
 	size = {x=8,z=10},
 	walls = {
@@ -30,7 +73,8 @@ blueprint_normalhouse = {
 		{"default:clay",{x=3,y=7,z=3},{x=5,y=7,z=7}},
 		
 	--front_door
-		{"air",{x=2,y=1,z=0},{x=2,y=2,z=0}},
+		{"doors:door_wood_t_1",{x=2,y=2,z=0},{x=2,y=2,z=0}},
+		{"doors:door_wood_b_1",{x=2,y=1,z=0},{x=2,y=1,z=0}},
 		
 	--windows
 		{"default:glass",{x=4,y=1,z=0},{x=7,y=3,z=0}},
@@ -64,6 +108,7 @@ blueprint_normalhouse = {
 }
 
 table.insert(mob_npc_houses,blueprint_normalhouse)
+table.insert(mob_npc_houses,blueprint_hut)
 
 function building_spawner.buid_wall(material,startpos,endpos)
 
@@ -226,7 +271,7 @@ function mob_npc_spawn_building(mob_name,mob_transform,spawning_data,environment
 		
 		function(name,pos,min_y,max_y)
 			
-			if math.random() < 0.05 then
+			if math.random() < 0.25 then
 				local blueprint = mob_npc_houses[math.random(1,#mob_npc_houses)]
 				
 				if building_spawner.builder(pos,blueprint,mob_name .."__default") then

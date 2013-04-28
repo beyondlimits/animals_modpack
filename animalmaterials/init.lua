@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animalmaterials loading ...")
-local version = "0.0.15"
+local version = "0.0.20"
 
 
 animalmaterialsdata = {}
@@ -62,7 +62,7 @@ minetest.register_tool("animalmaterials:scissors", {
 	tool_capabilities = {
 		max_drop_level=0,
 		groupcaps={
-			wool  = {uses=20,maxlevel=1}
+			wool  = {uses=40,maxlevel=1}
 		}
 	},
 })
@@ -99,6 +99,19 @@ minetest.register_craftitem("animalmaterials:saddle", {
 	image = "animalmaterials_saddle.png",
 	stack_max=1
 })
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- contract
+--
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+minetest.register_craftitem("animalmaterials:contract", {
+	description = "Contract",
+	image = "animalmaterials_contract.png",
+	stack_max=10,
+})
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- meat
@@ -164,7 +177,7 @@ minetest.register_craftitem("animalmaterials:meat_toxic", {
 minetest.register_craftitem("animalmaterials:meat_ostrich", {
 	description = "Ostrich Meat",
 	image = "animalmaterials_meat_raw.png",
-	on_use = minetest.item_eat(-5),
+	on_use = minetest.item_eat(3),
 	groups = { meat=1, eatable=1 },
 	stack_max=5
 })
@@ -308,6 +321,14 @@ minetest.register_craft({
 		{"animalmaterials:feather","animalmaterials:feather","animalmaterials:feather"},
 		{"animalmaterials:feather", "animalmaterials:feather","animalmaterials:feather"},
 		{"animalmaterials:feather","animalmaterials:feather","animalmaterials:feather"},
+	}
+})
+
+minetest.register_craft({
+	output = "animalmaterials:contract",
+	recipe = {
+		{"default:paper"},
+		{"default:paper"},
 	}
 })
 

@@ -20,9 +20,14 @@
 
 --! @class mgen_jordan4ibanez
 --! @brief a movement generator trying to follow or reach a target
-mgen_jordan4ibanez = {}
-mgen_jordan4ibanez.chillaxin_speed = 0.1
 --!@}
+
+mgen_jordan4ibanez = {}
+
+--! @brief chillaxin_speed
+--! @memberof mgen_jordan4ibanez
+mgen_jordan4ibanez.chillaxin_speed = 0.1
+
 
 --! @brief movement generator identifier
 --! @memberof mgen_jordan4ibanez
@@ -132,6 +137,19 @@ function mgen_jordan4ibanez.init_dynamic_data(entity,now)
 			}
 	
 	entity.dynamic_data.movement = data
+end
+
+-------------------------------------------------------------------------------
+-- name: set_target(entity,target)
+--
+--! @brief set target for movgen
+--! @memberof mgen_jordan4ibanez
+--
+--! @param entity mob to apply to
+--! @param target to set
+-------------------------------------------------------------------------------
+function mgen_jordan4ibanez.set_target(entity,target)
+	return false
 end
 
 

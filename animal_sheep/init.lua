@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.0.22"
+local version = "0.0.23"
 
 local sheep_groups = {
 						sheerable=1,
@@ -35,7 +35,7 @@ sheep_prototype = {
 					base_health=10,
 					kill_result="animalmaterials:meat_lamb 2",
 					armor_groups= {
-						fleshy=3,
+						fleshy=85,
 					},
 					groups = sheep_groups,
 					envid="meadow",
@@ -61,12 +61,16 @@ sheep_prototype = {
 					consumed=true,
 					},
 		spawning = {
-					rate=0.002,
-					density=50,
-					algorithm="willow_mapgen",
-					algorithm_secondary="willow",
-					height=2
-					},
+					primary_algorithms = {
+						{
+						rate=0.002,
+						density=50,
+						algorithm="willow_mapgen",
+						algorithm_secondary="willow",
+						height=2
+						},
+					}
+				},
 		sound = {
 					random = {
 								name="Mudchute_sheep_1",
@@ -156,7 +160,7 @@ lamb_prototype = {
 					base_health=3,
 					kill_result="animalmaterials:meat_lamb 1",
 					armor_groups= {
-						fleshy=3,
+						fleshy=85,
 					},
 					envid="meadow",
 				},
@@ -178,11 +182,15 @@ lamb_prototype = {
 					delay=1800
 					},
 		spawning = {
-					rate=0,
-					density=0,
-					algorithm="none",
-					height=1
-					},
+					primary_algorithms = {
+						{
+						rate=0,
+						density=0,
+						algorithm="none",
+						height=1
+						},
+					}
+				},
 		sound = {
 					random = {
 								name="Mudchute_lamb_1",
@@ -267,7 +275,7 @@ sheep_naked_prototype = {
 					base_health=10,
 					kill_result="animalmaterials:meat_lamb 2",
 					armor_groups= {
-						fleshy=3,
+						fleshy=85,
 					},
 					envid="meadow"
 				},
@@ -288,11 +296,15 @@ sheep_naked_prototype = {
 					delay=300
 					},
 		spawning = {
-					rate=0,
-					density=0,
-					algorithm="none",
-					height=2
-					},
+					primary_algorithms = {
+						{
+						rate=0,
+						density=0,
+						algorithm="none",
+						height=2
+						},
+					}
+				},
 		sound = {
 					random = {
 								name="Mudchute_sheep_1",

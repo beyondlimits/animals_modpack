@@ -1,4 +1,4 @@
-local version = "0.0.17"
+local version = "0.0.22"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -6,7 +6,7 @@ local vombie_groups = {
 						not_in_creative_inventory=1
 					}
 
-local selectionbox_vombie = {-0.3, -1.2, -0.5, 0.3, 1, 0.5}
+local selectionbox_vombie = {-0.3, -1.2, -0.3, 0.3, 1, 0.3}
 
 local modpath = minetest.get_modpath("animal_vombie")
 
@@ -29,7 +29,8 @@ function vombie_on_step_handler(entity,now,dtime)
 	local pos = entity.getbasepos(entity)
 	local current_light = minetest.env:get_node_light(pos)
 	
-	--print("vombie on step: current_light:" .. current_light .. " max light: " .. LIGHT_MAX .. " 3dmode:" .. dump(minetest.setting_getbool("disable_animals_3d_mode")))
+	--print("vombie on step: current_light:" .. current_light .. " max light: " 
+	--	.. LIGHT_MAX .. " 3dmode:" .. dump(minetest.setting_getbool("disable_animals_3d_mode")))
 
 	if current_light ~= nil and
 		current_light > LIGHT_MAX and
@@ -47,23 +48,42 @@ function vombie_on_step_handler(entity,now,dtime)
 
 		--add particles
 	end
+	if entity.dynamic_data.spawning.spawner == "at_night" or
+		entity.dynamic_data.spawning.spawner == "at_night_mapgen" then
+		local current_time = minetest.env:get_timeofday()
+		if (current_time > 0.15) and
+			(current_time < 0.30) then
+			if entity.last_time ~= nil then
+				local last_step_size = dtime /  86400 -- (24*3600)
+				local time_step = current_time - entity.last_time
+				if time_step > last_step_size * 10 then
+					spawning.remove(entity)
+					--return false to abort procession of other hooks
+					return false
+				end
+			end
+		end
+		
+		entity.last_time = current_time
+	end
 end
 
 function vombie_on_activate_handler(entity)
 
-        local pos = entity.object:getpos()
-        
-        local current_light = minetest.env:get_node_light(pos)
-            
-        if current_light == nil then
-            minetest.log(LOGLEVEL_ERROR,"ANIMALS: Bug!!! didn't get a light value for ".. printpos(pos))
-            return
-        end
-        --check if animal is in sunlight
-        if ( current_light > LIGHT_MAX) then
-            --don't spawn vombie in sunlight
-            spawning.remove(entity)
-        end
+	local pos = entity.object:getpos()
+	
+	local current_light = minetest.env:get_node_light(pos)
+	
+	if current_light == nil then
+		minetest.log(LOGLEVEL_ERROR,
+			"ANIMALS: Bug!!! didn't get a light value for ".. printpos(pos))
+		return
+	end
+	--check if animal is in sunlight
+	if ( current_light > LIGHT_MAX) then
+		--don't spawn vombie in sunlight
+		spawning.remove(entity)
+	end
 end
 
 vombie_prototype = {
@@ -75,8 +95,8 @@ vombie_prototype = {
 					base_health=8,
 					kill_result=vombie_drop,
 					armor_groups= {
-						fleshy=3,
-						daemon=1,
+						fleshy=95,
+						daemon=30,
 					},
 					groups = vombie_groups,
 					envid="on_ground_1",
@@ -105,11 +125,22 @@ vombie_prototype = {
 					},
 		
 		spawning = {
-					rate=0.05,
-					density=30,
-					algorithm="at_night_spawner",
-					height=2,
-					respawndelay=60,
+					primary_algorithms = {
+							{
+								rate=0.05,
+								density=30,
+								algorithm="at_night_spawner",
+								height=2,
+								respawndelay=10,
+							},
+							{
+								rate=0.05,
+								density=100,
+								algorithm="shadows_spawner",
+								height=2,
+								respawndelay = 300,
+							},
+						},
 					},
 		sound = {
 					random = {
@@ -172,10 +203,26 @@ vombie_prototype = {
 					typical_state_time = 9999,
 					chance = 0.0,
 					animation = "attack",
-					movgen="follow_mov_gen",
+					movgen="mgen_path",
 				},
 			}
 		}
+		
+		
+--compatibility code
+minetest.register_entity("animal_vombie:vombie_spawner",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
+	
+		local pos = self.object:getpos();
+		minetest.env:add_entity(pos,"animal_vombie:vombie_spawner_at_night")
+		self.object:remove()
+	end,
+})
 
 
 --register with animals mod

@@ -74,8 +74,8 @@ function graphics.update_orientation(entity,now,dtime)
 		--entity.dynamic_data.movement.ts_orientation_upd = now
 
 		local current_velocity = entity.object:getvelocity()
-		local acceleration = entity.object:getacceleration()
-		local pos = entity.getbasepos(entity)
+		local acceleration     = entity.object:getacceleration()
+		local pos              = entity.getbasepos(entity)
 		
 		dbg_mobf.graphics_lvl3("MOBF: vel: (" .. current_velocity.x .. ",".. current_velocity.z .. ") " .. 
 											"accel: (" ..acceleration.x .. "," .. acceleration.z .. ")")
@@ -90,27 +90,47 @@ function graphics.update_orientation(entity,now,dtime)
 
 		--legacy 2d mode
 		if (entity.mode == "2d") then
+			dbg_mobf.graphics_lvl3("MOBF: legacy 2d mode")
 			graphics.update_orientation_simple(entity,{x=delta_x, z=delta_z})
 		-- 3d mode
 		else
-			
+			dbg_mobf.graphics_lvl3("MOBF: 3d mode")
 			if (delta_x ~= 0 ) and
 				(delta_z ~= 0) then
-				
-				entity.object:setyaw(mobf_calc_yaw(delta_x,delta_z))
-				
 				dbg_mobf.graphics_lvl3("MOBF: x-delta: " .. delta_x 
 					.. " z-delta: " .. delta_z)
+				entity.object:setyaw(mobf_calc_yaw(delta_x,delta_z))
+				
+
 			elseif (delta_x ~= 0) or
 					(delta_z ~= 0) then
 					dbg_mobf.graphics_lvl3("MOBF: at least speed for one direction is 0")
 					graphics.update_orientation_simple(entity,{x=delta_x,z=delta_z})
 			else
-				dbg_mobf.movement_lvl3("MOBF: not moving")
+				dbg_mobf.graphics_lvl3("MOBF: not moving")
 			end
 		end
 	end
-
+	
+	-- make mobs face a specific player
+	-- TODO move from dynamics data inventory to somewhere else
+	
+	if entity.dynamic_data.attention ~= nil and
+		entity.data.attention ~= nil and
+		entity.dynamic_data.attention.current_value >
+		entity.data.attention.watch_threshold then
+		dbg_mobf.graphics_lvl3("MOBF: attention mode orientation update")
+		local direction = mobf_get_direction(entity.object:getpos(),
+								entity.dynamic_data.attention.most_relevant_target:getpos())
+	
+		if entity.mode == "3d" then
+			entity.object:setyaw(
+				mobf_calc_yaw(direction.x,direction.z))
+		else
+			entity.object:setyaw(
+				mobf_calc_yaw(direction.x,direction.z)+math.pi/2)
+		end
+	end
 end
 
 -------------------------------------------------------------------------------

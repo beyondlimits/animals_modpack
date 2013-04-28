@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_wolf loading ...")
 
-local version = "0.0.12"
+local version = "0.0.15"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
@@ -32,14 +32,13 @@ wolf_prototype = {
 					base_health=5,
 					kill_result="animalmaterials:fur 1",
 					armor_groups= {
-						fleshy=3,
+						fleshy=90,
 					},
 					groups = wolf_groups,
 					addoncatch = "animal_wolf:tamed_wolf",
 					envid="on_ground_2"
 				},
 		movement =  {
-					default_gen="follow_mov_gen",
 					canfly=false,
 					guardspawnpoint = true,
 					teleportdelay = 60,
@@ -53,7 +52,6 @@ wolf_prototype = {
 					consumed=true,
 					},
 		combat = {
-					angryness=1,
 					starts_attack=true,
 					sun_sensitive=false,
 					melee = {
@@ -66,12 +64,15 @@ wolf_prototype = {
 					},
 		
 		spawning = {
-					rate=0.002,
-					density=800,
-					algorithm="forrest_mapgen",
-					height=2
+				primary_algorithms = {
+						{
+						rate=0.002,
+						density=800,
+						algorithm="forrest_mapgen",
+						height=2
+						},
 					},
-					
+				},
 		sound = {
 					random = nil,
 					},
@@ -89,10 +90,23 @@ wolf_prototype = {
 					end_frame   = 180,
 					},
 			},
+		attention = {
+				hear_distance = 5,
+				hear_distance_value = 20,
+				view_angle = math.pi/2,
+				own_view_value = 0.2,
+				remote_view = false,
+				remote_view_value = 0,
+				attention_distance_value = 0.2,
+				watch_threshold = 10,
+				attack_threshold = 20,
+				attention_distance = 10,
+				attention_max = 25,
+		},
 		states = {
 				{
 					name = "default",
-					movgen = "none",
+					movgen = "follow_mov_gen",
 					typical_state_time = 30,
 					chance = 0,
 					animation = "stand",
@@ -132,7 +146,7 @@ tamed_wolf_prototype = {
 					base_health=10,
 					kill_result="animalmaterials:fur 1",
 					armor_groups= {
-						fleshy=3,
+						fleshy=90,
 					},
 					groups = wolf_groups,
 					envid="on_ground_2",
@@ -140,7 +154,12 @@ tamed_wolf_prototype = {
 					--before placer is known to entity
 					custom_on_place_handler = function(entity, placer, pointed_thing)
 						if placer:is_player(placer) then
-							entity.dynamic_data.movement.target = placer
+							if entity.dynamic_data ~= nil and
+								entity.dynamic_data.movement ~= nil  then
+								entity.dynamic_data.movement.target = placer
+							else
+								print("ANIMAL tamed wolf: unable to set owner maybe wolf has been already deleted")
+							end
 						end
 					end,
 					custom_on_activate_handler = function(entity)
@@ -173,12 +192,15 @@ tamed_wolf_prototype = {
 					consumed=true,
 					},
 		spawning = {
-					rate=0.002,
-					density=150,
-					algorithm="none",
-					height=2
-					},
-					
+					primary_algorithms = {
+						{
+						rate=0.002,
+						density=150,
+						algorithm="none",
+						height=2
+						},
+					}
+				},
 		sound = {
 					random = nil,
 					},

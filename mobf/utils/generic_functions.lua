@@ -23,21 +23,6 @@ if minetest.setting_getbool("mobf_enable_socket_trace") then
     require "socket"
 end
 
-
--------------------------------------------------------------------------------
--- name: mobf_bug_warning()
---
---! @brief make bug warnings configurable
---
---! @param level bug severity level to use for minetest.log
---! @param text data to print to log
--------------------------------------------------------------------------------
-function mobf_bug_warning(level,text)
-	if minetest.setting_getbool("mobf_log_bug_warnings") then
-		minetest.log(level,text)
-	end
-end
-
 -------------------------------------------------------------------------------
 -- name: mobf_get_time_ms()
 --
@@ -112,6 +97,18 @@ function MAX(a,b)
 end
 
 -------------------------------------------------------------------------------
+-- name: DELTA(a,b)
+--
+--! @brief delta of two numbers
+--
+--! @param a number 1
+--! @param b number 2
+--! @return delta
+-------------------------------------------------------------------------------
+function DELTA(a,b)
+	return math.abs(a-b)
+end
+-------------------------------------------------------------------------------
 -- name: mobf_is_walkable(node)
 --
 --! @brief check if walkable flag is set for a node
@@ -125,25 +122,6 @@ function mobf_is_walkable(node)
 end
 
 -------------------------------------------------------------------------------
--- name: printpos(pos)
---
---! @brief convert pos to string of type "(X,Y,Z)"
---
---! @param pos position to convert
---! @return string with coordinates of pos
--------------------------------------------------------------------------------
-function printpos(pos)
-	if pos ~= nil then
-		if pos.y ~= nil then
-			return "("..pos.x..","..pos.y..","..pos.z..")"
-		else
-			return "("..pos.x..", ? ,"..pos.z..")"
-		end
-	end
-	return ""
-end
-
--------------------------------------------------------------------------------
 -- name: mobf_get_current_time()
 --
 --! @brief alias to get current time
@@ -151,100 +129,10 @@ end
 --! @return current time in seconds
 -------------------------------------------------------------------------------
 function mobf_get_current_time()
-	return os.time(os.date('*t'))
-	--return minetest.get_time()
-end
-
-callback_statistics = {}
-
--------------------------------------------------------------------------------
--- name: mobf_warn_long_fct(starttime,fctname,facility)
---
---! @brief alias to get current time
---
---! @param starttime time fct started
---! @param fctname name of function
---! @param facility name of facility to add time to
---
---! @return current time in seconds
--------------------------------------------------------------------------------
-function mobf_warn_long_fct(starttime,fctname,facility)
-	local currenttime = mobf_get_time_ms()
-	local delta = currenttime - starttime
-	
-	if minetest.setting_getbool("mobf_enable_socket_trace_statistics") then
-		if facility == nil then
-			facility = "generic"
-		end
-		
-		if callback_statistics[facility] == nil then
-			callback_statistics[facility] = {
-				upto_005ms = 0,
-				upto_010ms = 0,
-				upto_020ms = 0,
-				upto_050ms = 0,
-				upto_100ms = 0,
-				upto_200ms = 0,
-				more       = 0,
-				valcount   = 0,
-				sum        = 0,
-				last_time  = 0,
-			}
-		end
-		
-		callback_statistics[facility].valcount = callback_statistics[facility].valcount +1
-		callback_statistics[facility].sum = callback_statistics[facility].sum + delta
-		
-		if callback_statistics[facility].valcount == 1000 then
-			callback_statistics[facility].valcount = 0
-			local deltatime = currenttime - callback_statistics[facility].last_time
-			callback_statistics[facility].last_time = currenttime
-			
-			minetest.log(LOGLEVEL_ERROR,"Statistics for: " .. facility .. ": " .. 
-										callback_statistics[facility].upto_005ms .. "," ..
-										callback_statistics[facility].upto_010ms .. "," ..
-										callback_statistics[facility].upto_020ms .. "," ..
-										callback_statistics[facility].upto_050ms .. "," ..
-										callback_statistics[facility].upto_100ms .. "," ..
-										callback_statistics[facility].upto_200ms .. "," ..
-										callback_statistics[facility].more .. 
-										" (".. callback_statistics[facility].sum .. " / " .. deltatime .. ") " ..
-										tostring(math.floor((callback_statistics[facility].sum/deltatime) * 100)) .. "%")
-										
-			callback_statistics[facility].sum = 0
-		end
-		
-		if delta < 5 then
-			callback_statistics[facility].upto_005ms = callback_statistics[facility].upto_005ms +1
-			return
-		end
-		if delta < 10 then
-			callback_statistics[facility].upto_010ms = callback_statistics[facility].upto_010ms +1
-			return
-		end
-		if delta < 20 then
-			callback_statistics[facility].upto_020ms = callback_statistics[facility].upto_020ms +1
-			return
-		end
-		if delta < 50 then
-			callback_statistics[facility].upto_050ms = callback_statistics[facility].upto_050ms +1
-			return
-		end
-		if delta < 100 then
-			callback_statistics[facility].upto_100ms = callback_statistics[facility].upto_100ms +1
-			return
-		end
-		
-		if delta < 200 then
-			callback_statistics[facility].upto_200ms = callback_statistics[facility].upto_200ms +1
-			return
-		end
-		
-		callback_statistics[facility].more = callback_statistics[facility].more +1
-	end
-	
-	if delta >200 then
-		minetest.log(LOGLEVEL_ERROR,"MOBF: function " .. fctname .. " took too long: " .. delta .. " ms")
+	if type(minetest.get_time) == "function" then
+		return minetest.get_time()
+	else
+		return os.time(os.date('*t'))
 	end
 end
 
@@ -265,36 +153,6 @@ function mobf_round_pos(pos)
 			y=math.floor(pos.y + 0.5),
 			z=math.floor(pos.z + 0.5)
 		 }
-
-end
-
--------------------------------------------------------------------------------
--- name: mobf_calc_distance(pos1,pos2)
---
---! @brief calculate 3d distance between to points
---
---! @param pos1 first position
---! @param pos2 second position
---! @retval scalar value, distance
--------------------------------------------------------------------------------
-function mobf_calc_distance(pos1,pos2)
-	return math.sqrt( 	math.pow(pos1.x-pos2.x,2) + 
-				math.pow(pos1.y-pos2.y,2) +
-				math.pow(pos1.z-pos2.z,2))
-end
-
--------------------------------------------------------------------------------
--- name: mobf_calc_distance_2d(pos1,pos2)
---
---! @brief calculate 2d distance between to points
---
---! @param pos1 first position
---! @param pos2 second position
---! @return scalar value, distance
--------------------------------------------------------------------------------
-function mobf_calc_distance_2d(pos1,pos2)
-	return math.sqrt( 	math.pow(pos1.x-pos2.x,2) + 
-				math.pow(pos1.z-pos2.z,2))
 end
 
 -------------------------------------------------------------------------------
@@ -343,7 +201,6 @@ function mobf_max_light_around(pos,distance,daytime)
 	return max_light
 end
 
-
 -------------------------------------------------------------------------------
 -- name: mobf_mob_around(mob_name,mob_transform_name,pos,range,)
 --
@@ -359,6 +216,8 @@ end
 function mobf_mob_around(mob_name,mob_transform,pos,range,ignore_playerspawned)
 	local count = 0
 	local objectcount = 0
+	
+	mobf_assert_backtrace(range ~= nil)
 
 	local objectlist = minetest.env:get_objects_inside_radius(pos,range)
 	
@@ -498,7 +357,8 @@ function mobf_line_of_sight(pos1,pos2)
 		local node = minetest.env:get_node(tocheck)
 
 
-		if minetest.registered_nodes[node.name].sunlight_propagates ~= true then
+		if minetest.registered_nodes[node.name] == nil or 
+			minetest.registered_nodes[node.name].sunlight_propagates ~= true then
 			line_of_sight = false
 			break
 		end
@@ -506,62 +366,6 @@ function mobf_line_of_sight(pos1,pos2)
 
 	return line_of_sight
 end
-
--------------------------------------------------------------------------------
--- name: mobf_get_direction(pos1,pos2)
---
---! @brief get normalized direction from pos1 to pos2
---
---! @param pos1 source point
---! @param pos2 destination point
---! @return xyz direction
--------------------------------------------------------------------------------
-function mobf_get_direction(pos1,pos2)
-
-	local x_raw = pos2.x -pos1.x
-	local y_raw = pos2.y -pos1.y
-	local z_raw = pos2.z -pos1.z
-
-
-	local x_abs = math.abs(x_raw)
-	local y_abs = math.abs(y_raw)
-	local z_abs = math.abs(z_raw)
-
-	if 	x_abs >= y_abs and
-		x_abs >= z_abs then
-
-		y_raw = y_raw * (1/x_abs)
-		z_raw = z_raw * (1/x_abs)
-
-		x_raw = x_raw/x_abs
-
-	end
-
-	if 	y_abs >= x_abs and
-		y_abs >= z_abs then
-
-
-		x_raw = x_raw * (1/y_abs)
-		z_raw = z_raw * (1/y_abs)
-
-		y_raw = y_raw/y_abs
-
-	end
-
-	if 	z_abs >= y_abs and
-		z_abs >= x_abs then
-
-		x_raw = x_raw * (1/z_abs)
-		y_raw = y_raw * (1/z_abs)
-
-		z_raw = z_raw/z_abs
-
-	end
-
-	return {x=x_raw,y=y_raw,z=z_raw}
-
-end
-
 
 -------------------------------------------------------------------------------
 -- name: mobf_pos_is_zero(pos)
@@ -720,7 +524,7 @@ function mobf_above_water(pos)
 end
 
 -------------------------------------------------------------------------------
--- name: get_surface(x,z, min_y, max_y)
+-- name: get_sunlight_surface(x,z, min_y, max_y)
 --
 --! @brief get surface for x/z coordinates
 --
@@ -731,7 +535,6 @@ end
 --! @return y value of surface or nil
 -------------------------------------------------------------------------------
 function mobf_get_sunlight_surface(x,z, min_y, max_y)
-
     for runy = min_y, max_y,1 do
         local pos = { x=x,y=runy, z=z }
         local node_to_check = minetest.env:get_node(pos)
@@ -757,12 +560,19 @@ end
 -------------------------------------------------------------------------------
 function mobf_get_surface(x,z, min_y, max_y)
 
-	local last_node = minetest.env:get_node({ x=x,y=min_y, z=z })
+	mobf_assert_backtrace(min_y ~= nil)
+	mobf_assert_backtrace(max_y ~= nil)
+	mobf_assert_backtrace(x ~= nil)
+	mobf_assert_backtrace(z ~= nil)
+	
+	if type(minetest.env.get_surface) == "function" then
+	return minetest.env:get_surface({x=x,y=min_y,z=z},max_y-min_y)
+	end
 
+	local last_node = minetest.env:get_node({ x=x,y=min_y, z=z })
     for runy = min_y+1, max_y,1 do
         local pos = { x=x,y=runy, z=z }
         local node_to_check = minetest.env:get_node(pos)
-        
         if node_to_check.name == "air" and
         	last_node.name ~= "air" and
         	last_node.mame ~= "ignore" then
@@ -817,50 +627,6 @@ function mobf_random_direction()
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_calc_yaw(x,z)
---
---! @brief calculate radians value of a 2 dimendional vector
---
---! @param x vector component 1
---! @param z vector component 2
---
---! @return radians value
--------------------------------------------------------------------------------
-function mobf_calc_yaw(x,z)
-	local direction = math.atan2(z,x)
-				
-	while direction < 0 do
-		direction = direction + (2* math.pi)
-	end
-	
-	while direction > (2*math.pi) do
-		direction = direction - (2* math.pi)
-	end
-				
-	return direction
-end
-
--------------------------------------------------------------------------------
--- name: mobf_calc_vector_components(dir_radians,absolute_speed)
---
---! @brief calculate calculate x and z components of a directed speed
---
---! @param dir_radians direction of movement radians
---! @param absolute_speed speed in direction
---
---! @return {x,z}
--------------------------------------------------------------------------------
-function mobf_calc_vector_components(dir_radians,absolute_speed)
-
-	local retval = {x=0,z=0}
-	
-	retval.x = absolute_speed * math.cos(dir_radians)
-	retval.z = absolute_speed * math.sin(dir_radians)
-
-	return retval
-end
-
--------------------------------------------------------------------------------
 -- name: mobf_pos_is_same(pos1,pos2)
 --
 --! @brief check if two positions are equal
@@ -892,6 +658,41 @@ function mobf_pos_is_same(pos1,pos2)
 end
 
 -------------------------------------------------------------------------------
+-- name: mobf_is_pos(value)
+--
+--! @brief check if a given value is a position
+--
+--! @param value to check
+--
+--! @return true/false
+-------------------------------------------------------------------------------
+function mobf_is_pos(value)
+
+	if value == nil or
+		type(value) ~= "table" then
+		return false
+	end
+	
+	if value.x == nil or
+		tonumber(value.x) == nil then
+		return false
+	end
+	
+	if value.y == nil or
+		tonumber(value.y) == nil then
+		return false
+	end
+	
+	if value.z == nil or
+		tonumber(value.z) == nil then
+		return false
+	end
+	
+	
+	return true
+end
+
+-------------------------------------------------------------------------------
 -- name: mobf_assert_backtrace(value)
 --
 --! @brief assert in case value is false
@@ -899,10 +700,12 @@ end
 --! @param value to evaluate
 -------------------------------------------------------------------------------
 function mobf_assert_backtrace(value)
-	if minetest.assert_backtrace ~= nil then
-		minetest.assert_backtrace(value)
-	else
+	if value == false then
+		print(debug.traceback("Current Callstack:\n"))
 		assert(value)
 	end
 end
+
+
+
 --!@}

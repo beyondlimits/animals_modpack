@@ -30,13 +30,13 @@
 
 function mobf_deserialize_permanent_entity_data(staticdata)
 
---	local deserialized = minetest.deserialize(staticdata)
+	local deserialized = minetest.deserialize(staticdata)
 	
---	if deserialized ~= nil and
---		deserialized.version ~= nil then
---		--print("DEBUG: deserialized -> " ..dump(deserialized))
---		return deserialized
---	end
+	if deserialized ~= nil and
+		deserialized.version ~= nil then
+		--print("DEBUG: deserialized -> " ..dump(deserialized))
+		return deserialized
+	end
 
 	--old style serialized static data
 	local retval = {spawnpoint={x=0,y=0,z=0},playerspawned=false,original_spawntime=-1,state="default"}
@@ -112,10 +112,47 @@ function mobf_deserialize_permanent_entity_data(staticdata)
 		end_pos = string.find(staticdata,";",start_pos)
 		
 		if end_pos ~= nil then
-			dbg_mobf.permanent_store_lvl1("MOBF: Found: ".. string.sub(staticdata,start_pos,end_pos-1).. " as sevemth element")
+			dbg_mobf.permanent_store_lvl1("MOBF: Found: ".. string.sub(staticdata,start_pos,end_pos-1).. " as seventh element")
 			retval.state = string.sub(staticdata,start_pos,end_pos-1)
 			if retval.state == "" then
 				retval.state = nil
+			end
+		else
+			return retval
+		end
+		
+		start_pos = end_pos +1
+		end_pos = string.find(staticdata,";",start_pos)
+		
+		if end_pos ~= nil then
+			dbg_mobf.permanent_store_lvl1("MOBF: Found: ".. string.sub(staticdata,start_pos,end_pos-1).. " as eigth element")
+			retval.pathindex_raw = string.sub(staticdata,start_pos,end_pos-1)
+			retval.pathindex = tonumber(retval.pathindex_raw)
+		else
+			return retval
+		end
+		
+		start_pos = end_pos +1
+		end_pos = string.find(staticdata,";",start_pos)
+		
+		if end_pos ~= nil then
+			dbg_mobf.permanent_store_lvl1("MOBF: Found: ".. string.sub(staticdata,start_pos,end_pos-1).. " as nineth element")
+			retval.pathowner = string.sub(staticdata,start_pos,end_pos-1)
+			if retval.pathowner == "" then
+				retval.pathowner = nil
+			end
+		else
+			return retval
+		end
+		
+		start_pos = end_pos +1
+		end_pos = string.find(staticdata,";",start_pos)
+		
+		if end_pos ~= nil then
+			dbg_mobf.permanent_store_lvl1("MOBF: Found: ".. string.sub(staticdata,start_pos,end_pos-1).. " as tenth element")
+			retval.pathname = string.sub(staticdata,start_pos,end_pos-1)
+			if retval.pathname == "" then
+				retval.pathname = nil
 			end
 		else
 			return retval
@@ -139,18 +176,6 @@ function mobf_serialize_permanent_entity_data(entity)
 		entity.dynamic_data ~= nil and
 		entity.dynamic_data.spawning ~= nil then
 		
-		local playerspawned = "false"
-		
-		if entity.dynamic_data.spawning.player_spawned then
-			playerspawned = "true"
-		end
-		
-		local spawner = ""
-		
-		if entity.dynamic_data.spawning.spawner ~= nil then
-			spawner = entity.dynamic_data.spawning.spawner
-		end
-		
 		local state = "default"
 		if entity.dynamic_data.state ~= nil and 
 			entity.dynamic_data.state.current ~= nil then
@@ -163,24 +188,37 @@ function mobf_serialize_permanent_entity_data(entity)
 				"MOBF: deactivating entity without spawntime setting current time")
 		end
 		
-		local serialized = playerspawned ..
-		";" ..entity.dynamic_data.spawning.spawnpoint.x ..
-		";" ..entity.dynamic_data.spawning.spawnpoint.y ..
-		";" ..entity.dynamic_data.spawning.spawnpoint.z ..
-		";" ..entity.dynamic_data.spawning.original_spawntime ..
-		";" ..spawner ..
-		";" ..state ..
-		";"
+		local pathowner = ""
+		local pathname  = ""
+		local pathindex = ""
 		
+		if entity.dynamic_data.p_movement ~= nil then
+			if entity.dynamic_data.p_movement.pathowner ~= nil then
+				pathowner = entity.dynamic_data.p_movement.pathowner
+			end
+			
+			if entity.dynamic_data.p_movement.pathname ~= nil then
+				pathname = entity.dynamic_data.p_movement.pathname
+			end
+			
+			if entity.dynamic_data.p_movement.next_path_index ~= nil then
+				pathindex = "" .. entity.dynamic_data.p_movement.next_path_index
+			end
+		end
 		
-		--local toserialize = {
-		--						spawnpoint = entity.dynamic_data.spawning.spawnpoint,
-		--					 	playerspawned = entity.dynamic_data.spawning.player_spawned,
-		--					 	original_spawntime = entity.dynamic_data.spawning.original_spawntime,
-		--					 	spawner = entity.dynamic_data.spawning.spawner,
-		--					 	version = 2
-		--					 }
-		--local serialized = minetest.serialize(toserialize)
+		local toserialize = {
+								spawnpoint = entity.dynamic_data.spawning.spawnpoint,
+								playerspawned = entity.dynamic_data.spawning.player_spawned,
+								original_spawntime = entity.dynamic_data.spawning.original_spawntime,
+								spawner = entity.dynamic_data.spawning.spawner,
+								version = 3,
+								state = state,
+								pathindex = pathindex,
+								pathowner = pathowner,
+								pathname = pathname,
+								custom_persistent = entity.dynamic_data.custom_persistent,
+							}
+		local serialized = minetest.serialize(toserialize)
 		--print("DEBUG: serialized -> " .. serialized)
 		return serialized
 	else

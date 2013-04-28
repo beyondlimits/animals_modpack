@@ -11,7 +11,6 @@
 --! @author Sapier
 --! @date 2012-08-09
 --
---
 --! @defgroup mob_state State handling functions
 --! @brief a component to do basic changes to mob on state change
 --! @ingroup framework_int
@@ -19,7 +18,9 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
-
+--! @class mob_state
+--! @brief state handling class
+--! @}
 mob_state = {}
 mob_state.default_state_time = 30
 
@@ -27,7 +28,8 @@ mob_state.default_state_time = 30
 -- name: initialize(entity,now)
 --
 --! @brief initialize state dynamic data
---! @ingroup mob_state
+--! @memberof mob_state
+--! @public
 --
 --! @param entity elemet to initialize state data
 --! @param now current time
@@ -77,7 +79,8 @@ end
 -- name: get_entity_name(mob,state)
 --
 --! @brief get entity name for a state
---! @ingroup mob_state
+--! @memberof mob_state
+--! @private
 --
 --! @param mob generic data
 --! @param state selected state data
@@ -92,7 +95,8 @@ end
 -- name: get_state_by_name(entity,name)
 --
 --! @brief get a state by its name
---! @ingroup mob_state
+--! @memberof mob_state
+--! @public
 --
 --! @param entity elemet to look for state data
 --! @param name of state
@@ -115,7 +119,8 @@ end
 -- name: lock(entity,value)
 --
 --! @brief disable random state changes for a mob
---! @ingroup mob_state
+--! @memberof mob_state
+--! @public
 --
 --! @param entity elemet to lock
 --! @param value to set
@@ -138,7 +143,8 @@ end
 -- name: callback(entity,now,dstep)
 --
 --! @brief callback handling state changes
---! @ingroup mob_state
+--! @memberof mob_state
+--! @public
 --
 --! @param entity elemet to look for state data
 --! @param now current time
@@ -182,7 +188,12 @@ function mob_state.callback(entity,now,dstep)
 		--fill table with available states
 		for i=1, #entity.data.states, 1 do
 			if entity.data.states[i].custom_preconhandler == nil or
-				entity.data.states[i].custom_preconhandler() then
+				entity.data.states[i].custom_preconhandler(entity,entity.data.states[i]) and
+				--ignore states that are not supposed to be switched to 
+				--by automatic state change handling e.g. fighting states or
+				--manual set states
+				( entity.data.states[i].state_mode == nil or
+				  entity.data.states[i].state_mode == "auto") then
 				table.insert(state_table,entity.data.states[i])
 			end
 		end
@@ -227,7 +238,8 @@ end
 -- name: switch_entity(entity,state)
 --
 --! @brief helper function to swich an entity based on new state
---! @ingroup mob_state
+--! @memberof mob_state
+--! @private
 --
 --! @param entity to replace
 --! @param state to take new entity
@@ -276,7 +288,8 @@ end
 -- name: switch_switch_movgenentity(entity,state)
 --
 --! @brief helper function to swich a movement based on new state
---! @ingroup mob_state
+--! @memberof mob_state
+--! @private
 --
 --! @param entity to change movement gen
 --! @param state to take new entity
@@ -307,7 +320,8 @@ end
 -- name: change_state(entity,state)
 --
 --! @brief change state for an entity
---! @ingroup mob_state
+--! @memberof mob_state
+--! @public
 --
 --! @param entity to change state
 --! @param state to change to
@@ -385,7 +399,8 @@ end
 -- name: getTimeToNextState(typical_state_time)
 --
 --! @brief helper function to calculate a gauss distributed random value
---! @ingroup mob_state
+--! @memberof mob_state
+--! @private
 --
 --! @param typical_state_time center of gauss
 --!
@@ -428,7 +443,7 @@ function mob_state.getTimeToNextState(typical_state_time)
 		retval = typical_state_time + ( u2*p * (typical_state_time/2))
 	end
 	
-	--! ensure minimum state time of 2 seconds
+	-- ensure minimum state time of 2 seconds
 	if retval > 2 then
 		return retval
 	else
@@ -439,8 +454,9 @@ end
 -------------------------------------------------------------------------------
 -- name: prepare_states(mob)
 --
---! @brief register a mob within mob framework
---! @ingroup mob_state
+--! @brief prepare mobs states upon registration
+--! @memberof mob_state
+--! @public
 --
 --! @param mob a mob declaration
 -------------------------------------------------------------------------------
@@ -530,5 +546,3 @@ function mob_state.prepare_states(mob)
 		table.insert(mob.states,default_state)
 	end
 end
-
---!@}

@@ -15,57 +15,71 @@ No what is in?
 -------------------------------------------------------------------------------
 
 --hostile mobs--
-Vombies
-Hostile mobs spawning at night in unlighted areas. They can't withstand the 
-sun and will burn as sun rises
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	Vombies
+	Hostile mobs spawning at night in unlighted areas. They can't withstand the 
+	sun and will burn as sun rises
+	
+	Dungeonmasters
+	Just dungenmasters throwing fireballs they spawn in dark stony areas too.
+	
+	Big Red
+	Beware of their plasma balls! Big red
+	spawns in dark stony areas
+	
+	Boombomb
+	Don't get near they will explode
+	
+	Slime
+	will bounce in large caves below surface
+	
+	Oerkki
+	will attack you underground
 
-Dungeonmasters
-Just dungenmasters throwing fireballs they spawn in dark stony areas too.
-
-Big Red
-They look like giant easter bunnys but beware of their plasma balls! Big red
-spawns in dark stony areas
-
-Boombomb
-Don't get near they will explode
-
---slime--
-will bounce in large caves below surface
-
---semi hostile mobs -- 
-
-Wolf
-A animal hiding in the woods that can be tamed to follow you
+--semi hostile mobs --
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	Wolf
+	A animal hiding in the woods that can be tamed to follow you
 
 --friendly mobs --
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	Chicken
+	Cicken droping egs now and then
+	
+	Sheep
+	Sheep that can be sheered, their wool will grow again. They randomly will 
+	spawn on willows
+	
+	Cow
+	Cows will spawn on willows and produce milk.
+	
+	Deer
+	Will spawn below trees.
+	
+	Rat 
+	Just a small animal jumping around
+	
+	Blue White Fish
+	Just a swimming animal
+	
+	Gull
+	flys around over your head!
+	
+	Clownfish
+	A funny small quick fish swiming around
+	
+	Ostrich
 
-Chicken
-Cicken droping egs now and then
-
-Sheep
-Sheep that can be sheered, their wool will grow again. They randomly will 
-spawn on willows
-
-Cow
-Cows will spawn on willows and produce milk.
-
-Deer
-Will spawn below trees.
-
-Rat 
-Just a small animal jumping around
-
-Blue White Fish
-Just a swimming animal
-
-Gull
-flys around over your head!
-
-Clownfish
-A funny small quick fish swiming around
-
---npc trader--
-will sell goods
+--npc--
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	Trader
+	will sell goods
+	
+	Archer
+	Shoots arrows to enemys
+	
+	Guard
+	defends his place
 
 
 What can you do with them?
@@ -78,7 +92,7 @@ Vombie     -> drops bone on kill
 Clownfish  -> drops golden scale on kill
 Wolf       -> tame it!
 NPC trader -> trading of course
-
+Oerkki     -> ride
 
 How to catch mobs? Take a lasso or net to catch them, create a farm. Sheep,
 chicken and cow will even breed if there's a filled barn nearby
@@ -121,42 +135,79 @@ wood       wood     wood
 wood  scale_golden  wood
 wood       wood     wood
 
-Settings (it's recommended to use mobf_settings command to change settings):
+Saddle
+
+<no reciep>
+
+Contract
+
+paper
+paper
+
+
+Settings: 
 -------------------------------------------------------------------------------
-mobf_enable_socket_trace  = true/false
--->enable socket mod tracing
+call /mobf_settings in game 
+(you need to be singleplayer or have priv mobf_admin)
 
-mobf_disable_3d_mode = true/false
--->disable 3d models
-
-disable_vombie_3d_burn_animation = true/false
--->VOMBIE ONLY disable 3d burn animation
-
-mobf_disable_animal_spawning = true/false
--->disable spawning of animals
-
-mobf_blacklist = <serialized table of animal names>
--->disable all animals in table e.g.
-    mobf_blacklist = return {animal_sheep:sheep}
-    
-mobf_animal_spawning_secondary = true/false
--->enable/disable secondary spawning mechanism 
-    NOTE secondary mechanism may cause serious lag issues sometimes
-    
-mobf_log_removed_entities = true/false
-	log removed mobs with reason of removal
-	
-vombie_3d_burn_animation_enabled = true/false
-	show vombie burn animation (may cause huge lag)
-	
-mobf_log_bug_warnings = true/false
-	show all mobf bug warnings
-	
-mobf_delete_disabled_mobs = true/false
-	delete mobs and spawners if a mob is disabled
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.0.84
+-fix armor groups to be compatible to default
+-fis shadow spawn algorithm to spawn more mobs below ground
+
+Changes 2.0.83
+-reduce chance (small) animals flee through fences
+-fix invalid barn texture
+-update trader inventory
+-add support for player specified hireling orientation
+-fix non admin mobf settings
+-improve weapon balancing
+-fix (some) spawning algorithms not working as expected
+-add support for spawning mobs at random positions
+-fix pathfinding not defaulting back to old method on no path found
+-fix auto transform not working anymore
+-add detection of "bed" like time jump mods
+-fix various crashes
+
+Changes 2.0.82
+-disable luatrace
+
+Changes 2.0.81
+-fix ostrich meat and egg
+-use get_surface core function if available
+-add support for manually spawning mobs at random pos
+-fix luatrace support
+-fix lifebar not beeing deleted if mob is deleted
+-fix orientation onf 3d mobs
+-update spawning definitions
+-fix density for new spawning style
+-vombie now uses pathfinding (if available)
+-add set_target interface to movegens
+
+Changes 2.0.80
+-add anti theft support
+-add player mob preservation on error removal
+-add mob <-> mob combat
+-add new weapon arrow
+-NEW MOB archer (can be hired at trader)
+-NEW MOB guard (can be hired at trader)
+-improove missile object physics
+-add ingame path editor
+-add path follow movegen
+-add guard patrol support
+-add mob lifebar (disabled by default enable via mobf settings)
+-improove trader inventory (thx to sokomine)
+-improove debug information
+-add support for mutliple spawn algorithms (make vombies spawn underground)
+-add support for flee state for non agressive mobs
+-NEW MOB oerkki
+-add attention support 
+	(player or other mobs now will draw attention to agressive mobs once some 
+	 threshold is exceeded a mob may look at you or even start an attack)
+-make all new gui's available from mobf_settings "Tools" page
+
 Changes 2.0.5
 -fix bug in mobf_settings using settings_save instead of mobf_setting_save 
 
@@ -629,4 +680,14 @@ http://www.mediafire.com/?ds4g46v3dhnkdg9 Version 1.9.0 (sleeping sheep) --exper
 http://www.mediafire.com/?umbcd1ptax9bbcb Version 1.9.1 (animating!) --experimental
 http://www.mediafire.com/?66v84hi9p43hw7o Version 1.9.6 (faster?) --experimental
 http://www.mediafire.com/?5z5wz2d329m849k Version 1.9.7 (frightened about water) --experimental
+http://www.mediafire.com/?x6q9aeaedea646m Version 1.9.8 (happy trading)
+http://www.mediafire.com/?s071u1sbcmue4we Version 1.9.9 (trader's home)
+http://www.mediafire.com/?f25z9705bu7y5s9 Version 1.9.10 (reduced dependencys)
+http://www.mediafire.com/?1cmg3aphdfiarvc Version 1.9.12 (you can run, but they'll follow)
+http://www.mediafire.com/?97cnawgzy6wjq64 Version 1.9.13 (ostrich racer)
+http://www.mediafire.com/?8ol8upqq5w1ha9b Version 1.9.15 (development phase finished)
+http://www.mediafire.com/?hyd4dzmyled9zcd Version 2.0.0 (meshed up ;-) )
+http://www.mediafire.com/?2ty86uof1fpuu9h Version 2.0.2 (meshed up ;-) )
+http://www.mediafire.com/?rtpxg9tkwgpsa6g Version 2.0.3 (meshed up ;-) )
+http://www.mediafire.com/?16ekfh1sti91vn8 Version 2.0.4 (meshed up ;-) )
 

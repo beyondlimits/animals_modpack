@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_rat loading ...")
 
-local version = "0.0.8"
+local version = "0.0.10"
 
 local selectionbox_rat = {-0.2, -0.0625, -0.2, 0.2, 0.125, 0.2}
 
@@ -32,7 +32,7 @@ rat_prototype = {
 					base_health=2,
 					kill_result="",
 					armor_groups= {
-						fleshy=3,
+						fleshy=90,
 					},
 					groups = rat_groups,
 					envid="on_ground_1",
@@ -50,11 +50,22 @@ rat_prototype = {
 					consumed=true,
 					},
 		spawning = {
-					rate=0.02,
-					density=250,
-					algorithm="forrest_mapgen",
-					height=1
-					},
+					primary_algorithms = {
+						{
+						rate=0.02,
+						density=250,
+						algorithm="forrest_mapgen",
+						height=1
+						},
+						{
+						rate=0.01,
+						density=250,
+						algorithm="shadows_spawner",
+						height=1,
+						respawndelay = 120,
+						},
+					}
+				},
 		animation = {
 				walk = {
 					start_frame = 1,

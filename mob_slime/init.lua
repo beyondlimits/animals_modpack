@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_slime mod loading ...")
-local version = "0.0.9"
+local version = "0.0.11"
 
 local selectionbox_slime_L = {-0.5, -0.4, -0.5,  0.5,0.4,0.5}
 local selectionbox_slime_M = {-0.3, -0.2, -0.3,  0.3,0.2,0.3}
@@ -104,7 +104,10 @@ local prototype_mob_slime_L = {
 		kill_result = nil,
 		
 		--! @brief [OPTIONAL] armor groups of mob
-		armor_groups = nil,
+		armor_groups = {
+						fleshy=40,
+						deamon=30,
+					},
 		
 		groups = slime_groups,
 		
@@ -180,18 +183,22 @@ local prototype_mob_slime_L = {
 		},
 	--! @brief [MANDATORY] spawning configuration for mob
 	spawning = {
-		--! @brief [MANDATORY] rate this mob is spawned
-		rate=0.01,
-		--! @brief [MANDATORY] typical distance between two mobs of this type when spawend
-		density=50,
-		--! @brief [MANDATORY] identifyer of spawn algorithm
-		algorithm="deep_large_caves_spawner",
-		
-		--! @brief [ALGORITHM DEPENDENT] shadows minimum number of air blocks above pos
-		height = 4,
-		
-		min_depth = -100,
-		},
+				primary_algorithms = {
+					{
+					--! @brief [MANDATORY] rate this mob is spawned
+					rate=0.01,
+					--! @brief [MANDATORY] typical distance between two mobs of this type when spawend
+					density=50,
+					--! @brief [MANDATORY] identifyer of spawn algorithm
+					algorithm="deep_large_caves_spawner",
+					
+					--! @brief [ALGORITHM DEPENDENT] shadows minimum number of air blocks above pos
+					height = 4,
+					
+					min_depth = -100,
+					},
+				}
+			},
 	die = {
 			name="mob_slime_die",
 			gain = 0.7,
@@ -237,7 +244,10 @@ local prototype_mob_slime_S = {
 		kill_result = nil,
 		
 		--! @brief [OPTIONAL] armor groups of mob
-		armor_groups = nil,
+		armor_groups = {
+						fleshy=40,
+						deamon=30,
+					},
 		
 		groups = slime_groups,
 		
@@ -297,18 +307,22 @@ local prototype_mob_slime_S = {
 		},
 	--! @brief [MANDATORY] spawning configuration for mob
 	spawning = {
-		--! @brief [MANDATORY] rate this mob is spawned
-		rate=0.01,
-		--! @brief [MANDATORY] typical distance between two mobs of this type when spawend
-		density=50,
-		--! @brief [MANDATORY] identifyer of spawn algorithm
-		algorithm="none",
-		
-		--! @brief [ALGORITHM DEPENDENT] shadows minimum number of air blocks above pos
-		height = 4,
-		
-		min_depth = -100,
-		},
+				primary_algorithms = {
+					{
+					--! @brief [MANDATORY] rate this mob is spawned
+					rate=0.01,
+					--! @brief [MANDATORY] typical distance between two mobs of this type when spawend
+					density=50,
+					--! @brief [MANDATORY] identifyer of spawn algorithm
+					algorithm="none",
+					
+					--! @brief [ALGORITHM DEPENDENT] shadows minimum number of air blocks above pos
+					height = 4,
+					
+					min_depth = -100,
+					},
+				}
+			},
 	die = {
 		name="mob_slime_die",
 		gain = 0.3,
@@ -353,7 +367,10 @@ local prototype_mob_slime_M = {
 		kill_result = nil,
 		
 		--! @brief [OPTIONAL] armor groups of mob
-		armor_groups = nil,
+		armor_groups = {
+						fleshy=40,
+						deamon=30,
+					},
 		
 		groups = slime_groups,
 		
@@ -412,17 +429,21 @@ local prototype_mob_slime_M = {
 		},
 	--! @brief [MANDATORY] spawning configuration for mob
 	spawning = {
-		--! @brief [MANDATORY] rate this mob is spawned
-		rate=0.01,
-		--! @brief [MANDATORY] typical distance between two mobs of this type when spawend
-		density=50,
-		--! @brief [MANDATORY] identifyer of spawn algorithm
-		algorithm="none",
-		
-		--! @brief [ALGORITHM DEPENDENT] shadows minimum number of air blocks above pos
-		height = 4,
-		
-		min_depth = -100,
+			primary_algorithms = {
+				{
+				--! @brief [MANDATORY] rate this mob is spawned
+				rate=0.01,
+				--! @brief [MANDATORY] typical distance between two mobs of this type when spawend
+				density=50,
+				--! @brief [MANDATORY] identifyer of spawn algorithm
+				algorithm="none",
+				
+				--! @brief [ALGORITHM DEPENDENT] shadows minimum number of air blocks above pos
+				height = 4,
+				
+				min_depth = -100,
+				},
+			}
 		},
 	die = {
 		name="mob_slime_die",

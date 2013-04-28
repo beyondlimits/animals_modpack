@@ -49,12 +49,25 @@ LOGLEVEL_WARNING  = "action"
 LOGLEVEL_ERROR    = "error"
 LOGLEVEL_CRITICAL = "error"
 
+-- initialize luatrace if necessary
+if mobf_rtd.luatrace_enabled then
+	luatrace = require("luatrace")
+end
+
 --include debug trace functions
 dofile (mobf_modpath .. "/debug_trace.lua")
 
 --include engine
-dofile (mobf_modpath .. "/generic_functions.lua")
+dofile (mobf_modpath .. "/utils/generic_functions.lua")
+dofile (mobf_modpath .. "/utils/settings.lua")
+dofile (mobf_modpath .. "/utils/data_storage.lua")
+dofile (mobf_modpath .. "/utils/tracing.lua")
+dofile (mobf_modpath .. "/utils/geometry.lua")
+dofile (mobf_modpath .. "/utils/text.lua")
+dofile (mobf_modpath .. "/utils/permanent_data.lua")
+dofile (mobf_modpath .. "/lifebar.lua")
 dofile (mobf_modpath .. "/environment.lua")
+dofile (mobf_modpath .. "/attention.lua")
 dofile (mobf_modpath .. "/movement_generic.lua")
 dofile (mobf_modpath .. "/graphics.lua")
 dofile (mobf_modpath .. "/movement_gen_registry.lua")
@@ -63,13 +76,14 @@ dofile (mobf_modpath .. "/weapons.lua")
 dofile (mobf_modpath .. "/fighting.lua")
 dofile (mobf_modpath .. "/random_drop.lua")
 dofile (mobf_modpath .. "/sound.lua")
-dofile (mobf_modpath .. "/permanent_data.lua")
 dofile (mobf_modpath .. "/ride.lua")
 dofile (mobf_modpath .. "/mobf.lua")
 dofile (mobf_modpath .. "/api.lua")
 dofile (mobf_modpath .. "/debug.lua")
 dofile (mobf_modpath .. "/mob_state.lua")
 dofile (mobf_modpath .. "/inventory.lua")
+dofile (mobf_modpath .. "/mob_preserve.lua")
+dofile (mobf_modpath .. "/path.lua")
 
 --include spawning support
 dofile (mobf_modpath .. "/spawning.lua")
@@ -79,9 +93,10 @@ dofile (mobf_modpath .. "/mgen_probab/main_probab.lua")
 dofile (mobf_modpath .. "/mgen_follow/main_follow.lua")
 dofile (mobf_modpath .. "/mgen_rasterized/mgen_raster.lua")
 dofile (mobf_modpath .. "/mgen_jordan4ibanez/mgen_jordan4ibanez.lua")
+dofile (mobf_modpath .. "/mgen_pathbased/main.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "2.0.5"
+mobf_version = "2.0.84"
 
 --! @brief define tools used for more than one mob
 function mobf_init_basic_tools()	
@@ -144,13 +159,20 @@ function mobf_init_framework()
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing debug hooks..")
 	mobf_debug.init()
 	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing mob preservation..")
+	mob_preserve.init()
+	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize path handling subsystem..")
+	mobf_path.init()
+	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize lifebar subsystem..")
+	mobf_lifebar.init()
+	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize mobf supplied modules..")
 	mobf_init_modules()
 	
-	-- initialize luatrace if necessary
-	if mobf_rtd.luatrace_enabled then
-		luatrace = require("luatrace")
-	end
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Register rightclick button handler..")
+	minetest.register_on_player_receive_fields(mobf.rightclick_button_handler)
 	
 	-- register privilege to change mobf settings
 	minetest.register_privilege("mobfw_admin", 
@@ -219,20 +241,19 @@ function mobf_init_modules()
 				end
 				})
 				
-	--attack hook
+	--attention hook
 	mobf.register_on_step_callback({
-			name = "aggression",
-			handler = fighting.aggression,
-			init = nil, -- already done by fighting.combat
+			name = "attention",
+			handler = attention.callback,
+			init = attention.init_dynamic_data,
 			configcheck = function(entity)
-					if entity.data.combat ~= nil then
+					if entity.data.attention ~= nil or
+						entity.data.combat ~= nil then
 						return true
 					end
 					return false
 				end
 				})
-		
-
 
 	--workaround for shortcomings in spawn algorithm
 	mobf.register_on_step_callback({
@@ -281,7 +302,6 @@ function mobf_init_modules()
 				end
 				})
 
-
 	--custom hook
 	mobf.register_on_step_callback({
 			name = "custom_hooks",
@@ -327,22 +347,29 @@ function mobf_init_modules()
 				
 				
 	--on rightclick callbacks
-	--Note debug needs to be registred FIRST!
-	mobf.register_on_rightclick_callback({
-			name = "debugcallback",
-			handler		= mobf_debug.rightclick_callback,
-			configcheck	= function(entity)
-					return true
-				end
-			})
-			
 	mobf.register_on_rightclick_callback({
 			name = "tradercallback",
+			visiblename = "Trade",
 			handler		= mob_inventory.trader_callback,
 			configcheck	= mob_inventory.config_check
 			})
 			
+	mobf.register_on_rightclick_callback({
+			name = "debugcallback",
+			visiblename = "Show debuginfo",
+			handler		= mobf_debug.rightclick_callback,
+			configcheck	= function(entity)
+					return true
+				end,
+			privs = {mobfw_admin=true}
+			})
 
+	mobf.register_on_rightclick_callback({
+			name = "pathcallback",
+			visiblename = mobf_path.buttontext,
+			handler		= mobf_path.mob_rightclick_callback,
+			configcheck	= mobf_path.config_check
+			})
 end
 
 mobf_init_framework()

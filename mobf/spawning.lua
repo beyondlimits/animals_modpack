@@ -54,6 +54,8 @@ function spawning.remove_uninitialized(entity, staticdata)
 			entity.dynamic_data = {}
 			entity.dynamic_data.spawning = {}
 			entity.dynamic_data.spawning.spawnpoint = permanent_data.spawnpoint
+			entity.dynamic_data.spawning.player_spawned = permanent_data.playerspawned
+			entity.dynamic_data.spawning.spawner = permanent_data.spawner
 
 			spawning.remove(entity,"remove uninitialized")
 		end
@@ -87,6 +89,10 @@ function spawning.remove(entity,reason)
 			minetest.log(LOGLEVEL_NOTICE,"MOBF: removing " .. entity.data.name ..
 				" at " .. printpos(pos) .. " due to: " .. reason)
 		end
+		mob_preserve.handle_remove(entity,reason)
+		if entity.lifebar ~= nil then
+			mobf_lifebar.del(entity.lifebar)
+		end
 		entity.object:remove()
 	else
 		minetest.log(LOGLEVEL_ERROR,"Trying to delete an an non existant mob")
@@ -108,10 +114,12 @@ end
 function spawning.init_dynamic_data(entity,now)
 
 	local data = {
-		player_spawned = false,
-		ts_dense_check = now,
-		spawnpoint = entity.object:getpos(),
+		player_spawned     = false,
+		ts_dense_check     = now,
+		spawnpoint         = entity.object:getpos(),
 		original_spawntime = now,
+		spawner            = nil,
+		density            = spawning.get_min_density(entity),
 	}
 	
 	entity.removed = false
@@ -175,10 +183,12 @@ function spawning.check_population_density(entity,now)
 		secondary_name = entity.data.harvest.transform_to
 	end
 
+	mobf_assert_backtrace(entity.dynamic_data.spawning.density ~= nil)
+
 	local mob_count = mobf_mob_around(entity.data.modname..":"..entity.data.name,
 										secondary_name,
 										entitypos,
-										entity.data.spawning.density,
+										entity.dynamic_data.spawning.density,
 										true)
 	if  mob_count > 5 then
 		entity.removed = true
@@ -287,18 +297,19 @@ end
 -------------------------------------------------------------------------------
 function spawning.lifecycle(entity,now)
 
-	if entity.dynamic_data.spawning.original_spawntime ~= nil and
-		entity.data.spawning.lifetime ~= nil then
-	
-		local lifetime = entity.data.spawning.lifetime
+	if entity.dynamic_data.spawning.original_spawntime ~= nil then
+		if entity.data.spawning.lifetime ~= nil then
 		
-		local current_age = now - entity.dynamic_data.spawning.original_spawntime
-	
-		if current_age > 0 and 
-			current_age > lifetime then
-			dbg_mobf.spawning_lvl1("MOBF: removing animal due to limited lifetime")
-			spawning.remove(entity," limited mob lifetime")
-			return false
+			local lifetime = entity.data.spawning.lifetime
+			
+			local current_age = now - entity.dynamic_data.spawning.original_spawntime
+		
+			if current_age > 0 and 
+				current_age > lifetime then
+				dbg_mobf.spawning_lvl1("MOBF: removing animal due to limited lifetime")
+				spawning.remove(entity," limited mob lifetime")
+				return false
+			end
 		end
 	else
 		entity.dynamic_data.spawning.original_spawntime = now
@@ -342,21 +353,25 @@ end
 --! @return spawned mob entity
 -------------------------------------------------------------------------------
 function spawning.spawn_and_check(name,suffix,pos,text)
+	mobf_assert_backtrace(pos ~= nil)
+	mobf_assert_backtrace(pos.y ~= nil)
+	mobf_assert_backtrace(name ~= nil)
+	mobf_assert_backtrace(suffix ~= nil)
 	local newobject = minetest.env:add_entity(pos,name .. suffix)
 	
 	if newobject then
 		local newentity = mobf_find_entity(newobject)
 		
 		if newentity == nil then
-			dbg_mobf.spawning_lvl3("MOBF BUG!!! no " .. name..
+			dbg_mobf.spawning_lvl3("MOBF BUG!!! no " .. name.. suffix ..
 				" entity has been created by " .. text .. "!")
-			mobf_bug_warning(LOGLEVEL_ERROR,"BUG!!! no " .. name..
+			mobf_bug_warning(LOGLEVEL_ERROR,"BUG!!! no " .. name.. suffix ..
 				" entity has been created by " .. text .. "!")
 		else
-			dbg_mobf.spawning_lvl2("MOBF: spawning "..name.." entity by " .. 
-				text .. " at position ".. printpos(pos))
-			minetest.log(LOGLEVEL_INFO,"MOBF: spawning "..name.." entity by " .. 
-				text .. " at position ".. printpos(pos))
+			dbg_mobf.spawning_lvl2("MOBF: spawning "..name.. suffix ..
+				" entity by " .. text .. " at position ".. printpos(pos))
+			minetest.log(LOGLEVEL_INFO,"MOBF: spawning "..name.. suffix .. 
+				" entity by " .. text .. " at position ".. printpos(pos))
 			return newentity
 		end
 	else
@@ -421,7 +436,11 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 	if maxtries == nil then
 		maxtries = 5
 	end
-
+	
+	local divs = 0
+	local attempts = 0
+	local spawned = 0
+	
 	local starttime = mobf_get_time_ms()
 	
 	local min_x = MIN(minp.x,maxp.x)
@@ -451,37 +470,47 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 		
 		local centerpos = {x=x_center,y=surface_center,z=z_center}
 		
-		dbg_mobf.spawning_lvl3("MOBF: center is (" .. x_center .. "," .. z_center .. ")"
+		if surface_center  == nil then
+			dbg_mobf.spawning_lvl2(
+				"MOBF: didn't find surface for " ..printpos(centerpos))
+			centerpos.y = min_y + ((max_y-min_y)/2)
+		end
+		
+		dbg_mobf.spawning_lvl3("MOBF: center is set to " ..
+			"(" .. x_center .. "," .. z_center .. ")"
 			.."  --> (".. x_delta .."," .. z_delta .. ")")
 		
 		--check if there is already a mob of same type within area
-		if surface_center  then
-			local mobs_around = mobf_spawner_around(name,centerpos,spawndata.density)
-			if mobs_around == 0 then
-				dbg_mobf.spawning_lvl3("no " .. name .. " within range of " .. 
-					spawndata.density .. " around " ..printpos(centerpos))
-				for i= 0, maxtries do
-					local x_try = math.random(-x_delta,x_delta)
-					local z_try = math.random(-z_delta,z_delta)
-					
-					local pos = { x= x_center + x_try,
-									z= z_center + z_try }
-					
-					--do place spawners in center of block
-					pos.x = math.floor(pos.x + 0.5)
-					pos.z = math.floor(pos.z + 0.5)
-					
-					if spawnfunc(name,pos,min_y,max_y,spawndata) then
-						break
-					end
-				end	--for -> 5
-			end --mob around
-		else
-			dbg_mobf.spawning_lvl3("MOBF: didn't find surface for " ..printpos(centerpos))
-		end --surface_center
+		local mobs_around = mobf_spawner_around(name,centerpos,spawndata.density)
+		if mobs_around == 0 then
+			dbg_mobf.spawning_lvl3("no " .. name .. " within range of " .. 
+				spawndata.density .. " around " ..printpos(centerpos))
+			
+			for i = 0, maxtries, 1 do
+				attempts = attempts +1
+				local x_try = math.random(-x_delta,x_delta)
+				local z_try = math.random(-z_delta,z_delta)
+				
+				local pos = { x= x_center + x_try,
+								z= z_center + z_try }
+				
+				--do place spawners in center of block
+				pos.x = math.floor(pos.x + 0.5)
+				pos.z = math.floor(pos.z + 0.5)
+				
+				if spawnfunc(name,pos,min_y,max_y,spawndata) then
+					spawned = spawned +1
+					break
+				end
+			end --for -> 5
+		end --mob around
+		
+		divs = divs +1
 	end -- for z divs
 	end -- for x divs
-	dbg_mobf.spawning_lvl3("magen ended")
+	local max_available_tries = divs * maxtries
+	dbg_mobf.spawning_lvl2("MOBF: divide_mapgen I " ..
+			"(" .. divs .. "|" .. attempts .. "|" .. spawned .. "|" .. max_available_tries .. ")")
 end
 
 ------------------------------------------------------------------------------
@@ -510,6 +539,10 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 	if maxtries == nil then
 		maxtries = 5
 	end
+	
+	local divs = 0
+	local attempts = 0
+	local spawned = 0
 
 	local starttime = mobf_get_time_ms()
 	
@@ -533,21 +566,27 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 	for i = 1, xdivs,1 do
 	for j = 1, zdivs,1 do
 	
-	local x_center,x_delta = spawning.get_center(min_x,max_x,i,density)
-	local z_center,z_delta = spawning.get_center(min_z,max_z,j,density)
-	
-	local surface_center = surfacefunc(x_center,z_center,min_y,max_y)
-	
-	local centerpos = {x=x_center,y=surface_center,z=z_center}
-	
-	dbg_mobf.spawning_lvl3("MOBF: center is (" .. x_center .. "," .. z_center .. ") --> (".. x_delta .."," .. z_delta .. ")")
-	
-	--check if there is already a mob of same type within area
-	if surface_center  then
+		local x_center,x_delta = spawning.get_center(min_x,max_x,i,density)
+		local z_center,z_delta = spawning.get_center(min_z,max_z,j,density)
+		
+		local surface_center = surfacefunc(x_center,z_center,min_y,max_y)
+		
+		local centerpos = {x=x_center,y=surface_center,z=z_center}
+		
+		if surface_center  == nil then
+			dbg_mobf.spawning_lvl2(
+				"MOBF: didn't find surface for " ..printpos(centerpos))
+			centerpos.y = min_y + ((max_y-min_y)/2)
+		end
+		
+		dbg_mobf.spawning_lvl3("MOBF: center is (" .. x_center .. "," .. z_center .. ") --> (".. x_delta .."," .. z_delta .. ")")
+		
 		local mobs_around = mobf_mob_around(name,secondary_name,centerpos,density,true)
 		if mobs_around == 0 then
 			dbg_mobf.spawning_lvl3("no " .. name .. " within range of " .. density .. " around " ..printpos(centerpos))
-				i= 0, maxtries, 1 do
+			
+			for i = 0, maxtries, 1 do
+				attempts = attempts +1
 				local x_try = math.random(-x_delta,x_delta)
 				local z_try = math.random(-z_delta,z_delta)
 				
@@ -557,17 +596,19 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 				pos.y = surfacefunc(pos.x,pos.z,min_y,max_y)
 				
 				if pos.y and spawnfunc(name,pos,min_y,max_y) then
+					spawned = spawned +1
 					break
 				end
 			end --for -> 5
 		end --mob around
-	else
-		dbg_mobf.spawning_lvl3("MOBF: didn't find surface for " ..printpos(centerpos))
-	end --surface_center
+
+		divs = divs +1
 	end -- for z divs
 	end -- for x divs
 	mobf_warn_long_fct(starttime,"on_mapgen" .. name,"mapgen")
-	dbg_mobf.spawning_lvl3("magen ended")
+	local max_available_tries = divs * maxtries
+	dbg_mobf.spawning_lvl2("MOBF: divide_mapgen II " ..
+			"(" .. divs .. "|" .. attempts .. "|" .. spawned .. "|" .. max_available_tries .. ")")
 end
 
 ------------------------------------------------------------------------------
@@ -582,11 +623,15 @@ end
 --! @param spawndata spawning information to use
 --! @param environment what environment is good for mob
 --! @param spawnfunc function to call for spawning
+--! @param suffix to add
 --
 --! @return
 -------------------------------------------------------------------------------
-function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,environment,spawnfunc)
-	minetest.register_entity(mobname .. "_spawner",
+function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,environment,spawnfunc,suffix)
+	if suffix == nil then
+		suffix = ""
+	end
+	minetest.register_entity(mobname .. "_spawner" .. suffix,
 		 {
 			physical        = false,
 			collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
@@ -600,7 +645,19 @@ function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,en
 				
 				if self.spawner_time_passed < 0 then
 					local starttime = mobf_get_time_ms()
-					spawnfunc(self)
+					
+					local mobcount = mobf_mob_around(self.spawner_mob_name,
+										self.spawner_mob_transform,
+										self.object:getpos(),
+										1.5,true)
+					
+					--check if mob is already at spawner pos
+					if mobcount == 0 then
+						spawnfunc(self)
+					else
+						dbg_mobf.spawning_lvl3("MOBF: not spawning " .. self.spawner_mob_name .. " due to mob being to near " .. mobcount)
+					end
+					
 					mobf_warn_long_fct(starttime,"spawnfunc " .. self.spawner_mob_name,"spawnfunc")
 				end
 			end,
@@ -626,6 +683,8 @@ end
 --
 --! @brief register an entity to cleanup spawners
 --! @memberof spawning
+--
+--! @param mobname mobname to create cleanup
 -------------------------------------------------------------------------------
 function spawning.register_cleanup_spawner(mobname)
 	minetest.register_entity(mobname .. "_spawner",
@@ -634,6 +693,148 @@ function spawning.register_cleanup_spawner(mobname)
 				self.object:remove()
 			end
 		})
+end
+
+
+------------------------------------------------------------------------------
+-- name: setup_algorithm(mob)
+-- @function [parent=#spawning] setup_algorithm
+--
+--! @brief set up a specific algorithm for a mob
+--! @memberof spawning
+--
+--! @param primary_name name of mob
+--! @param secondary_name name of mob (when harvested)
+--! @param parameters spawning parameters
+--! @param envid identifyer for environment of mob
+-------------------------------------------------------------------------------
+function spawning.setup_algorithm(primary_name,secondary_name,parameters,envid)
+	
+	if type(parameters) == "table" then
+
+		if mobf_spawn_algorithms[parameters.algorithm] ~= nil and
+			type(mobf_spawn_algorithms[parameters.algorithm].register_spawn) == "function" then
+			dbg_mobf.spawning_lvl2("MOBF: algorithm: " .. parameters.algorithm)
+			dbg_mobf.spawning_lvl2("MOBF: " .. dump(primary_name) .. " " ..
+				dump(secondary_name) .. " " .. dump(parameters) .. " " ..
+				dump(envid))
+			mobf_spawn_algorithms[parameters.algorithm].register_spawn(
+								primary_name,
+								secondary_name,
+								parameters,
+								environment_list[envid])
+		end
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: get_min_density(entity)
+-- @function [parent=#spawning] get_min_density
+--
+--! @brief get minimum density for this mob
+--! @memberof spawning
+--
+--! @param entity the mob itself
+--
+--! @return minimum density over all spawners defined for this mob
+-------------------------------------------------------------------------------
+function spawning.get_min_density(entity)
+	if type(entity.data.spawning.primary_algorithms) == "table" then
+		local density = nil
+		for i=1 , #entity.data.spawning.primary_algorithms , 1 do
+			if density == nil or
+				entity.data.spawning.primary_algorithms[i].density < density then
+				
+				density = entity.data.spawning.primary_algorithms[i].density
+			end
+		end
+		return density
+	else
+		return entity.data.spawning.density
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: register_mob(mob)
+-- @function [parent=#spawning] register_mob
+--
+--! @brief initialize spawn algorithms for a mob
+--! @memberof spawning
+--
+--! @param mob definition
+-------------------------------------------------------------------------------
+function spawning.register_mob(mob)
+	--spawn mechanism handling
+	if not minetest.setting_getbool("mobf_disable_animal_spawning") then
+		--register spawn callback to world
+		if environment_list[mob.generic.envid] ~= nil then
+			local secondary_name = ""		
+			if mob.harvest ~= nil then
+				secondary_name = mob.harvest.transforms_to
+			end
+			
+			dbg_mobf.spawning_lvl3("MOBF: Environment to use: " .. tostring(mob.generic.envid))
+			
+			if mob.spawning.algorithm == nil then
+				dbg_mobf.spawning_lvl2("MOBF: Register spawning algorithms")
+				if type(mob.spawning.primary_algorithms) == "table" then
+					for i=1 , #mob.spawning.primary_algorithms , 1 do
+						spawning.setup_algorithm(
+								mob.modname..":"..mob.name,
+								secondary_name,
+								mob.spawning.primary_algorithms[i],
+								mob.generic.envid)
+					end
+				else
+					dbg_mobf.spawning_lvl2("MOBF: " .. mob.name 
+						.. " no primary spawn algorithm defined! ")
+				end
+			
+				if minetest.setting_getbool("mobf_animal_spawning_secondary") then
+					if type(mob.spawning.secondary_algorithms) == "table" then
+						for i=1 , #mob.spawning.secondary_algorithms , 1 do
+							spawning.setup_algorithm(
+									mob.modname..":"..mob.name,
+									secondary_name,
+									mob.spawning.secondary_algorithms[i],
+									mob.generic.envid)
+						end
+					end
+				end
+			else
+				minetest.log(LOGLEVEL_WARNING,"MOBF: legacy spawning declaration"
+						.. " for mob: " .. mob.name
+						.. "!!! plz update to new way of defining spawn"
+						.. " algorithms")
+				if mobf_spawn_algorithms[mob.spawning.algorithm] ~= nil and
+					type(mobf_spawn_algorithms[mob.spawning.algorithm].register_spawn) == "function" then
+					mobf_spawn_algorithms[mob.spawning.algorithm].register_spawn(mob.modname..":"..mob.name,
+																		secondary_name,
+																		mob.spawning,
+																		environment_list[mob.generic.envid])
+				else
+					dbg_mobf.spawning_lvl2("MOBF: " .. mob.name 
+						.. " no primary spawn algorithm defined: " 
+						.. tostring(mob.spawning.algorithm))
+				end
+				
+				if minetest.setting_getbool("mobf_animal_spawning_secondary") then
+					if mob.spawning.algorithm_secondary ~= nil and 
+						type(mobf_spawn_algorithms[mob.spawning.algorithm_secondary].register_spawn) == "function" then
+						mobf_spawn_algorithms[mob.spawning.algorithm_secondary].register_spawn(mob.modname..":"..mob.name,
+																	secondary_name,
+																	mob.spawning,
+																	environment_list[mob.generic.envid])
+					end
+				end
+			end
+		else
+			minetest.log(LOGLEVEL_ERROR,"MOBF: specified mob >" .. mob.name 
+				.. "< without environment!")
+		end
+	else
+		dbg_mobf.spawning_lvl3("MOBF: MOB spawning disabled!")
+	end
 end
 
 --include spawn algorithms

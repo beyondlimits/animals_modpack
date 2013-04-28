@@ -21,9 +21,10 @@
 
 --! @class mgen_follow
 --! @brief a movement generator trying to follow or reach a target
-mgen_follow = {}
 
 --!@}
+
+mgen_follow = {}
 
 --! @brief movement generator identifier
 --! @memberof mgen_follow
@@ -34,6 +35,7 @@ mgen_follow.name = "follow_mov_gen"
 --
 --! @brief check what situation we are
 --! @memberof mgen_follow
+--! @private
 --
 --! @param ownpos position of entity
 --! @param targetpos position of target
@@ -47,6 +49,9 @@ mgen_follow.name = "follow_mov_gen"
 --!          "unknown"
 -------------------------------------------------------------------------------
 function mgen_follow.identify_movement_state(ownpos,targetpos)
+	mobf_assert_backtrace(ownpos ~= nil)
+	mobf_assert_backtrace(targetpos ~= nil)
+	
 	local same_height_delta = 0.1
 	
 	local los = mobf_line_of_sight(ownpos,targetpos)
@@ -85,6 +90,7 @@ end
 --
 --! @brief handle teleportsupport
 --! @memberof mgen_follow
+--! @private
 --
 --! @param entity mob to check for teleport
 --! @param now current time
@@ -104,6 +110,26 @@ function mgen_follow.handleteleport(entity,now,targetpos)
 
 		if (entity.dynamic_data.movement.teleportsupport) and
 			time_since_next_to_target > entity.data.movement.teleportdelay then
+			
+			--check targetpos try to playe above if not valid
+			local maxoffset = 5
+			local current_offset = 0
+			while (not environment.possible_pos(entity,{
+												x=targetpos.x,
+												y=targetpos.y + current_offset,
+												z=targetpos.z
+												})) and
+				current_offset < maxoffset do
+				print("MOBF: teleport target within block trying above: " .. current_offset)
+				current_offset = current_offset +1
+			end
+			
+			targetpos.y = targetpos.y + current_offset
+			
+			--adjust to collisionbox of mob
+			if entity.collisionbox[2] < -0.5 then
+				targetpos.y = targetpos.y - (entity.collisionbox[2] + 0.49)
+			end
 
 			entity.object:setvelocity({x=0,y=0,z=0})
 			entity.object:setacceleration({x=0,y=0,z=0})
@@ -127,8 +153,6 @@ end
 function mgen_follow.callback(entity,now)
 
 	dbg_mobf.fmovement_lvl3("MOBF: Follow mgen callback called")
-	
-
 	
 	if entity == nil then
 		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: called movement gen without entity!")
@@ -190,16 +214,26 @@ function mgen_follow.callback(entity,now)
 		entity.dynamic_data.movement.guardspawnpoint then
 		dbg_mobf.fmovement_lvl3("MOBF:   Target available")
 		--calculate distance to target
-		local targetpos = entity.dynamic_data.spawning.spawnpoint
+		local targetpos = nil
 		
+		if entity.dynamic_data.movement.target ~= nil then
+			dbg_mobf.fmovement_lvl3("MOBF:   have moving target")
+			
+			if not mobf_is_pos(entity.dynamic_data.movement.target) then
+				targetpos = entity.dynamic_data.movement.target:getpos()
+			else
+				targetpos = entity.dynamic_data.movement.target
+			end
+		end
 		
-		if entity.dynamic_data.movement.guardspawnpoint ~= true then
-			dbg_mobf.fmovement_lvl3("MOBF:   moving target selected")
-			targetpos = entity.dynamic_data.movement.target:getpos()
+		if targetpos == nil and
+			entity.dynamic_data.movement.guardspawnpoint == true then
+			dbg_mobf.fmovement_lvl3("MOBF:   non target selected")
+			targetpos = entity.dynamic_data.spawning.spawnpoint	
 		end
 		
 		if targetpos == nil then
-			minetest.log(LOGLEVEL_ERROR,"MOBF: " .. entity.data.name 
+			mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: " .. entity.data.name 
 			.. " don't have targetpos " 
 			.. "SP: " .. dump(entity.dynamic_data.spawning.spawnpoint)
 			.. " TGT: " .. dump(entity.dynamic_data.movement.target))
@@ -229,9 +263,11 @@ function mgen_follow.callback(entity,now)
 		end
 		
 		--check if mob needs to move towards target
-		dbg_mobf.fmovement_lvl3("MOBF: max distance is set to : " .. max_distance)
+		dbg_mobf.fmovement_lvl3("MOBF: max distance is set to : " 
+									.. max_distance .. " dist: " .. distance)
 		if distance > max_distance then
-		
+			entity.dynamic_data.movement.was_moving_last_step = true
+			
 			if mgen_follow.handleteleport(entity,now,targetpos) then
 				return
 			end
@@ -266,7 +302,7 @@ function mgen_follow.callback(entity,now)
 				local predicted_pos = movement_generic.predict_next_block(basepos,current_velocity,accel_to_set)
 				local pos_state  = environment.pos_is_ok(predicted_pos,entity)
 				
-				if pos_state == "collision_jumpable" then			
+				if pos_state == "collision_jumpable" then
 					local pos_to_set = entity.object:getpos()
 					pos_to_set.y = pos_to_set.y + 1.1
 					entity.object:moveto(pos_to_set)
@@ -284,22 +320,24 @@ function mgen_follow.callback(entity,now)
 			end
 		--nothing to do
 		else
-			dbg_mobf.fmovement_lvl3("MOBF:   next to target")
-			entity.object:setvelocity({x=0,y=0,z=0})
-			entity.object:setacceleration({x=0,y=0,z=0})
-			entity.dynamic_data.movement.last_next_to_target = now
-			
-			
-			local dir = mobf_get_direction(basepos,targetpos)
-			--update mob orientation
-			if entity.mode == "3d" then
-				entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
-			else
-				entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
+			if entity.dynamic_data.movement.was_moving_last_step == true then
+				dbg_mobf.fmovement_lvl3("MOBF:   next to target")
+				entity.object:setvelocity({x=0,y=0,z=0})
+				entity.object:setacceleration({x=0,y=yaccel,z=0})
+				entity.dynamic_data.movement.last_next_to_target = now
+				
+				
+				local dir = mobf_get_direction(basepos,targetpos)
+				--update mob orientation
+				if entity.mode == "3d" then
+					entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
+				else
+					entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
+				end
 			end
 		end
 	
-	else	
+	else
 		--TODO evaluate if this is an error case	
 	end
 end
@@ -365,8 +403,8 @@ function mgen_follow.checkspeed(entity)
 
 	local current_velocity = entity.object:getvelocity()
 
-	local xzspeed = math.sqrt(math.pow(current_velocity.x,2)+
-	                          math.pow(current_velocity.z,2))
+	local xzspeed = 
+		mobf_calc_scalar_speed(current_velocity.x,current_velocity.z)
 
 	if (xzspeed > entity.data.movement.max_speed) then
 	
@@ -401,6 +439,19 @@ function mgen_follow.set_acceleration(entity,accel,speedup)
 								   z=accel.z*speedup})
 end
 
+-------------------------------------------------------------------------------
+-- name: set_target(entity,target)
+--
+--! @brief set target for movgen
+--! @memberof mgen_follow
+--
+--! @param entity mob to apply to
+--! @param target to set
+-------------------------------------------------------------------------------
+function mgen_follow.set_target(entity,target)
+	entity.dynamic_data.movement.target = target
+	return true
+end
 
 --register this movement generator
 registerMovementGen(mgen_follow.name,mgen_follow)

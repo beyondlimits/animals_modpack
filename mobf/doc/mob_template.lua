@@ -156,6 +156,12 @@ local mob_template = {
 		--! @brief [OPTIONAL] is mob sensitive to sun?
 		sun_sensitive=true,
 		
+		--! @brief [OPTIONAL] attacks hostile mobs
+		attack_hostile_mobs=false,
+		
+		--! @brief [UNUSED] attacks hostile mobs
+		--attack_friendly_mobs=false,
+		
 		--! @brief [OPTIONAL] configuration of meele attack				
 		melee = {
 			--! @brief [MANDATORY] maximum damage mob does per hit
@@ -171,7 +177,9 @@ local mob_template = {
 			attack="some_entity",
 			--! @brief [MANDATORY] distance to issue an attack
 			range=10,
-			--! @brief [MANDATORY] minimum time between two attacks			
+			--! @brief [OPTIONAL] minimum range of distance attack (should be > range of melee attack)
+			min_range = 3,
+			--! @brief [MANDATORY] minimum time between two attacks
 			speed=2,
 			},
 			
@@ -317,9 +325,6 @@ local mob_template = {
 				--! @brief [OPTIONAL] a animation to be played while this state is active
 				animation = "name",
 			},
-			{
-				
-			}
 		},
 	--! @brief [OPTIONAL] description of animations
 	animation = {
@@ -357,5 +362,37 @@ local mob_template = {
 						},
 				--! @brief [MANDATORY] list of names randomly choosen for trader
 				random_names = { "Name1","Name2","Name3"},
-			}
+			},
+	--! @brief [OPTIONAL] configuration for attention handling
+	attention = {
+				--! @brief [OPTIONAL] hear distance value
+				hear_distance = 3,
+				--! @brief [UPPER_VALUE_DEPENDENT | MANDATORY] value to add if within hear distance
+				hear_distance_value = 0.5,
+				
+				--! @brief [OPTIONAL] view angle to consider
+				view_angle = nil,
+				--! @brief [UPPER_VALUE_DEPENDENT | MANDATORY] value to add if someone is within view angke
+				own_view_value = 0,
+				
+				--! @brief [OPTIONAL] is remove view angle relevant?
+				remote_view = false,
+				--! @brief [UPPER_VALUE_DEPENDENT | MANDATORY] value to add if remote target looks at mob
+				remote_view_value = 0,
+				
+				--! @brief [OPTIONAL] value to add if within attention distance
+				attention_distance_value = 0.2,
+				
+				--! @brief [OPTIONAL] threshold to issue watch callback
+				watch_threshold = 2,
+				
+				--! @brief [OPTIONAL] threshold to issue attack callback
+				attack_threshold = nil,
+				
+				--! @brief [MANDATORY] maximum distance to consider objects for attantion
+				attention_distance = 7.5,
+				
+				--! @brief [MANDATORY] maximum amount of attention any object can draw
+				attention_max = 10,
+		},
 	} 

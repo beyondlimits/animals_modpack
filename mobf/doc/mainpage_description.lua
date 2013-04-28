@@ -9,12 +9,12 @@
 --! @brief just a doc page
 --! @copyright Sapier
 --! @author Sapier
---! @date 2013-01-27
+--! @date 2013-04-28
 
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
---! @mainpage Mob Framework Mod 2.0.x
+--! @mainpage Mob Framework Mod 2.1.x
 --! 
 --! This documentation uses doxygen created from lua code. As some of you 
 --! probably know doxygen doesn't support lua on it's own so some of the
@@ -44,3 +44,4 @@
 --! \li \b 2D MANDATORY parameter is required in case of 2D mob
 --! \li \b 3D MANDATORY parameter is required in case of 3D mob
 --! \li \b ALGORITHM \b DEPENDENT is required dependent on selected algorithm
+--! \li \b UPPER_VALUE_DEPENDENT if you specify upper value you need to specify this too

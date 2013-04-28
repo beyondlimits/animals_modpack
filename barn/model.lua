@@ -15,8 +15,8 @@ local textures_small_empty = {
 }
 
 local textures_small_filled = {
-	"barn_3d_bottom.png",
 	"barn_3d_small_top.png",
+	"barn_3d_bottom.png",
 	"barn_3d_bottom.png",
 }
 
@@ -31,8 +31,8 @@ local textures_empty = {
 }
 
 local textures_filled = {
-	"barn_3d_bottom.png",
 	"barn_3d_filled_top.png",
+	"barn_3d_bottom.png",
 	"barn_3d_filled_side.png",
 	"barn_3d_filled_side.png",
 	"barn_3d_filled_side.png",

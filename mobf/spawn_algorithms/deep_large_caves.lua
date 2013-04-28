@@ -131,7 +131,7 @@ function mobf_spawn_in_deep_large_caves_entity(mob_name,mob_transform,spawning_d
 			end
 			
 			if not good then
-				dbg_mobf.spawning_lvl2("MOBF: not spawning spawner for " .. self.spawner_mob_name .. " somehow got to bad place")
+				dbg_mobf.spawning_lvl2("MOBF: DLC not spawning for " .. self.spawner_mob_name .. " somehow got to bad place")
 				--TODO try to move spawner to better place
 				
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay

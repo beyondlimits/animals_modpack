@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_gull loading ...")
 
-local version = "0.0.11"
+local version = "0.0.14"
 
 local gull_groups = {
 						not_in_creative_inventory=1
@@ -32,7 +32,7 @@ gull_prototype = {
 					base_health=5,
 					kill_result="",
 					armor_groups= {
-						fleshy=3,
+						fleshy=85,
 					},
 					groups = gull_groups,
 					envid="flight_1",
@@ -46,12 +46,16 @@ gull_prototype = {
 					},
 		
 		spawning = {
-					rate=0.02,
-					density=250,
-					algorithm="in_air1_spawner",
-					height=-1,
-					respawndelay=60
-					},
+					primary_algorithms = {
+						{
+						rate=0.02,
+						density=250,
+						algorithm="in_air1_spawner",
+						height=-1,
+						respawndelay=60
+						},
+					}
+				},
 		animation = {
 				fly = {
 					start_frame = 0,

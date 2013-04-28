@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_clownfish mod loading ...")
 
-local version = "0.0.9"
+local version = "0.0.10"
 
 local selectionbox_clownfish = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
 
@@ -40,7 +40,7 @@ clownfish_prototype = {
 					base_health=5,
 					kill_result=clownfish_drop,
 					armor_groups= {
-						fleshy=3,
+						fleshy=90,
 					},
 					groups = clownfish_groups,
 					envid = "open_waters"
@@ -58,11 +58,15 @@ clownfish_prototype = {
 					consumed=true,
 					},
 		spawning = {
-					rate=0.02,
-					density=350,
-					algorithm="in_shallow_water_spawner",
-					height=-1,
-					respawndelay = 60,
+					primary_algorithms = {
+							{
+							rate=0.02,
+							density=350,
+							algorithm="in_shallow_water_spawner",
+							height=-1,
+							respawndelay = 60,
+							}
+						}
 					},
 		animation = {
 				swim = {

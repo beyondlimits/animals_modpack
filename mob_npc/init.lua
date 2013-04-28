@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_npc mod loading ...")
 
-local version = "0.0.9"
+local version = "0.0.13"
 local npc_groups = {
 						not_in_creative_inventory=1
 					}
@@ -33,7 +33,7 @@ npc_prototype = {
 					base_health=40,
 					kill_result="",
 					armor_groups= {
-						fleshy=3,
+						fleshy=90,
 					},
 					groups = npc_groups,
 					envid="on_ground_1",
@@ -48,11 +48,15 @@ npc_prototype = {
 					},
 		
 		spawning = {
-					rate=0,
-					density=0,
-					algorithm="none",
-					height=2
-					},
+					primary_algorithms = {
+						{
+						rate=0,
+						density=0,
+						algorithm="none",
+						height=2
+						},
+					}
+				},
 		states = {
 				{ 
 				name = "walking",
@@ -97,7 +101,7 @@ npc_trader_prototype = {
 					base_health=200,
 					kill_result="",
 					armor_groups= {
-						fleshy=3,
+						fleshy=60,
 					},
 					groups = npc_groups,
 					envid="on_ground_1",
@@ -113,11 +117,15 @@ npc_trader_prototype = {
 					},
 		
 		spawning = {
-					rate=0,
-					density=750,
-					algorithm="building_spawner",
-					height=2
-					},
+					primary_algorithms = {
+						{
+						rate=0,
+						density=750,
+						algorithm="building_spawner",
+						height=2
+						},
+					}
+				},
 		states = {
 				{ 
 				name = "default",
@@ -150,21 +158,37 @@ npc_trader_prototype = {
 					end_frame   = 79,
 					},
 			},
+		attention = {
+				hear_distance = 3,
+				hear_distance_value = 0.5,
+				view_angle = nil,
+				own_view_value = 0,
+				remote_view = false,
+				remote_view_value = 0,
+				attention_distance_value = 0.2,
+				watch_threshold = 2,
+				attack_threshold = nil,
+				attention_distance = 7.5,
+				attention_max = 10,
+		},
 		trader_inventory = {
 				goods = {
-							{ "default:mese 1", "default:dirt 99", "default:cobble 50"},
-							{ "default:steel_ingot 1", "default:mese_crystal 5", "default:cobble 20"},
-							{ "default:stone 5", "default:mese_crystal 1", "default:cobble 50"},
-							{ "default:furnace 1", "default:mese_crystal 3", nil},
+							{ "default:mese 1", "default:dirt 99", "default:cobble 60"},
+							{ "doors:door_wood 1", "default:mese_crystal 1", "default:cobble 10"},
+							{ "default:fence_wood 20", "default:mese_crystal 5", "default:cobble 25"},
+							{ "animalmaterials:saddle 1", "default:mese 1", "default:cobble 50"},
 							{ "default:sword_steel 1", "default:mese_crystal 4", "default:stone 20"},
 							{ "bucket:bucket_empty 1", "default:cobble 10", "default:stone 2"},
 							{ "default:pick_mese 1", "default:mese_crystal 12", "default:stone 60"},
 							{ "default:shovel_steel 1", "default:mese_crystal 2", "default:stone 10"},
 							{ "default:axe_steel 1", "default:mese_crystal 2", "default:stone 22"},
 							{ "default:torch 33", "default:mese_crystal 2", "default:stone 10"},
-							{ "default:ladder 12", "default:mese_crystal 1", "default:stone 5"},
+							{ "default:ladder 12", "default:mese 1", "default:cobble 50"},
 							{ "default:paper 12", "default:mese_crystal 2", "default:stone 10"},
-							{ "default:chest 1", "default:mese_crystal 2", "default:stone 10"},
+							{ "default:chest_locked 1", "default:mese_crystal 5", "default:cobble 25"},
+							{ "mob_archer:archer 1","default:mese_crystal 10",nil},
+							{ "mob_guard:guard 1","default:mese_crystal 10",nil},
+							{ "doors:door_steel 1","default:mese_crystal 3","default:cobble 20"},
 						},
 				random_names = { "Hans","Franz","Xaver","Fritz","Thomas","Martin"},
 			}

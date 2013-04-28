@@ -11,24 +11,26 @@
 --! @author Sapier
 --! @date 2013-01-02
 --
---! @defgroup Inventory inventory subcomponent
+--! @defgroup Inventory Inventory subcomponent
 --! @brief Component handling mob inventory
 --! @ingroup framework_int
 --! @{
+--
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
-
-
+--! @class mob_inventory
+--! @brief inventory handling for trader like mobs
+--! @}
 mob_inventory = {}
 mob_inventory.trader_inventories = {}
 mob_inventory.formspecs = {}
-
 
 -------------------------------------------------------------------------------
 -- name: allow_move(inv, from_list, from_index, to_list, to_index, count, player)
 --
 --! @brief check if there is enough at payroll
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv inventory reference
 --! @param from_list name of list elements taken 
@@ -52,7 +54,13 @@ function mob_inventory.allow_move(inv, from_list, from_index, to_list, to_index,
 		from_list == "identifier" then
 		return 0
 	end
-
+	
+	-- forbid moving of parts of stacks
+	local old_stack = inv.get_stack(inv, from_list, from_index)
+	if count ~= old_stack.get_count(old_stack) then
+		return 0;
+	end
+	
 	return count
 end
 
@@ -60,7 +68,8 @@ end
 -- name: allow_put(inv, listname, index, stack, player)
 --
 --! @brief check if there is enough at payroll
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv inventory reference
 --! @param listname name of list changed
@@ -85,7 +94,8 @@ end
 -- name: allow_take(inv, listname, index, stack, player)
 --
 --! @brief check if there is enough at payroll
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv inventory reference
 --! @param listname name of list changed
@@ -110,7 +120,8 @@ end
 -- name: on_move(inv, from_list, from_index, to_list, to_index, count, player)
 --
 --! @brief check if there is enough at payroll
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv inventory reference
 --! @param from_list name of list elements taken 
@@ -130,15 +141,31 @@ function mob_inventory.on_move(inv, from_list, from_index, to_list, to_index, co
 		
 		local moved = inv.get_stack(inv,to_list, to_index)
 		
+		local goodname = moved.get_name(moved)
 		local elements = moved.get_count(moved)
 		
-		--if elements > 1 then
-		--	moved = moved.take_item(moved,elements-1)
-		--	inv.set_stack(inv,from_list, from_index, moved)
-		--	inv.set_stack(inv,to_list, to_index, moved)
-		--else
-		--	inv.set_stack(inv,from_list, from_index, moved)
-		--end
+		
+		-- handle situations where diffrent amounts of the same good are offered-
+		dbg_mobf.trader_inv_lvl2("MOBF: moving " .. dump(elements) .."/"
+			.. dump(count) .. " from "
+			.. dump(from_list).. " to ".. dump(from_list )..
+			" at index "..dump(from_index ))
+
+		-- if it was the same type of good (and now contains a summed up number
+		-- of offerings) put the old stack back into the traders inv
+		if( elements > count ) then
+			dbg_mobf.trader_inv_lvl2(
+				"MOBF: ok, whe have to give back a stack of "
+				..tostring( elements - count ).." "..tostring( goodname )
+				..". target stack: "..tostring( from_index ))
+			-- remove the surplus parts
+			inv.set_stack(inv,"selection", 1,goodname.." "..tostring( count ))
+			-- the slot we took from is now free
+			inv.set_stack(inv,"goods",from_index, 
+				goodname.." "..tostring( elements - count ))
+			-- update the real amount of items in the slot now
+			elements = count
+		end
 		
 		local entity = mob_inventory.get_entity(inv)
 		
@@ -147,11 +174,10 @@ function mob_inventory.on_move(inv, from_list, from_index, to_list, to_index, co
 			return
 		end
 		
-		local goodname = moved.get_name(moved)
 		dbg_mobf.trader_inv_lvl1("MOBF: good selected: " .. goodname)
 		
 		--get element put to selection
-		mob_inventory.fill_prices(entity,inv,goodname,moved.get_count(moved))
+		mob_inventory.fill_prices(entity,inv,goodname,count)
 		mob_inventory.update_takeaway(inv)
 	end
 end
@@ -160,7 +186,8 @@ end
 -- name: on_put(inv, listname, index, stack, player)
 --
 --! @brief check if there is enough at payroll
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv inventory reference
 --! @param listname name of list changed
@@ -187,7 +214,8 @@ end
 -- name: on_take(inv, listname, index, stack, player)
 --
 --! @brief check if there is enough at payroll
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv inventory reference
 --! @param listname name of list changed
@@ -231,7 +259,8 @@ end
 -- name: update_takeaway(inv)
 --
 --! @brief update content of takeaway
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv to update
 -------------------------------------------------------------------------------
@@ -253,7 +282,8 @@ end
 -- name: check_pay(inv)
 --
 --! @brief check if there is enough at payroll
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv inventory to do check
 --! @param paynow true/false if it's called to pay or not
@@ -268,7 +298,8 @@ function mob_inventory.check_pay(inv,paynow)
 	local price1 = inv.get_stack(inv,"price_1", 1)
 	local price2 = inv.get_stack(inv,"price_2", 1)
 	
-	dbg_mobf.trader_inv_lvl1("MOBF: p1 " .. dump(price1) .. " " .. dump(price1:get_name()))
+	dbg_mobf.trader_inv_lvl1(
+		"MOBF: p1 " .. dump(price1) .. " " .. dump(price1:get_name()))
 	if price1:get_name() == name then
 		local price = price1:get_count()
 		if price > 0 and
@@ -287,7 +318,8 @@ function mob_inventory.check_pay(inv,paynow)
 		end
 	end
 		
-	dbg_mobf.trader_inv_lvl1("MOBF: p2 " .. dump(price1) .. " " .. dump(price2:get_name()))
+	dbg_mobf.trader_inv_lvl1(
+		"MOBF: p2 " .. dump(price1) .. " " .. dump(price2:get_name()))
 	if price2:get_name() == name then
 		local price = price2:get_count()
 		if price > 0 and
@@ -312,17 +344,22 @@ end
 -- name: init_detached_inventories(entity,now)
 --
 --! @brief initialize dynamic data required by harvesting
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @public
 --
 --! @param entity mob to initialize harvest dynamic data
 -------------------------------------------------------------------------------
 function mob_inventory.init_trader_inventory(entity)
 	--TODO find out why calling "tostring" is necessary?!
-	local tradername       = tostring(entity.data.trader_inventory.random_names[math.random(1,#entity.data.trader_inventory.random_names)])
-	dbg_mobf.trader_inv_lvl3("MOBF: randomly selected \"" .. tradername .. "\" as name")
+	local tradername       = tostring(
+		entity.data.trader_inventory.random_names[
+		math.random(1,#entity.data.trader_inventory.random_names)])
+	dbg_mobf.trader_inv_lvl3(
+		"MOBF: randomly selected \"" .. tradername .. "\" as name")
 	local unique_entity_id = string.gsub(tostring(entity),"table: ","")
 	--local unique_entity_id = "testinv"
-	local trader_inventory = minetest.create_detached_inventory(unique_entity_id,
+	local trader_inventory = 
+	minetest.create_detached_inventory(unique_entity_id,
 	{
 		allow_move 	= mob_inventory.allow_move,
 		allow_put 	= mob_inventory.allow_put,
@@ -348,7 +385,8 @@ function mob_inventory.init_trader_inventory(entity)
 										inv_ref 	= trader_inventory,
 										ent_ref 	= entity,
 										})
-	dbg_mobf.trader_inv_lvl3("MOBF: registering identifier: " .. unique_entity_id 
+	dbg_mobf.trader_inv_lvl3(
+		"MOBF: registering identifier: " .. unique_entity_id 
 		.. " invref \"" .. tostring(trader_inventory) .. "\"  for entity \"" 
 		.. tostring(entity) .. "\"" )
 
@@ -371,7 +409,8 @@ function mob_inventory.init_trader_inventory(entity)
 			"list[detached:" .. unique_entity_id .. ";takeaway;7,4.5;1,1;]" ..
 			"list[current_player;main;0,6;8,4;]"
 			
-	if mob_inventory.register_formspec("formspec_" .. unique_entity_id,trader_formspec) == false then
+	if mob_inventory.register_formspec("formspec_" 
+		.. unique_entity_id,trader_formspec) == false then
 		dbg_mobf.trader_inv_lvl1("MOBF: unable to create trader formspec")
 	end
 end
@@ -381,7 +420,8 @@ end
 -- name: config_check(entity)
 --
 --! @brief check if mob is configured as trader
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @public
 --
 --! @param entity mob being checked
 --! @return true/false if trader or not
@@ -398,7 +438,8 @@ end
 -- name: register_formspec(name,formspec)
 --
 --! @brief check if mob is configured as trader
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @publuc
 --
 --! @param name name of formspec to register
 --! @param formspec formspec definition
@@ -416,10 +457,11 @@ function mob_inventory.register_formspec(name,formspec)
 end
 
 -------------------------------------------------------------------------------
--- name: callback(entity,player,now)
+-- name: trader_callback(entity,player)
 --
---! @brief callback handler for harvest by player
---! @ingroup mob_inventory
+--! @brief callback handler for inventory by rightclick
+--! @memberof mob_inventory
+--! @public
 --
 --! @param entity mob being harvested
 --! @param player player harvesting
@@ -437,14 +479,19 @@ function mob_inventory.trader_callback(entity,player)
 												player:getpos())
 
 		if entity.mode == "3d" then
-			entity.object:setyaw(mobf_calc_yaw(direction.x,direction.z)-math.pi/2)
+			entity.object:setyaw(
+				mobf_calc_yaw(direction.x,direction.z))
 		else
-			entity.object:setyaw(mobf_calc_yaw(direction.x,direction.z)+math.pi/2)
+			entity.object:setyaw(
+				mobf_calc_yaw(direction.x,direction.z)+math.pi/2)
 		end
 	
+		attention.increase_attention_level(entity,player,10)
+
 		if minetest.show_formspec(playername,
 					"formspec_" .. unique_entity_id,
-					mob_inventory.formspecs["formspec_" .. unique_entity_id]) == false then
+					mob_inventory.formspecs["formspec_" .. unique_entity_id]) 
+					== false then
 			dbg_mobf.trader_inv_lvl1("MOBF: unable to show trader formspec")
 		end
 	end
@@ -454,21 +501,25 @@ end
 -- name: get_entity(inv)
 --
 --! @brief find entity linked to inventory
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv name of inventory
 -------------------------------------------------------------------------------
 function mob_inventory.get_entity(inv)
-	dbg_mobf.trader_inv_lvl3("MOBF: checking " .. #mob_inventory.trader_inventories 
+	dbg_mobf.trader_inv_lvl3("MOBF: checking " 
+		.. #mob_inventory.trader_inventories 
 		.. " registred inventorys")
 	
 	local location = inv.get_location(inv)
 	
 	if location.type == "detached" then
 		for i=1,#mob_inventory.trader_inventories,1 do
-			dbg_mobf.trader_inv_lvl3("MOBF: comparing \"" .. location.name .. "\" to \"" 
+			dbg_mobf.trader_inv_lvl3("MOBF: comparing \"" 
+				.. location.name .. "\" to \"" 
 				.. mob_inventory.trader_inventories[i].identifier .. "\"")
-			if mob_inventory.trader_inventories[i].identifier == location.name then
+			if mob_inventory.trader_inventories[i].identifier 
+				== location.name then
 				return mob_inventory.trader_inventories[i].ent_ref
 			end
 		end
@@ -481,7 +532,8 @@ end
 -- name: fill_prices(entity,inventory,goodname)
 --
 --! @brief fill price fields
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param entity to look for prices
 --! @param inventory to set prices
@@ -495,8 +547,8 @@ function mob_inventory.fill_prices(entity,inventory,goodname,count)
 	
 	for i=1,#entity.data.trader_inventory.goods,1 do
 		local stackstring = goodname .." " .. count
-		dbg_mobf.trader_inv_lvl3("MOBF: comparing \"" .. stackstring .. "\" to \"" 
-			.. entity.data.trader_inventory.goods[i][1] .. "\"")
+		dbg_mobf.trader_inv_lvl3("MOBF: comparing \"" .. stackstring .. "\"" ..
+			" to \"" .. entity.data.trader_inventory.goods[i][1] .. "\"")
 		if entity.data.trader_inventory.goods[i][1] == stackstring then
 			good = entity.data.trader_inventory.goods[i]
 		end
@@ -515,20 +567,21 @@ end
 -- name: add_goods(entity,trader_inventory)
 --
 --! @brief fill inventory with mobs goods
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param entity to look for prices
 --! @param trader_inventory to put goods
 -------------------------------------------------------------------------------
 function mob_inventory.add_goods(entity,trader_inventory)
-	dbg_mobf.trader_inv_lvl3("MOBF: adding " .. #entity.data.trader_inventory.goods 
+	dbg_mobf.trader_inv_lvl3("MOBF: adding " 
+		.. #entity.data.trader_inventory.goods 
 		.. " goods for trader")
 	for i=1,#entity.data.trader_inventory.goods,1 do
-		dbg_mobf.trader_inv_lvl3("MOBF:\tadding " .. entity.data.trader_inventory.goods[i][1])
-		trader_inventory.add_item(trader_inventory,"goods",
+		dbg_mobf.trader_inv_lvl3("MOBF:\tadding " .. 
+			entity.data.trader_inventory.goods[i][1])
+		trader_inventory.set_stack(trader_inventory,"goods", i,
 									entity.data.trader_inventory.goods[i][1])
 	end
 
 end
-
---!@}

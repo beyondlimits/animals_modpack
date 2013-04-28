@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_ostrich mod loading ...")
-local version = "0.0.3"
+local version = "0.0.6"
 
 local ostrich_groups = {
 						not_in_creative_inventory=1
@@ -44,7 +44,7 @@ ostrich_f_prototype = {
 					base_health=10,
 					kill_result=ostrich_drop,
 					armor_groups= {
-						fleshy=3,
+						fleshy=90,
 					},
 					groups = ostrich_groups,
 					envid = "meadow"
@@ -62,16 +62,20 @@ ostrich_f_prototype = {
 					consumed=true,
 					},
 		random_drop = {
- 					result="animalmaterials:big_egg",
+ 					result="animalmaterials:egg_big",
  					min_delay=300,
  					chance=0.1
  					},
 		spawning = {
-					rate=0.001,
-					density=500,
-					algorithm="willow_mapgen",
-					height=2
-					},
+					primary_algorithms = {
+						{
+						rate=0.001,
+						density=600,
+						algorithm="willow_mapgen",
+						height=2
+						},
+					}
+				},
 		ride = {
 					walkspeed  = 7.8,
 					sneakspeed = 0.8,
@@ -124,7 +128,7 @@ ostrich_m_prototype = {
 					base_health=11,
 					kill_result=ostrich_drop,
 					armor_groups= {
-						fleshy=3,
+						fleshy=90,
 					},
 					groups = ostrich_groups,
 					envid = "meadow"
@@ -142,11 +146,15 @@ ostrich_m_prototype = {
 					consumed=true,
 					},
 		spawning = {
-					rate=0.001,
-					density=500,
-					algorithm="willow_mapgen",
-					height=2
-			},
+					primary_algorithms = {
+						{
+						rate=0.001,
+						density=600,
+						algorithm="willow_mapgen",
+						height=2
+						}
+					}
+				},
 		ride = {
 					walkspeed  = 8,
 					sneakspeed = 1,
@@ -154,7 +162,7 @@ ostrich_m_prototype = {
 					attacheoffset = { x=0,y=2,z=0},
 					texturemod = "^mob_ostrich_ostrich_saddle_mesh.png",
 					walk_anim = "walk"
-			},
+				},
 		animation = {
 				walk = {
 					start_frame = 41,

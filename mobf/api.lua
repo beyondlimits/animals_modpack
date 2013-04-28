@@ -93,46 +93,11 @@ function mobf_add_mob(mob)
 	if mobf_rtd.movement_patterns[mob.movement.pattern] == nil then
 		minetest.log(LOGLEVEL_WARNING,"MOBF: no movement pattern specified!")
 	end
+	
+	
+	spawning.register_mob(mob)
 
-	--spawn mechanism handling
-	if not minetest.setting_getbool("mobf_disable_animal_spawning") then
-		--register spawn callback to world
-		if environment_list[mob.generic.envid] ~= nil then
-			local secondary_name = ""		
-			if mob.harvest ~= nil then
-				secondary_name = mob.harvest.transforms_to
-			end
-			
-			dbg_mobf.mobf_core_lvl3("MOBGF: Environment to use: " .. tostring(mob.generic.envid))
-			
-			if mobf_spawn_algorithms[mob.spawning.algorithm] ~= nil and
-				type(mobf_spawn_algorithms[mob.spawning.algorithm].register_spawn) == "function" then
-				mobf_spawn_algorithms[mob.spawning.algorithm].register_spawn(mob.modname..":"..mob.name,
-																	secondary_name,
-																	mob.spawning,
-																	environment_list[mob.generic.envid])
-			else
-				dbg_mobf.mobf_core_lvl2("MOBGF: " .. mob.name 
-					.. " no primary spawn algorithm defined: " 
-					.. tostring(mob.spawning.algorithm))
-			end
-			
-			if minetest.setting_getbool("mobf_animal_spawning_secondary") then
-				if mob.spawning.algorithm_secondary ~= nil and 
-					type(mobf_spawn_algorithms[mob.spawning.algorithm_secondary].register_spawn) == "function" then
-					mobf_spawn_algorithms[mob.spawning.algorithm_secondary].register_spawn(mob.modname..":"..mob.name,
-																secondary_name,
-																mob.spawning,
-																environment_list[mob.generic.envid])
-				end
-			end
-		else
-			minetest.log(LOGLEVEL_ERROR,"MOBF: specified mob >" .. mob.name 
-				.. "< without environment!")
-		end
-	else
-		dbg_mobf.mobf_core_lvl3("MOBF: MOB spawning disabled!")
-	end
+	
 
 	--register mob name to internal data structures
 	table.insert(mobf_rtd.registred_mob,mob.modname.. ":"..mob.name)

@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_creeper mod loading ...")
 
-local version = "0.0.15"
+local version = "0.0.19"
 
 local creeper_groups = {
 						not_in_creative_inventory=1
@@ -32,7 +32,8 @@ creeper_prototype = {
 					base_health=3,
 					kill_result="",
 					armor_groups= {
-						cracky=3,
+						monster=90,
+						fleshy=45
 					},
 					groups = creeper_groups,
 					envid="on_ground_1",
@@ -64,12 +65,16 @@ creeper_prototype = {
 					},
 		
 		spawning = {
-					rate=0.02,
-					density=500,
-					algorithm="at_night_spawner",
-					height=2,
-					respawndelay=60,
-					},
+					primary_algorithms = {
+						{
+						rate=0.02,
+						density=500,
+						algorithm="at_night_spawner",
+						height=2,
+						respawndelay=60,
+						},
+					}
+				},
 		sound = {
 					random = {
 								name="animal_creeper_random_1",
@@ -105,6 +110,21 @@ creeper_prototype = {
 				},
 			}
 		}
+		
+		--compatibility code
+minetest.register_entity("animal_creeper:creeper_spawner",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
+	
+		local pos = self.object:getpos();
+		minetest.env:add_entity(pos,"animal_creeper:creeper_spawner_at_night")
+		self.object:remove()
+	end,
+})
 
 --register with animals mod
 minetest.log("action","\tadding mob "..creeper_prototype.name)

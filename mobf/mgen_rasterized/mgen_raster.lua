@@ -21,9 +21,8 @@
 
 --! @class mgen_raster
 --! @brief a movement generator creating a rasterized probabilistic movement
-mgen_raster = {}
-
 --!@}
+mgen_raster = {}
 
 --! @brief movement generator identifier
 --! @memberof mgen_follow
@@ -190,6 +189,20 @@ function mgen_raster.onground(entity,now,basepos)
 	end
 	end
 
+end
+
+-------------------------------------------------------------------------------
+-- name: set_target(entity,target)
+--
+--! @brief set target for movgen
+--! @memberof mgen_raster
+--! @private
+--
+--! @param entity mob to apply to
+--! @param target to set
+-------------------------------------------------------------------------------
+function mgen_raster.set_target(entity,target)
+	return false
 end
 
 --register this movement generator

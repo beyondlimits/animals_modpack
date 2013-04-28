@@ -62,6 +62,14 @@ function harvesting.callback(entity,player,now)
 	--handle catching of mob
 	if entity.data.catching ~= nil and
 		entity.data.catching.tool ~= "" then
+		
+		--grief protection
+		if minetest.setting_getbool("mobf_grief_protection") and
+			entity.dynamic_data.spawning.player_spawned and
+			entity.dynamic_data.spawning.spawner ~= player:get_player_name() then
+			dbg_mobf.harvesting_lvl1("MOBF: anti gief triggered catching aborted")
+			return true
+		end
 
 		-- what's wielded by player
 		local tool = player:get_wielded_item()
@@ -87,6 +95,9 @@ function harvesting.callback(entity,player,now)
 						return true
 					end
 			end
+			
+			--TODO check if player has enough room
+			
 			if entity.data.generic.addoncatch ~= nil then
 				player:get_inventory():add_item("main", 
 					entity.data.generic.addoncatch.." 1")
@@ -160,6 +171,7 @@ function harvesting.callback(entity,player,now)
 		if entity.data.harvest.min_delay < 0 or
 			entity.dynamic_data.harvesting.ts_last + entity.data.harvest.min_delay < now then
 		
+			--TODO check if player has enough room
 			player:get_inventory():add_item("main", entity.data.harvest.result.." 1")
 
 			--check if tool is consumed by action
