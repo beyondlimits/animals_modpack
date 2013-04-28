@@ -32,13 +32,13 @@ function mobf_init_weapons()
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_do_area_damage(pos,immune,damage,range) 
+-- name: mobf_do_area_damage(pos,immune,damage_groups,range) 
 --
 --! @brief damage all objects within a certain range
 --
 --! @param pos cennter of damage area
 --! @param immune object immune to damage
---! @param damage damage to be done
+--! @param damage_groups list of damage groups to do damage to
 --! @param range range around pos
 -------------------------------------------------------------------------------
 function mobf_do_area_damage(pos,immune,damage_groups,range)
@@ -338,37 +338,9 @@ function MOBF_PLASMABALL_ENTITY.on_step(self, dtime)
 	end
 end
 
---------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Code Below is by far extent taken from throwing mod by PilzAdam
---------------------------------------------------------------------------------
-
-minetest.register_node("mobf:arrow_box", {
-	drawtype = "nodebox",
-	node_box = {
-		type = "fixed",
-		fixed = {
-			-- Shaft
-			{-6.5/17, -1.5/17, -1.5/17, 6.5/17, 1.5/17, 1.5/17},
-			--Spitze
-			{-4.5/17, 2.5/17, 2.5/17, -3.5/17, -2.5/17, -2.5/17},
-			{-8.5/17, 0.5/17, 0.5/17, -6.5/17, -0.5/17, -0.5/17},
-			--Federn
-			{6.5/17, 1.5/17, 1.5/17, 7.5/17, 2.5/17, 2.5/17},
-			{7.5/17, -2.5/17, 2.5/17, 6.5/17, -1.5/17, 1.5/17},
-			{7.5/17, 2.5/17, -2.5/17, 6.5/17, 1.5/17, -1.5/17},
-			{6.5/17, -1.5/17, -1.5/17, 7.5/17, -2.5/17, -2.5/17},
-			
-			{7.5/17, 2.5/17, 2.5/17, 8.5/17, 3.5/17, 3.5/17},
-			{8.5/17, -3.5/17, 3.5/17, 7.5/17, -2.5/17, 2.5/17},
-			{8.5/17, 3.5/17, -3.5/17, 7.5/17, 2.5/17, -2.5/17},
-			{7.5/17, -2.5/17, -2.5/17, 8.5/17, -3.5/17, -3.5/17},
-		}
-	},
-	tiles = {"mobf_arrow.png", "mobf_arrow.png", "mobf_arrow_back.png",
-			"mobf_arrow_front.png", "mobf_arrow_2.png", "mobf_arrow.png"},
-	groups = {not_in_creative_inventory=1},
-})
-
+-- -----------------------------------------------------------------------------
 
 --! @class MOBF_ARROW_ENTITY
 --! @ingroup weapons
@@ -389,7 +361,6 @@ MOBF_ARROW_ENTITY={
 					},
 	gravity  =9.81,
 }
-
 
 -------------------------------------------------------------------------------
 -- name: MOBF_ARROW_ENTITY.on_step = function(self, dtime)
@@ -438,6 +409,35 @@ MOBF_ARROW_ENTITY.on_step = function(self, dtime)
 	end
 	self.lastpos={x=pos.x, y=pos.y, z=pos.z}
 end
+
+
+-- moved due to doxygen problems
+minetest.register_node("mobf:arrow_box", {
+	drawtype = "nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			-- Shaft
+			{-6.5/17, -1.5/17, -1.5/17, 6.5/17, 1.5/17, 1.5/17},
+			--Spitze
+			{-4.5/17, 2.5/17, 2.5/17, -3.5/17, -2.5/17, -2.5/17},
+			{-8.5/17, 0.5/17, 0.5/17, -6.5/17, -0.5/17, -0.5/17},
+			--Federn
+			{6.5/17, 1.5/17, 1.5/17, 7.5/17, 2.5/17, 2.5/17},
+			{7.5/17, -2.5/17, 2.5/17, 6.5/17, -1.5/17, 1.5/17},
+			{7.5/17, 2.5/17, -2.5/17, 6.5/17, 1.5/17, -1.5/17},
+			{6.5/17, -1.5/17, -1.5/17, 7.5/17, -2.5/17, -2.5/17},
+			
+			{7.5/17, 2.5/17, 2.5/17, 8.5/17, 3.5/17, 3.5/17},
+			{8.5/17, -3.5/17, 3.5/17, 7.5/17, -2.5/17, 2.5/17},
+			{8.5/17, 3.5/17, -3.5/17, 7.5/17, 2.5/17, -2.5/17},
+			{7.5/17, -2.5/17, -2.5/17, 8.5/17, -3.5/17, -3.5/17},
+		}
+	},
+	tiles = {"mobf_arrow.png", "mobf_arrow.png", "mobf_arrow_back.png",
+			"mobf_arrow_front.png", "mobf_arrow_2.png", "mobf_arrow.png"},
+	groups = {not_in_creative_inventory=1},
+})
 	
 local mods = minetest.get_modnames()
 if mobf_contains(mods,"throwing") then

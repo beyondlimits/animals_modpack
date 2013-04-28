@@ -19,6 +19,9 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+--! @class mobf
+--! @brief basic management component of mob functions
+--!@}
 
 mobf = {}
 
@@ -31,7 +34,8 @@ mobf.on_rightclick_callbacks = {}
 -- name: register_on_step_callback(callback)
 --
 --! @brief make a new on_step callback known to mobf
---! @ingroup mobf
+--! @memberof mobf
+--! @public
 --
 --! @param callback to make known to mobf
 -------------------------------------------------------------------------------
@@ -55,7 +59,8 @@ end
 -- name: init_on_step_callbacks(entity,now)
 --
 --! @brief initalize callbacks to be used on step
---! @ingroup mobf
+--! @memberof mobf
+--! @private
 --
 --! @param entity entity to initialize on_step handler
 --! @param now current time
@@ -99,7 +104,8 @@ end
 -- name: register_on_rightclick_callback(callback)
 --
 --! @brief make a new on_rightclick callback known to mobf
---! @ingroup mobf
+--! @memberof mobf
+--! @public
 --
 --! @param callback to make known to mobf
 -------------------------------------------------------------------------------
@@ -123,7 +129,8 @@ end
 -- name: register_on_punch_callback(callback)
 --
 --! @brief make a new on_punch callback known to mobf
---! @ingroup mobf
+--! @memberof mobf
+--! @public
 --
 --! @param callback the callback to register in mobf
 -------------------------------------------------------------------------------
@@ -146,7 +153,8 @@ end
 -- name: init_on_punch_callbacks(entity,now)
 --
 --! @brief initalize callbacks to be used on punch
---! @ingroup mobf
+--! @memberof mobf
+--! @private
 --
 --! @param entity entity to initialize on_punch handler
 --! @param now current time
@@ -185,7 +193,8 @@ end
 -- name: init_on_rightclick_callbacks(entity,now)
 --
 --! @brief initalize callbacks to be used on punch
---! @ingroup mobf
+--! @memberof mobf
+--! @private
 --
 --! @param entity entity to initialize on_punch handler
 --! @param now current time
@@ -224,7 +233,8 @@ end
 -- name: get_basepos(entity)
 --
 --! @brief get basepos for an entity
---! @ingroup mobf
+--! @memberof mobf
+--! @public
 --
 --! @param entity entity to fetch basepos
 --! @return basepos of mob
@@ -255,7 +265,8 @@ end
 -- name: mobf_activate_handler(self,staticdata)
 --
 --! @brief hanlder called for basic mob initialization
---! @ingroup mobf
+--! @memberof mobf
+--! @private
 --
 --! @param self entity to initialize onstep handler
 --! @param staticdata data to use for initialization
@@ -425,7 +436,8 @@ end
 -- name: register_entity(entityname,graphics)
 --
 --! @brief register an entity
---! @ingroup mobf
+--! @memberof mobf
+--! @private
 --
 --! @param name of entity to add
 --! @param graphics graphics to use for entity
@@ -604,7 +616,8 @@ end
 -- name: rightclick_handler(entity,clicker)
 --
 --! @brief handle rightclick of mob
---! @ingroup mobf
+--! @memberof mobf
+--! @private
 --
 --! @param entity
 --! @param clicker
@@ -667,13 +680,15 @@ function mobf.rightclick_handler(entity,clicker)
 end
 
 -------------------------------------------------------------------------------
--- name: rightclick_button_handler(entity,clicker)
+-- name: rightclick_button_handler(player,formname,fields)
 --
 --! @brief handle button clicks as result of rightclick of mob
---! @ingroup mobf
+--! @memberof mobf
+--! @private
 --
---! @param entity
---! @param clicker
+--! @param player issuer of rightclick
+--! @param formname name of form that has been clicked
+--! @param fields fields passed to form
 --
 --! @return true/false if handled or not
 -------------------------------------------------------------------------------
@@ -713,7 +728,8 @@ end
 -- name: register_mob_item(mob)
 --
 --! @brief add mob item for catchable mobs
---! @ingroup mobf
+--! @memberof mobf
+--! @private
 --
 --! @param name name of mob
 --! @param modname name of mod mob is defined in
@@ -758,7 +774,8 @@ end
 -- name: blacklist_handling(mob)
 --
 --! @brief add mob item for catchable mobs
---! @ingroup mobf
+--! @memberof mobf
+--! @public
 --
 --! @param mob
 -------------------------------------------------------------------------------
@@ -805,6 +822,7 @@ function mobf.blacklisthandling(mob)
 				on_activate = on_activate_fct
 			})
 		
+		--TODO move to mob_state
 		if mob.states ~= nil then
 			for s = 1, #mob.states , 1 do
 				minetest.register_entity(":".. mob_state.get_entity_name(mob,mob.states[s]),

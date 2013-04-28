@@ -11,23 +11,26 @@
 --! @author Sapier
 --! @date 2013-01-02
 --
---! @defgroup Inventory inventory subcomponent
+--! @defgroup Inventory Inventory subcomponent
 --! @brief Component handling mob inventory
 --! @ingroup framework_int
 --! @{
+--
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
-
+--! @class mob_inventory
+--! @brief inventory handling for trader like mobs
+--! @}
 mob_inventory = {}
 mob_inventory.trader_inventories = {}
 mob_inventory.formspecs = {}
-
 
 -------------------------------------------------------------------------------
 -- name: allow_move(inv, from_list, from_index, to_list, to_index, count, player)
 --
 --! @brief check if there is enough at payroll
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv inventory reference
 --! @param from_list name of list elements taken 
@@ -39,8 +42,7 @@ mob_inventory.formspecs = {}
 --
 --! @return number of elements allowed to move
 -------------------------------------------------------------------------------
-function mob_inventory.allow_move(inv, from_list, from_index, to_list, 
-									to_index, count, player)
+function mob_inventory.allow_move(inv, from_list, from_index, to_list, to_index, count, player)
 
 	dbg_mobf.trader_inv_lvl1("MOBF: move inv: " .. tostring(inv) .. " from:"
 		.. dump(from_list) .. " to: " .. dump(to_list))
@@ -66,7 +68,8 @@ end
 -- name: allow_put(inv, listname, index, stack, player)
 --
 --! @brief check if there is enough at payroll
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv inventory reference
 --! @param listname name of list changed
@@ -91,7 +94,8 @@ end
 -- name: allow_take(inv, listname, index, stack, player)
 --
 --! @brief check if there is enough at payroll
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv inventory reference
 --! @param listname name of list changed
@@ -116,7 +120,8 @@ end
 -- name: on_move(inv, from_list, from_index, to_list, to_index, count, player)
 --
 --! @brief check if there is enough at payroll
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv inventory reference
 --! @param from_list name of list elements taken 
@@ -126,8 +131,7 @@ end
 --! @param count number of elements moved
 --! @param player doing changes
 -------------------------------------------------------------------------------
-function mob_inventory.on_move(inv, from_list, from_index, to_list, 
-								to_index, count, player)
+function mob_inventory.on_move(inv, from_list, from_index, to_list, to_index, count, player)
 	dbg_mobf.trader_inv_lvl1("MOBF: inv\"" .. tostring(inv) .. "\" moving " 
 		.. count .. " items from: " .. from_list .. ":" .. from_index .. " to: "
 		.. to_list .. ":" .. to_index)
@@ -182,7 +186,8 @@ end
 -- name: on_put(inv, listname, index, stack, player)
 --
 --! @brief check if there is enough at payroll
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv inventory reference
 --! @param listname name of list changed
@@ -209,7 +214,8 @@ end
 -- name: on_take(inv, listname, index, stack, player)
 --
 --! @brief check if there is enough at payroll
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv inventory reference
 --! @param listname name of list changed
@@ -253,7 +259,8 @@ end
 -- name: update_takeaway(inv)
 --
 --! @brief update content of takeaway
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv to update
 -------------------------------------------------------------------------------
@@ -275,7 +282,8 @@ end
 -- name: check_pay(inv)
 --
 --! @brief check if there is enough at payroll
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv inventory to do check
 --! @param paynow true/false if it's called to pay or not
@@ -336,7 +344,8 @@ end
 -- name: init_detached_inventories(entity,now)
 --
 --! @brief initialize dynamic data required by harvesting
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @public
 --
 --! @param entity mob to initialize harvest dynamic data
 -------------------------------------------------------------------------------
@@ -411,7 +420,8 @@ end
 -- name: config_check(entity)
 --
 --! @brief check if mob is configured as trader
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @public
 --
 --! @param entity mob being checked
 --! @return true/false if trader or not
@@ -428,7 +438,8 @@ end
 -- name: register_formspec(name,formspec)
 --
 --! @brief check if mob is configured as trader
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @publuc
 --
 --! @param name name of formspec to register
 --! @param formspec formspec definition
@@ -449,7 +460,8 @@ end
 -- name: trader_callback(entity,player)
 --
 --! @brief callback handler for inventory by rightclick
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @public
 --
 --! @param entity mob being harvested
 --! @param player player harvesting
@@ -489,7 +501,8 @@ end
 -- name: get_entity(inv)
 --
 --! @brief find entity linked to inventory
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param inv name of inventory
 -------------------------------------------------------------------------------
@@ -519,7 +532,8 @@ end
 -- name: fill_prices(entity,inventory,goodname)
 --
 --! @brief fill price fields
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param entity to look for prices
 --! @param inventory to set prices
@@ -553,7 +567,8 @@ end
 -- name: add_goods(entity,trader_inventory)
 --
 --! @brief fill inventory with mobs goods
---! @ingroup mob_inventory
+--! @memberof mob_inventory
+--! @private
 --
 --! @param entity to look for prices
 --! @param trader_inventory to put goods
@@ -570,5 +585,3 @@ function mob_inventory.add_goods(entity,trader_inventory)
 	end
 
 end
-
---!@}

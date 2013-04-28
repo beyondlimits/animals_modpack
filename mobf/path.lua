@@ -241,7 +241,11 @@ end
 --! @brief handle button click in mobf_path menu
 --! @ingroup mobf_path
 --
---! @param pathnames names of paths
+--! @param player player issuing click
+--! @param formname name of form beeing clicked
+--! @param fields data submitted to form
+--
+--! @return true/false event has been handled by this handler
 -------------------------------------------------------------------------------
 function mobf_path.button_handler(player, formname, fields)
 	local playername = player:get_player_name()
@@ -371,15 +375,15 @@ function mobf_path.button_handler(player, formname, fields)
 end
 
 -------------------------------------------------------------------------------
--- name: make_button_name(buttonid,data)
+-- name: get_pathlist(playername,isadmin)
 --
---! @brief create a button name
+--! @brief get a list of paths for a specific player
 --! @ingroup mobf_path
 --
---! @param buttonid id to use for this button
---! @param data information to add to this button
+--! @param playername name of player to get paths
+--! @param isadmin does this player have admin rights?
 --
---! @return string containing data
+--! @return list of paths
 -------------------------------------------------------------------------------
 function mobf_path.get_pathlist(playername,isadmin)
 	local retval = {}
@@ -412,21 +416,22 @@ function mobf_path.get_pathlist(playername,isadmin)
 	return retval
 end
 -------------------------------------------------------------------------------
--- name: make_button_name(buttonid,data)
+-- name: point_labels(playername,pathname)
 --
---! @brief create a button name
+--! @brief create a gui point gui element
 --! @ingroup mobf_path
 --
---! @param buttonid id to use for this button
---! @param data information to add to this button
+--! @param playername name of player to create path for
+--! @param pathname name of path to prepare point gui list
 --
---! @return string containing data
+--! @return string containing gui point list description
 -------------------------------------------------------------------------------
 function mobf_path.point_labels(playername,pathname)
 	local retval = ""
 	local current_y = 2.15
 	local current_x = 6
 	
+	--TODO don't need to path playername here!
 	for i,v in ipairs(mobf_rtd.path_data.users[playername].paths[pathname].points) do
 	
 		if i == 21 then 
@@ -455,7 +460,6 @@ end
 --! @ingroup mobf_path
 --
 --! @param paths paths to add
---! @param ystart start of buttons
 --! @param startindex index in paths to start
 --! @param playername name of player
 --! @param data information to add to button
@@ -507,13 +511,13 @@ function mobf_path.path_buttons(paths,startindex, playername,data,isadmin)
 end
 
 -------------------------------------------------------------------------------
--- name: show_manage_menu(playername)
+-- name: show_manage_menu(playername,data)
 --
 --! @brief show management menu for paths
 --! @ingroup mobf_path
 --
 --! @param playername name of player
---! @param fields fields given
+--! @param data current menu data prepared by previous functions
 -------------------------------------------------------------------------------
 function mobf_path.show_manage_menu(playername,data)
 
@@ -734,7 +738,8 @@ end
 --! @ingroup mobf_path
 --
 --! @param entity mob being switched
---! @param points points to use for patroling
+--! @param pathowner owner of path to switch to
+--! @param pathname path to switch to
 -------------------------------------------------------------------------------
 function mobf_path.switch_patrol(entity,pathowner,pathname)
 	if pathowner ~= nil and
@@ -778,8 +783,8 @@ end
 --! @brief get a path by owner and name
 --! @ingroup mobf_path
 --
---! @param owner of path
---! @param name of path
+--! @param pathowner player owning the path
+--! @param pathname name of path
 --! @return list of points
 -------------------------------------------------------------------------------
 function mobf_path.getpoints(pathowner,pathname)

@@ -21,9 +21,10 @@
 
 --! @class mgen_follow
 --! @brief a movement generator trying to follow or reach a target
-mgen_follow = {}
 
 --!@}
+
+mgen_follow = {}
 
 --! @brief movement generator identifier
 --! @memberof mgen_follow
@@ -34,6 +35,7 @@ mgen_follow.name = "follow_mov_gen"
 --
 --! @brief check what situation we are
 --! @memberof mgen_follow
+--! @private
 --
 --! @param ownpos position of entity
 --! @param targetpos position of target
@@ -88,6 +90,7 @@ end
 --
 --! @brief handle teleportsupport
 --! @memberof mgen_follow
+--! @private
 --
 --! @param entity mob to check for teleport
 --! @param now current time
@@ -441,7 +444,6 @@ end
 --
 --! @brief set target for movgen
 --! @memberof mgen_follow
---! @private
 --
 --! @param entity mob to apply to
 --! @param target to set

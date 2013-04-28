@@ -107,13 +107,13 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: hit(entity,player)
+-- name: hit(entity,attacker)
 --
 --! @brief handler for mob beeing hit
 --! @memberof fighting
 --
 --! @param entity mob being hit
---! @param player player/object hitting the mob
+--! @param attacker player/object hitting the mob
 -------------------------------------------------------------------------------
 function fighting.hit(entity,attacker)
 	mobf_assert_backtrace(entity ~= nil)
@@ -466,6 +466,9 @@ end
 --
 --! @param entity mob to do action
 --! @param now current time
+--! @param dtime time fraction since last call
+--
+--! @return continue callback execution or not
 -------------------------------------------------------------------------------
 function fighting.combat(entity,now,dtime)
 	
@@ -1109,7 +1112,7 @@ end
 --
 --! @brief decide if only switching target or state
 --! @memberof fighting
---! @private
+--! @public
 --
 --! @param entity entity to update
 --! @param target to set

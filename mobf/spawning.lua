@@ -734,7 +734,9 @@ end
 --! @brief get minimum density for this mob
 --! @memberof spawning
 --
---! @param mob entity
+--! @param entity the mob itself
+--
+--! @return minimum density over all spawners defined for this mob
 -------------------------------------------------------------------------------
 function spawning.get_min_density(entity)
 	if type(entity.data.spawning.primary_algorithms) == "table" then

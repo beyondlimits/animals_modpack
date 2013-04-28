@@ -20,9 +20,10 @@
 
 --! @class random_drop
 --! @brief random drop features e.g lay eggs
+--!@}
 random_drop = {}
 
---!@}
+
 
 -------------------------------------------------------------------------------
 -- name: callback(entity)

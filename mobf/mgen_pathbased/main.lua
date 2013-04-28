@@ -6,12 +6,12 @@
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file path_based_movement_gen.lua
---! @brief component containing a path based movement generator (NOT COMPLETED)
+--! @brief component containing a path based movement generator
 --! @copyright Sapier
 --! @author Sapier
 --! @date 2012-08-09
 --
---! @defgroup mgen_path_based MGEN: Path based movement generator (NOT COMPLETED)
+--! @defgroup mgen_path_based MGEN: Path based movement generator
 --! @ingroup framework_int
 --! @{ 
 -- Contact sapier a t gmx net
@@ -19,9 +19,10 @@
 
 --! @class p_mov_gen
 --! @brief a movement generator evaluating a path to a target and following it
+--!@}
 p_mov_gen = {}
 
---!@}
+
 
 --! @brief movement generator identifier
 --! @memberof p_mov_gen
@@ -124,8 +125,10 @@ end
 --
 --! @brief get distance to next target point (2d only)
 --! @memberof p_mov_gen
+--! @private
 --
---! @param entity to check
+--! @param entity mob to check
+--! @param current_pos position mob is atm
 -- 
 --! @retval distance
 -------------------------------------------------------------------------------
@@ -145,6 +148,7 @@ end
 --
 --! @param entity to initialize
 --! @param now current time
+--! @param restored_data data restored on activate
 -------------------------------------------------------------------------------
 function p_mov_gen.init_dynamic_data(entity,now,restored_data)
 
@@ -191,8 +195,8 @@ end
 -- name: set_target(entity,target)
 --
 --! @brief set target for movgen
---! @memberof mgen_follow
---! @private
+--! @memberof p_mov_gen
+--! @public
 --
 --! @param entity mob to apply to
 --! @param target to set

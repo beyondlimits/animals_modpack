@@ -44,7 +44,7 @@ end
 --! @brief make a text fixed length
 --
 --! @param text text to enforce lenght
---! @param lenght lenght to enforce
+--! @param length lenght to enforce
 --!
 --! @return text with exactly lenght characters
 -------------------------------------------------------------------------------

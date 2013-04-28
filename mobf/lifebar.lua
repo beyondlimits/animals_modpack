@@ -14,21 +14,21 @@
 --! @defgroup mobf_lifebar
 --! @brief lifebar implements a visible lifebar showing health of a mob abov
 --!        its head
---
---
--- Contact sapier a t gmx net
+--! @ingroup framework_int
+--! @{
+-- Contact: sapier a t gmx net
 -------------------------------------------------------------------------------
-
-
+--! @class mobf_lifebar
+--! @brief a simple lifebar implementation
+--!@}
 
 mobf_lifebar = {}
-
 
 -------------------------------------------------------------------------------
 -- name: init()
 --
 --! @brief register lifebar entity
---! @ingroup mobf_lifebar
+--! @memberof mobf_lifebar
 -------------------------------------------------------------------------------
 function mobf_lifebar.init()
 	minetest.register_entity(":mobf:lifebar",
@@ -63,7 +63,7 @@ end
 -- name: add(entity)
 --
 --! @brief add a lifebat to an entity
---! @ingroup mobf_lifebar
+--! @memberof mobf_lifebar
 --
 --! @param entity entity to add lifebar
 --
@@ -97,7 +97,7 @@ end
 -- name: del(lifebar)
 --
 --! @brief delete a lifebar
---! @ingroup mobf_lifebar
+--! @memberof mobf_lifebar
 --
 --! @param lifebar lifebar do telete
 -------------------------------------------------------------------------------
@@ -112,7 +112,8 @@ end
 -- name: set(lifebar,value)
 --
 --! @brief set value of a lifebar
---! @ingroup mobf_lifebar
+--! @memberof mobf_lifebar
+--! @private
 --
 --! @param lifebar lifebar do update
 --! @param value (0-1) value of lifebar
@@ -129,7 +130,8 @@ end
 -- name: get_imagename(value)
 --
 --! @brief calculate imagename from value
---! @ingroup mobf_lifebar
+--! @memberof mobf_lifebar
+--! @private
 --
 --! @param value to get image for
 -------------------------------------------------------------------------------

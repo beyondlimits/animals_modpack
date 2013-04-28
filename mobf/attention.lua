@@ -22,7 +22,8 @@
 
 --!@}
 
---! @brief fighting class reference
+--! @brief attention handling class reference
+--TODO rename to fix documentation issues
 attention = {}
 
 -------------------------------------------------------------------------------

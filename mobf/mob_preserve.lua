@@ -12,22 +12,18 @@
 --! @date 2013-01-29
 --
 
---! @defgroup spawning Spawn mechanisms
---! @brief all functions and variables required for automatic mob spawning 
+--! @defgroup mob_preserve gui to reclaim mobs removed by error handling
+--! @brief gui to reclaim error removed player spawned mobs 
 --! @ingroup framework_int
 --! @{
---
---! @defgroup spawn_algorithms Spawn algorithms 
---! @brief spawn algorithms provided by mob framework (can be extended by mods)
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 --! @class mob_preserve
 --! @brief mob preserve features
-mob_preserve = {}
-
 --!@}
 
+mob_preserve = {}
 mob_preserve.entrys_per_page = 10
 
 ------------------------------------------------------------------------------
@@ -36,6 +32,7 @@ mob_preserve.entrys_per_page = 10
 --
 --! @brief initialize dynamic data
 --! @memberof mob_preserve
+--! @public
 ------------------------------------------------------------------------------
 function mob_preserve.init()
 
@@ -63,6 +60,7 @@ end
 --
 --! @brief check if a mob needs to be preserved
 --! @memberof mob_preserve
+--! @public
 --
 --! @param entity entity to check
 --! @param reason reason for removal
@@ -103,14 +101,15 @@ function mob_preserve.handle_remove(entity,reason)
 end
 
 ------------------------------------------------------------------------------
--- name: handle_rightclick(player)
+-- name: handle_rightclick(name,param)
 -- @function [parent=#mob_preserve] preserve handler
 --
 --! @brief show list of removed mobs
 --! @memberof mob_preserve
+--! @public
 --
---! @param playername
---! @param reason reason for removal
+--! @param name name of formspec
+--! @param param unused parameter
 -------------------------------------------------------------------------------
 function mob_preserve.handle_command(name,param)
 
@@ -125,7 +124,8 @@ end
 -- @function [parent=#mob_preserve] get formspec
 --
 --! @brief generate page form for mob_preserve
---! @ingroup mob_preserve
+--! @memberof mob_preserve
+--! @private
 --
 --! @param name player to create page for
 --! @param pagenum pagenumber to create
@@ -207,7 +207,8 @@ end
 -- @function [parent=#mob_preserve] handle button callback
 --
 --! @brief handle button callback
---! @ingroup mob_preserve
+--! @memberof mob_preserve
+--! @private
 --
 --! @param player player doing button click
 --! @param formname name of form clicked
@@ -262,11 +263,12 @@ end
 -- @function [parent=#mob_preserve] give mob back to player
 --
 --! @brief give mob back to player
---! @ingroup mob_preserve
+--! @memberof mob_preserve
+--! @private
 --
 --! @param player player doing button click
 --! @param entrynumber number of entry to give back to player
---! @param totalnumber number of entrys on time of form creation
+--! @param total number of entrys on time of form creation
 -------------------------------------------------------------------------------
 function mob_preserve.retake_mob(player,entrynumber,total)
 

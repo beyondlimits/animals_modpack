@@ -20,9 +20,14 @@
 
 --! @class mgen_jordan4ibanez
 --! @brief a movement generator trying to follow or reach a target
-mgen_jordan4ibanez = {}
-mgen_jordan4ibanez.chillaxin_speed = 0.1
 --!@}
+
+mgen_jordan4ibanez = {}
+
+--! @brief chillaxin_speed
+--! @memberof mgen_jordan4ibanez
+mgen_jordan4ibanez.chillaxin_speed = 0.1
+
 
 --! @brief movement generator identifier
 --! @memberof mgen_jordan4ibanez
@@ -139,7 +144,6 @@ end
 --
 --! @brief set target for movgen
 --! @memberof mgen_jordan4ibanez
---! @private
 --
 --! @param entity mob to apply to
 --! @param target to set

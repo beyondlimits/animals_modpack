@@ -12,13 +12,16 @@
 --! @date 2013-01-06
 --
 --
---! @defgroup mobf_ride functions required for riding mobs
+--! @defgroup mobf_ride Rideable mobs subcomponent
 --! @brief a component containing all functions required to ride a mob
 --! @ingroup framework_int
 --! @{ 
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+--! @class mobf_ride
+--! @brief contains all riding specific functions
+--! @}
 
 mobf_ride = {}
 
@@ -26,7 +29,8 @@ mobf_ride = {}
 -- name: attache_player(entity,player)
 --
 --! @brief make a player ride this mob
---! @ingroup mobf
+--! @class mobf_ride
+--! @private
 --
 --! @param entity entity to be ridden
 --! @param player player riding
@@ -55,7 +59,8 @@ end
 -- name: dettache_player(entity,player)
 --
 --! @brief make a player ride this mob
---! @ingroup mobf
+--! @class mobf_ride
+--! @private
 --
 --! @param entity entity to be ridden
 -------------------------------------------------------------------------------
@@ -72,7 +77,8 @@ end
 -- name: on_step_callback(entity)
 --
 --! @brief make a player ride this mob
---! @ingroup mobf
+--! @class mobf_ride
+--! @public
 --
 --! @param entity entity to be ridden
 -------------------------------------------------------------------------------
@@ -198,7 +204,8 @@ end
 -- name: on_punch_callback(entity,player)
 --
 --! @brief make a player ride this mob
---! @ingroup mobf
+--! @class mobf_ride
+--! @public
 --
 --! @param entity entity to be ridden
 --! @param player player riding
@@ -238,7 +245,8 @@ end
 -- name: is_enabled(entity)
 --
 --! @brief check if riding is enabled for a mob
---! @ingroup mobf
+--! @class mobf_ride
+--! @public
 --
 --! @param entity entity to be ridden
 -------------------------------------------------------------------------------
@@ -254,7 +262,8 @@ end
 -- name: attache_player(entity,player)
 --
 --! @brief make a player ride this mob
---! @ingroup mobf
+--! @class mobf_ride
+--! @public
 --
 --! @param entity entity to be ridden
 -------------------------------------------------------------------------------
@@ -267,6 +276,7 @@ function mobf_ride.init(entity)
 	entity.dynamic_data.ride = data
 end
 
+-- special handler on leave
 minetest.register_on_leaveplayer( function(player)
 	if player ~= nil and
 		player.object ~= nil then

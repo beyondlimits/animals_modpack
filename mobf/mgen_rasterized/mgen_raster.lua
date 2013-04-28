@@ -21,9 +21,8 @@
 
 --! @class mgen_raster
 --! @brief a movement generator creating a rasterized probabilistic movement
-mgen_raster = {}
-
 --!@}
+mgen_raster = {}
 
 --! @brief movement generator identifier
 --! @memberof mgen_follow

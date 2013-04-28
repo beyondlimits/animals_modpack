@@ -91,8 +91,8 @@ end
 -- name: set_target(entity,target)
 --
 --! @brief set target for movgen
---! @memberof mgen_follow
---! @private
+--! @memberof mgen_none
+--! @public
 --
 --! @param entity mob to apply to
 --! @param target to set
