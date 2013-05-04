@@ -153,6 +153,11 @@ call /mobf_settings in game
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.1.1
+-fix some typos
+-fix missing parameter in documentation
+-add parameter check to avoid crash on core error
+
 Changes 2.1.0
 -fix doxygen comments
 
