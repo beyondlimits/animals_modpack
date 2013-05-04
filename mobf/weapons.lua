@@ -47,7 +47,7 @@ function mobf_do_area_damage(pos,immune,damage_groups,range)
 	for k, obj in pairs(objs) do
 
 		--don't do damage to issuer
-		if obj ~= immune then
+		if obj ~= immune and obj ~= nil then
 			--punch
 			obj:punch(nil, 1.0, {
 				full_punch_interval=1.0,
