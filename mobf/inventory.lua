@@ -439,7 +439,7 @@ end
 --
 --! @brief check if mob is configured as trader
 --! @memberof mob_inventory
---! @publuc
+--! @public
 --
 --! @param name name of formspec to register
 --! @param formspec formspec definition
