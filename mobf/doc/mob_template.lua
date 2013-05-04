@@ -324,6 +324,8 @@ local mob_template = {
 				graphics_2d = "<graphic definition as previous described>",
 				--! @brief [OPTIONAL] a animation to be played while this state is active
 				animation = "name",
+				--! @brief [OPTIONAL] mode to differentiate different states e.g. "auto" for auto switched states "user_def" for user defined or "combat" for combat states
+				state_mode = "auto",
 			},
 		},
 	--! @brief [OPTIONAL] description of animations
