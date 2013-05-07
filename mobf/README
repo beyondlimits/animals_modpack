@@ -153,6 +153,10 @@ call /mobf_settings in game
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.1.2
+-fix crash when trying to get name from non entity fight target
+-make sure only players and luaentitys can be set as attack target
+
 Changes 2.1.1
 -fix some typos
 -fix missing parameter in documentation

@@ -1098,7 +1098,8 @@ function fighting.get_target_name(target)
 		return target:get_player_name()
 	else
 		local target_entity = target:get_luaentity()
-		if target_entity.data ~= nil and
+		if target_entity ~= nil and
+			target_entity.data ~= nil and
 			target_entity.data.name ~= nil then
 			return "MOB: " .. target_entity.data.name
 		end
@@ -1120,6 +1121,10 @@ end
 function fighting.set_target(entity,target)
 
 	mobf_assert_backtrace(entity.dynamic_data ~= nil)
+	
+	if not fighting.is_valid_target(target) then
+		return
+	end
 
 	if entity.dynamic_data.combat.target ~= nil then
 		dbg_mobf.fighting_lvl2("MOBF: switching attack target")
@@ -1141,6 +1146,36 @@ function fighting.set_target(entity,target)
 
 		end
 	end
+end
+
+-------------------------------------------------------------------------------
+-- name: is_valid_target(target) 
+--
+--! @brief check if a target is a valid target
+--! @memberof fighting
+--! @public
+--
+--! @param target to set
+-------------------------------------------------------------------------------
+function fighting.is_valid_target(target)
+
+	--remove target case
+	if target == nil then
+		return true
+	end
+	
+	--valid if it's a player
+	if target:is_player() then
+		return true
+	end
+	
+	--valid if it's a lua entity
+	if target:get_luaentity() ~= nil then
+		return true
+	end
+	
+	--invalid any other case
+	return false
 end
 
 -------------------------------------------------------------------------------
