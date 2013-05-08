@@ -1,4 +1,4 @@
-local version = "0.0.22"
+local version = "0.0.23"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -135,7 +135,7 @@ vombie_prototype = {
 							},
 							{
 								rate=0.05,
-								density=100,
+								density=25,
 								algorithm="shadows_spawner",
 								height=2,
 								respawndelay = 300,
