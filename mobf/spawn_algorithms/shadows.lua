@@ -205,15 +205,25 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 			end
 			
 			if good and mobf_mob_around(self.spawner_mob_name,
-							   self.spawner_mob_transform,
-							   pos, -- this is intended we really want to know mobs around spawner not new pos
-							   self.spawner_mob_spawndata.density,true) == 0 then
-				spawning.spawn_and_check(
-					self.spawner_mob_name,"__default",newpos,"shadows_spawner_ent")
+								self.spawner_mob_transform,
+								-- this is intended we really want to know 
+								-- mobs around spawner not new pos
+								pos, 
+								self.spawner_mob_spawndata.density,true) == 0 then
+				if spawning.spawn_and_check(
+							self.spawner_mob_name,
+							"__default",
+							newpos,
+							"shadows_spawner_ent") then
+					self.spawner_last_result = "successfull"
+				else
+					self.spawner_last_result = "failed to spawn"
+				end
 			else
 				dbg_mobf.spawning_lvl2("MOBF: shadows: not spawning " .. 
 					self.spawner_mob_name .. 
 					" there's a mob around or pos not ok: " .. dump(good) .. " rsn: " .. dump(reason))
+				self.spawner_last_result = dump(reason)
 			end
 			
 			self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay

@@ -130,6 +130,8 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 			if gametime > 0.25 and
 				gametime < 0.75 then
 				dbg_mobf.spawning_lvl3("MOBF: wrong time for at night spawner")
+				self.spawner_last_result = "daytime"
+				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
 				return
 			end
 			
@@ -189,13 +191,15 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 				--TODO try to move spawner to better place
 				
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
+				self.spawner_last_result = "at_night:" .. dump(reason)
 				return
 			end
 			
 			
 			--check if current light is dark enough
-			
 			if minetest.env:get_node_light(pos) > 6 then
+				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
+				self.spawner_last_result = "at_night: to much light"
 				return
 			end
 
@@ -210,11 +214,15 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 					entity.dynamic_data ~= nil and
 					entity.dynamic_data.spawning ~= nil then
 					entity.dynamic_data.spawning.spawner = "at_night_mapgen"
+					self.spawner_last_result = "at_night successfull"
+				else
+					self.spawner_last_result = "at_night failed to spawn"
 				end
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
 			else
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
 				dbg_mobf.spawning_lvl2("MOBF: not spawning " .. self.spawner_mob_name .. " there's a mob around")
+				self.spawner_last_result = "at_night: to much mobs around"
 			end
 		end,
 		"_at_night")
