@@ -642,7 +642,7 @@ function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,en
 			on_step = function(self,dtime)
 				self.spawner_time_passed = self.spawner_time_passed -dtime
 
-				
+				--self.spawner_time_passed has to be handled by spawnfunc!
 				if self.spawner_time_passed < 0 then
 					local starttime = mobf_get_time_ms()
 					
@@ -666,11 +666,13 @@ function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,en
 				if self.spawner_mob_transform == nil then
 					self.spawner_mob_transform = ""
 				end
+				--TODO honor time since deactivation
+				self.spawner_time_passed     = 1
 			end,
 			
-			spawner_mob_name 		= mobname,
-			spawner_mob_transform 	= secondary_mobname,
-			spawner_time_passed 	= 1,
+			spawner_mob_name        = mobname,
+			spawner_mob_transform   = secondary_mobname,
+			spawner_time_passed     = 1,
 			spawner_mob_env         = environment,
 			spawner_mob_spawndata   = spawndata,
 		})
