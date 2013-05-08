@@ -168,6 +168,30 @@ function mobf_debug.list_active_mobs(name,param)
 end
 
 -------------------------------------------------------------------------------
+-- name: list_spawners(name,param)
+--
+--! @brief print list of all spawners around player
+--
+--! @param name name of player
+--! @param param parameters received
+------------------------------------------------------------------------------
+function mobf_debug.list_spawners(name,param)
+	
+	for index,value in pairs(minetest.luaentities) do 
+		if value ~= nil and value.spawner_mob_name ~= nil then
+			local resultline = "SPW: " 
+				.. mobf_fixed_size_string(value.spawner_mob_name,24) .. " "
+				.. mobf_fixed_size_string(printpos(value.object:getpos()),16)
+				.. "  STATE: " 
+				.. mobf_fixed_size_string(dump(value.spawner_last_result),32)
+				.. " TIME: " .. value.spawner_time_passed
+			
+			print(resultline)
+		end
+	end
+end
+
+-------------------------------------------------------------------------------
 -- name: mob_count(name,param)
 --
 --! @brief count active mobs
@@ -272,6 +296,14 @@ function mobf_debug.init()
 			func		= function(name,param)
 								minetest.chat_send_player(name,"MOBF version: " .. mobf_version)
 							end 
+		})
+		
+	minetest.register_chatcommand("listspawners",
+		{
+			params		= "",
+			description = "debug info about spawner entities" ,
+			privs		= {mobfw_admin=true},
+			func		= mobf_debug.list_spawners
 		})
 		
 	minetest.register_chatcommand("mobf_count",
