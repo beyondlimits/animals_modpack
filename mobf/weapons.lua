@@ -43,6 +43,8 @@ end
 -------------------------------------------------------------------------------
 function mobf_do_area_damage(pos,immune,damage_groups,range)
 	--damage objects within inner blast radius
+	mobf_assert_backtrace(type(range) ~= "table")
+
 	objs = minetest.env:get_objects_inside_radius(pos, range)
 	for k, obj in pairs(objs) do
 
@@ -298,10 +300,10 @@ function MOBF_PLASMABALL_ENTITY.on_step(self, dtime)
 
 	if hit then
 		--damage objects within inner blast radius
-		mobf_do_area_damage(pos,self.owner,self.damage_range/4,self.damage)
+		mobf_do_area_damage(pos,self.owner,self.damage,self.damage_range/4)
 
 		--damage all objects within blast radius
-		mobf_do_area_damage(pos,self.owner,self.damage_range/2,self.damage)
+		mobf_do_area_damage(pos,self.owner,self.damage,self.damage_range/2)
 	end
 
 	-- vanish when hitting a node
