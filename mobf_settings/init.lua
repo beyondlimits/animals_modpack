@@ -16,7 +16,7 @@
 minetest.log("action","MOD: mobf_settings mod loading ... ")
 
 mobf_settings = {}
-mobf_settings.version = "0.0.20"
+mobf_settings.version = "0.0.21"
 mobf_settings.max_list_page_num = 5
 mobf_settings.buttons = {}
 mobf_settings.buttons[1] = {}
@@ -31,19 +31,6 @@ mobf_settings.formspechandler = function(player,formspec)
 		end
 		
 mobf_settings_debug = function () end
-------------------------------------------------------------------------------
--- name: save
---
---! @brief save current config to config file
---! @ingroup mobf_settings
---
--------------------------------------------------------------------------------
-function mobf_settings.save()
-	if not minetest.is_singleplayer() then
-		minetest.setting_save()
-	end
-	--singleplayer saves automaticaly
-end
 
 ------------------------------------------------------------------------------
 -- name: get_animal_list
@@ -57,7 +44,7 @@ end
 -------------------------------------------------------------------------------
 function mobf_settings.get_animal_list(page_number)
 
-    local mobf_mob_blacklist_string = minetest.setting_get("mobf_blacklist")
+    local mobf_mob_blacklist_string = minetest.world_setting_get("mobf_blacklist")
     local mobf_mobs_blacklisted = nil
     if mobf_mob_blacklist_string ~= nil then
         mobf_mobs_blacklisted = minetest.deserialize(mobf_mob_blacklist_string)
@@ -242,7 +229,7 @@ function mobf_settings.draw_buttons(buttons,xpos)
 	local y_pos = 3.75
 		
 	for i=1,#buttons,1 do
-		local current_setting = minetest.setting_getbool(buttons[i].value)
+		local current_setting = minetest.world_setting_get(buttons[i].value)
 		
 		if buttons[i].inverted then
 			if not current_setting then
@@ -318,7 +305,7 @@ function mobf_settings.handle_mob_en_disable_button(fields)
         
         for i = 0 , 5 , 1 do
             if fields["page".. i .. "_enable_" .. val] ~= nil then
-                local mobf_mob_blacklist_string = minetest.setting_get("mobf_blacklist")
+                local mobf_mob_blacklist_string = minetest.world_setting_get("mobf_blacklist")
                 local mobf_mobs_blacklisted = nil
                 if mobf_mob_blacklist_string ~= nil then
                     mobf_mobs_blacklisted = minetest.deserialize(mobf_mob_blacklist_string)
@@ -336,7 +323,7 @@ function mobf_settings.handle_mob_en_disable_button(fields)
                         end
                     end
                     
-                    minetest.setting_set("mobf_blacklist",minetest.serialize(new_blacklist))
+                    minetest.world_setting_set("mobf_blacklist",minetest.serialize(new_blacklist))
                     mobf_settings_debug("MOBF_SETTINGS: Enabling: " .. val .. " blacklist is now: " .. dump(new_blacklist))
                 end
                 page = i
@@ -346,7 +333,7 @@ function mobf_settings.handle_mob_en_disable_button(fields)
         for i = 0 , 5 , 1 do
             if fields["page".. i .. "_disable_" .. val] ~= nil then
             
-                local mobf_mob_blacklist_string = minetest.setting_get("mobf_blacklist")
+                local mobf_mob_blacklist_string = minetest.world_setting_get("mobf_blacklist")
                 local mobf_mobs_blacklisted = nil
                 if mobf_mob_blacklist_string ~= nil then
                     mobf_mobs_blacklisted = minetest.deserialize(mobf_mob_blacklist_string)
@@ -358,19 +345,16 @@ function mobf_settings.handle_mob_en_disable_button(fields)
                 
                 table.insert(mobf_mobs_blacklisted,val)
                     
-                minetest.setting_set("mobf_blacklist",minetest.serialize(mobf_mobs_blacklisted))
+                minetest.world_setting_set("mobf_blacklist",minetest.serialize(mobf_mobs_blacklisted))
                 page = i
                 mobf_settings_debug("MOBF_SETTINGS: Disabling: " .. val)
             end
         end
         
         if page ~= nil then
-            mobf_settings.save()
             return "mobf_list_page" .. page
         end
     end
-    
-    mobf_settings.save()
     return nil
 end
 
@@ -411,11 +395,10 @@ function mobf_settings.handle_config_changed_button(fields)
 	if config_setting ~= nil then
 		mobf_settings_debug("MOBF_SETTINGS: detected changed value " .. config_setting.value)
 		if enable then
-			minetest.setting_set(config_setting.value,"true")
+			minetest.world_setting_set(config_setting.value,"true")
 		else
-			minetest.setting_set(config_setting.value,"false")
+			minetest.world_setting_set(config_setting.value,"false")
 		end
-		mobf_settings.save()
 		return true
 	end
 	

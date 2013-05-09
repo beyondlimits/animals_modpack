@@ -36,7 +36,7 @@ function mobf_warn_long_fct(starttime,fctname,facility)
 	local currenttime = mobf_get_time_ms()
 	local delta = currenttime - starttime
 	
-	if minetest.setting_getbool("mobf_enable_socket_trace_statistics") then
+	if minetest.world_setting_get("mobf_enable_socket_trace_statistics") then
 		if facility == nil then
 			facility = "generic"
 		end
@@ -121,7 +121,7 @@ end
 --! @param text data to print to log
 -------------------------------------------------------------------------------
 function mobf_bug_warning(level,text)
-	if minetest.setting_getbool("mobf_log_bug_warnings") then
+	if minetest.world_setting_get("mobf_log_bug_warnings") then
 		minetest.log(level,text)
 	end
 end

@@ -208,7 +208,7 @@ function graphics.prepare_info(graphics2d,graphics3d,modname,name,statename)
 	
 
 	if (graphics3d == nil) or
-		minetest.setting_getbool("mobf_disable_3d_mode") then
+		minetest.world_setting_get("mobf_disable_3d_mode") then
 		if (graphics2d == nil) then
 			--this maybe correct if there's a state model requested!
 			return nil

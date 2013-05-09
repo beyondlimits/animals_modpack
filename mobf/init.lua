@@ -136,7 +136,7 @@ function mobf_init_framework()
 	mobf_init_basic_tools()
 	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Reading mob blacklist")
-	local mobf_mob_blacklist_string = minetest.setting_get("mobf_blacklist")
+	local mobf_mob_blacklist_string = minetest.world_setting_get("mobf_blacklist")
 	
 	if mobf_mob_blacklist_string ~= nil then
 		mobf_rtd.registred_mob = minetest.deserialize(mobf_mob_blacklist_string)

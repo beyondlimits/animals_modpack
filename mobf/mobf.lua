@@ -420,7 +420,7 @@ function mobf.activate_handler(self,staticdata)
 	end
 	
 	--add lifebar
-	if minetest.setting_getbool("mobf_lifebar") then
+	if minetest.world_setting_get("mobf_lifebar") then
 		self.lifebar = mobf_lifebar.add(self)
 		mobf_lifebar.set(self.lifebar,self.object:get_hp()/self.hp_max)
 	end
@@ -460,7 +460,7 @@ function mobf.register_entity(name, graphics, mob)
 				automatic_rotate = true,
 				groups          = mob.generic.groups,
 				hp_max          = mob.generic.base_health,
-				
+--				stepheight      = 0.6,
 
 
 
@@ -786,7 +786,7 @@ function mobf.blacklisthandling(mob)
 	local on_activate_fct = nil
 	
 	--remove unknown animal objects
-	if minetest.setting_getbool("mobf_delete_disabled_mobs") then
+	if minetest.world_setting_get("mobf_delete_disabled_mobs") then
 		on_activate_fct = function(self,staticdata)
 				self.object:remove()
 			end

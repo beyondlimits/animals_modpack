@@ -82,7 +82,7 @@ function spawning.remove(entity,reason)
 	if entity ~= nil then
 		entity.removed = true
 		dbg_mobf.spawning_lvl1("MOBF: remove entity=" .. tostring(entity))
-		if minetest.setting_getbool("mobf_log_removed_entities") then
+		if minetest.world_setting_get("mobf_log_removed_entities") then
 			if reason == nil then
 				reason = "unknown"
 			end
@@ -767,7 +767,7 @@ end
 -------------------------------------------------------------------------------
 function spawning.register_mob(mob)
 	--spawn mechanism handling
-	if not minetest.setting_getbool("mobf_disable_animal_spawning") then
+	if not minetest.world_setting_get("mobf_disable_animal_spawning") then
 		--register spawn callback to world
 		if environment_list[mob.generic.envid] ~= nil then
 			local secondary_name = ""		
@@ -792,7 +792,7 @@ function spawning.register_mob(mob)
 						.. " no primary spawn algorithm defined! ")
 				end
 			
-				if minetest.setting_getbool("mobf_animal_spawning_secondary") then
+				if minetest.world_setting_get("mobf_animal_spawning_secondary") then
 					if type(mob.spawning.secondary_algorithms) == "table" then
 						for i=1 , #mob.spawning.secondary_algorithms , 1 do
 							spawning.setup_algorithm(
@@ -820,7 +820,7 @@ function spawning.register_mob(mob)
 						.. tostring(mob.spawning.algorithm))
 				end
 				
-				if minetest.setting_getbool("mobf_animal_spawning_secondary") then
+				if minetest.world_setting_get("mobf_animal_spawning_secondary") then
 					if mob.spawning.algorithm_secondary ~= nil and 
 						type(mobf_spawn_algorithms[mob.spawning.algorithm_secondary].register_spawn) == "function" then
 						mobf_spawn_algorithms[mob.spawning.algorithm_secondary].register_spawn(mob.modname..":"..mob.name,

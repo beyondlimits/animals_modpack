@@ -250,7 +250,7 @@ function mob_state.switch_entity(entity,state)
 	--switch entity
 	local state_has_model = false
 	
-	if minetest.setting_getbool("mobf_disable_3d_mode") then
+	if minetest.world_setting_get("mobf_disable_3d_mode") then
 		if state.graphics ~= nil then
 			state_has_model = true
 		end

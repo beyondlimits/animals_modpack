@@ -1,4 +1,4 @@
-local version = "0.0.23"
+local version = "0.0.25"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -30,12 +30,12 @@ function vombie_on_step_handler(entity,now,dtime)
 	local current_light = minetest.env:get_node_light(pos)
 	
 	--print("vombie on step: current_light:" .. current_light .. " max light: " 
-	--	.. LIGHT_MAX .. " 3dmode:" .. dump(minetest.setting_getbool("disable_animals_3d_mode")))
+	--	.. LIGHT_MAX .. " 3dmode:" .. dump(minetest.world_setting_get("disable_animals_3d_mode")))
 
 	if current_light ~= nil and
 		current_light > LIGHT_MAX and
-		minetest.setting_getbool("mobf_disable_3d_mode") ~= true and
-		minetest.setting_getbool("vombie_3d_burn_animation_enabled") == true then
+		minetest.world_setting_get("mobf_disable_3d_mode") ~= true and
+		minetest.world_setting_get("vombie_3d_burn_animation_enabled") == true then
 		
 		
 		local xdelta = (math.random()-0.5)

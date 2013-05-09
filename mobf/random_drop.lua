@@ -101,7 +101,7 @@ function random_drop.register(random_drop)
 		local ent_graphics = {}
 		local id = drop_basename .. "_" .. drop_itemname
 		
-		if minetest.setting_getbool("mobf_disable_3d_mode") or 
+		if minetest.world_setting_get("mobf_disable_3d_mode") or 
 			animalmaterialsdata[id] == nil or
 			animalmaterialsdata[id].graphics_3d == nil then
 			ent_graphics.visual = "sprite"
