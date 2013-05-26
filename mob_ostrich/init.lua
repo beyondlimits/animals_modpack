@@ -88,6 +88,7 @@ ostrich_f_prototype = {
 				walk = {
 					start_frame = 41,
 					end_frame   = 81,
+					basevelocity = 0.28,
 					},
 				stand = {
 					start_frame = 1,
@@ -167,6 +168,7 @@ ostrich_m_prototype = {
 				walk = {
 					start_frame = 41,
 					end_frame   = 81,
+					basevelocity = 0.28,
 					},
 				stand = {
 					start_frame = 1,

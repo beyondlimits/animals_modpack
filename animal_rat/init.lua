@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_rat loading ...")
 
-local version = "0.0.10"
+local version = "0.0.11"
 
 local selectionbox_rat = {-0.2, -0.0625, -0.2, 0.2, 0.125, 0.2}
 
@@ -41,7 +41,7 @@ rat_prototype = {
 					default_gen="probab_mov_gen",
 					min_accel=0.4,
 					max_accel=0.6,
-					max_speed=2,
+					max_speed=1.0,
 					pattern="run_and_jump_low",
 					canfly=false,
 					},
@@ -70,6 +70,7 @@ rat_prototype = {
 				walk = {
 					start_frame = 1,
 					end_frame   = 40,
+					basevelocity = 0.1,
 					},
 				stand = {
 					start_frame = 41,

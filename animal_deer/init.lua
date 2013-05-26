@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_deer mod loading ... ")
 
-local version = "0.0.12"
+local version = "0.0.13"
 
 local deer_groups = {
 						not_in_creative_inventory=1
@@ -42,6 +42,7 @@ deer_prototype = {
 					min_accel=0.2,
 					max_accel=0.4,
 					max_speed=2,
+					min_speed=0.02,
 					pattern="stop_and_go",
 					canfly=false,
 					},		
@@ -65,6 +66,7 @@ deer_prototype = {
 				walk = {
 					start_frame = 0,
 					end_frame   = 60,
+					basevelocity = 0.225,
 					},
 				stand = {
 					start_frame = 61,

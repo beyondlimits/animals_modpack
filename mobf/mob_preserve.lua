@@ -114,7 +114,6 @@ end
 function mob_preserve.handle_command(name,param)
 
 	local formspec = mob_preserve.get_formspec(name,0)
-
 	minetest.show_formspec(name,"mob_preserve:main",formspec)
 end
 

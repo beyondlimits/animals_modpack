@@ -124,7 +124,7 @@ function graphics.update_animation(entity,now,dtime)
 					DELTA(scalar_velocity,
 							entity.dynamic_data.graphics.last_scalar_speed)
 							
-				if speeddiff > 0.1 then
+				if speeddiff > 0.05 then
 					local current_fps = scalar_velocity/animdata.basevelocity * 15
 					
 					entity.object:set_animation_speed(current_fps)

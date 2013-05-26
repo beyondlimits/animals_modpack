@@ -89,7 +89,7 @@ sheep_prototype = {
 				walk = {
 					start_frame = 0,
 					end_frame   = 60,
-					basevelocity = 0.2,
+					basevelocity = 0.25,
 					},
 				stand = {
 					start_frame = 61,
@@ -205,7 +205,7 @@ lamb_prototype = {
 				walk = {
 					start_frame = 0,
 					end_frame   = 60,
-					basevelocity = 0.1,
+					basevelocity = 0.25,
 					},
 				stand = {
 					start_frame = 61,
