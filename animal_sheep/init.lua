@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.0.23"
+local version = "0.0.24"
 
 local sheep_groups = {
 						sheerable=1,
@@ -89,6 +89,7 @@ sheep_prototype = {
 				walk = {
 					start_frame = 0,
 					end_frame   = 60,
+					basevelocity = 0.2,
 					},
 				stand = {
 					start_frame = 61,
@@ -204,6 +205,7 @@ lamb_prototype = {
 				walk = {
 					start_frame = 0,
 					end_frame   = 60,
+					basevelocity = 0.1,
 					},
 				stand = {
 					start_frame = 61,
@@ -281,10 +283,10 @@ sheep_naked_prototype = {
 				},
 		movement =  {
 					canfly=false,
-                    min_accel=0.05,
-                    max_accel=0.1,
-                    max_speed=0.5,
-                    min_speed=0.1,
+					min_accel=0.05,
+					max_accel=0.1,
+					max_speed=0.5,
+					min_speed=0.1,
 					pattern="stop_and_go"
 					},		
 		catching = {
@@ -318,6 +320,7 @@ sheep_naked_prototype = {
 				walk = {
 					start_frame = 0,
 					end_frame   = 60,
+					basevelocity = 0.3,
 					},
 				stand = {
 					start_frame = 61,

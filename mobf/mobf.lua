@@ -241,7 +241,7 @@ end
 -------------------------------------------------------------------------------
 function mobf.get_basepos(entity)
 	local pos = entity.object:getpos()
-	local nodeatpos = minetest.env:get_node(pos)
+	local nodeatpos = minetest.get_node(pos)
 	
 	dbg_mobf.mobf_core_helper_lvl3("MOBF: " .. entity.data.name 
 		.. " Center Position: " .. printpos(pos) .. " is: " .. nodeatpos.name)
@@ -254,7 +254,7 @@ function mobf.get_basepos(entity)
 			.. entity.collisionbox[2])
 	end
 
-	nodeatpos = minetest.env:get_node(pos)
+	nodeatpos = minetest.get_node(pos)
 	dbg_mobf.mobf_core_helper_lvl3("MOBF: Base Position: " .. printpos(pos) 
 		.. " is: " .. nodeatpos.name)
 
@@ -280,7 +280,7 @@ function mobf.activate_handler(self,staticdata)
 	if pos == nil then
 		minetest.log(LOGLEVEL_ERROR,"MOBF: mob at nil pos!")
 	end
-	local current_node = minetest.env:get_node(pos)
+	local current_node = minetest.get_node(pos)
 	
 	
 	if current_node == nil then
@@ -589,7 +589,7 @@ function mobf.register_entity(name, graphics, mob)
 					local fp = { x= posbelow.x + (0.5*dx),
 								  y= posbelow.y,
 								  z= posbelow.z + (0.5*dz) }
-					local n = minetest.env:get_node(fp)
+					local n = minetest.get_node(fp)
 					if not mobf_is_walkable(n) then
 						return true
 					end

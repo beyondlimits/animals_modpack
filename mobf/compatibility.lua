@@ -20,8 +20,8 @@ minetest.register_abm({
 		chance = 1,
 
 		action = function(pos, node, active_object_count, active_object_count_wider)
-			minetest.env:remove_node(pos)
-			minetest.env:add_node(pos,{name="wool:white"})
+			minetest.remove_node(pos)
+			minetest.add_node(pos,{name="wool:white"})
 		end
 	
 	})
@@ -32,8 +32,8 @@ minetest.register_abm({
 		chance = 1,
 
 		action = function(pos, node, active_object_count, active_object_count_wider)
-			minetest.env:remove_node(pos)
-			minetest.env:add_node(pos,{name="wool:grey"})
+			minetest.remove_node(pos)
+			minetest.add_node(pos,{name="wool:grey"})
 		end
 	
 	})
@@ -44,8 +44,8 @@ minetest.register_abm({
 		chance = 1,
 
 		action = function(pos, node, active_object_count, active_object_count_wider)
-			minetest.env:remove_node(pos)
-			minetest.env:add_node(pos,{name="wool:brown"})
+			minetest.remove_node(pos)
+			minetest.add_node(pos,{name="wool:brown"})
 		end
 	
 	})
@@ -56,8 +56,8 @@ minetest.register_abm({
 		chance = 1,
 
 		action = function(pos, node, active_object_count, active_object_count_wider)
-			minetest.env:remove_node(pos)
-			minetest.env:add_node(pos,{name="wool:black"})
+			minetest.remove_node(pos)
+			minetest.add_node(pos,{name="wool:black"})
 		end
 	
 	})

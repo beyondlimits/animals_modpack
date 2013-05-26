@@ -132,7 +132,7 @@ deer_prototype = {
 minetest.register_entity(":animal_deer:deer__default",
 	{
 		on_activate = function(self,staticdata)
-			minetest.env:add_entity(self.object:getpos(),"animal_deer:deer_m__default")
+			minetest.add_entity(self.object:getpos(),"animal_deer:deer_m__default")
 			self.object:remove()
 		end
 	})

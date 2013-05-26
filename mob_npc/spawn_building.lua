@@ -130,7 +130,7 @@ function building_spawner.buid_wall(material,startpos,endpos)
 	
 		for y=startpos.y,endpos.y,1 do
 		for z=startpos.z,endpos.z,1 do
-			minetest.env:set_node({x=startpos.x,y=y,z=z},{ name=material } )
+			minetest.set_node({x=startpos.x,y=y,z=z},{ name=material } )
 		end
 		end
 	end
@@ -138,7 +138,7 @@ function building_spawner.buid_wall(material,startpos,endpos)
 	if startpos.y == endpos.y then
 		for x=startpos.x,endpos.x,1 do
 		for z=startpos.z,endpos.z,1 do
-			minetest.env:set_node({x=x,y=startpos.y,z=z},{ name=material })
+			minetest.set_node({x=x,y=startpos.y,z=z},{ name=material })
 		end
 		end	
 	end
@@ -146,7 +146,7 @@ function building_spawner.buid_wall(material,startpos,endpos)
 	if startpos.z == endpos.z then
 		for y=startpos.y,endpos.y,1 do
 		for x=startpos.x,endpos.x,1 do
-			minetest.env:set_node({x=x,y=y,z=startpos.z},{ name=material })
+			minetest.set_node({x=x,y=y,z=startpos.z},{ name=material })
 		end
 		end	
 	end
@@ -172,7 +172,7 @@ function building_spawner.checkfloor(startpos,endpos)
 		local found_ground	= false
 		local found_air		= false
 		for y=startpos.y-1,startpos.y+2,1 do
-			local node_to_check	= minetest.env:get_node({x=x,y=y,z=z})
+			local node_to_check	= minetest.get_node({x=x,y=y,z=z})
 
 			if node_to_check ~= nil and
 				node_to_check.name ~= "ignore" then
@@ -236,7 +236,7 @@ function building_spawner.builder(startpos,blueprint,mobname)
 			if mobname == nil then
 				mobname = blueprint.entities[i][2]
 			end
-			local object = minetest.env:add_entity( {
+			local object = minetest.add_entity( {
 								x=startpos.x + blueprint.entities[i][1].x,
 								y=startpos.y + blueprint.entities[i][1].y,
 								z=startpos.z + blueprint.entities[i][1].z},

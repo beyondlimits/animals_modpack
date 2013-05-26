@@ -257,7 +257,7 @@ function spawning.replace_entity(entity,name,preserve)
 	--removing is done after exiting lua!
 	spawning.remove(entity,"replaced")
 
-	local newobject = minetest.env:add_entity(pos,name)
+	local newobject = minetest.add_entity(pos,name)
 	local newentity = mobf_find_entity(newobject)
 
 	if newentity ~= nil then
@@ -357,7 +357,7 @@ function spawning.spawn_and_check(name,suffix,pos,text)
 	mobf_assert_backtrace(pos.y ~= nil)
 	mobf_assert_backtrace(name ~= nil)
 	mobf_assert_backtrace(suffix ~= nil)
-	local newobject = minetest.env:add_entity(pos,name .. suffix)
+	local newobject = minetest.add_entity(pos,name .. suffix)
 	
 	if newobject then
 		local newentity = mobf_find_entity(newobject)

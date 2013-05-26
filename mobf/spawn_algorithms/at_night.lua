@@ -46,7 +46,7 @@ function mobf_spawn_at_night(mob_name,mob_transform,spawning_data,environment)
 			chance = math.floor(1/spawning_data.rate),
 			action = function(pos, node, active_object_count, active_object_count_wider)
 			
-				local gametime = minetest.env:get_timeofday()
+				local gametime = minetest.get_timeofday()
 				
 				if gametime > 0.25 and
 					gametime < 0.75 then
@@ -73,7 +73,7 @@ function mobf_spawn_at_night(mob_name,mob_transform,spawning_data,environment)
 					return
 				end
 				
-				local gametime = minetest.env:get_timeofday()
+				local gametime = minetest.get_timeofday()
 				
 				if gametime > 0.25 and
 					gametime < 0.75 then
@@ -81,7 +81,7 @@ function mobf_spawn_at_night(mob_name,mob_transform,spawning_data,environment)
 				end
 
 
-				local node_above = minetest.env:get_node(pos_above)
+				local node_above = minetest.get_node(pos_above)
 
 
 				if mob_name == nil then
@@ -89,9 +89,9 @@ function mobf_spawn_at_night(mob_name,mob_transform,spawning_data,environment)
 				else
 					--print("Find mobs of same type around:"..mob_name.. " pop dens: ".. population_density)
 					if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
-						if minetest.env:get_node_light(pos_above,0.5) == LIGHT_MAX +1 and 
-							minetest.env:get_node_light(pos_above,0.0) < 7 and
-							minetest.env:get_node_light(pos_above) < 6 then
+						if minetest.get_node_light(pos_above,0.5) == LIGHT_MAX +1 and 
+							minetest.get_node_light(pos_above,0.0) < 7 and
+							minetest.get_node_light(pos_above) < 6 then
 							
 							local entity = spawning.spawn_and_check(mob_name,"__default",pos_above,"at_night_spawner")
 							
@@ -125,7 +125,7 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 	
 	spawning.register_spawner_entity(mob_name,mob_transform,spawning_data,environment,
 		function(self)
-			local gametime = minetest.env:get_timeofday()
+			local gametime = minetest.get_timeofday()
 				
 			if gametime > 0.25 and
 				gametime < 0.75 then
@@ -161,7 +161,7 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 			
 			--check if own position is good
 			local pos_below = {x=newpos.x,y=newpos.y-1,z=newpos.z}
-			local node_below = minetest.env:get_node(pos_below)
+			local node_below = minetest.get_node(pos_below)
 			
 			if good and not mobf_contains(at_night_surfaces,node_below.name) then
 				reason = "wrong surface"
@@ -174,8 +174,8 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 				good = false
 			end
 			
-			local light_day = minetest.env:get_node_light(newpos,0.5)
-			local light_midnight = minetest.env:get_node_light(newpos,0.0)
+			local light_day = minetest.get_node_light(newpos,0.5)
+			local light_midnight = minetest.get_node_light(newpos,0.0)
 			
 			--check if area is in day/night cycle
 			if good and (light_day ~= LIGHT_MAX +1 or
@@ -197,7 +197,7 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 			
 			
 			--check if current light is dark enough
-			if minetest.env:get_node_light(pos) > 6 then
+			if minetest.get_node_light(pos) > 6 then
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
 				self.spawner_last_result = "at_night: to much light"
 				return
@@ -238,7 +238,7 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 				if surface then
 					pos.y= surface -1
 					
-					local node = minetest.env:get_node(pos)
+					local node = minetest.get_node(pos)
 					
 					if not mobf_contains(at_night_surfaces,node.name) then
 						dbg_mobf.spawning_lvl3("MOBF: node ain't of correct type: " .. node.name)
@@ -246,13 +246,13 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 					end
 					
 					local pos_above = {x=pos.x,y=pos.y+1,z=pos.z}
-					local node_above = minetest.env:get_node(pos_above)
+					local node_above = minetest.get_node(pos_above)
 					if not mobf_contains({"air"},node_above.name) then
 						dbg_mobf.spawning_lvl3("MOBF: node above ain't air but: " .. node_above.name)
 						return false
 					end
 					
-					local light_day = minetest.env:get_node_light(pos_above,0.5)
+					local light_day = minetest.get_node_light(pos_above,0.5)
 					
 					if light_day ~= (LIGHT_MAX +1) then
 						dbg_mobf.spawning_lvl3("MOBF: node above ain't in sunlight")

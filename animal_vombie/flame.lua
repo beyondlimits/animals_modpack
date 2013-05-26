@@ -48,7 +48,7 @@ end
 -------------------------------------------------------------------------------
 function vombie_flame.on_step(self, dtime)
 	local pos = self.object:getpos()
-	local node = minetest.env:get_node(pos)
+	local node = minetest.get_node(pos)
 	
 	self.leveldtime = self.leveldtime + dtime
 	

@@ -199,7 +199,7 @@ end
 ------------------------------------------------------------------------------
 function environment.get_absolute_min_max_pos(env,pos)
 	
-	local node = minetest.env:get_node(pos)
+	local node = minetest.get_node(pos)
 
 	--if is not within environment it should be return current position
 	--as min max
@@ -277,7 +277,7 @@ function environment.checksurface(pos,surface)
 	
 	local pos_below = {x=pos.x,y=pos.y-1,z=pos.z}
 	
-	local node_below = minetest.env:get_node(pos_below)
+	local node_below = minetest.get_node(pos_below)
 	
 	
 	if node_below == nil then
@@ -374,7 +374,7 @@ function environment.pos_is_ok(pos,entity,dont_do_jumpcheck)
 	--check if mob at pos will be in correct environment
 	for i=1,#cornerpositions,1 do
 		if not mobf_pos_is_same(lastpos,cornerpositions[i]) then
-			local node_to_check = minetest.env:get_node(cornerpositions[i])
+			local node_to_check = minetest.get_node(cornerpositions[i])
 			
 			if node_to_check == nil then
 				mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking position with invalid node")
@@ -482,7 +482,7 @@ function environment.get_default_gravity(pos,media,canfly)
 		return nil
 	end
 
-	local node = minetest.env:get_node(pos)
+	local node = minetest.get_node(pos)
 
 	--if an mob can't fly or isn't within it's medium default acceleration 
 	-- for it's current medium is applied
@@ -527,10 +527,10 @@ function environment.fix_base_pos(entity, center_to_bottom)
 		
 		local pos = entity.object:getpos()
 	
-		local node_pos = minetest.env:get_node(pos)
+		local node_pos = minetest.get_node(pos)
 		
 		local pos_to_check = {x=pos.x,y=pos.y-center_to_bottom+0.1,z=pos.z}
-		local node_pos_check = minetest.env:get_node(pos_to_check)
+		local node_pos_check = minetest.get_node(pos_to_check)
 		
 		if node_pos ~= nil and
 			node_pos_check ~= nil then

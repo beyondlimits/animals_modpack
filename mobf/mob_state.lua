@@ -539,7 +539,7 @@ function mob_state.prepare_states(mob)
 			 		local pos = self.object:getpos()
 			 		self.object:remove()
 			 		
-			 		minetest.env:add_entity(pos,self.new_name)
+			 		minetest.add_entity(pos,self.new_name)
 			 	end
 			 })
 		

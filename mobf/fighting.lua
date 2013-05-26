@@ -190,7 +190,7 @@ function fighting.hit(entity,attacker)
 				end
 			else
 				--todo check if spawning a stack is possible
-				minetest.env:add_item(mob_pos,result)
+				minetest.add_item(mob_pos,result)
 			end
 			spawning.remove(entity, "killed")
 		else
@@ -633,7 +633,7 @@ function fighting.get_target(entity)
 			range = entity.data.combat.distance.range
 		end
 	
-		local objectlist = minetest.env:get_objects_inside_radius(
+		local objectlist = minetest.get_objects_inside_radius(
 												entity.object:getpos(),range)
 
 		local count = 0
@@ -796,10 +796,10 @@ function fighting.self_destruct_handler(entity,now)
 				for k=pos.z-entity.data.combat.self_destruct.range/2, 
 						pos.z+entity.data.combat.self_destruct.range/2, 1 do
 				
-					local current = minetest.env:get_node({x=i,y=j,z=k})
+					local current = minetest.get_node({x=i,y=j,z=k})
 					
 					if (current.name == "air") then
-						minetest.env:set_node({x=i,y=j,z=k}, 
+						minetest.set_node({x=i,y=j,z=k}, 
 											{name="fire:basic_flame"})
 					end
 				
@@ -944,7 +944,7 @@ function fighting.distance_attack_handler(entity,targetpos,mob_pos,now,distance)
 				sound.play(mob_pos,entity.data.sound.distance);
 			end
 				
-			local newobject=minetest.env:add_entity({	x=mob_pos.x+dir.x,
+			local newobject=minetest.add_entity({	x=mob_pos.x+dir.x,
 														y=mob_pos.y+dir.y+1,
 														z=mob_pos.z+dir.z
 														},
@@ -1022,7 +1022,7 @@ function fighting.sun_damage_handler(entity,now)
 		local pos = entity.object:getpos()
 		local current_state = mob_state.get_state_by_name(entity,
 											entity.dynamic_data.state.current)
-		local current_light = minetest.env:get_node_light(pos)
+		local current_light = minetest.get_node_light(pos)
 			
 		if current_light == nil then
 			minetest.log(LOGLEVEL_ERROR,"MOBF: Bug!!! didn't get a light value for "

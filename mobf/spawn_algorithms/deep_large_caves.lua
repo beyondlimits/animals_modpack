@@ -72,14 +72,14 @@ function mobf_spawn_in_deep_large_caves(mob_name,mob_transform,spawning_data,env
 					return
 				end
 
-				local node_above = minetest.env:get_node(pos_above)
+				local node_above = minetest.get_node(pos_above)
 
 				if mob_name == nil then
 					minetest.log(LOGLEVEL_ERROR,"MOBF: Bug!!! mob name not available")
 				else
 					dbg_mobf.spawning_lvl3("MOBF: trying to spawn " .. mob_name)
 					if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
-						local newobject = minetest.env:add_entity(pos_above,mob_name .. "__default")
+						local newobject = minetest.add_entity(pos_above,mob_name .. "__default")
 
 						local newentity = mobf_find_entity(newobject)
 
@@ -145,7 +145,7 @@ function mobf_spawn_in_deep_large_caves_entity(mob_name,mob_transform,spawning_d
 				if newpos.y ~= nil then
 					--check if own position is good
 					local pos_below = {x=newpos.x,y=newpos.y-1,z=newpos.z}
-					local node_below = minetest.env:get_node(pos_below)
+					local node_below = minetest.get_node(pos_below)
 				
 				
 					if not mobf_contains({ "default:stone","default:gravel","default:dirt" },node_below.name) then
@@ -225,7 +225,7 @@ function mobf_spawn_in_deep_large_caves_entity(mob_name,mob_transform,spawning_d
 				if surface then
 					pos.y= surface -1
 					
-					local node = minetest.env:get_node(pos)
+					local node = minetest.get_node(pos)
 					
 					if not mobf_contains({ "default:stone","default:gravel","default:dirt","default:sand" },node.name) then
 						dbg_mobf.spawning_lvl3("MOBF: node ain't of correct type: " .. node.name)
@@ -233,7 +233,7 @@ function mobf_spawn_in_deep_large_caves_entity(mob_name,mob_transform,spawning_d
 					end
 					
 					local pos_above = {x=pos.x,y=pos.y+1,z=pos.z}
-					local node_above = minetest.env:get_node(pos_above)
+					local node_above = minetest.get_node(pos_above)
 					if not mobf_contains({"air"},node_above.name) then
 						dbg_mobf.spawning_lvl3("MOBF: node above ain't air but: " .. node_above.name)
 						return

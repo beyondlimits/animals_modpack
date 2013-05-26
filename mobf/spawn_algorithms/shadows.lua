@@ -67,7 +67,7 @@ function mobf_spawn_in_shadows(mob_name,mob_transform,spawning_data,environment)
 					return
 				end
 
-				local node_above = minetest.env:get_node(pos_above)
+				local node_above = minetest.get_node(pos_above)
 
 				if mob_name == nil then
 					minetest.log(LOGLEVEL_ERROR,"MOBF: Bug!!! mob name not available")
@@ -83,7 +83,7 @@ function mobf_spawn_in_shadows(mob_name,mob_transform,spawning_data,environment)
 						if  maxlight < 3 then
 
 							local newobject = 
-								minetest.env:add_entity(pos_above,mob_name .. "__default")
+								minetest.add_entity(pos_above,mob_name .. "__default")
 
 							local newentity = mobf_find_entity(newobject)
 
@@ -163,7 +163,7 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 					
 					--check if own position is good
 					local pos_below = {x=newpos.x,y=newpos.y-1,z=newpos.z}
-					local node_below = minetest.env:get_node(pos_below)
+					local node_below = minetest.get_node(pos_below)
 					
 					
 					if not mobf_contains({	"default:stone",
@@ -180,7 +180,7 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 					end
 					
 					for i=0.0,1,0.1 do
-						local light_val = minetest.env:get_node_light(pos,i)
+						local light_val = minetest.get_node_light(pos,i)
 						if light_val == nil or light_val > 6 then
 							good = false
 							reason = reason .. ":to much light"
@@ -242,7 +242,7 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 				if surface then
 					pos.y= surface -1
 					
-					local node = minetest.env:get_node(pos)
+					local node = minetest.get_node(pos)
 					
 					if not mobf_contains({	"default:stone",
 											"default:gravel",
@@ -254,7 +254,7 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 					end
 					
 					local pos_above = {x=pos.x,y=pos.y+1,z=pos.z}
-					local node_above = minetest.env:get_node(pos_above)
+					local node_above = minetest.get_node(pos_above)
 					if not mobf_contains({"air"},node_above.name) then
 						dbg_mobf.spawning_lvl3(
 							"MOBF: node above ain't air but: " .. node_above.name)
@@ -263,7 +263,7 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 					
 					--check if its always in shadows
 					for i=0.0,1,0.1 do
-						if minetest.env:get_node_light(pos_above,i) > 6 then
+						if minetest.get_node_light(pos_above,i) > 6 then
 							return false
 						end
 					end

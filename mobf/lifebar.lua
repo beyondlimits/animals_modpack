@@ -74,7 +74,7 @@ function mobf_lifebar.add(entity)
 	local BS = 10
 	pos.y = pos.y + entity.collisionbox[5] + 0.1
 
-	local lifebar = minetest.env:add_entity(pos,"mobf:lifebar")
+	local lifebar = minetest.add_entity(pos,"mobf:lifebar")
 	
 	if lifebar ~= nil then
 

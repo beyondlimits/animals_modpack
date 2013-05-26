@@ -19,6 +19,22 @@
 graphics = {}
 
 -------------------------------------------------------------------------------
+-- name: init_dynamic_data(entity,velocity)
+--
+--! @brief initialize values required by graphics
+--! @memberof graphics
+--
+--! @param entity mob to calculate direction
+--! @param current_velocity data to calculate direction from
+-------------------------------------------------------------------------------
+function graphics.init_dynamic_data(entity,now)
+	local data = {
+		last_scalar_speed = nil,	
+	}	
+	
+	entity.dynamic_data.graphics = data
+end
+-------------------------------------------------------------------------------
 -- name: update_orientation_simple(entity,velocity)
 --
 --! @brief calculate direction of mob to face
@@ -46,7 +62,85 @@ function graphics.update_orientation_simple(entity,current_velocity)
 end
 
 -------------------------------------------------------------------------------
--- name: update_orientation(entity)
+-- name: update(entity,now,dtime)
+--
+--! @brief callback for updating graphics of mob
+--! @memberof graphics
+--
+--! @param entity mob to calculate direction
+--! @param now current time
+--! @param dtime current dtime
+-------------------------------------------------------------------------------
+function graphics.update(entity,now,dtime)
+
+	--updating orientation
+	graphics.update_orientation(entity,now,dtime)
+	
+	
+	--update animation speed
+	graphics.update_animation(entity,now,dtime)
+	
+	--update attention
+	if entity.dynamic_data.attention ~= nil and
+		entity.data.attention ~= nil and
+		entity.dynamic_data.attention.current_value >
+		entity.data.attention.watch_threshold then
+		dbg_mobf.graphics_lvl3("MOBF: attention mode orientation update")
+		local direction = mobf_get_direction(entity.object:getpos(),
+								entity.dynamic_data.attention.most_relevant_target:getpos())
+	
+		if entity.mode == "3d" then
+			entity.object:setyaw(
+				mobf_calc_yaw(direction.x,direction.z))
+		else
+			entity.object:setyaw(
+				mobf_calc_yaw(direction.x,direction.z)+math.pi/2)
+		end
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: update_animation(entity,now,dtime)
+--
+--! @brief callback for updating graphics of mob
+--! @memberof graphics
+--
+--! @param entity mob to calculate direction
+--! @param now current time
+--! @param dtime current dtime
+-------------------------------------------------------------------------------
+function graphics.update_animation(entity,now,dtime)
+	if entity.dynamic_data.animation ~= nil then
+	
+		local animdata = entity.data.animation[entity.dynamic_data.animation]
+		if animdata ~= nil and
+			animdata.basevelocity ~= nil then
+			
+			local current_velocity = entity.object:getvelocity()
+			local scalar_velocity = mobf_calc_scalar_speed(current_velocity.x,current_velocity.z)
+			
+			if entity.dynamic_data.graphics.last_scalar_speed ~= nil then
+				local speeddiff = 
+					DELTA(scalar_velocity,
+							entity.dynamic_data.graphics.last_scalar_speed)
+							
+				if speeddiff > 0.1 then
+					local current_fps = scalar_velocity/animdata.basevelocity * 15
+					
+					entity.object:set_animation_speed(current_fps)
+				
+					entity.dynamic_data.graphics.last_scalar_speed = scalar_velocity
+					entity.dynamic_data.graphics.last_fps = current_fps
+				end
+			else
+				entity.dynamic_data.graphics.last_scalar_speed = scalar_velocity
+			end
+		end
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: update_orientation(entity,now,dtime)
 --
 --! @brief callback for calculating a mobs direction
 --! @memberof graphics
@@ -109,26 +203,6 @@ function graphics.update_orientation(entity,now,dtime)
 			else
 				dbg_mobf.graphics_lvl3("MOBF: not moving")
 			end
-		end
-	end
-	
-	-- make mobs face a specific player
-	-- TODO move from dynamics data inventory to somewhere else
-	
-	if entity.dynamic_data.attention ~= nil and
-		entity.data.attention ~= nil and
-		entity.dynamic_data.attention.current_value >
-		entity.data.attention.watch_threshold then
-		dbg_mobf.graphics_lvl3("MOBF: attention mode orientation update")
-		local direction = mobf_get_direction(entity.object:getpos(),
-								entity.dynamic_data.attention.most_relevant_target:getpos())
-	
-		if entity.mode == "3d" then
-			entity.object:setyaw(
-				mobf_calc_yaw(direction.x,direction.z))
-		else
-			entity.object:setyaw(
-				mobf_calc_yaw(direction.x,direction.z)+math.pi/2)
 		end
 	end
 end

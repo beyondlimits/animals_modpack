@@ -166,7 +166,7 @@ tamed_wolf_prototype = {
 						print("ANIMAL tamed wolf: custom on activate handler called")
 						if (entity.dynamic_data.spawning.spawner ~= nil) then
 							print("ANIMAL tamed wolf: setting target to: " .. entity.dynamic_data.spawning.spawner )
-							entity.dynamic_data.movement.target = minetest.env:get_player_by_name(entity.dynamic_data.spawning.spawner)
+							entity.dynamic_data.movement.target = minetest.get_player_by_name(entity.dynamic_data.spawning.spawner)
 						end
 					end,
 					custom_on_step_handler = function(entity,now,dstep)

@@ -51,7 +51,7 @@ function mobf_spawn_in_air1(mob_name,mob_transform,spawning_data,environment)
 					z = pos.z
 				}
 				
-				local node_above = minetest.env:get_node(pos_above)
+				local node_above = minetest.get_node(pos_above)
 				
 				if node_above.name ~= "air" then
 					mobf_warn_long_fct(starttime,"mobf_spawn_in_air1")
@@ -65,7 +65,7 @@ function mobf_spawn_in_air1(mob_name,mob_transform,spawning_data,environment)
 					z = pos.z
 				}
 				
-				local node_spawn = minetest.env:get_node(pos_spawn)
+				local node_spawn = minetest.get_node(pos_spawn)
 
 
 
@@ -113,7 +113,7 @@ function mobf_spawn_in_air1_spawner(mob_name,mob_transform,spawning_data,environ
 			for y=pos.y-1,pos.y+1,1 do
 			for z=pos.z-1,pos.z+1,1 do
 			
-				local node_to_check = minetest.env:get_node({x=x,y=y,z=z})
+				local node_to_check = minetest.get_node({x=x,y=y,z=z})
 				
 				if node_to_check == nil then
 					good = false

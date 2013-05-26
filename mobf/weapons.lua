@@ -45,7 +45,7 @@ function mobf_do_area_damage(pos,immune,damage_groups,range)
 	--damage objects within inner blast radius
 	mobf_assert_backtrace(type(range) ~= "table")
 
-	objs = minetest.env:get_objects_inside_radius(pos, range)
+	objs = minetest.get_objects_inside_radius(pos, range)
 	for k, obj in pairs(objs) do
 
 		--don't do damage to issuer
@@ -77,7 +77,7 @@ function mobf_do_node_damage(pos,immune_list,range,chance)
 			for k=pos.z-range,pos.z+range,1 do
 				--TODO create a little bit more sophisticated blast resistance
 				if math.random() < chance then
-					local toremove = minetest.env:get_node({x=i,y=j,z=k})
+					local toremove = minetest.get_node({x=i,y=j,z=k})
 
 					if toremove ~= nil then
 						local immune = false
@@ -92,7 +92,7 @@ function mobf_do_node_damage(pos,immune_list,range,chance)
 
 
 						if immune ~= true then					
-							minetest.env:remove_node({x=i,y=j,z=k})
+							minetest.remove_node({x=i,y=j,z=k})
 						end
 					end
 				end
@@ -158,15 +158,15 @@ function MOBF_FIREBALL_ENTITY.surfacefire(pos,range)
 		for j=pos.y-range/2, pos.y+range/2, 1 do
 		for k=pos.z-range/2, pos.z+range/2, 1 do
 		
-			local current = minetest.env:get_node({x=i,y=j,z=k})
-			local ontop  = minetest.env:get_node({x=i,y=j+1,z=k})
+			local current = minetest.get_node({x=i,y=j,z=k})
+			local ontop  = minetest.get_node({x=i,y=j+1,z=k})
 			
 			--print("put fire? " .. printpos({x=i,y=j,z=k}) .. " " .. current.name .. " " ..ontop.name)
 			
 			if (current.name ~= "air") and
 				(current.name ~= "fire:basic_flame") and
 				(ontop.name == "air") then
-				minetest.env:set_node({x=i,y=j+1,z=k}, {name="fire:basic_flame"})
+				minetest.set_node({x=i,y=j+1,z=k}, {name="fire:basic_flame"})
 			end
 					
 		end
@@ -189,11 +189,11 @@ end
 -------------------------------------------------------------------------------
 function MOBF_FIREBALL_ENTITY.on_step(self, dtime)
 	local pos = self.object:getpos()
-	local node = minetest.env:get_node(pos)
+	local node = minetest.get_node(pos)
 
 
 	--detect hit
-	local objs=minetest.env:get_objects_inside_radius({x=pos.x,y=pos.y,z=pos.z}, 1)
+	local objs=minetest.get_objects_inside_radius({x=pos.x,y=pos.y,z=pos.z}, 1)
 
 	local hit = false
 
@@ -280,11 +280,11 @@ end
 -------------------------------------------------------------------------------
 function MOBF_PLASMABALL_ENTITY.on_step(self, dtime)
 	local pos = self.object:getpos()
-	local node = minetest.env:get_node(pos)
+	local node = minetest.get_node(pos)
 
 
 	--detect hit
-	local objs=minetest.env:get_objects_inside_radius({x=pos.x,y=pos.y,z=pos.z}, 1)
+	local objs=minetest.get_objects_inside_radius({x=pos.x,y=pos.y,z=pos.z}, 1)
 
 	local hit = false
 
@@ -310,20 +310,20 @@ function MOBF_PLASMABALL_ENTITY.on_step(self, dtime)
 	if node.name ~= "air" or
 		hit then
 
-		--replace this loop by minetest.env:find_node_near?
+		--replace this loop by minetest.find_node_near?
 		--do node damage
 		for i=pos.x-1, pos.x+1, 1 do
 			for j=pos.y-1, pos.y+1, 1 do
 				for k=pos.z-1,pos.z+1,1 do
 					--TODO create a little bit more sophisticated blast resistance
 					if math.random() < 0.5 then
-						local toremove = minetest.env:get_node({x=i,y=j,z=k})
+						local toremove = minetest.get_node({x=i,y=j,z=k})
 
 						if toremove ~= nil and
 							toremove.name ~= "default:stone" and
 							toremove.name ~= "default:cobble" then
 						
-							minetest.env:remove_node({x=i,y=j,z=k})
+							minetest.remove_node({x=i,y=j,z=k})
 						end
 					end
 				end
@@ -377,10 +377,10 @@ MOBF_ARROW_ENTITY={
 MOBF_ARROW_ENTITY.on_step = function(self, dtime)
 	self.timer=self.timer+dtime
 	local pos = self.object:getpos()
-	local node = minetest.env:get_node(pos)
+	local node = minetest.get_node(pos)
 
 	if self.timer>0.2 then
-		local objs = minetest.env:get_objects_inside_radius({x=pos.x,y=pos.y,z=pos.z}, 2)
+		local objs = minetest.get_objects_inside_radius({x=pos.x,y=pos.y,z=pos.z}, 2)
 		for k, obj in pairs(objs) do
 			if obj:get_luaentity() ~= nil and
 				obj ~= self.owner then
@@ -405,7 +405,7 @@ MOBF_ARROW_ENTITY.on_step = function(self, dtime)
 
 	if self.lastpos.x~=nil then
 		if node.name ~= "air" then
-			minetest.env:add_item(self.lastpos, 'mobf:arrow')
+			minetest.add_item(self.lastpos, 'mobf:arrow')
 			self.object:remove()
 		end
 	end

@@ -63,7 +63,7 @@ function mobf_spawn_on_willow(mob_name,mob_transform,spawning_data,environment)
 					return
 				end
 
-				local node_above = minetest.env:get_node(pos_above)
+				local node_above = minetest.get_node(pos_above)
 
 				if mob_name == nil then
 					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! mob name not available")
@@ -72,7 +72,7 @@ function mobf_spawn_on_willow(mob_name,mob_transform,spawning_data,environment)
 					if node_above.name == "air" then
 						--print("Find mobs of same type around:"..mob_name.. " pop dens: ".. population_density)
 					   if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
-							local newobject = minetest.env:add_entity(pos_above,mob_name .. "__default")
+							local newobject = minetest.add_entity(pos_above,mob_name .. "__default")
 
 							local newentity = mobf_find_entity(newobject)
 							

@@ -116,6 +116,7 @@ cow_prototype = {
 				walk = {
 					start_frame = 170,
 					end_frame   = 250,
+					basevelocity = 0.35,
 					},
 				stand = {
 					start_frame = 0,
@@ -175,7 +176,7 @@ steer_prototype = {
                                 max_hear_distance = 10,
                                 },
                     },
-        states = {
+		states = {
 				{ 
 				name = "walking",
 				movgen = "probab_mov_gen",
@@ -214,6 +215,7 @@ steer_prototype = {
 				walk = {
 					start_frame = 170,
 					end_frame   = 250,
+					basevelocity = 0.35,
 					},
 				stand = {
 					start_frame = 0,
@@ -280,6 +282,7 @@ baby_calf_f_prototype = {
 				walk = {
 					start_frame = 1,
 					end_frame   = 40,
+					basevelocity = 0.15,
 					},
 				stand = {
 					start_frame = 41,
@@ -369,6 +372,7 @@ baby_calf_m_prototype = {
 				walk = {
 					start_frame = 1,
 					end_frame   = 40,
+					basevelocity = 0.15,
 					},
 				stand = {
 					start_frame = 41,

@@ -37,7 +37,7 @@ minetest.register_craftitem("barn:barn_empty", {
 				if pointed_thing.type == "node" then
 					local pos = pointed_thing.above
 			
-					local newobject = minetest.env:add_entity(pos,"barn:barn_empty_ent")
+					local newobject = minetest.add_entity(pos,"barn:barn_empty_ent")
 					
 					item:take_item()
 
@@ -53,7 +53,7 @@ minetest.register_craftitem("barn:barn_small_empty", {
 				if pointed_thing.type == "node" then
 					local pos = pointed_thing.above
 			
-					local newobject = minetest.env:add_entity(pos,"barn:barn_small_empty_ent")
+					local newobject = minetest.add_entity(pos,"barn:barn_small_empty_ent")
 					
 					item:take_item()
 
@@ -95,7 +95,7 @@ end
 function breed(breedpairs,self,now)
 
 	local pos = self.object:getpos()
-	local objectlist = minetest.env:get_objects_inside_radius(pos,2)
+	local objectlist = minetest.get_objects_inside_radius(pos,2)
 	local le_animal1 = nil
 	local le_animal2 = nil
 	
@@ -150,7 +150,7 @@ function breed(breedpairs,self,now)
 		
 		local result = breedpairs[math.random(3,4)]
 		
-		local breeded = minetest.env:add_entity(pos_to_breed ,result .. "__default")
+		local breeded = minetest.add_entity(pos_to_breed ,result .. "__default")
 		
 		local breeded_lua = breeded:get_luaentity()
 		breeded_lua.dynamic_data.spawning.player_spawned = true
@@ -188,7 +188,7 @@ minetest.register_entity(":barn:barn_ent",
 					--remove barn and add empty one
 					self.object:remove()
 		
-					local barn_empty = minetest.env:add_entity(pos,"barn:barn_empty_ent")
+					local barn_empty = minetest.add_entity(pos,"barn:barn_empty_ent")
 					local barn_empty_lua = barn_empty:get_luaentity()
 					barn_empty_lua.last_breed_time = now
 				end
@@ -239,7 +239,7 @@ minetest.register_entity(":barn:barn_empty_ent",
 				
 				self.object:remove()
 			
-				local barn = minetest.env:add_entity(pos,"barn:barn_ent")
+				local barn = minetest.add_entity(pos,"barn:barn_ent")
 					
 				local barn_lua = barn:get_luaentity()
 					
@@ -286,7 +286,7 @@ minetest.register_entity(":barn:barn_small_ent",
 					--remove barn and add empty one
 					self.object:remove()
 		
-					local barn_empty = minetest.env:add_entity(pos,"barn:barn_small_empty_ent")
+					local barn_empty = minetest.add_entity(pos,"barn:barn_small_empty_ent")
 					local barn_empty_lua = barn_empty:get_luaentity()
 					barn_empty_lua.last_breed_time = now
 				end
@@ -337,7 +337,7 @@ minetest.register_entity(":barn:barn_small_empty_ent",
 				
 				self.object:remove()
 			
-				local barn = minetest.env:add_entity(pos,"barn:barn_small_ent")
+				local barn = minetest.add_entity(pos,"barn:barn_small_ent")
 					
 				local barn_lua = barn:get_luaentity()
 					

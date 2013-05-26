@@ -54,7 +54,7 @@ function random_drop.callback(entity,now)
 				local toput = environment.get_suitable_pos_same_level(entitybasepos,1,entity)
 
 				if toput ~= nil then
-					minetest.env:add_entity(toput,entity.data.random_drop.result.."_ent")
+					minetest.add_entity(toput,entity.data.random_drop.result.."_ent")
 					dbg_mobf.random_drop_lvl3("MOBF: adding random drop for "..entity.data.name .. ": "..entity.data.random_drop.result.."_ent" .. " at " .. printpos(toput))
 					if entity.data.sound ~= nil then
 						sound.play(entitybasepos,entity.data.sound.random_drop)

@@ -9,7 +9,7 @@ minetest.register_craftitem("trap:undead", {
 				if pointed_thing.type == "node" then
 					local pos = pointed_thing.above
 			
-					local newobject = minetest.env:add_entity(pos,"trap:undead_ent")
+					local newobject = minetest.add_entity(pos,"trap:undead_ent")
 
 					item:take_item()
 
@@ -43,7 +43,7 @@ minetest.register_entity(":trap:undead_ent",
 			
 				local pos = self.object:getpos()
 			
-				local objectlist = minetest.env:get_objects_inside_radius(pos,2)
+				local objectlist = minetest.get_objects_inside_radius(pos,2)
 				
 				for index,value in pairs(objectlist) do
 				
@@ -57,7 +57,7 @@ minetest.register_entity(":trap:undead_ent",
 						
 						self.object:remove()
 						
-						minetest.env:add_node(pos,{name="trap:cought_vombie"})
+						minetest.add_node(pos,{name="trap:cought_vombie"})
 					end
 				
 				end

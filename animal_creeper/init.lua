@@ -121,7 +121,7 @@ minetest.register_entity("animal_creeper:creeper_spawner",
 	on_activate = function(self,staticdata)
 	
 		local pos = self.object:getpos();
-		minetest.env:add_entity(pos,"animal_creeper:creeper_spawner_at_night")
+		minetest.add_entity(pos,"animal_creeper:creeper_spawner_at_night")
 		self.object:remove()
 	end,
 })

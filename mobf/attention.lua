@@ -141,7 +141,7 @@ function attention.callback(entity,now)
 	
 	--get list of all objects in attention range
 	local objectlist = 
-		minetest.env:get_objects_inside_radius(own_pos,attention_distance)
+		minetest.get_objects_inside_radius(own_pos,attention_distance)
 	
 	if #objectlist > 0 then
 		for i = 1 , #objectlist, 1 do

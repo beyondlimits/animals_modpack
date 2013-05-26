@@ -108,7 +108,7 @@ function mobf_debug.spawn_mob(name,param)
 	else
 		--todo find random pos
 
-		local player = minetest.env:get_player_by_name(name)
+		local player = minetest.get_player_by_name(name)
 		
 		if player == nil then
 		
@@ -220,7 +220,7 @@ end
 --! @param param parameters received
 ------------------------------------------------------------------------------
 function mobf_debug.add_tools(name,param)
-	local player = minetest.env:get_player_by_name(name)
+	local player = minetest.get_player_by_name(name)
 	
 	if player ~= nil then
 		player:get_inventory():add_item("main", "animalmaterials:lasso 20")
@@ -378,7 +378,7 @@ function mobf_debug.rightclick_callback(entity,player)
 			print("MOBF: \t\tpath:                        " .. dump(entity.dynamic_data.p_movement.path))
 		if entity.dynamic_data.p_movement.path ~= nil then
 			for i,v in ipairs(entity.dynamic_data.p_movement.path) do
-				local objects = minetest.env:get_objects_inside_radius(v,0.5)
+				local objects = minetest.get_objects_inside_radius(v,0.5)
 				local found = false;
 				for i=1,#objects,1 do
 					local luaentity = objects[i]:get_luaentity()
@@ -389,7 +389,7 @@ function mobf_debug.rightclick_callback(entity,player)
 					end
 				end
 				
-				local node_at = minetest.env:get_node(v)
+				local node_at = minetest.get_node(v)
 				
 				if not found and 
 					node_at.name ~= nil and
@@ -425,6 +425,9 @@ function mobf_debug.rightclick_callback(entity,player)
 		for k,v in pairs(entity.dynamic_data.attention.watched_objects) do
 			print("MOBF: \t\t " .. k .. ": " .. v.value)
 		end
+	end
+	if entity.dynamic_data.graphics.last_fps ~= nil then
+		print("MOBF: Animating with: " .. entity.dynamic_data.graphics.last_fps .. " fps")
 	end
 	return false
 end

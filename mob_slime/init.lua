@@ -30,7 +30,7 @@ function mob_slime_bounce(entity)
 	local pos = entity.object:getpos()
 	local current_velocity = entity.object:getvelocity()
 	
-	local node_below = minetest.env:get_node({x=pos.x,y=pos.y + entity.collisionbox[2] -0.01,z=pos.z})
+	local node_below = minetest.get_node({x=pos.x,y=pos.y + entity.collisionbox[2] -0.01,z=pos.z})
 	
 	if not mobf_is_walkable(node_below) then
 		entity.object:setvelocity( {x=current_velocity.x,y=entity.data.movement.bounce,z=current_velocity.z})

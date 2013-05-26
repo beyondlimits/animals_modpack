@@ -250,7 +250,7 @@ function direction_control.precheck_movement(entity,movement_state,pos_predicted
 			dbg_mobf.movement_lvl1("mob is about to collide")
 			if environment.pos_is_ok({x=pos_predicted.x,y=pos_predicted.y+1,z=pos_predicted.z},entity) == "ok" then
 				if math.random() < ( entity.dynamic_data.movement.mpattern.jump_up * PER_SECOND_CORRECTION_FACTOR) then
-					local node_at_predicted_pos = minetest.env:get_node(pos_predicted)
+					local node_at_predicted_pos = minetest.get_node(pos_predicted)
 					dbg_mobf.pmovement_lvl2("MOBF: velocity is:" .. printpos(movement_state.current_velocity) .. " position is: "..printpos(pos) ) 
 					dbg_mobf.pmovement_lvl2("MOBF: estimated position was: "..printpos(pos_predicted))
 					dbg_mobf.pmovement_lvl2("MOBF: predicted node state is: " .. environment.pos_is_ok(pos_predicted,entity))

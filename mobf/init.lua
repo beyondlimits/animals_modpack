@@ -3,7 +3,7 @@
 -- 
 -- You may copy, use, modify or do nearly anything except removing this
 -- copyright notice. 
--- And of course you are NOT allow to pretend you have written it.
+-- And of course you are NOT allowed to pretend you have written it.
 --
 --! @file init.lua
 --! @brief main module file responsible for including all parts of mob framework mod
@@ -58,8 +58,9 @@ end
 dofile (mobf_modpath .. "/debug_trace.lua")
 
 --include engine
-dofile (mobf_modpath .. "/utils/generic_functions.lua")
+dofile (mobf_modpath .. "/utils/error_handling.lua")
 dofile (mobf_modpath .. "/utils/settings.lua")
+dofile (mobf_modpath .. "/utils/generic_functions.lua")
 dofile (mobf_modpath .. "/utils/data_storage.lua")
 dofile (mobf_modpath .. "/utils/tracing.lua")
 dofile (mobf_modpath .. "/utils/geometry.lua")
@@ -294,9 +295,9 @@ function mobf_init_modules()
 
 	--visual change hook
 	mobf.register_on_step_callback({
-			name = "update_orientation",
-			handler = graphics.update_orientation,
-			init = nil,
+			name = "update_graphics",
+			handler = graphics.update,
+			init = graphics.init_dynamic_data,
 			configcheck = function(entity)
 					return true
 				end
