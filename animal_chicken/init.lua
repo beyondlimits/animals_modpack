@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_chicken mod loading ...")
-local version = "0.0.18"
+local version = "0.0.19"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
@@ -87,7 +87,13 @@ chicken_prototype = {
 						max_hear_distance = 5,
 						},
 					random = {
-						name="animal_chicken_random_chicken",
+						name= {
+							"animal_chicken_random_chicken_1",
+							"animal_chicken_random_chicken_2",
+							"animal_chicken_random_chicken_3",
+							"animal_chicken_random_chicken_4",
+							"animal_chicken_random_chicken_5",
+							},
 						min_delta = 60,
 						chance = 0.5,
 						gain = 1,
