@@ -66,6 +66,14 @@ cow_prototype = {
 						algorithm="big_willow_mapgen",
 						height=2
 						},
+					},
+					secondary_algorithms = {
+						{
+						rate=0.001,
+						density=200,
+						algorithm="big_willow",
+						height=2
+						},
 					}
 				},
 		sound = {
@@ -160,22 +168,30 @@ steer_prototype = {
         spawning = {
 					primary_algorithms = {
 						{
-	                    rate=0.001,
-	                    density=200,
-	                    algorithm="big_willow_mapgen",
-	                    height=2
-	                    },
-	                }
-	           },
-        sound = {
-                    random = {
-                                name="Mudchute_cow_1",
-                                min_delta = 30,
-                                chance = 0.5,
-                                gain = 1,
-                                max_hear_distance = 10,
-                                },
-                    },
+						rate=0.001,
+						density=200,
+						algorithm="big_willow_mapgen",
+						height=2
+						},
+					},
+					secondary_algorithms = {
+						{
+						rate=0.001,
+						density=200,
+						algorithm="big_willow",
+						height=2
+						},
+					}
+				},
+		sound = {
+					random = {
+						name="Mudchute_cow_1",
+						min_delta = 30,
+						chance = 0.5,
+						gain = 1,
+						max_hear_distance = 10,
+						},
+					},
 		states = {
 				{ 
 				name = "walking",
