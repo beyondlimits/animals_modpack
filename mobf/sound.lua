@@ -74,7 +74,14 @@ function sound.play_random(entity,now)
 		if (entity.dynamic_data.sound.random_last + entity.data.sound.random.min_delta < now) then
 
 			if math.random() < entity.data.sound.random.chance then
-				sound.play(entity.object:getpos(),entity.data.sound.random)
+				local toplay = nil
+				if type(entity.data.sound.random) == "table" then 
+					local current_random_sound = math.floor(math.random(1,#entity.data.sound.random) + 0.5)
+					toplay = entity.data.sound.random[current_random_sound]
+				else
+					toplay = entity.data.sound.random
+				end
+				sound.play(entity.object:getpos(),toplay)
 				entity.dynamic_data.sound.random_last = now
 				dbg_mobf.sound_lvl1("MOBF: playing sound")
 			else
