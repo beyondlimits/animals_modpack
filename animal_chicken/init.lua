@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_chicken mod loading ...")
-local version = "0.0.17"
+local version = "0.0.18"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
@@ -169,6 +169,14 @@ rooster_prototype = {
 							algorithm="willow_mapgen",
 							height=1
 						}
+					},
+				secondary_algorithms = {
+						{
+						rate=0.001,
+						density=75,
+						algorithm="willow",
+						height=2
+						},
 					}
 				},
 		sound = {
