@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_deer mod loading ... ")
 
-local version = "0.0.13"
+local version = "0.0.14"
 
 local deer_groups = {
 						not_in_creative_inventory=1
@@ -58,6 +58,14 @@ deer_prototype = {
 						rate=0.002,
 						density=200,
 						algorithm="forrest_mapgen",
+						height=2
+						},
+					},
+					secondary_algorithms = {
+						{
+						rate=0.002,
+						density=200,
+						algorithm="forrest",
 						height=2
 						},
 					}
