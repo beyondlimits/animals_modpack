@@ -64,6 +64,20 @@ rat_prototype = {
 						height=1,
 						respawndelay = 120,
 						},
+					},
+					secondary_algorithms = {
+						{
+						rate=0.002,
+						density=250,
+						algorithm="forrest",
+						height=2
+						},
+						{
+						rate=0.002,
+						density=250,
+						algorithm="shadows",
+						height=2
+						},
 					}
 				},
 		animation = {
