@@ -3,7 +3,7 @@
 -- 
 -- You may copy, use, modify or do nearly anything except removing this
 -- copyright notice. 
--- And of course you are NOT allow to pretend you have written it.
+-- And of course you are NOT allowed to pretend you have written it.
 --
 --! @file init.lua
 --! @brief wolf implementation
@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_wolf loading ...")
 
-local version = "0.0.15"
+local version = "0.0.16"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
@@ -72,6 +72,14 @@ wolf_prototype = {
 						height=2
 						},
 					},
+				secondary_algorithms = {
+						{
+						rate=0.002,
+						density=800,
+						algorithm="forrest",
+						height=2
+						},
+					}
 				},
 		sound = {
 					random = nil,
