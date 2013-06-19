@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.0.24"
+local version = "0.0.25"
 
 local sheep_groups = {
 						sheerable=1,
@@ -66,7 +66,14 @@ sheep_prototype = {
 						rate=0.002,
 						density=50,
 						algorithm="willow_mapgen",
-						algorithm_secondary="willow",
+						height=2
+						},
+					},
+					secondary_algorithms = {
+						{
+						rate=0.002,
+						density=50,
+						algorithm="willow",
 						height=2
 						},
 					}
