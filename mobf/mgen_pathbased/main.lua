@@ -245,7 +245,7 @@ function p_mov_gen.set_target(entity,target)
 	if type(minetest.env.find_path) == "function" then
 		print("trying to find path to: " .. printpos(targetpos))
 		entity.dynamic_data.p_movement.path = 
-			minetest.env:find_path(current_pos,targetpos,5,1,1,nil)
+			minetest.find_path(current_pos,targetpos,5,1,1,nil)
 					
 		if entity.dynamic_data.p_movement.path ~= nil then
 
