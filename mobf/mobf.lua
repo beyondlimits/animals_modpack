@@ -413,6 +413,9 @@ function mobf.activate_handler(self,staticdata)
 
 	--initialize height level
 	environment.fix_base_pos(self, self.collisionbox[2] * -1)
+	
+	--initialize mob factions
+	mobf.init_factions(self)
 
 	--custom on activate handler
 	if (self.data.generic.custom_on_activate_handler ~= nil) then
@@ -429,8 +432,23 @@ function mobf.activate_handler(self,staticdata)
 end
 
 
+------------------------------------------------------------------------------
+-- name: init_factions(entityn)
+--
+--! @brief register mob to factions nod
+--! @memberof mobf
+--! @private
+--
+--! @param entity entity to initialize
+-------------------------------------------------------------------------------
+function mobf.init_factions(entity)
 
-
+	if not mobf_rtd.factions_available then
+		return
+	end
+	
+	
+end
 
 ------------------------------------------------------------------------------
 -- name: register_entity(entityname,graphics)
