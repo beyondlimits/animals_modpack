@@ -97,7 +97,9 @@ function mobf_add_mob(mob)
 	
 	spawning.register_mob(mob)
 
-	
+	if mob.generic.stepheight == nil then
+		mob.generic.stepheight = 0
+	end
 
 	--register mob name to internal data structures
 	table.insert(mobf_rtd.registred_mob,mob.modname.. ":"..mob.name)

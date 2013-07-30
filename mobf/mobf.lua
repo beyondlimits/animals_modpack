@@ -478,7 +478,7 @@ function mobf.register_entity(name, graphics, mob)
 				automatic_rotate = true,
 				groups          = mob.generic.groups,
 				hp_max          = mob.generic.base_health,
---				stepheight      = 0.6,
+				stepheight      = mob.generic.stepheight,
 
 
 
