@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_ostrich mod loading ...")
-local version = "0.0.7"
+local version = "0.0.8"
 
 local ostrich_groups = {
 						not_in_creative_inventory=1
@@ -47,7 +47,8 @@ ostrich_f_prototype = {
 						fleshy=90,
 					},
 					groups = ostrich_groups,
-					envid = "meadow"
+					envid = "meadow",
+					stepheight=1.1,
 				},
 		movement =  {
 					min_accel=0.05,
@@ -140,7 +141,8 @@ ostrich_m_prototype = {
 						fleshy=90,
 					},
 					groups = ostrich_groups,
-					envid = "meadow"
+					envid = "meadow",
+					stepheight=1.1,
 				},
 		movement =  {
 					min_accel=0.05,
