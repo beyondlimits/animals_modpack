@@ -528,7 +528,6 @@ function mobf_get_surface(x,z, min_y, max_y)
 	if type(minetest.get_surface) == "function" then
 		local basepos = {x=x,y=min_y,z=z}
 		local offset = max_y-min_y
-		print("Values: " .. dump(basepos) .." " .. dump(offset))
 		return minetest.get_surface(basepos,offset)
 	end
 
