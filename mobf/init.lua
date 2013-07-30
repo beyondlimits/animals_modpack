@@ -31,7 +31,9 @@ mobf_rtd = {
 	--!do we have luatrace
 	luatrace_enabled		= false,
 	--!do we have inventory plus support
-	inventory_plus_enabled = false,
+	inventory_plus_enabled	= false,
+	--!do we have factions support
+	factions_available		= false,
 	--!registry for movement patterns
 	movement_patterns		= {},
 	--!registry of mobs
