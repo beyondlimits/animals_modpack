@@ -846,10 +846,17 @@ function fighting.melee_attack_handler(entity,now,distance)
 		return false
 	end
 	
+	local ownpos = entity.object:getpos()
+	local target_obj = entity.dynamic_data.combat.target.object
+	
+	mobf_assert_backtrace(target ~= nil)
+	if target:is_player() then
+		target_obj = entity.dynamic_data.combat.target
+	end
+	mobf_assert_backtrace(target_obj ~= nil)
+	
 	if distance <= entity.data.combat.melee.range
-		then
-		
-		local target = entity.dynamic_data.combat.target
+		and mobf_line_of_sight(ownpos,target_obj:getpos()) then
 
 		--save time of attack
 		entity.dynamic_data.combat.ts_last_attack = now
@@ -869,7 +876,7 @@ function fighting.melee_attack_handler(entity,now,distance)
 			--do damage
 			target:set_hp(target_health -damage_done)
 		else
-			target:punch(entity.object, 1.0, {
+			target_obj:punch(entity.object, 1.0, {
 							full_punch_interval=1.0,
 							groupcaps={
 								fleshy={times={	[1]=1/(damage_done-2), 
@@ -1129,7 +1136,7 @@ function fighting.set_target(entity,target)
 	if entity.dynamic_data.combat.target ~= nil then
 		dbg_mobf.fighting_lvl2("MOBF: switching attack target")
 		
-		--set target
+		--set movement target
 		entity.dynamic_data.current_movement_gen.set_target(entity,target)
 		
 		--set attack target
@@ -1138,7 +1145,7 @@ function fighting.set_target(entity,target)
 		if entity.dynamic_data.combat.target ~= target then
 			
 			local attackername = fighting.get_target_name(target)
-			dbg_mobf.fighting_lvl2("MOBF: initial attack at: "..attackername)
+			dbg_mobf.fighting_lvl2("MOBF: initial attack at: ".. attackername)
 			
 			if entity.dynamic_data.combat.target == nil then
 				fighting.switch_to_combat_state(entity,mobf_get_current_time(),target)
