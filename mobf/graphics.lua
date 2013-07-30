@@ -74,11 +74,13 @@ end
 function graphics.update(entity,now,dtime)
 
 	--updating orientation
-	graphics.update_orientation(entity,now,dtime)
+	--replaced by core function (if ever merged)
+	--graphics.update_orientation(entity,now,dtime)
 	
 	
 	--update animation speed
-	graphics.update_animation(entity,now,dtime)
+	--replaced by core function (if ever merged)
+	--graphics.update_animation(entity,now,dtime)
 	
 	--update attention
 	if entity.dynamic_data.attention ~= nil and
@@ -250,7 +252,10 @@ function graphics.set_animation(entity,name)
 			entity.object:set_animation({
 											x=entity.data.animation[name].start_frame,
 											y=entity.data.animation[name].end_frame
-										}, nil, nil)
+										},
+										nil,
+										nil,
+										entity.data.animation[name].basevelocity)
 			entity.dynamic_data.animation = name
 		end
 		
