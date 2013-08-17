@@ -407,9 +407,11 @@ function mobf_debug.rightclick_callback(entity,player)
 			entity.object:getvelocity(),
 			entity.object:getacceleration())
 	local pos_state  = environment.pos_is_ok(predicted_pos,entity)
+	local detailed_state = environment.pos_quality(entity.getbasepos(entity),entity)
 	
 	print("MOBF: \tTime to state change:        " .. entity.dynamic_data.state.time_to_next_change .. " seconds")
 	print("MOBF: \tCurrent environmental state: " .. environment.pos_is_ok(entity.getbasepos(entity),entity))
+	print("MOBF: \tCurrent detailed state:      " .. detailed_state.tostring(detailed_state))
 	print("MOBF: \tCurrent accel:               " .. printpos(entity.object:getacceleration()))
 	print("MOBF: \tCurrent speed:               " .. printpos(entity.object:getvelocity()))
 	print("MOBF: \tSpawnpoint:                  " .. printpos(entity.dynamic_data.spawning.spawnpoint))
