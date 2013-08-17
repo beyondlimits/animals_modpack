@@ -131,3 +131,73 @@ function movement_generic.predict_next_block(pos,velocity,acceleration)
 	
 	return pos_predicted
 end
+
+-------------------------------------------------------------------------------
+-- name: predict_enter_next_block(entity,pos,velocity,acceleration)
+--
+--! @brief predict next block based on pos velocity and acceleration
+--
+--! @param pos current position
+--! @param velocity current velocity
+--! @param acceleration current acceleration
+--! @return { x,y,z } position of next block
+-------------------------------------------------------------------------------
+function movement_generic.predict_enter_next_block(entity,pos,velocity,acceleration)
+
+
+	local cornerpositions = {}
+
+	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[4] -0.01,y=pos.y,z=pos.z + entity.collisionbox[6] -0.01})
+	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[4] -0.01,y=pos.y,z=pos.z + entity.collisionbox[3] +0.01})
+	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[1] +0.01,y=pos.y,z=pos.z + entity.collisionbox[6] -0.01})
+	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[1] +0.01,y=pos.y,z=pos.z + entity.collisionbox[3] +0.01})
+	
+	print("basepos = " .. printpos(pos))
+
+	local sameblock = function(a,b)
+		for i=1,#a,1 do
+			if not mobf_pos_is_same(
+						mobf_round_pos(a[i]),
+						mobf_round_pos(b[i])) then
+				return false
+			end
+		end
+		return true
+	end
+	
+	local prediction_time = 0.1
+	local predicted_corners = {}
+	
+	for i=1,#cornerpositions,1 do
+		predicted_corners[i] = movement_generic.calc_new_pos(cornerpositions[i],
+								acceleration,
+								prediction_time,
+								velocity
+								)
+	end
+
+	--check if any of the corners is in different block after prediction time
+	while sameblock(cornerpositions,predicted_corners) and
+		prediction_time < 2 do
+		
+		prediction_time = prediction_time + 0.1
+		
+		for i=1,#cornerpositions,1 do
+			predicted_corners[i] = movement_generic.calc_new_pos(cornerpositions[i],
+									acceleration,
+									prediction_time,
+									velocity
+									)
+		end
+				
+	end
+	
+	print("time to next block: " .. prediction_time)
+	pos_predicted = movement_generic.calc_new_pos(pos,
+								acceleration,
+								prediction_time,
+								velocity
+								)
+	
+	return pos_predicted
+end
