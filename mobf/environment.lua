@@ -303,7 +303,7 @@ function environment.checksurface(pos,surface)
 		end
 	end
 	
-	return "wrong_surface"
+	return "wrong_surface",node_below.name
 
 end
 
@@ -349,16 +349,13 @@ end
 -------------------------------------------------------------------------------
 function environment.evaluate_pos_media(pos,media)
 	local node_to_check = minetest.get_node(pos)
-			
+
 	if node_to_check == nil then
 		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking position with invalid node")
 		return 0,nil
 	end
 	
-	if not environment.is_media_element(node_to_check.name,entity.environment.media) == true then
-		dbg_mobf.environment_lvl3("MOBF: " .. i .. ": " .. 
-			printpos(cornerpositions[i]) .. " -- " .. printpos(pos) .. 
-			" not within environment")
+	if not environment.is_media_element(node_to_check.name,media) then
 		return 10,node_to_check
 	end
 	
@@ -461,14 +458,13 @@ function environment.compare_state(state1,state2)
 end
 
 -------------------------------------------------------------------------------
--- name: pos_quality(pos,entity,dont_do_jumpcheck)
+-- name: pos_quality(pos,entity)
 --
 --! @brief check position quality
 --! @ingroup environment
 --
 --! @param pos position to check
 --! @param entity mob to check
---! @param dont_do_jumpcheck
 --! @return position quality
 --! {
 --!    media_quality             100 = in media
@@ -497,15 +493,55 @@ end
 --!    valid             =      true = data is valid
 --!                            false = no valid data
 -------------------------------------------------------------------------------
-function environment.pos_quality(pos,entity,dont_do_jumpcheck)
+function environment.pos_quality(pos,entity)
 
 	local retval = {
-					media_quality       = 1000,
+					media_quality       = 100,
 					geometric_quality   = 0,
 					surface_quality_min = 100,
 					surface_quality_max = 0,
 					level_quality       = 100,
 					valid               = true,
+					
+					tostring = function(state)
+						local retval = "\nState: ".. dump(state.valid) .. "\n"
+						retval = retval .."\tmedia_quality: (" .. state.media_quality ..") "
+						if state.media_quality == 100 then retval = retval .. "in media" end
+						if state.media_quality ==  30 then retval = retval .. "collision" end
+						if state.media_quality ==  20 then retval = retval .. "in water" end
+						if state.media_quality ==  10 then retval = retval .. "in air" end
+						if state.media_quality ==   5 then retval = retval .. "solid" end
+						if state.media_quality ==   0 then retval = retval .. "not evaluated" end
+						
+						retval = retval .."\n\tgeometric_quality: (" .. state.geometric_quality .. ") "
+						if state.geometric_quality == 100 then retval = retval .. "full contact" end
+						if state.geometric_quality ==  60 then retval = retval .. "partial contact" end
+						if state.geometric_quality ==  30 then retval = retval .. "no contact" end
+						if state.geometric_quality ==   0 then retval = retval .. "not evaluated" end
+					
+						retval = retval .."\n\tsurface_quality_min: (" .. state.surface_quality_min ..") "
+						if state.surface_quality_min == 100 then retval = retval .. "ok" end
+						if state.surface_quality_min ==  60 then retval = retval .. "possible" end
+						if state.surface_quality_min ==  30 then retval = retval .. "wrong" end
+						if state.surface_quality_min ==  10 then retval = retval .. "above water" end
+						if state.surface_quality_min ==   0 then retval = retval .. "not evaluated" end
+						
+						retval = retval .."\n\tsurface_quality_max: (" .. state.surface_quality_max .. ") "
+						if state.surface_quality_max == 100 then retval = retval .. "ok" end
+						if state.surface_quality_max ==  60 then retval = retval .. "possible" end
+						if state.surface_quality_max ==  30 then retval = retval .. "wrong" end
+						if state.surface_quality_max ==  10 then retval = retval .. "above water" end
+						if state.surface_quality_max ==   0 then retval = retval .. "not evaluated" end
+					
+						retval = retval .."\n\tlevel_quality: (" .. state.level_quality .. ") "
+						if state.level_quality == 100 then retval = retval .. "ok" end
+						if state.level_quality ==  60 then retval = retval .. "above limit" end
+						if state.level_quality ==  30 then retval = retval .. "below limit" end
+						if state.level_quality ==   0 then retval = retval .. "not evaluated" end
+						retval = retval .. "\n"
+						
+						return retval
+					end
 				}
 
 	
@@ -517,8 +553,6 @@ function environment.pos_quality(pos,entity,dont_do_jumpcheck)
 	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[4] -0.01,y=pos.y,z=pos.z + entity.collisionbox[3] +0.01})
 	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[1] +0.01,y=pos.y,z=pos.z + entity.collisionbox[6] -0.01})
 	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[1] +0.01,y=pos.y,z=pos.z + entity.collisionbox[3] +0.01})
-
-	local quality = -1
 	
 	local min_ground_distance,max_ground_distance = environment.get_min_max_ground_dist(entity)
 
@@ -528,25 +562,24 @@ function environment.pos_quality(pos,entity,dont_do_jumpcheck)
 			local med_quality,node_to_check = 
 				environment.evaluate_pos_media(cornerpositions[i],
 												entity.environment.media)
-				
 			--if current result is worse than old one
 			if med_quality < retval.media_quality then
 				if med_quality == 0 then
-					result.valid = false
+					retval.valid = false
 				end
 				
 				if node_to_check.name == "default:water_source" or 
 					node_to_check.name == "default:water_flowing" then
-					result.media_quality = 20
+					retval.media_quality = 20
 				end
 				
 				if node_to_check.name == "air" then
-					result.media_quality = 10
+					retval.media_quality = 10
 					break
 				end
 				
 				if med_quality < retval.media_quality then
-					result.media_quality = med_quality
+					retval.media_quality = 5
 				end
 			end
 		end
@@ -565,14 +598,14 @@ function environment.pos_quality(pos,entity,dont_do_jumpcheck)
 					
 				
 				if cornerpositions[i].y < miny then
-					result.level_quality = 30
+					retval.level_quality = 30
 				end
 				
 				if cornerpositions[i].y > maxy then
-					result.level_quality = 60
+					retval.level_quality = 60
 				end
 
-				if result.level_quality < 100 then
+				if retval.level_quality < 100 then
 					break
 				end
 			end
@@ -595,32 +628,44 @@ function environment.pos_quality(pos,entity,dont_do_jumpcheck)
 				if ground_distance <= max_ground_distance then
 					have_contact = true
 					
-					local current_surface = environment.checksurface(cornerpositions[i],entity.environment.surfaces)
+					local current_surface,belowname = 
+						environment.checksurface(cornerpositions[i],entity.environment.surfaces)
 				
 					if current_surface == "ok" then
-						if result.surface_quality_max < 100 then
-							result.surface_quality_max = 100
+						if retval.surface_quality_max < 100 then
+							retval.surface_quality_max = 100
 						end
 					end
 					
 					if current_surface == "possible_surface" then
-						if result.surface_quality_max < 60 then
-							result.surface_quality_max = 60
+						if retval.surface_quality_max < 60 then
+							retval.surface_quality_max = 60
 						end
 						
-						if result.surface_quality_min > 60 then
-							result.surface_quality_min = 60
+						if retval.surface_quality_min > 60 then
+							retval.surface_quality_min = 60
 						end
 					end
 					
 					if current_surface == "wrong_surface" then
-						--TODO check for special case "above water"
-						if result.surface_quality_max < 30 then
-							result.surface_quality_max = 30
-						end
-						
-						if result.surface_quality_min > 30 then
-							result.surface_quality_min = 30
+						if	belowname == "default:water_source" or 
+							belowname == "default:water_flowing" then
+							if retval.surface_quality_max < 10 then
+								retval.surface_quality_max = 10
+							end
+							
+							if retval.surface_quality_min > 10 then
+								retval.surface_quality_min = 10
+							end
+							
+						else
+							if retval.surface_quality_max < 30 then
+								retval.surface_quality_max = 30
+							end
+							
+							if retval.surface_quality_min > 30 then
+								retval.surface_quality_min = 30
+							end
 						end
 					end
 				else
@@ -632,19 +677,19 @@ function environment.pos_quality(pos,entity,dont_do_jumpcheck)
 		end
 		
 		if have_contact and not have_no_contact then
-			result.geometric_quality = 100
+			retval.geometric_quality = 100
 		end
 		
 		if have_contact and have_no_contact then
-			result.geometric_quality = 60
+			retval.geometric_quality = 60
 		end
 		
 		if not have_contact and have_no_contact then
-			result.geometric_quality = 30
+			retval.geometric_quality = 30
 		end
 	end
 	
-	return result
+	return retval
 end
 
 

@@ -57,6 +57,7 @@ if mobf_rtd.luatrace_enabled then
 end
 
 --include debug trace functions
+dofile (mobf_modpath .. "/utils/text.lua")
 dofile (mobf_modpath .. "/debug_trace.lua")
 
 --include engine
@@ -66,7 +67,6 @@ dofile (mobf_modpath .. "/utils/generic_functions.lua")
 dofile (mobf_modpath .. "/utils/data_storage.lua")
 dofile (mobf_modpath .. "/utils/tracing.lua")
 dofile (mobf_modpath .. "/utils/geometry.lua")
-dofile (mobf_modpath .. "/utils/text.lua")
 dofile (mobf_modpath .. "/utils/permanent_data.lua")
 dofile (mobf_modpath .. "/lifebar.lua")
 dofile (mobf_modpath .. "/environment.lua")
