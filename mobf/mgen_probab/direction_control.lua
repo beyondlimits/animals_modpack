@@ -35,21 +35,25 @@ direction_control = {}
 -------------------------------------------------------------------------------
 function direction_control.changeaccel(pos,entity,current_velocity)
 
+	local maxtries = 5
+	local old_quality = environment.pos_quality(pos,entity)
+
 	local new_accel = direction_control.get_random_acceleration(entity.data.movement.min_accel,
 														entity.data.movement.max_accel,entity.object:getyaw(),0)
-
 	local pos_predicted = movement_generic.predict_next_block(pos,current_velocity,new_accel)
+	
+	local new_quality = environment.pos_quality(pos_predicted,entity)
+	local prefered_state = 
+		environment.evaluate_state(	new_quality,
+									old_quality,
+									MQ_IN_MEDIA,
+									nil,
+									GQ_FULL,
+									SQ_POSSIBLE,
+									SQ_OK)
 
-	local maxtries = 5
-
-	local state = environment.pos_is_ok(pos_predicted,entity)
-
-	--below_limit and above_limit are ok too respective to movement handled by this component is xz only
-	while  state ~= "ok" and
-			state == "above_limit" and
-			state == "below_limit"do
-		dbg_mobf.pmovement_lvl1("MOBF: predicted pos " .. printpos(pos_predicted) .. " isn't ok " .. maxtries .. " tries left, state: " .. state)
-		local done = false
+	while not prefered_state do
+		dbg_mobf.pmovement_lvl1("MOBF: predicted pos " .. printpos(pos_predicted) .. " isn't perfect " .. maxtries .. " tries left, state: " .. state)
 
 		--don't loop forever get to save mode and try next time
 		if maxtries <= 0 then
@@ -68,46 +72,54 @@ function direction_control.changeaccel(pos,entity,current_velocity)
 						z=0 }
 		end
 		
-		--in case mob is already at non perfect surface it's not that bad to get on it again
-		if not done and (state == "possible_surface") then
-			local current_state = environment.pos_is_ok(pos,entity)
-			local probab = math.random()
+		local probab = math.random()
+		
+		--accept possible surface in rare cases
+		if probab < 0.3 then
+			local acceptable_state = 
+				environment.evaluate_state(new_quality,
+									nil,
+									MQ_IN_MEDIA,
+									GQ_PARTIAL,
+									nil,
+									SQ_WRONG,
+									SQ_POSSIBLE)
 			
-			if current_state == "wrong_surface" or
-				current_state == "possible_surface" then
-				if probab < 0.3 then
-					done = true
-				end
-			else
-				if probab < 0.05 then
-					done = true
-				end
+			if acceptable_state then
+				return new_accel
+			end
+		end
+		
+		--accept possible surface in rare cases
+		if probab < 0.2 then
+			local acceptable_state = 
+				environment.evaluate_state(new_quality,
+									nil,
+									MQ_IN_MEDIA,
+									nil,
+									GQ_FULL,
+									SQ_WRONG,
+									SQ_POSSIBLE)
+			
+			if acceptable_state then
+				return new_accel
 			end
 		end
 
-		--first try to invert acceleration on collision
---		if not done and (state == "collision" or
---			state == "collision_jumpable") then
---			new_accel = { 	x= new_accel.x * -1,
---					y= new_accel.y,
---					z= new_accel.z * -1}
-
---			pos_predicted = movement_generic.predict_next_block(pos,current_velocity,new_accel)
---			if environment.pos_is_ok(pos_predicted,entity) == "ok" then
---				done = true
---			end
-
---		end
-
-		--generic way to find new acceleration
-		if not done then
-			new_accel = direction_control.get_random_acceleration(entity.data.movement.min_accel,
+		--try another acceleration
+		new_accel = direction_control.get_random_acceleration(entity.data.movement.min_accel,
 														entity.data.movement.max_accel,entity.object:getyaw(),1.57)
-		
-			pos_predicted = movement_generic.predict_next_block(pos,current_velocity,new_accel)
-		end
+		pos_predicted = movement_generic.predict_next_block(pos,current_velocity,new_accel)
 
-		state = environment.pos_is_ok(pos_predicted,entity)
+
+		local prefered_state = 
+			environment.evaluate_state(	new_quality,
+									old_quality,
+									MQ_IN_MEDIA,
+									nil,
+									GQ_FULL,
+									SQ_POSSIBLE,
+									SQ_OK)
 		maxtries = maxtries -1
 	end
 
@@ -342,7 +354,7 @@ end
 --! @return movement_state is modified!
 -------------------------------------------------------------------------------
 function direction_control.random_movement_handler(entity,movement_state)
-	dbg_mobf.pmovement_lvl1("MOBF: random movement handler called")
+	dbg_mobf.pmovement_lvl2("MOBF: random movement handler called")
 	if movement_state.changed == false and
 		(math.random() < (entity.dynamic_data.movement.mpattern.random_acceleration_change * PER_SECOND_CORRECTION_FACTOR) or 
 		movement_state.force_change) then
