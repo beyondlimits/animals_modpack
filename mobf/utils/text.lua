@@ -30,9 +30,12 @@
 function printpos(pos)
 	if pos ~= nil then
 		if pos.y ~= nil then
-			return "("..pos.x..","..pos.y..","..pos.z..")"
+			return "("..string.format("%3f",pos.x)..","
+						..string.format("%3f",pos.y)..","
+						..string.format("%3f",pos.z)..")"
 		else
-			return "("..pos.x..", ? ,"..pos.z..")"
+			return "("..string.format("%3f",pos.x)..", ? ,"
+						..string.format("%3f",pos.z)..")"
 		end
 	end
 	return ""
