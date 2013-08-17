@@ -382,7 +382,13 @@ end
 --! @param media table of blocks not considered to be ground
 --! @return number of blocks to ground
 -------------------------------------------------------------------------------
-function mobf_ground_distance(pos,media)
+function mobf_ground_distance(pos_raw,media)
+
+	local pos = {
+					x=pos_raw.x,
+					y=math.floor(pos_raw.y + 0.5),
+					z=pos_raw.z
+				}
 
 	local node_to_check = minetest.get_node(pos)
 
@@ -390,7 +396,6 @@ function mobf_ground_distance(pos,media)
 	
 	while node_to_check ~= nil and mobf_contains(media,node_to_check.name) and
 			count < 32 do
-		
 		count = count +1
 		pos = {x=pos.x,y=pos.y-1,z=pos.z};
 		node_to_check = minetest.get_node(pos)
