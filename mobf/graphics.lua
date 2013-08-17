@@ -73,17 +73,14 @@ end
 -------------------------------------------------------------------------------
 function graphics.update(entity,now,dtime)
 
-	--updating orientation
-	--replaced by core function (if ever merged)
-	--graphics.update_orientation(entity,now,dtime)
-	
 	
 	--update animation speed
 	--replaced by core function (if ever merged)
 	--graphics.update_animation(entity,now,dtime)
 	
 	--update attention
-	if entity.dynamic_data.attention ~= nil and
+	if  entity.dynamic_data ~= nil and
+		entity.dynamic_data.attention ~= nil and
 		entity.data.attention ~= nil and
 		entity.dynamic_data.attention.current_value >
 		entity.data.attention.watch_threshold then
