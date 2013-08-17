@@ -20,6 +20,9 @@ mobf_settings.tabs = {}
 mobf_settings.version = "0.9.0"
 mobf_settings.formname = "mobf_settings"
 
+local COLOR_RED   = "#FF0000"
+local COLOR_GREEN = "#00FF00"
+
 ------------------------------------------------------------------------------
 -- name: contains
 --
@@ -257,7 +260,7 @@ function mobf_settings.show_main_tab(sender_data)
 	local formspec = mobf_settings.formspec_header(sender_data)
 	
 	formspec = formspec .. "label[0.5,0;Mobs:]"
-	formspec = formspec .. "textlist[0.5,0.5;6,8;tl_" .. sender_data.tab .. "_mobs;"
+	formspec = formspec .. "textlist[0.5,0.5;7,8;tl_" .. sender_data.tab .. "_mobs;"
 	
 	local mobf_mob_blacklist_string = minetest.world_setting_get("mobf_blacklist")
 	local mobf_mobs_blacklisted = nil
@@ -273,9 +276,9 @@ function mobf_settings.show_main_tab(sender_data)
 			toadd = toadd .. ","
 		end
 		if contains(mobf_mobs_blacklisted,val) then
-			toadd = toadd .. "#RED" .. val
+			toadd = toadd .. COLOR_RED .. val
 		else
-			toadd = toadd .. "#GRN" .. val
+			toadd = toadd .. COLOR_GREEN .. val
 		end	
 	end
 	
@@ -454,27 +457,28 @@ end
 --! @param sender_data all information gatered
 -------------------------------------------------------------------------------
 function mobf_settings.handle_settings_tab_input(sender_data)
-	if sender_data.name == "mobf_disable_animal_spawning" then
+	print("settings tab handler " .. dump(sender_data))
+	if sender_data.name == "disable_animal_spawning" then
 		mobf_set_world_setting("mobf_disable_animal_spawning",
 								mobf_settings.tobool(sender_data.value))
 	end
 	
-	if sender_data.name == "mobf_disable_3d_mode" then
+	if sender_data.name == "disable_3d_mode" then
 		mobf_set_world_setting("mobf_disable_3d_mode",
 								mobf_settings.tobool(sender_data.value))
 	end
 	
-	if sender_data.name == "mobf_animal_spawning_secondary" then
+	if sender_data.name == "animal_spawning_secondary" then
 		mobf_set_world_setting("mobf_animal_spawning_secondary",
 								mobf_settings.tobool(sender_data.value))
 	end
 	
-	if sender_data.name == "mobf_delete_disabled_mobs" then
+	if sender_data.name == "delete_disabled_mobs" then
 		mobf_set_world_setting("mobf_delete_disabled_mobs",
 								mobf_settings.tobool(sender_data.value))
 	end
 	
-	if sender_data.name == "mobf_log_bug_warnings" then
+	if sender_data.name == "log_bug_warnings" then
 		mobf_set_world_setting("mobf_log_bug_warnings",
 								mobf_settings.tobool(sender_data.value))
 	end
@@ -543,7 +547,7 @@ end
 --! @param sender_data all information gatered
 -------------------------------------------------------------------------------
 function mobf_settings.formspec_header(sender_data)
-	local retval = "size[7,9]" ..
+	local retval = "size[8,9]" ..
 				"label[-0.25,8.98;MOBF version: " ..mobf_get_version().."]" ..
 				"tabheader[-0.3,-0.99;th_" .. sender_data.tab .. "_maintab;"
 
