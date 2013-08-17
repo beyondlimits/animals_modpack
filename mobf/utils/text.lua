@@ -42,6 +42,17 @@ function printpos(pos)
 end
 
 -------------------------------------------------------------------------------
+-- name: mobf_print(text)
+--
+--! @brief print adding timestamp in front of text
+--
+--! @param text to show
+-------------------------------------------------------------------------------
+function mobf_print(text)
+	print("[" .. string.format("%10f",os.clock()) .. "]" .. text)
+end
+
+-------------------------------------------------------------------------------
 -- name: mobf_fixed_size_string(text,length)
 --
 --! @brief make a text fixed length
