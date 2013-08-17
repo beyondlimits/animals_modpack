@@ -164,7 +164,13 @@ function movement_gen.callback(entity)
 		entity.data.name .. " "..printpos(movement_state.basepos))
 	
 	movement_gen.fix_runaway(entity,movement_state)
-	movement_gen.fix_to_slow(entity,movement_state)
+	
+	--don't do slowness check each callback
+	if entity.dynamic_data.movement.ts_last_slowcheck == nil or
+		entity.dynamic_data.movement.ts_last_slowcheck +2 < movement_state.now then
+		movement_gen.fix_to_slow(entity,movement_state)
+		entity.dynamic_data.movement.ts_last_slowcheck = movement_state.now
+	end
 	
 	---------------------------------------------------------------------------
 	---------------------------------------------------------------------------
@@ -193,16 +199,18 @@ function movement_gen.callback(entity)
 		local pos_predicted_state = environment.pos_is_ok(pos_predicted,entity)
 		dbg_mobf.pmovement_lvl3("MOBF: Pos predicted state ".. entity.data.name 
 			.. ": " .. pos_predicted_state)
+			
 		-- Y-Movement
 		if movement_state.changed == false then
 			height_level_control.precheck_movement(entity,movement_state,
 											pos_predicted,pos_predicted_state)
 		end	
 		
+		local pos_predicted_quality = environment.pos_quality(pos_predicted,entity)
 		-- X/Z-Movement
 		if movement_state.changed == false then
 			direction_control.precheck_movement(entity,movement_state,
-											pos_predicted,pos_predicted_state)
+											pos_predicted,pos_predicted_quality)
 		end	
 
 	end
@@ -312,6 +320,7 @@ function movement_gen.init_dynamic_data(entity,now)
 			ts_orientation_upd  = now,
 			mpattern            = mobf_rtd.movement_patterns[entity.data.movement.pattern],
 			orientation_fix_needed              = true,
+			ts_last_slowcheck   = now,
 			}
 	
 	entity.dynamic_data.movement = data
@@ -402,7 +411,7 @@ function movement_gen.fix_to_slow(entity,movement_state)
 		xzspeed < entity.data.movement.min_speed) or
 		xzspeed == nil then
 		
-		dbg_mobf.pmovement_lvl3("MOBF: too slow! vxz=" .. xzspeed)
+		dbg_mobf.pmovement_lvl2("MOBF: too slow! vxz=" .. xzspeed)
 		--use normal speed change handling
 		movement_state.force_change = true
 	end
