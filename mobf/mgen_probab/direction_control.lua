@@ -53,7 +53,9 @@ function direction_control.changeaccel(pos,entity,current_velocity)
 									SQ_OK)
 
 	while not prefered_state do
-		dbg_mobf.pmovement_lvl1("MOBF: predicted pos " .. printpos(pos_predicted) .. " isn't perfect " .. maxtries .. " tries left, state: " .. state)
+		dbg_mobf.pmovement_lvl1("MOBF: predicted pos " .. printpos(pos_predicted) 
+			.. " isn't perfect " .. maxtries .. " tries left, state: " 
+			.. new_quality.tostring(new_quality))
 
 		--don't loop forever get to save mode and try next time
 		if maxtries <= 0 then
