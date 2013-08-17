@@ -349,7 +349,7 @@ end
 ------------------------------------------------------------------------------
 function mobf_debug.rightclick_callback(entity,player)
 	local lifetime = mobf_get_current_time() - entity.dynamic_data.spawning.original_spawntime
-	print("MOBF: " .. entity.data.name .. " is alive for " .. lifetime .. " seconds")
+	print("MOBF: " .. entity.data.name .. " " .. tostring(entity) .. " is alive for " .. lifetime .. " seconds")
 	print("MOBF: \tAbsolute spawntime:          " .. entity.dynamic_data.spawning.original_spawntime)
 	print("MOBF: \tCurrent state:               " .. entity.dynamic_data.state.current )
 	print("MOBF: \tCurrent movgen:              " .. entity.dynamic_data.current_movement_gen.name )
