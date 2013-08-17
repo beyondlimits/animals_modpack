@@ -40,11 +40,11 @@ environment_list = {}
 --! @return {x,y,z} position found or nil
 -------------------------------------------------------------------------------
 function environment.get_suitable_pos_same_level(pos_raw,maxsearcharea,entity,accept_possible)
-    dbg_mobf.movement_lvl3("MOBF: --> get_suitable_pos_same_level " 
+    dbg_mobf.environment_lvl2("MOBF: --> get_suitable_pos_same_level " 
     	.. printpos(pos_raw))
 	local pos = mobf_round_pos(pos_raw)
 
-	dbg_mobf.movement_lvl1("MOBF: Starting pos is "..printpos(pos)
+	dbg_mobf.environment_lvl3("MOBF: Starting pos is "..printpos(pos)
 		.." max search area is "..maxsearcharea)
 
 	local e1 = "|"
@@ -56,21 +56,20 @@ function environment.get_suitable_pos_same_level(pos_raw,maxsearcharea,entity,ac
 
 	--search next position on solid ground
 	for search=1, maxsearcharea,1 do
-		--TODO randomize search order
-
 		--find along edge 1
 		for current=-search,search,1 do
 			local pos_tocheck = { x= pos.x + current,y=pos.y,z=pos.z -search}		
 			local pos_state = environment.pos_is_ok(pos_tocheck,entity)
 
-			dbg_mobf.movement_lvl1("MOBF: state of "..printpos(pos_tocheck).." is " 
+			dbg_mobf.environment_lvl3("MOBF: state of "..printpos(pos_tocheck).." is " 
 				.. pos_state)
 
 			if pos_state == "ok" then
-				dbg_mobf.movement_lvl1("found new pos")
+				dbg_mobf.environment_lvl3("    -->found good pos")
 				table.insert(possible_targets, pos_tocheck)
 			elseif pos_state == "possible_surface" and
 					accept_possible then
+				dbg_mobf.environment_lvl3("    -->found acceptable pos")
 				table.insert(possible_targets, pos_tocheck)
 --			elseif pos_state == "collision_jumpabe" then
 --				dbg_mobf.movement_lvl1("found new pos above")
@@ -85,14 +84,15 @@ function environment.get_suitable_pos_same_level(pos_raw,maxsearcharea,entity,ac
 			local pos_tocheck = { x= pos.x + search,y=pos.y,z=pos.z + current}		
 			local pos_state = environment.pos_is_ok(pos_tocheck,entity)
 			
-			dbg_mobf.movement_lvl1("MOBF: state of "..printpos(pos_tocheck).." is "
+			dbg_mobf.environment_lvl3("MOBF: state of "..printpos(pos_tocheck).." is "
 				.. pos_state)
 
 			if pos_state == "ok" then
-				dbg_mobf.movement_lvl1("found new pos")
+				dbg_mobf.environment_lvl3("    -->found good pos")
 				table.insert(possible_targets, pos_tocheck)
 			elseif pos_state == "possible_surface" and
 					accept_possible then
+				dbg_mobf.environment_lvl3("    -->found acceptable pos")
 				table.insert(possible_targets, pos_tocheck)
 			else
 				e2 = e2..pos_state.."|"
@@ -105,14 +105,15 @@ function environment.get_suitable_pos_same_level(pos_raw,maxsearcharea,entity,ac
 			local pos_tocheck = { x= pos.x + current,y=pos.y,z=pos.z + search}		
 			local pos_state = environment.pos_is_ok(pos_tocheck,entity)
 
-			dbg_mobf.movement_lvl1("MOBF: state of "..printpos(pos_tocheck).." is "
+			dbg_mobf.environment_lvl3("MOBF: state of "..printpos(pos_tocheck).." is "
 				.. pos_state)
 
 			if pos_state == "ok" then
-				dbg_mobf.movement_lvl1("found new pos")
+				dbg_mobf.environment_lvl3("    -->found good pos")
 				table.insert(possible_targets, pos_tocheck)
 			elseif pos_state == "possible_surface" and
 					accept_possible then
+				dbg_mobf.environment_lvl3("    -->found acceptable pos")
 				table.insert(possible_targets, pos_tocheck)
 			else
 				e3 = e3..pos_state.."|"
@@ -124,14 +125,15 @@ function environment.get_suitable_pos_same_level(pos_raw,maxsearcharea,entity,ac
 			local pos_tocheck = { x= pos.x -search,y=pos.y,z=pos.z + current}		
 			local pos_state = environment.pos_is_ok(pos,entity)
 
-			dbg_mobf.movement_lvl1("MOBF: state of "..printpos(pos_tocheck).." is "
+			dbg_mobf.environment_lvl3("MOBF: state of "..printpos(pos_tocheck).." is "
 				.. pos_state)
 
 			if pos_state == "ok" then
-				dbg_mobf.movement_lvl1("found new pos")
+				dbg_mobf.environment_lvl3("    -->found good pos")
 				table.insert(possible_targets, pos_tocheck)
 			elseif pos_state == "possible_surface" and
 					accept_possible then
+				dbg_mobf.environment_lvl3("    -->found acceptable pos")
 				table.insert(possible_targets, pos_tocheck)
 			else
 				e4 = e4..pos_state.."|"
@@ -148,6 +150,9 @@ function environment.get_suitable_pos_same_level(pos_raw,maxsearcharea,entity,ac
 
 	if #possible_targets > 0 then
 		local i = math.random(1, #possible_targets)
+		dbg_mobf.environment_lvl2("Found " .. #possible_targets 
+			.. " possible positions, selected: " 
+			.. i .. ": " .. printpos(possible_targets[i]))
 		return possible_targets[i]
 	end
 
@@ -332,7 +337,319 @@ function environment.get_min_max_ground_dist(entity)
 end
 
 -------------------------------------------------------------------------------
--- name: pos_is_ok(pos,entity)
+-- name: evaluate_pos_media(pos,media)
+--
+--! @brief check position media quality
+--! @ingroup environment
+--
+--! @param pos position to check
+--! @param entity mob to check
+--!
+--! @return 100 = in media 10 collision 0 invalid, nodename
+-------------------------------------------------------------------------------
+function environment.evaluate_pos_media(pos,media)
+	local node_to_check = minetest.get_node(pos)
+			
+	if node_to_check == nil then
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking position with invalid node")
+		return 0,nil
+	end
+	
+	if not environment.is_media_element(node_to_check.name,entity.environment.media) == true then
+		dbg_mobf.environment_lvl3("MOBF: " .. i .. ": " .. 
+			printpos(cornerpositions[i]) .. " -- " .. printpos(pos) .. 
+			" not within environment")
+		return 10,node_to_check
+	end
+	
+	return 100,node_to_check
+end
+
+-------------------------------------------------------------------------------
+-- name: same_state(state1,state2)
+--
+--! @brief compare two states
+--! @ingroup environment
+--
+--! @param state1
+--! @param state2
+--!
+--! @return true/false
+-------------------------------------------------------------------------------
+function environment.same_state(state1,state2)
+
+	if state1.valid == false or
+		state2.valid == false then
+		return false
+	end
+
+	if state1.media_quality ~= state2.media_quality then
+		return false
+	end
+	
+	if state1.geometric_quality ~= state2.geometric_quality then
+		return false
+	end
+	
+	if state1.surface_quality_min ~= state2.surface_quality_min then
+		return false
+	end
+	
+	if state1.surface_quality_max ~= state2.surface_quality_max then
+		return false
+	end
+	
+	if state1.level_quality ~= state2.level_quality then
+		return false
+	end
+
+	return true
+end
+
+-------------------------------------------------------------------------------
+-- name: compare_state(state1,state2)
+--
+--! @brief compare state1 and state2
+--! @ingroup environment
+--
+--! @param state1
+--! @param state2
+--!
+--! @return -1, 0, 1
+-------------------------------------------------------------------------------
+function environment.compare_state(state1,state2)
+	mobf_assert_backtrace(state1)
+	mobf_assert_backtrace(state2)
+
+	local right_worse = false
+	local right_better = false
+	
+	if state1.valid == false and state2.valid == true then
+		return 1
+	end
+	
+	if state1.valid == true and state2.valid == false then
+		return -1
+	end
+	
+	if	state1.media_quality < state2.media_quality or
+		state1.geometric_quality < state2.geometric_quality or
+		state1.surface_quality_min < state2.surface_quality_min or
+		state1.surface_quality_max < state2.surface_quality_max or
+		state1.level_quality < state2.level_quality
+		then
+		right_better = true
+	end
+	
+	if	state1.media_quality > state2.media_quality or 
+		state1.geometric_quality > state2.geometric_quality or
+		state1.surface_quality_min > state2.surface_quality_min or
+		state1.surface_quality_max > state2.surface_quality_max or
+		state1.level_quality > state2.level_quality
+		then
+		left_better = true
+	end
+	if right_better and not left_better then
+		return 1
+	end
+	
+	if left_better and not right_better then
+		return -1
+	end
+	
+	return 0
+end
+
+-------------------------------------------------------------------------------
+-- name: pos_quality(pos,entity,dont_do_jumpcheck)
+--
+--! @brief check position quality
+--! @ingroup environment
+--
+--! @param pos position to check
+--! @param entity mob to check
+--! @param dont_do_jumpcheck
+--! @return position quality
+--! {
+--!    media_quality             100 = in media
+--!                               30 = collision
+--!                               20 = special in_water
+--!                               10 = special in_air
+--!                                0 = not evaluated
+--!    geometric_quality =       100 = full contact
+--!                               60 = partial contact
+--!                               30 = no contact
+--!                                0 = not evaluated
+--!    surface_quality_min =     100 = all ok
+--!                               60 = worst is possible
+--!                               30 = worst is wrong
+--!                               10 = special "above_water"
+--!                                0 = not evaluated
+--!    surface_quality_max =     100 = all ok
+--!                               60 = best is possible
+--!                               30 = best is wrong
+--!                               10 = special "above_water"
+--!                                0 = not evaluated
+--!    level_quality     =       100 = ok
+--!                               60 = above_limit
+--!                               30 = below_limit
+--!                                0 = not evaluated
+--!    valid             =      true = data is valid
+--!                            false = no valid data
+-------------------------------------------------------------------------------
+function environment.pos_quality(pos,entity,dont_do_jumpcheck)
+
+	local retval = {
+					media_quality       = 1000,
+					geometric_quality   = 0,
+					surface_quality_min = 100,
+					surface_quality_max = 0,
+					level_quality       = 100,
+					valid               = true,
+				}
+
+	
+	
+	local cornerpositions = {}
+	local lastpos = nil -- performance improvement to skip checking same pos multiple times
+	
+	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[4] -0.01,y=pos.y,z=pos.z + entity.collisionbox[6] -0.01})
+	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[4] -0.01,y=pos.y,z=pos.z + entity.collisionbox[3] +0.01})
+	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[1] +0.01,y=pos.y,z=pos.z + entity.collisionbox[6] -0.01})
+	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[1] +0.01,y=pos.y,z=pos.z + entity.collisionbox[3] +0.01})
+
+	local quality = -1
+	
+	local min_ground_distance,max_ground_distance = environment.get_min_max_ground_dist(entity)
+
+	--check if mob at pos will be in correct environment
+	for i=1,#cornerpositions,1 do
+		if not mobf_pos_is_same(lastpos,cornerpositions[i]) then
+			local med_quality,node_to_check = 
+				environment.evaluate_pos_media(cornerpositions[i],
+												entity.environment.media)
+				
+			--if current result is worse than old one
+			if med_quality < retval.media_quality then
+				if med_quality == 0 then
+					result.valid = false
+				end
+				
+				if node_to_check.name == "default:water_source" or 
+					node_to_check.name == "default:water_flowing" then
+					result.media_quality = 20
+				end
+				
+				if node_to_check.name == "air" then
+					result.media_quality = 10
+					break
+				end
+				
+				if med_quality < retval.media_quality then
+					result.media_quality = med_quality
+				end
+			end
+		end
+		lastpos = cornerpositions[i]
+	end
+	
+	--check height level for flying mobs
+	if entity.data.movement.canfly == true then
+		lastpos = nil
+		for i=1,#cornerpositions,1 do
+			if not mobf_pos_is_same(lastpos,cornerpositions[i]) then
+				local miny,maxy = environment.get_absolute_min_max_pos(entity.environment,cornerpositions[i])
+				
+				dbg_mobf.environment_lvl2("MOBF: \tflying mob detected, min: " 
+					.. miny .. " max: " .. maxy .. " current: " .. pos.y)
+					
+				
+				if cornerpositions[i].y < miny then
+					result.level_quality = 30
+				end
+				
+				if cornerpositions[i].y > maxy then
+					result.level_quality = 60
+				end
+
+				if result.level_quality < 100 then
+					break
+				end
+			end
+			
+		lastpos = cornerpositions[i]
+		end
+	else
+	
+		--check geometric and surface quality
+		lastpos = nil
+		local have_contact    = false
+		local have_no_contact = false
+		for i=1,#cornerpositions,1 do
+			if not mobf_pos_is_same(lastpos,cornerpositions[i]) then
+			
+				local ground_distance = mobf_ground_distance(cornerpositions[i], entity.environment.media)
+				
+				
+				--first check if on surface or not
+				if ground_distance <= max_ground_distance then
+					have_contact = true
+					
+					local current_surface = environment.checksurface(cornerpositions[i],entity.environment.surfaces)
+				
+					if current_surface == "ok" then
+						if result.surface_quality_max < 100 then
+							result.surface_quality_max = 100
+						end
+					end
+					
+					if current_surface == "possible_surface" then
+						if result.surface_quality_max < 60 then
+							result.surface_quality_max = 60
+						end
+						
+						if result.surface_quality_min > 60 then
+							result.surface_quality_min = 60
+						end
+					end
+					
+					if current_surface == "wrong_surface" then
+						--TODO check for special case "above water"
+						if result.surface_quality_max < 30 then
+							result.surface_quality_max = 30
+						end
+						
+						if result.surface_quality_min > 30 then
+							result.surface_quality_min = 30
+						end
+					end
+				else
+					have_no_contact = true
+				end
+			end
+			
+			lastpos = cornerpositions[i]
+		end
+		
+		if have_contact and not have_no_contact then
+			result.geometric_quality = 100
+		end
+		
+		if have_contact and have_no_contact then
+			result.geometric_quality = 60
+		end
+		
+		if not have_contact and have_no_contact then
+			result.geometric_quality = 30
+		end
+	end
+	
+	return result
+end
+
+
+-------------------------------------------------------------------------------
+-- name: pos_is_ok(pos,entity) DEPRECATED
 --
 --! @brief check if a position is suitable for an mob
 --! @ingroup environment
