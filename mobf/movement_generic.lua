@@ -151,8 +151,6 @@ function movement_generic.predict_enter_next_block(entity,pos,velocity,accelerat
 	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[4] -0.01,y=pos.y,z=pos.z + entity.collisionbox[3] +0.01})
 	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[1] +0.01,y=pos.y,z=pos.z + entity.collisionbox[6] -0.01})
 	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[1] +0.01,y=pos.y,z=pos.z + entity.collisionbox[3] +0.01})
-	
-	print("basepos = " .. printpos(pos))
 
 	local sameblock = function(a,b)
 		for i=1,#a,1 do
@@ -192,7 +190,6 @@ function movement_generic.predict_enter_next_block(entity,pos,velocity,accelerat
 				
 	end
 	
-	print("time to next block: " .. prediction_time)
 	pos_predicted = movement_generic.calc_new_pos(pos,
 								acceleration,
 								prediction_time,
