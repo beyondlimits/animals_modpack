@@ -346,8 +346,8 @@ function mobf_settings.show_statistics_tab(sender_data)
 			"label[0.75," .. yval .. ";" .. mobf_fixed_size_string(name,20) .. "]" ..
 			"label[2.75," .. yval .. ";" .. 
 				mobf_fixed_size_string(string.format(fs,data.current),10).. "]" ..
-			"label[4.5," .. yval .. ";" .. 
-				mobf_fixed_size_string(string.format(fs,data.min),10).. "]" ..
+			"label[4.25," .. yval .. ";" .. 
+				mobf_fixed_size_string(data.maxabs,10).. "]" ..
 			"label[6," .. yval .. ";" .. 
 				mobf_fixed_size_string(string.format(fs,data.max),10).. "]"
 
@@ -361,7 +361,7 @@ function mobf_settings.show_statistics_tab(sender_data)
 		printfac("Active Mobs",statistics.data.mobs,"1.75","%6d") ..
 		"label[0.75,3;"	.. mobf_fixed_size_string("Facility",20)
 						.. mobf_fixed_size_string("Current",10)
-						.. mobf_fixed_size_string("Minimum",10)
+						.. mobf_fixed_size_string("Abs.Max",10)
 						.. mobf_fixed_size_string("Maximum",10) .. "]" ..
 		"label[0.75,3.25;--------------------------------------------------]" ..
 		printfac("Total",statistics.data.total,"3.75","%.2f%%") ..
@@ -369,7 +369,8 @@ function mobf_settings.show_statistics_tab(sender_data)
 		printfac("Punch",statistics.data.punch,"4.75","%.2f%%") ..
 		printfac("ABM",statistics.data.abm,"5.25","%.2f%%") ..
 		printfac("MapGen",statistics.data.mapgen,"5.75","%.2f%%") ..
-		printfac("Activate",statistics.data.activate,"6.25","%.2f%%")
+		printfac("Spawn onstep",statistics.data.spawn_onstep,"6.25","%.2f%%") ..
+		printfac("Activate",statistics.data.activate,"6.75","%.2f%%")
 
 	if formspec ~= nil then
 		minetest.show_formspec(sender_data.player:get_player_name(),
@@ -394,22 +395,22 @@ function mobf_settings.show_settings_tab(sender_data)
 				mobf_settings.setting_gettext("mobf_disable_animal_spawning") .."]"
 				
 	formspec = formspec .. "checkbox[1,1.75;" .. 
-				"cb_" .. sender_data.tab .. "_mobf_disable_3d_mode;" ..
+				"cb_" .. sender_data.tab .. "_disable_3d_mode;" ..
 				"Disable 3D mobs;" .. 
 				mobf_settings.setting_gettext("mobf_disable_3d_mode") .."]"
 				
 	formspec = formspec .. "checkbox[1,2.5;" .. 
-				"cb_" .. sender_data.tab .. "_mobf_animal_spawning_secondary;" ..
+				"cb_" .. sender_data.tab .. "_animal_spawning_secondary;" ..
 				"Enable secondary spawning;" .. 
 				mobf_settings.setting_gettext("mobf_animal_spawning_secondary") .."]"
 				
 	formspec = formspec .. "checkbox[1,3.25;" .. 
-				"cb_" .. sender_data.tab .. "_mobf_delete_disabled_mobs;" ..
+				"cb_" .. sender_data.tab .. "_delete_disabled_mobs;" ..
 				"Delete disabled mobs+spawners;" .. 
 				mobf_settings.setting_gettext("mobf_delete_disabled_mobs") .."]"
 				
 	formspec = formspec .. "checkbox[1,4;" .. 
-				"cb_" .. sender_data.tab .. "_mobf_log_bug_warnings;" ..
+				"cb_" .. sender_data.tab .. "_log_bug_warnings;" ..
 				"Log MOBF bug warnings;" .. 
 				mobf_settings.setting_gettext("mobf_log_bug_warnings") .."]"
 				
@@ -419,17 +420,17 @@ function mobf_settings.show_settings_tab(sender_data)
 				mobf_settings.setting_gettext("vombie_3d_burn_animation_enabled") .."]"
 				
 	formspec = formspec .. "checkbox[1,5.5;" .. 
-				"cb_" .. sender_data.tab .. "_mobf_log_removed_entities;" ..
+				"cb_" .. sender_data.tab .. "_log_removed_entities;" ..
 				"Log all removed mobs;" .. 
 				mobf_settings.setting_gettext("mobf_log_removed_entities") .."]"
 				
 	formspec = formspec .. "checkbox[1,6.25;" .. 
-				"cb_" .. sender_data.tab .. "_mobf_grief_protection;" ..
+				"cb_" .. sender_data.tab .. "_grief_protection;" ..
 				"Enable grief protection;" .. 
 				mobf_settings.setting_gettext("mobf_grief_protection") .."]"
 				
 	formspec = formspec .. "checkbox[1,7;" .. 
-				"cb_" .. sender_data.tab .. "_mobf_lifebar;" ..
+				"cb_" .. sender_data.tab .. "_lifebar;" ..
 				"Show mob lifebar;" .. 
 				mobf_settings.setting_gettext("mobf_lifebar") .."]"
 				
@@ -437,7 +438,7 @@ function mobf_settings.show_settings_tab(sender_data)
 				"cb_" .. sender_data.tab .. "_enable_statistics;" ..
 				"Enable statistics;" .. 
 				mobf_settings.setting_gettext("mobf_enable_statistics") .."]"
-	print("formspec: " .. formspec)
+	--print("formspec: " .. formspec)
 	if formspec ~= nil then
 		minetest.show_formspec(sender_data.player:get_player_name(),
 							sender_data.formname,
@@ -551,17 +552,17 @@ function mobf_settings.handle_settings_tab_input(sender_data)
 								mobf_settings.tobool(sender_data.value))
 	end
 
-	if sender_data.name == "mobf_log_removed_entities" then
+	if sender_data.name == "log_removed_entities" then
 		mobf_set_world_setting("mobf_log_removed_entities",
 								mobf_settings.tobool(sender_data.value))
 	end
 	
-	if sender_data.name == "mobf_grief_protection" then
+	if sender_data.name == "grief_protection" then
 		mobf_set_world_setting("mobf_grief_protection",
 								mobf_settings.tobool(sender_data.value))
 	end
 	
-	if sender_data.name == "mobf_lifebar" then
+	if sender_data.name == "lifebar" then
 		mobf_set_world_setting("mobf_lifebar",
 								mobf_settings.tobool(sender_data.value))
 	end

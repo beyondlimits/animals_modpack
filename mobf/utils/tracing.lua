@@ -29,14 +29,16 @@ statistics.mapgen = 0
 statistics.lastcalc = 0
 statistics.activate = 0
 statistics.punch = 0
+statistics.spawn_onstep = 0
 statistics.data = {}
-statistics.data.total    = { current=0,min=9999,max=0 }
-statistics.data.abm      = { current=0,min=9999,max=0 }
-statistics.data.onstep   = { current=0,min=9999,max=0 }
-statistics.data.mapgen   = { current=0,min=9999,max=0 }
-statistics.data.activate = { current=0,min=9999,max=0 }
-statistics.data.punch    = { current=0,min=9999,max=0 }
-statistics.data.mobs     = { current=0,min=9999,max=0 }
+statistics.data.total        = { current=0,maxabs=0,max=0 }
+statistics.data.abm          = { current=0,maxabs=0,max=0 }
+statistics.data.onstep       = { current=0,maxabs=0,max=0 }
+statistics.data.mapgen       = { current=0,maxabs=0,max=0 }
+statistics.data.activate     = { current=0,maxabs=0,max=0 }
+statistics.data.punch        = { current=0,maxabs=0,max=0 }
+statistics.data.mobs         = { current=0,maxabs=" ",max=0 }
+statistics.data.spawn_onstep = { current=0,maxabs=0,max=0 }
 
 -------------------------------------------------------------------------------
 -- name: mobf_statistic_calc()
@@ -48,12 +50,13 @@ function mobf_statistic_calc(dtime)
 	local now = mobf_get_time_ms()
 	if statistics.lastcalc == nil or now > statistics.lastcalc + 30000 then
 		local delta = now - statistics.lastcalc
-		local current_total  = statistics.total/delta
-		local current_abm    = statistics.abms/delta
-		local current_onstep = statistics.onstep/delta
-		local current_mapgen = statistics.mapgen/delta
-		local current_activate = statistics.activate/delta
-		local current_punch  = statistics.punch/delta
+		local current_total  = (statistics.total/delta)*100
+		local current_abm    = (statistics.abms/delta)*100
+		local current_onstep = (statistics.onstep/delta)*100
+		local current_mapgen = (statistics.mapgen/delta)*100
+		local current_activate = (statistics.activate/delta)*100
+		local current_punch  = (statistics.punch/delta)*100
+		local current_spawn_onstep  = (statistics.spawn_onstep/delta)*100
 		
 		local active_mobs = 1
 		for index,value in pairs(minetest.luaentities) do 
@@ -68,33 +71,37 @@ function mobf_statistic_calc(dtime)
 		statistics.mapgen = 0
 		statistics.activate = 0
 		statistics.punch = 0
+		statistics.spawn_onstep = 0
 	
 		statistics.data.total.current = current_total
-		statistics.data.total.min = MIN(statistics.data.total.min,current_total)
+		statistics.data.total.maxabs = MAX(statistics.data.total.maxabs, math.floor(current_total*300))
 		statistics.data.total.max = MAX(statistics.data.total.max,current_total)
 		
 		statistics.data.abm.current = current_abm
-		statistics.data.abm.min = MIN(statistics.data.abm.min,current_abm)
+		statistics.data.abm.maxabs = MAX(statistics.data.abm.maxabs, math.floor(current_abm*300))
 		statistics.data.abm.max = MAX(statistics.data.abm.max,current_abm)
 		
 		statistics.data.onstep.current = current_onstep
-		statistics.data.onstep.min = MIN(statistics.data.onstep.min,current_onstep)
+		statistics.data.onstep.maxabs = MAX(statistics.data.onstep.maxabs, math.floor(current_onstep*300))
 		statistics.data.onstep.max = MAX(statistics.data.onstep.max,current_onstep)
 		
 		statistics.data.mapgen.current = current_mapgen
-		statistics.data.mapgen.min = MIN(statistics.data.mapgen.min,current_mapgen)
+		statistics.data.mapgen.maxabs = MAX(statistics.data.mapgen.maxabs, math.floor(current_mapgen*300))
 		statistics.data.mapgen.max = MAX(statistics.data.mapgen.max,current_mapgen)
 		
 		statistics.data.activate.current = current_activate
-		statistics.data.activate.min = MIN(statistics.data.activate.min,current_activate)
+		statistics.data.activate.maxabs = MAX(statistics.data.activate.maxabs, math.floor(current_activate*300))
 		statistics.data.activate.max = MAX(statistics.data.activate.max,current_activate)
 		
 		statistics.data.punch.current = current_punch
-		statistics.data.punch.min = MIN(statistics.data.punch.min,current_punch)
+		statistics.data.punch.maxabs = MAX(statistics.data.punch.maxabs, math.floor(current_punch*300))
 		statistics.data.punch.max = MAX(statistics.data.punch.max,current_punch)
 		
+		statistics.data.spawn_onstep.current = current_spawn_onstep
+		statistics.data.spawn_onstep.maxabs = MAX(statistics.data.spawn_onstep.maxabs, math.floor(current_spawn_onstep*300))
+		statistics.data.spawn_onstep.max = MAX(statistics.data.spawn_onstep.max,current_spawn_onstep)
+		
 		statistics.data.mobs.current = active_mobs
-		statistics.data.mobs.min = MIN(statistics.data.mobs.min,active_mobs)
 		statistics.data.mobs.max = MAX(statistics.data.mobs.max,active_mobs)
 		
 		statistics.lastcalc = now
@@ -129,6 +136,11 @@ function mobf_warn_long_fct(starttime,fctname,facility)
 		
 		if facility == "mapgen" then
 			statistics.mapgen = statistics.mapgen + delta
+			statistics.total = statistics.total + delta
+		end
+		
+		if facility == "spawn_onstep" then
+			statistics.spawn_onstep = statistics.spawn_onstep + delta
 			statistics.total = statistics.total + delta
 		end
 		
