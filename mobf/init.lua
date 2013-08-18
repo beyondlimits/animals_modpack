@@ -157,6 +157,33 @@ function mobf_init_framework()
 			end
 		end
 	end
+	
+	--try to catch all mobf abms
+	if minetest.world_setting_get("mobf_enable_statistics") then
+		local abm_register_call = minetest.register_abm
+		
+		minetest.register_abm = function(spec)
+			local modname = minetest.get_current_modname()
+			
+			local mob_start,mob_end = string.find(modname,"mob")
+			local animal_start,animal_end = string.find(modname,"animal")
+			local mobf_start,mobf_end = string.find(modname,"mobf")
+			
+			if mob_start == 1 or animal_start == 1 or mobf_start == 1 then
+				local action = spec.action
+				
+				spec.action = function(pos, node, active_object_count, active_object_count_wider)
+						local starttime = mobf_get_time_ms()
+						local retval = action(pos, node, active_object_count, active_object_count_wider)
+						mobf_warn_long_fct(starttime,"auto_abm","abm")
+						return retval
+					end
+					
+				minetest.log(LOGLEVEL_WARNING,"MOBF: tracing enabled instrumenting abm for mod " .. modname)
+			end
+			abm_register_call(spec)
+		end
+	end
 
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing mob framework")
 	mobf_init_basic_tools()
