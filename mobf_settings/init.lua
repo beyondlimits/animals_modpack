@@ -341,28 +341,36 @@ end
 function mobf_settings.show_statistics_tab(sender_data)
 	local formspec = mobf_settings.formspec_header(sender_data)
 	
-	local printfac = function(name,data)
-		return mobf_fixed_size_string(name,20) ..
-				mobf_fixed_size_string(string.format("%.2f%%",data.current),10) ..
-				mobf_fixed_size_string(string.format("%.2f%%",data.min),10) ..
-				mobf_fixed_size_string(string.format("%.2f%%",data.max),10)
+	local printfac = function(name,data,yval,fs)
+		return 
+			"label[0.75," .. yval .. ";" .. mobf_fixed_size_string(name,20) .. "]" ..
+			"label[2.75," .. yval .. ";" .. 
+				mobf_fixed_size_string(string.format(fs,data.current),10).. "]" ..
+			"label[4.5," .. yval .. ";" .. 
+				mobf_fixed_size_string(string.format(fs,data.min),10).. "]" ..
+			"label[6," .. yval .. ";" .. 
+				mobf_fixed_size_string(string.format(fs,data.max),10).. "]"
+
 	end
 	
 	formspec = formspec ..
-		"label[0.75,1;"	.. mobf_fixed_size_string("Facility",20)
+		"label[0.75,0.5;Info:]" ..
+		"label[0.75,0.75;--------------------------------------------------]" ..
+		"label[0.75,1.25;Timesource:]" ..
+		"label[2.75,1.25;" .. mobf_fixed_size_string(mobf_rtd.timesource,30) .. "]" ..
+		printfac("Active Mobs",statistics.data.mobs,"1.75","%6d") ..
+		"label[0.75,3;"	.. mobf_fixed_size_string("Facility",20)
 						.. mobf_fixed_size_string("Current",10)
 						.. mobf_fixed_size_string("Minimum",10)
 						.. mobf_fixed_size_string("Maximum",10) .. "]" ..
-		"label[0.75,1.5;" .. printfac("Total",statistics.data.total) .. "]" ..
-		"label[0.75,3;" .. printfac("Onstep",statistics.data.onstep) .. "]" ..
-		"label[0.75,3.5;" .. printfac("Punch",statistics.data.punch) .. "]" ..
-		"label[0.75,4;" .. printfac("ABM",statistics.data.abm) .. "]" ..
-		"label[0.75,4.5;" .. printfac("MapGen",statistics.data.mapgen) .. "]" ..
-		"label[0.75,5;" .. printfac("Activate",statistics.data.activate) .."]" ..
-		"label[0.75,2;" ..mobf_fixed_size_string("Active Mobs",20) ..
-				mobf_fixed_size_string(string.format("%6d",statistics.data.mobs.current),10) ..
-				mobf_fixed_size_string(string.format("%6d",statistics.data.mobs.min),10) ..
-				mobf_fixed_size_string(string.format("%6d",statistics.data.mobs.max),10) .. "]"
+		"label[0.75,3.25;--------------------------------------------------]" ..
+		printfac("Total",statistics.data.total,"3.75","%.2f%%") ..
+		printfac("Onstep",statistics.data.onstep,"4.25","%.2f%%") ..
+		printfac("Punch",statistics.data.punch,"4.75","%.2f%%") ..
+		printfac("ABM",statistics.data.abm,"5.25","%.2f%%") ..
+		printfac("MapGen",statistics.data.mapgen,"5.75","%.2f%%") ..
+		printfac("Activate",statistics.data.activate,"6.25","%.2f%%")
+
 	if formspec ~= nil then
 		minetest.show_formspec(sender_data.player:get_player_name(),
 							sender_data.formname,
@@ -675,6 +683,18 @@ minetest.register_on_player_receive_fields(mobf_settings.handle_event)
 
 --register chatcommand
 minetest.register_chatcommand("mobf_settings",
+	{
+		params		= "",
+		description = "show mobf settings" ,
+		privs		= {},
+		func		= function(name,param)
+				minetest.chat_send_player(name, "MOBF: >mobf_settings< is DEPRECATED use >mobf<")
+				local player = minetest.get_player_by_name(name)
+				mobf_settings.handle_event(player,mobf_settings.formname,{btn_1_init="init"})
+			end
+	})
+--"mobf_settings" will be removed
+minetest.register_chatcommand("mobf",
 	{
 		params		= "",
 		description = "show mobf settings" ,
