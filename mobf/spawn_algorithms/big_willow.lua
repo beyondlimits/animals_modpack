@@ -71,7 +71,7 @@ function mobf_spawn_on_big_willow(mob_name,mob_transform,spawning_data,environme
 				
 						for x=pos.x-2,pos.x+2,1 do
 						for z=pos.z-2,pos.z+2,1 do
-							local node_to_check = minetest.getnode({x=x,y=pos.y,z=z})
+							local node_to_check = minetest.get_node({x=x,y=pos.y,z=z})
 				
 							if node_to_check == nil or
 								node_to_check.name ~= "default:dirt_with_grass" then
@@ -89,7 +89,7 @@ function mobf_spawn_on_big_willow(mob_name,mob_transform,spawning_data,environme
 						if pos_is_big_willow then
 							dbg_mobf.spawning_lvl3("willow is big enough " ..printpos(centerpos))
 							local spawnpos = {x=pos.x,y=pos.y+1,z=pos.z}
-							spawning.spawn_and_check(name,"__default",spawnpos,"on_big_willow_mapgen")
+							spawning.spawn_and_check(mob_name,"__default",spawnpos,"on_big_willow_mapgen")
 							return true
 						end
 					end
