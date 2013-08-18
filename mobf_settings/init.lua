@@ -370,7 +370,10 @@ function mobf_settings.show_statistics_tab(sender_data)
 		printfac("ABM",statistics.data.abm,"5.25","%.2f%%") ..
 		printfac("MapGen",statistics.data.mapgen,"5.75","%.2f%%") ..
 		printfac("Spawn onstep",statistics.data.spawn_onstep,"6.25","%.2f%%") ..
-		printfac("Activate",statistics.data.activate,"6.75","%.2f%%")
+		printfac("Activate",statistics.data.activate,"6.75","%.2f%%") ..
+		printfac("User 1",statistics.data.user_1,"7.5","%.2f%%") ..
+		printfac("User 2",statistics.data.user_2,"8","%.2f%%") ..
+		printfac("User 3",statistics.data.user_3,"8.5","%.2f%%")
 
 	if formspec ~= nil then
 		minetest.show_formspec(sender_data.player:get_player_name(),

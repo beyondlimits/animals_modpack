@@ -30,6 +30,9 @@ statistics.lastcalc = 0
 statistics.activate = 0
 statistics.punch = 0
 statistics.spawn_onstep = 0
+statistics.user_1 = 0
+statistics.user_2 = 0
+statistics.user_3 = 0
 statistics.data = {}
 statistics.data.total        = { current=0,maxabs=0,max=0 }
 statistics.data.abm          = { current=0,maxabs=0,max=0 }
@@ -39,6 +42,10 @@ statistics.data.activate     = { current=0,maxabs=0,max=0 }
 statistics.data.punch        = { current=0,maxabs=0,max=0 }
 statistics.data.mobs         = { current=0,maxabs=" ",max=0 }
 statistics.data.spawn_onstep = { current=0,maxabs=0,max=0 }
+
+statistics.data.user_1 = { current=0,maxabs=0,max=0 }
+statistics.data.user_2 = { current=0,maxabs=0,max=0 }
+statistics.data.user_3 = { current=0,maxabs=0,max=0 }
 
 -------------------------------------------------------------------------------
 -- name: mobf_statistic_calc()
@@ -57,6 +64,9 @@ function mobf_statistic_calc(dtime)
 		local current_activate = (statistics.activate/delta)*100
 		local current_punch  = (statistics.punch/delta)*100
 		local current_spawn_onstep  = (statistics.spawn_onstep/delta)*100
+		local current_user_1  = (statistics.user_1/delta)*100
+		local current_user_2  = (statistics.user_2/delta)*100
+		local current_user_3  = (statistics.user_3/delta)*100
 		
 		local active_mobs = 1
 		for index,value in pairs(minetest.luaentities) do 
@@ -72,6 +82,9 @@ function mobf_statistic_calc(dtime)
 		statistics.activate = 0
 		statistics.punch = 0
 		statistics.spawn_onstep = 0
+		statistics.user_1 = 0
+		statistics.user_2 = 0
+		statistics.user_3 = 0
 	
 		statistics.data.total.current = current_total
 		statistics.data.total.maxabs = MAX(statistics.data.total.maxabs, math.floor(current_total*300))
@@ -103,6 +116,18 @@ function mobf_statistic_calc(dtime)
 		
 		statistics.data.mobs.current = active_mobs
 		statistics.data.mobs.max = MAX(statistics.data.mobs.max,active_mobs)
+		
+		statistics.data.user_1.current = current_user_1
+		statistics.data.user_1.maxabs = MAX(statistics.data.user_1.maxabs, math.floor(current_user_1*300))
+		statistics.data.user_1.max = MAX(statistics.data.user_1.max,current_user_1)
+		
+		statistics.data.user_2.current = current_user_2
+		statistics.data.user_2.maxabs = MAX(statistics.data.user_2.maxabs, math.floor(current_user_2*300))
+		statistics.data.user_2.max = MAX(statistics.data.user_2.max,current_user_2)
+		
+		statistics.data.user_3.current = current_user_3
+		statistics.data.user_3.maxabs = MAX(statistics.data.user_3.maxabs, math.floor(current_user_3*300))
+		statistics.data.user_3.max = MAX(statistics.data.user_3.max,current_user_3)
 		
 		statistics.lastcalc = now
 	end
@@ -152,6 +177,18 @@ function mobf_warn_long_fct(starttime,fctname,facility)
 		if facility == "onactivate_total" then
 			statistics.activate = statistics.activate + delta
 			statistics.total = statistics.total + delta
+		end
+		
+		if facility == "user_1" then
+			statistics.user_1 = statistics.user_1 + delta
+		end
+		
+		if facility == "user_2" then
+			statistics.user_2 = statistics.user_2 + delta
+		end
+		
+		if facility == "user_3" then
+			statistics.user_3 = statistics.user_3 + delta
 		end
 	end
 	
