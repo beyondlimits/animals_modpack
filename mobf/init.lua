@@ -40,6 +40,8 @@ mobf_rtd = {
 	registred_mob			= {},
 	--!registred mobs_data
 	registred_mob_data		= {},
+	--!timesource
+	timesource				= "os.clock() (10ms ONLY!)",
 }
 
 --!path of mod
@@ -136,6 +138,26 @@ end
 
 --! @brief main initialization function
 function mobf_init_framework()
+
+	--try to get timesource with best accuracy
+	if type(minetest.get_us_time) == "function" then
+		mobf_get_time_ms = function()
+				return minetest.get_us_time() / 1000
+			end
+		mobf_rtd.timesource = "minetest.get_us_time()"
+	else
+		if socket == nil then
+			local status, module = pcall(require, 'socket')
+			
+			if status and type(module.gettime) == "function" then
+				mobf_get_time_ms = function()
+						return socket.gettime()*1000
+					end
+				mobf_rtd.timesource = "socket.gettime()"
+			end
+		end
+	end
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing mob framework")
 	mobf_init_basic_tools()
 	

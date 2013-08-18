@@ -19,10 +19,6 @@
 --! @ingroup framework_int
 --! @{
 
-if minetest.world_setting_get("mobf_enable_socket_time") then
-    require "socket"
-end
-
 -------------------------------------------------------------------------------
 -- name: mobf_get_time_ms()
 --
@@ -31,11 +27,8 @@ end
 --! @return current time in ms
 -------------------------------------------------------------------------------
 function mobf_get_time_ms()
-	if minetest.world_setting_get("mobf_enable_socket_time") then
-		return socket.gettime()*1000
-	else
-	    return os.clock()*1000
-	end
+	--this fct is overwritten on init with best timesource available atm
+	return os.clock() * 1000
 end
 
 -------------------------------------------------------------------------------
