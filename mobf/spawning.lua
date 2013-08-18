@@ -434,7 +434,7 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 	dbg_mobf.spawning_lvl3("MOBF:	" .. dump(spawnfunc))
 	
 	if maxtries == nil then
-		maxtries = 5
+		maxtries = 2
 	end
 	
 	local divs = 0
@@ -498,11 +498,13 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 				pos.x = math.floor(pos.x + 0.5)
 				pos.z = math.floor(pos.z + 0.5)
 				
+				local starttime = mobf_get_time_ms()
 				if spawnfunc(name,pos,min_y,max_y,spawndata) then
 					spawned = spawned +1
+					mobf_warn_long_fct(starttime,"on_mapgen_entity","user_3")
 					break
 				end
-			end --for -> 5
+			end --for -> maxtries
 		end --mob around
 		
 		divs = divs +1
@@ -538,7 +540,7 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 	dbg_mobf.spawning_lvl3("MOBF:	" .. dump(spawnfunc))
 	
 	if maxtries == nil then
-		maxtries = 5
+		maxtries = 2
 	end
 	
 	local divs = 0
@@ -566,11 +568,12 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 	
 	for i = 1, xdivs,1 do
 	for j = 1, zdivs,1 do
-	
+		local starttime = mobf_get_time_ms()
 		local x_center,x_delta = spawning.get_center(min_x,max_x,i,density)
 		local z_center,z_delta = spawning.get_center(min_z,max_z,j,density)
 		
 		local surface_center = surfacefunc(x_center,z_center,min_y,max_y)
+		mobf_warn_long_fct(starttime,"surface_detection","user_2")
 		
 		local centerpos = {x=x_center,y=surface_center,z=z_center}
 		
@@ -593,8 +596,9 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 				
 				local pos = { x= x_center + x_try,
 								z= z_center + z_try }
-				
+				local starttime = mobf_get_time_ms()
 				pos.y = surfacefunc(pos.x,pos.z,min_y,max_y)
+				mobf_warn_long_fct(starttime,"surface_detection","user_1")
 				
 				if pos.y and spawnfunc(name,pos,min_y,max_y) then
 					spawned = spawned +1
