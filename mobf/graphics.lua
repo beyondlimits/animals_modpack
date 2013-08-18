@@ -230,7 +230,12 @@ function graphics.set_animation(entity,name)
 	
 		if name == "burning" then
 			entity.object:setsprite({x=0,y=1}, 1, 0, true)
+			return
 		end
+		
+		
+		--fallback
+		entity.object:setsprite({x=0,y=0}, 1, 0, true)
 		
 		return
 	end
