@@ -87,7 +87,6 @@ function graphics.update(entity,now,dtime)
 		dbg_mobf.graphics_lvl3("MOBF: attention mode orientation update")
 		local direction = mobf_get_direction(entity.object:getpos(),
 								entity.dynamic_data.attention.most_relevant_target:getpos())
-	
 		if entity.mode == "3d" then
 			entity.object:setyaw(
 				mobf_calc_yaw(direction.x,direction.z))
@@ -232,7 +231,6 @@ function graphics.set_animation(entity,name)
 			entity.object:setsprite({x=0,y=1}, 1, 0, true)
 			return
 		end
-		
 		
 		--fallback
 		entity.object:setsprite({x=0,y=0}, 1, 0, true)

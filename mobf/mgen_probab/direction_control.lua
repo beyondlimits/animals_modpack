@@ -143,7 +143,7 @@ end
 --! @return x/y/z acceleration
 -------------------------------------------------------------------------------
 function direction_control.get_random_acceleration(minaccel,maxaccel,current_yaw, minrotation)
-
+	
 	local direction = 1
 	if math.random() < 0.5 then
 		direction = -1
