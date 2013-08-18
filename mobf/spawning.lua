@@ -662,7 +662,7 @@ function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,en
 					
 					mobf_warn_long_fct(starttime,"spawnfunc " .. self.spawner_mob_name,"spawnfunc")
 				end
-				mobf_warn_long_fct(starttime,"spawner_entity_onstep","mapgen")
+				mobf_warn_long_fct(starttime,"spawner_entity_onstep","spawn_onstep")
 			end,
 			
 			on_activate = function(self,staticdata)
@@ -672,7 +672,7 @@ function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,en
 				end
 				--TODO honor time since deactivation
 				self.spawner_time_passed     = 1
-				mobf_warn_long_fct(starttime,"spawner_entity_activate","mapgen")
+				mobf_warn_long_fct(starttime,"spawner_entity_activate","spawn_onstep")
 			end,
 			
 			spawner_mob_name        = mobname,
