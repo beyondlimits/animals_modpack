@@ -359,6 +359,7 @@ function mobf_settings.show_statistics_tab(sender_data)
 		"label[0.75,1.25;Timesource:]" ..
 		"label[2.75,1.25;" .. mobf_fixed_size_string(mobf_rtd.timesource,30) .. "]" ..
 		printfac("Active Mobs",statistics.data.mobs,"1.75","%6d") ..
+		printfac("Jobqueue",statistics.data.queue,"2.25","%6d") ..
 		"label[0.75,3;"	.. mobf_fixed_size_string("Facility",20)
 						.. mobf_fixed_size_string("Current",10)
 						.. mobf_fixed_size_string("Abs.Max",10)
@@ -392,55 +393,63 @@ end
 function mobf_settings.show_settings_tab(sender_data)
 	local formspec = mobf_settings.formspec_header(sender_data)
 	
-	formspec = formspec .. "checkbox[1,1;" .. 
+	formspec = formspec .. "checkbox[1,0.5;" .. 
 				"cb_" .. sender_data.tab .. "_disable_animal_spawning;" ..
 				"Disable mob spawning;" .. 
 				mobf_settings.setting_gettext("mobf_disable_animal_spawning") .."]"
 				
-	formspec = formspec .. "checkbox[1,1.75;" .. 
+	formspec = formspec .. "checkbox[1,1;" .. 
 				"cb_" .. sender_data.tab .. "_disable_3d_mode;" ..
 				"Disable 3D mobs;" .. 
 				mobf_settings.setting_gettext("mobf_disable_3d_mode") .."]"
 				
-	formspec = formspec .. "checkbox[1,2.5;" .. 
+	formspec = formspec .. "checkbox[1,1.5;" .. 
 				"cb_" .. sender_data.tab .. "_animal_spawning_secondary;" ..
 				"Enable secondary spawning;" .. 
 				mobf_settings.setting_gettext("mobf_animal_spawning_secondary") .."]"
 				
-	formspec = formspec .. "checkbox[1,3.25;" .. 
+	formspec = formspec .. "checkbox[1,2;" .. 
 				"cb_" .. sender_data.tab .. "_delete_disabled_mobs;" ..
 				"Delete disabled mobs+spawners;" .. 
 				mobf_settings.setting_gettext("mobf_delete_disabled_mobs") .."]"
 				
-	formspec = formspec .. "checkbox[1,4;" .. 
+	formspec = formspec .. "checkbox[1,2.5;" .. 
 				"cb_" .. sender_data.tab .. "_log_bug_warnings;" ..
 				"Log MOBF bug warnings;" .. 
 				mobf_settings.setting_gettext("mobf_log_bug_warnings") .."]"
 				
-	formspec = formspec .. "checkbox[1,4.75;" .. 
+	formspec = formspec .. "checkbox[1,3;" .. 
 				"cb_" .. sender_data.tab .. "_vombie_3d_burn_animation_enabled;" ..
 				"Vombie 3D burn animation;" .. 
 				mobf_settings.setting_gettext("vombie_3d_burn_animation_enabled") .."]"
 				
-	formspec = formspec .. "checkbox[1,5.5;" .. 
+	formspec = formspec .. "checkbox[1,3.5;" .. 
 				"cb_" .. sender_data.tab .. "_log_removed_entities;" ..
 				"Log all removed mobs;" .. 
 				mobf_settings.setting_gettext("mobf_log_removed_entities") .."]"
 				
-	formspec = formspec .. "checkbox[1,6.25;" .. 
+	formspec = formspec .. "checkbox[1,4;" .. 
 				"cb_" .. sender_data.tab .. "_grief_protection;" ..
 				"Enable grief protection;" .. 
 				mobf_settings.setting_gettext("mobf_grief_protection") .."]"
 				
-	formspec = formspec .. "checkbox[1,7;" .. 
+	formspec = formspec .. "checkbox[1,4.5;" .. 
 				"cb_" .. sender_data.tab .. "_lifebar;" ..
 				"Show mob lifebar;" .. 
 				mobf_settings.setting_gettext("mobf_lifebar") .."]"
 				
-	formspec = formspec .. "checkbox[1,7.75;" .. 
+	formspec = formspec .. "checkbox[1,5;" .. 
 				"cb_" .. sender_data.tab .. "_enable_statistics;" ..
 				"Enable statistics;" .. 
 				mobf_settings.setting_gettext("mobf_enable_statistics") .."]"
+	formspec = formspec .. "checkbox[1,5.5;" .. 
+				"cb_" .. sender_data.tab .. "_delayed_spawning;" ..
+				"Delay spawning at mapgen;" .. 
+				mobf_settings.setting_gettext("mobf_delayed_spawning") .."]"
+	formspec = formspec .. "checkbox[1,6;" .. 
+				"cb_" .. sender_data.tab .. "_queue_processing;" ..
+				"Queue processing;" .. 
+				mobf_settings.setting_gettext("mobf_queue_processing") .."]"
 	--print("formspec: " .. formspec)
 	if formspec ~= nil then
 		minetest.show_formspec(sender_data.player:get_player_name(),
@@ -572,6 +581,16 @@ function mobf_settings.handle_settings_tab_input(sender_data)
 	
 	if sender_data.name == "enable_statistics" then
 		mobf_set_world_setting("mobf_enable_statistics",
+								mobf_settings.tobool(sender_data.value))
+	end
+	
+	if sender_data.name == "delayed_spawning" then
+		mobf_set_world_setting("mobf_delayed_spawning",
+								mobf_settings.tobool(sender_data.value))
+	end
+	
+	if sender_data.name == "queue_processing" then
+		mobf_set_world_setting("mobf_queue_processing",
 								mobf_settings.tobool(sender_data.value))
 	end
 end
