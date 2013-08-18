@@ -228,12 +228,8 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 			
 			self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
 		end)
-
-	--add mob spawner on map generation
-	minetest.register_on_generated(function(minp, maxp, seed)
-	
-		spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,
-			function(name,pos,min_y,max_y,spawning_data)
+		
+	local spawnfunc = function(name,pos,min_y,max_y,spawning_data)
 			
 				dbg_mobf.spawning_lvl3("MOBF: trying to create a spawner for " 
 					.. name .. " at " ..printpos(pos))
@@ -275,8 +271,30 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 						.. name .. " spawner at " ..printpos(pos))
 				end
 				return false
-			end)
-    end) --register mapgen
+			end
+
+	if minetest.world_setting_get("mobf_delayed_spawning") then
+		minetest.register_on_generated(function(minp, maxp, seed)
+			local job = {
+				callback = spawning.divide_mapgen_entity_jobfunc,
+				data = {
+					minp          = minp,
+					maxp          = maxp,
+					spawning_data = spawning_data,
+					mob_name      = mob_name,
+					spawnfunc     = spawnfunc,
+					maxtries      = 5,
+					func          = spawning.divide_mapgen_entity_jobfunc,
+					}
+				}
+			mobf_job_queue.add_job(job)
+		end)
+	else	
+		--add mob spawner on map generation
+		minetest.register_on_generated(function(minp, maxp, seed)
+			spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,spawnfunc)
+		end) --register mapgen
+	end
 end
 
 --!@}

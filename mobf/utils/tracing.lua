@@ -41,6 +41,7 @@ statistics.data.mapgen       = { current=0,maxabs=0,max=0 }
 statistics.data.activate     = { current=0,maxabs=0,max=0 }
 statistics.data.punch        = { current=0,maxabs=0,max=0 }
 statistics.data.mobs         = { current=0,maxabs=" ",max=0 }
+statistics.data.queue         = { current=0,maxabs=0,max=0 }
 statistics.data.spawn_onstep = { current=0,maxabs=0,max=0 }
 
 statistics.data.user_1 = { current=0,maxabs=0,max=0 }
@@ -116,6 +117,9 @@ function mobf_statistic_calc(dtime)
 		
 		statistics.data.mobs.current = active_mobs
 		statistics.data.mobs.max = MAX(statistics.data.mobs.max,active_mobs)
+		
+		statistics.data.queue.current = #mobf_job_queue.queue
+		statistics.data.queue.max = MAX(statistics.data.queue.max,#mobf_job_queue.queue)
 		
 		statistics.data.user_1.current = current_user_1
 		statistics.data.user_1.maxabs = MAX(statistics.data.user_1.maxabs, math.floor(current_user_1*300))

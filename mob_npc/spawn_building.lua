@@ -265,11 +265,7 @@ end
 function mob_npc_spawn_building(mob_name,mob_transform,spawning_data,environment)
 	minetest.log(LOGLEVEL_INFO,"MOBF:\tspawn_building spawner for mob "..mob_name)
 	
-	--add mob on map generation
-	minetest.register_on_generated(function(minp, maxp, seed)
-		spawning.divide_mapgen(minp,maxp,spawning_data.density,mob_name,mob_transform,
-		
-		function(name,pos,min_y,max_y)
+	local spawnfunc = function(name,pos,min_y,max_y)
 			
 			if math.random() < 0.25 then
 				local blueprint = mob_npc_houses[math.random(1,#mob_npc_houses)]
@@ -279,10 +275,34 @@ function mob_npc_spawn_building(mob_name,mob_transform,spawning_data,environment
 				end
 			end
 			return false
-		end,
-		mobf_get_sunlight_surface,
-		20)
-	end)
+		end
+	
+	if minetest.world_setting_get("mobf_delayed_spawning") then
+		minetest.register_on_generated(function(minp, maxp, seed)
+			local job = {
+				callback = spawning.divide_mapgen_jobfunc,
+				data = {
+					minp          = minp,
+					maxp          = maxp,
+					spawning_data = spawning_data,
+					mob_name      = mob_name,
+					mob_transform = mob_transform,
+					spawnfunc     = spawnfunc,
+					surfacefunc   = mobf_get_sunlight_surface,
+					maxtries      = 20,
+					spawned       = 0,
+					func          = spawning.divide_mapgen_jobfunc
+					}
+				}
+			mobf_job_queue.add_job(job)
+		end)
+	else
+		--add mob on map generation
+		minetest.register_on_generated(function(minp, maxp, seed)
+			spawning.divide_mapgen(minp,maxp,spawning_data.density,mob_name,
+				mob_transform,spawnfunc,mobf_get_sunlight_surface,20)
+		end)
+	end
 end --end spawn algo
 
 function build_house_cmd_handler(name,param)

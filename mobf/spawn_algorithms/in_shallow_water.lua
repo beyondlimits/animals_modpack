@@ -167,11 +167,8 @@ function mobf_spawn_in_shallow_water_entity(mob_name,mob_transform,spawning_data
 			end
 		end)
 		
-	--add mob spawner on map generation
-	minetest.register_on_generated(function(minp, maxp, seed)
-	
-		spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,
-			function(name,pos,min_y,max_y)
+		
+	local spawnfunc = function(name,pos,min_y,max_y)
 				dbg_mobf.spawning_lvl3("MOBF: trying to create a spawner for " .. name .. " at " ..printpos(pos))
 				local surface = mobf_get_surface(pos.x,pos.z,min_y,max_y)
 				
@@ -192,10 +189,30 @@ function mobf_spawn_in_shallow_water_entity(mob_name,mob_transform,spawning_data
 					dbg_mobf.spawning_lvl3("MOBF:	unable to find surface")
 				end
 				return false
-			end,
-			15
-			)
-    end) --register mapgen
+			end
+			
+	if minetest.world_setting_get("mobf_delayed_spawning") then
+		minetest.register_on_generated(function(minp, maxp, seed)
+			local job = {
+				callback = spawning.divide_mapgen_entity_jobfunc,
+				data = {
+					minp          = minp,
+					maxp          = maxp,
+					spawning_data = spawning_data,
+					mob_name      = mob_name,
+					spawnfunc     = spawnfunc,
+					maxtries      = 15,
+					func          = spawning.divide_mapgen_entity_jobfunc,
+					}
+				}
+			mobf_job_queue.add_job(job)
+		end)
+	else
+		--add mob spawner on map generation
+		minetest.register_on_generated(function(minp, maxp, seed)
+			spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,spawnfunc,15)
+		end) --register mapgen
+	end
  end --end spawn algo
 --!@}
 

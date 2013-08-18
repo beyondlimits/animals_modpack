@@ -99,12 +99,7 @@ end
 function mobf_spawn_in_forrest_mapgen(mob_name,mob_transform,spawning_data,environment)
 
 	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering forrest spawn mapgen callback for mob "..mob_name)
-	
-	--add mob on map generation
-	minetest.register_on_generated(function(minp, maxp, seed)
-		spawning.divide_mapgen(minp,maxp,spawning_data.density,mob_name,mob_transform,
-		
-		function(name,pos,min_y,max_y)
+	local spawnfunc = function(name,pos,min_y,max_y)
 			
 			--check if there s enough space above to place mob
 			if mobf_air_above(pos,spawning_data.height) then
@@ -123,10 +118,33 @@ function mobf_spawn_in_forrest_mapgen(mob_name,mob_transform,spawning_data,envir
 				.. " for mob ".. name .. " minimum is: " .. spawning_data.height )
 			end -- air_above
 			return false
-		end,
-		mobf_get_sunlight_surface,
-		5)
-	end) --register mapgen
+		end
+		
+	if minetest.world_setting_get("mobf_delayed_spawning") then
+		minetest.register_on_generated(function(minp, maxp, seed)
+		
+			local job = {
+				callback = spawning.divide_mapgen_jobfunc,
+				data = {
+					minp          = minp,
+					maxp          = maxp,
+					spawning_data = spawning_data,
+					mob_name      = mob_name,
+					mob_transform = mob_transform,
+					spawnfunc     = spawnfunc,
+					surfacefunc   = mobf_get_sunlight_surface,
+					maxtries      = 5
+					}
+				}
+			mobf_job_queue.add_job(job)
+		end)
+	else
+		--add mob on map generation
+		minetest.register_on_generated(function(minp, maxp, seed)
+			spawning.divide_mapgen(minp,maxp,spawning_data.density,mob_name,mob_transform,
+									spawnfunc,mobf_get_sunlight_surface,5)
+			end) --register mapgen
+	end
 end --end spawn algo
 
 --!@}

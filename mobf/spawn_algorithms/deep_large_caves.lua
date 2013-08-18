@@ -212,11 +212,10 @@ function mobf_spawn_in_deep_large_caves_entity(mob_name,mob_transform,spawning_d
 	--add mob spawner on map generation
 	minetest.register_on_generated(function(minp, maxp, seed)
 	
-		spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,
-			function(name,pos,min_y,max_y,spawning_data)
+		local spawnfunc = function(name,pos,min_y,max_y,spawning_data)
 			
 				if max_y > spawning_data.min_depth then
-					return
+					return false
 				end
 			
 				dbg_mobf.spawning_lvl3("MOBF: trying to create a spawner for " .. name .. " at " ..printpos(pos))
@@ -236,7 +235,7 @@ function mobf_spawn_in_deep_large_caves_entity(mob_name,mob_transform,spawning_d
 					local node_above = minetest.get_node(pos_above)
 					if not mobf_contains({"air"},node_above.name) then
 						dbg_mobf.spawning_lvl3("MOBF: node above ain't air but: " .. node_above.name)
-						return
+						return false
 					end
 					
 					spawning.spawn_and_check(name,"_spawner",pos_above,"deep_large_caves_spawner")
@@ -245,8 +244,31 @@ function mobf_spawn_in_deep_large_caves_entity(mob_name,mob_transform,spawning_d
 					dbg_mobf.spawning_lvl3("MOBF: didn't find surface for " .. name .. " spawner at " ..printpos(pos))
 				end
 				return false
+			end
+	
+		if minetest.world_setting_get("mobf_delayed_spawning") then
+			minetest.register_on_generated(function(minp, maxp, seed)
+			
+				local job = {
+					
+					callback = spawning.divide_mapgen_entity_jobfunc,
+					data = {
+						minp          = minp,
+						maxp          = maxp,
+						spawning_data = spawning_data,
+						mob_name      = mob_name,
+						spawnfunc     = spawnfunc,
+						maxtries      = 30,
+						spawned       = 0,
+						func          = spawning.divide_mapgen_entity_jobfunc
+						}
+					}
+				mobf_job_queue.add_job(job)
 			end)
-    end) --register mapgen
+		else
+			spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,spawnfunc)
+		end
+	end) --register mapgen
 end
 --!@}
 
