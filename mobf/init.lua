@@ -70,6 +70,7 @@ dofile (mobf_modpath .. "/utils/data_storage.lua")
 dofile (mobf_modpath .. "/utils/tracing.lua")
 dofile (mobf_modpath .. "/utils/geometry.lua")
 dofile (mobf_modpath .. "/utils/permanent_data.lua")
+dofile (mobf_modpath .. "/job_queue.lua")
 dofile (mobf_modpath .. "/lifebar.lua")
 dofile (mobf_modpath .. "/env_constants.lua")
 dofile (mobf_modpath .. "/environment.lua")
@@ -102,7 +103,7 @@ dofile (mobf_modpath .. "/mgen_jordan4ibanez/mgen_jordan4ibanez.lua")
 dofile (mobf_modpath .. "/mgen_pathbased/main.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "2.1.2"
+mobf_version = "2.1.81"
 
 --! @brief define tools used for more than one mob
 function mobf_init_basic_tools()	
