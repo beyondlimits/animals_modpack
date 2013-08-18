@@ -41,7 +41,7 @@ blueprint_hut = {
 		{"default:torch",{x=2,y=2,z=1},{x=2,y=2,z=1}},
 	},
 	entities = {
-		{ {x=4,y=1,z=1},"mob_npc:npc_trader__default",math.pi }
+		{ {x=4.5,y=1,z=1.5},"mob_npc:npc_trader__default",-math.pi }
 	}
 }
 
@@ -103,7 +103,7 @@ blueprint_normalhouse = {
 		{"default:lava_source",{x=1,y=0,z=8},{x=1,y=0,z=8}},
 	},
 	entities = {
-			{ {x=3,y=1,z=5},"mob_npc:npc_trader__default",-1.14 }
+			{ {x=3.5,y=1,z=5.5},"mob_npc:npc_trader__default",-1.14 }
 		}
 }
 
