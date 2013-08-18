@@ -425,7 +425,7 @@ end
 --
 -------------------------------------------------------------------------------
 function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtries)
-
+	local starttime = mobf_get_time_ms()
 	local density = spawndata.density
 	
 	dbg_mobf.spawning_lvl3("MOBF: divide_mapgen params: ")
@@ -511,6 +511,7 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 	local max_available_tries = divs * maxtries
 	dbg_mobf.spawning_lvl2("MOBF: divide_mapgen I " ..
 			"(" .. divs .. "|" .. attempts .. "|" .. spawned .. "|" .. max_available_tries .. ")")
+	mobf_warn_long_fct(starttime,"on_mapgen_entity","mapgen")
 end
 
 ------------------------------------------------------------------------------
@@ -640,6 +641,7 @@ function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,en
 			
 			
 			on_step = function(self,dtime)
+				local starttime = mobf_get_time_ms()
 				self.spawner_time_passed = self.spawner_time_passed -dtime
 
 				--self.spawner_time_passed has to be handled by spawnfunc!
@@ -660,14 +662,17 @@ function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,en
 					
 					mobf_warn_long_fct(starttime,"spawnfunc " .. self.spawner_mob_name,"spawnfunc")
 				end
+				mobf_warn_long_fct(starttime,"spawner_entity_onstep","mapgen")
 			end,
 			
 			on_activate = function(self,staticdata)
+				local starttime = mobf_get_time_ms()
 				if self.spawner_mob_transform == nil then
 					self.spawner_mob_transform = ""
 				end
 				--TODO honor time since deactivation
 				self.spawner_time_passed     = 1
+				mobf_warn_long_fct(starttime,"spawner_entity_activate","mapgen")
 			end,
 			
 			spawner_mob_name        = mobname,

@@ -21,6 +21,86 @@
 
 callback_statistics = {}
 
+statistics = {}
+statistics.total = 0
+statistics.abms = 0
+statistics.onstep = 0
+statistics.mapgen = 0
+statistics.lastcalc = 0
+statistics.activate = 0
+statistics.punch = 0
+statistics.data = {}
+statistics.data.total    = { current=0,min=9999,max=0 }
+statistics.data.abm      = { current=0,min=9999,max=0 }
+statistics.data.onstep   = { current=0,min=9999,max=0 }
+statistics.data.mapgen   = { current=0,min=9999,max=0 }
+statistics.data.activate = { current=0,min=9999,max=0 }
+statistics.data.punch    = { current=0,min=9999,max=0 }
+statistics.data.mobs     = { current=0,min=9999,max=0 }
+
+-------------------------------------------------------------------------------
+-- name: mobf_statistic_calc()
+--
+--! @brief periodic update statistics
+--
+-------------------------------------------------------------------------------
+function mobf_statistic_calc(dtime)
+	local now = mobf_get_time_ms()
+	if statistics.lastcalc == nil or now > statistics.lastcalc + 30000 then
+		local delta = now - statistics.lastcalc
+		local current_total  = statistics.total/delta
+		local current_abm    = statistics.abms/delta
+		local current_onstep = statistics.onstep/delta
+		local current_mapgen = statistics.mapgen/delta
+		local current_activate = statistics.activate/delta
+		local current_punch  = statistics.punch/delta
+		
+		local active_mobs = 1
+		for index,value in pairs(minetest.luaentities) do 
+			if value.data ~= nil and value.data.name ~= nil then
+				active_mobs = active_mobs +1
+			end
+		end
+		
+		statistics.total = 0
+		statistics.abms = 0
+		statistics.onstep = 0
+		statistics.mapgen = 0
+		statistics.activate = 0
+		statistics.punch = 0
+	
+		statistics.data.total.current = current_total
+		statistics.data.total.min = MIN(statistics.data.total.min,current_total)
+		statistics.data.total.max = MAX(statistics.data.total.max,current_total)
+		
+		statistics.data.abm.current = current_abm
+		statistics.data.abm.min = MIN(statistics.data.abm.min,current_abm)
+		statistics.data.abm.max = MAX(statistics.data.abm.max,current_abm)
+		
+		statistics.data.onstep.current = current_onstep
+		statistics.data.onstep.min = MIN(statistics.data.onstep.min,current_onstep)
+		statistics.data.onstep.max = MAX(statistics.data.onstep.max,current_onstep)
+		
+		statistics.data.mapgen.current = current_mapgen
+		statistics.data.mapgen.min = MIN(statistics.data.mapgen.min,current_mapgen)
+		statistics.data.mapgen.max = MAX(statistics.data.mapgen.max,current_mapgen)
+		
+		statistics.data.activate.current = current_activate
+		statistics.data.activate.min = MIN(statistics.data.activate.min,current_activate)
+		statistics.data.activate.max = MAX(statistics.data.activate.max,current_activate)
+		
+		statistics.data.punch.current = current_punch
+		statistics.data.punch.min = MIN(statistics.data.punch.min,current_punch)
+		statistics.data.punch.max = MAX(statistics.data.punch.max,current_punch)
+		
+		statistics.data.mobs.current = active_mobs
+		statistics.data.mobs.min = MIN(statistics.data.mobs.min,active_mobs)
+		statistics.data.mobs.max = MAX(statistics.data.mobs.max,active_mobs)
+		
+		statistics.lastcalc = now
+	end
+end
+
 -------------------------------------------------------------------------------
 -- name: mobf_warn_long_fct(starttime,fctname,facility)
 --
@@ -36,7 +116,34 @@ function mobf_warn_long_fct(starttime,fctname,facility)
 	local currenttime = mobf_get_time_ms()
 	local delta = currenttime - starttime
 	
-	if minetest.world_setting_get("mobf_enable_socket_trace_statistics") then
+	if delta > 0 and minetest.world_setting_get("mobf_enable_statistics") then
+		if facility == "abm" then
+			statistics.abms = statistics.abms + delta
+			statistics.total = statistics.total + delta
+		end
+		
+		if facility == "on_step_total" then
+			statistics.onstep = statistics.onstep + delta
+			statistics.total = statistics.total + delta
+		end
+		
+		if facility == "mapgen" then
+			statistics.mapgen = statistics.mapgen + delta
+			statistics.total = statistics.total + delta
+		end
+		
+		if facility == "onpunch_total" then
+			statistics.punch = statistics.punch + delta
+			statistics.total = statistics.total + delta
+		end
+		
+		if facility == "onactivate_total" then
+			statistics.activate = statistics.activate + delta
+			statistics.total = statistics.total + delta
+		end
+	end
+	
+	if minetest.world_setting_get("mobf_enable_callback_statistics") then
 		if facility == nil then
 			facility = "generic"
 		end
@@ -124,6 +231,11 @@ function mobf_bug_warning(level,text)
 	if minetest.world_setting_get("mobf_log_bug_warnings") then
 		minetest.log(level,text)
 	end
+end
+
+--initialize statistics
+if minetest.world_setting_get("mobf_enable_statistics") then
+	minetest.register_globalstep(mobf_statistic_calc)
 end
 
 --!@}

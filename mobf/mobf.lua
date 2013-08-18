@@ -485,18 +485,19 @@ function mobf.register_entity(name, graphics, mob)
 
 		--	actions to be done by mob on its own
 			on_step = function(self, dtime)
-			
 				local starttime = mobf_get_time_ms()
 				
 				if self.removed ~= false then
 					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: on_step: " 
 						.. self.data.name .. " on_step for removed entity????")
+					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
 					return
 				end
 				
 				if self.dynamic_data == nil then
 					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: on_step: " 
 						.. "no dynamic data available!")
+					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
 					return
 				end
 			
@@ -505,12 +506,14 @@ function mobf.register_entity(name, graphics, mob)
 						mobf.activate_handler(self,self.dynamic_data.last_static_data)
 						self.dynamic_data.last_static_data = nil
 					else
+						mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
 						return
 					end
 				end
 				
 				--do special ride callback
 				if mobf_ride.on_step_callback(self) then
+					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
 					return
 				end
 			
@@ -519,12 +522,14 @@ function mobf.register_entity(name, graphics, mob)
 				local now = mobf_get_current_time()
 						
 				if self.current_dtime < 0.25 then
+					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
 					return
 				end
 				
 				--check lifetime
 				if spawning.lifecycle(self,now) == false then
-				    return
+					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
+					return
 				end
 				
 				mobf_warn_long_fct(starttime,"on_step lifecycle","lifecycle")
@@ -566,11 +571,13 @@ function mobf.register_entity(name, graphics, mob)
 				for i = 1, #self.on_punch_hooks, 1 do
 					if self.on_punch_hooks[i](self,hitter,now,
 							time_from_last_punch, tool_capabilities, dir) then
+						mobf_warn_long_fct(starttime,"onpunch_total","onpunch_total")
 						return
 					end
 					mobf_warn_long_fct(starttime,"callback nr " .. i,
 						"callback_op_".. self.data.name .. "_" .. i)
 				end
+				mobf_warn_long_fct(starttime,"onpunch_total","onpunch_total")
 				end,
 
 		--rightclick handler
@@ -578,15 +585,15 @@ function mobf.register_entity(name, graphics, mob)
 
 		--do basic mob initialization on activation
 			on_activate = function(self,staticdata)
-				
-				self.dynamic_data = {}
-				self.dynamic_data.initialized = false
-				
-				--make sure entity is in loaded area at initialization
-				local pos = self.object:getpos()
-				
-				if pos ~= nil and
-					entity_at_loaded_pos(pos) then
+					local starttime = mobf_get_time_ms()
+					self.dynamic_data = {}
+					self.dynamic_data.initialized = false
+					
+					--make sure entity is in loaded area at initialization
+					local pos = self.object:getpos()
+					
+					if pos ~= nil and
+						entity_at_loaded_pos(pos) then
 						mobf.activate_handler(self,staticdata)
 					else
 						minetest.log(LOGLEVEL_INFO,
@@ -594,6 +601,7 @@ function mobf.register_entity(name, graphics, mob)
 							"delaying activation")
 						self.dynamic_data.last_static_data = staticdata
 					end
+					mobf_warn_long_fct(starttime,"onactivate_total","onactivate_total")
 				end,
 			
 			getbasepos       = mobf.get_basepos,

@@ -188,6 +188,22 @@ function mobf_settings.get_sender_data(fields)
 end
 
 ------------------------------------------------------------------------------
+-- name: handle_statistics_tab
+--
+--! @brief handle events from main tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+--!
+--! @return sender information
+-------------------------------------------------------------------------------
+function mobf_settings.handle_statistics_tab(sender_data)
+
+	mobf_settings.show_statistics_tab(sender_data)
+
+end
+
+------------------------------------------------------------------------------
 -- name: handle_main_tab
 --
 --! @brief handle events from main tab
@@ -315,6 +331,45 @@ function mobf_settings.show_tools_tab(sender_data)
 end
 
 ------------------------------------------------------------------------------
+-- name: show_statistics_tab
+--
+--! @brief update formspec to tools tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.show_statistics_tab(sender_data)
+	local formspec = mobf_settings.formspec_header(sender_data)
+	
+	local printfac = function(name,data)
+		return mobf_fixed_size_string(name,20) ..
+				mobf_fixed_size_string(string.format("%.2f%%",data.current),10) ..
+				mobf_fixed_size_string(string.format("%.2f%%",data.min),10) ..
+				mobf_fixed_size_string(string.format("%.2f%%",data.max),10)
+	end
+	
+	formspec = formspec ..
+		"label[0.75,1;"	.. mobf_fixed_size_string("Facility",20)
+						.. mobf_fixed_size_string("Current",10)
+						.. mobf_fixed_size_string("Minimum",10)
+						.. mobf_fixed_size_string("Maximum",10) .. "]" ..
+		"label[0.75,1.5;" .. printfac("Total",statistics.data.total) .. "]" ..
+		"label[0.75,3;" .. printfac("Onstep",statistics.data.onstep) .. "]" ..
+		"label[0.75,3.5;" .. printfac("Punch",statistics.data.punch) .. "]" ..
+		"label[0.75,4;" .. printfac("ABM",statistics.data.abm) .. "]" ..
+		"label[0.75,4.5;" .. printfac("MapGen",statistics.data.mapgen) .. "]" ..
+		"label[0.75,5;" .. printfac("Activate",statistics.data.activate) .."]" ..
+		"label[0.75,2;" ..mobf_fixed_size_string("Active Mobs",20) ..
+				mobf_fixed_size_string(string.format("%6d",statistics.data.mobs.current),10) ..
+				mobf_fixed_size_string(string.format("%6d",statistics.data.mobs.min),10) ..
+				mobf_fixed_size_string(string.format("%6d",statistics.data.mobs.max),10) .. "]"
+	if formspec ~= nil then
+		minetest.show_formspec(sender_data.player:get_player_name(),
+							sender_data.formname,
+							formspec)
+	end
+end
+------------------------------------------------------------------------------
 -- name: show_settings_tab
 --
 --! @brief update formspec to settings tab
@@ -369,6 +424,11 @@ function mobf_settings.show_settings_tab(sender_data)
 				"cb_" .. sender_data.tab .. "_mobf_lifebar;" ..
 				"Show mob lifebar;" .. 
 				mobf_settings.setting_gettext("mobf_lifebar") .."]"
+				
+	formspec = formspec .. "checkbox[1,7.75;" .. 
+				"cb_" .. sender_data.tab .. "_enable_statistics;" ..
+				"Enable statistics;" .. 
+				mobf_settings.setting_gettext("mobf_enable_statistics") .."]"
 	print("formspec: " .. formspec)
 	if formspec ~= nil then
 		minetest.show_formspec(sender_data.player:get_player_name(),
@@ -497,6 +557,11 @@ function mobf_settings.handle_settings_tab_input(sender_data)
 		mobf_set_world_setting("mobf_lifebar",
 								mobf_settings.tobool(sender_data.value))
 	end
+	
+	if sender_data.name == "enable_statistics" then
+		mobf_set_world_setting("mobf_enable_statistics",
+								mobf_settings.tobool(sender_data.value))
+	end
 end
 
 ------------------------------------------------------------------------------
@@ -598,6 +663,10 @@ end
 mobf_settings.register_tab("Known Mobs",true, mobf_settings.handle_main_tab)
 mobf_settings.register_tab("Settings",  true, mobf_settings.handle_settings_tab)
 mobf_settings.register_tab("Tools",     false,mobf_settings.handle_tools_tab)
+
+if minetest.world_setting_get("mobf_enable_statistics") then
+	mobf_settings.register_tab("Statistics",     false,mobf_settings.handle_statistics_tab)
+end
 
 ------------------------------------------------------------------------------
 -- register handler for pressed buttons

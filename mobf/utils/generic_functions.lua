@@ -19,7 +19,7 @@
 --! @ingroup framework_int
 --! @{
 
-if minetest.world_setting_get("mobf_enable_socket_trace") then
+if minetest.world_setting_get("mobf_enable_socket_time") then
     require "socket"
 end
 
@@ -31,10 +31,10 @@ end
 --! @return current time in ms
 -------------------------------------------------------------------------------
 function mobf_get_time_ms()
-	if minetest.world_setting_get("mobf_enable_socket_trace") then
+	if minetest.world_setting_get("mobf_enable_socket_time") then
 		return socket.gettime()*1000
 	else
-	    return 0
+	    return os.clock()*1000
 	end
 end
 

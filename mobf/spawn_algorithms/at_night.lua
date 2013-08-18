@@ -45,11 +45,12 @@ function mobf_spawn_at_night(mob_name,mob_transform,spawning_data,environment)
 			interval = 20,
 			chance = math.floor(1/spawning_data.rate),
 			action = function(pos, node, active_object_count, active_object_count_wider)
-			
+				local starttime = mobf_get_time_ms()
 				local gametime = minetest.get_timeofday()
 				
 				if gametime > 0.25 and
 					gametime < 0.75 then
+					mobf_warn_long_fct(starttime,"at_night_abm","abm")
 					return
 				end
 			
@@ -64,12 +65,14 @@ function mobf_spawn_at_night(mob_name,mob_transform,spawning_data,environment)
 				--used to find bugs in initial spawnpoint setting code
 				if mobf_pos_is_zero(pos) then
 					mobf_warn_long_fct(starttime,"mobf_spawn_at_night")
+					mobf_warn_long_fct(starttime,"at_night_abm","abm")
 					return
 				end
 
 				--check if there s enough space above to place mob
 				if mobf_air_above(pos,spawning_data.height) ~= true then
 					mobf_warn_long_fct(starttime,"mobf_spawn_at_night")
+					mobf_warn_long_fct(starttime,"at_night_abm","abm")
 					return
 				end
 				
@@ -106,6 +109,7 @@ function mobf_spawn_at_night(mob_name,mob_transform,spawning_data,environment)
 					end
 				end
 				mobf_warn_long_fct(starttime,"mobf_spawn_at_night")
+				mobf_warn_long_fct(starttime,"at_night_abm","abm")
 			end,
 		})
 end
