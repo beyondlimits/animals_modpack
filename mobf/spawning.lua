@@ -441,10 +441,8 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 	local attempts = 0
 	local spawned = 0
 	
-	local starttime = mobf_get_time_ms()
-	
 	local min_x = MIN(minp.x,maxp.x)
-	local min_y = MIN(minp.y,maxp.x)
+	local min_y = MIN(minp.y,maxp.y)
 	local min_z = MIN(minp.z,maxp.z)
 	
 	local max_x = MAX(minp.x,maxp.x)
@@ -498,10 +496,8 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 				pos.x = math.floor(pos.x + 0.5)
 				pos.z = math.floor(pos.z + 0.5)
 				
-				local starttime = mobf_get_time_ms()
 				if spawnfunc(name,pos,min_y,max_y,spawndata) then
 					spawned = spawned +1
-					mobf_warn_long_fct(starttime,"on_mapgen_entity","user_3")
 					break
 				end
 			end --for -> maxtries
@@ -511,9 +507,10 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 	end -- for z divs
 	end -- for x divs
 	local max_available_tries = divs * maxtries
-	dbg_mobf.spawning_lvl2("MOBF: divide_mapgen I " ..
+	dbg_mobf.spawning_lvl3("MOBF: divide_mapgen I " ..
 			"(" .. divs .. "|" .. attempts .. "|" .. spawned .. "|" .. max_available_tries .. ")")
 	mobf_warn_long_fct(starttime,"on_mapgen_entity","mapgen")
+	return spawned
 end
 
 ------------------------------------------------------------------------------
@@ -532,7 +529,7 @@ end
 --! @param maxtries maximum number of tries to place a entity
 --
 -------------------------------------------------------------------------------
-function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,surfacefunc,maxtries)
+function spawning.divide_mapgen(minp,maxp,sp_data,name,secondary_name,spawnfunc,surfacefunc,maxtries)
 	local starttime = mobf_get_time_ms()
 	dbg_mobf.spawning_lvl3("MOBF: divide_mapgen params: ")
 	dbg_mobf.spawning_lvl3("MOBF:	" .. dump(density))
@@ -543,6 +540,13 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 		maxtries = 2
 	end
 	
+	local density = sp_data
+	local spawning_data = nil
+	if type(sp_data) == "table" then
+		density = sp_data.density
+		spawning_data = sp_data
+	end
+	
 	local divs = 0
 	local attempts = 0
 	local spawned = 0
@@ -550,7 +554,7 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 	local starttime = mobf_get_time_ms()
 	
 	local min_x = MIN(minp.x,maxp.x)
-	local min_y = MIN(minp.y,maxp.x)
+	local min_y = MIN(minp.y,maxp.y)
 	local min_z = MIN(minp.z,maxp.z)
 	
 	local max_x = MAX(minp.x,maxp.x)
@@ -600,7 +604,7 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 				pos.y = surfacefunc(pos.x,pos.z,min_y,max_y)
 				mobf_warn_long_fct(starttime,"surface_detection","user_1")
 				
-				if pos.y and spawnfunc(name,pos,min_y,max_y) then
+				if pos.y and spawnfunc(name,pos,min_y,max_y,spawning_data) then
 					spawned = spawned +1
 					break
 				end
@@ -610,10 +614,11 @@ function spawning.divide_mapgen(minp,maxp,density,name,secondary_name,spawnfunc,
 		divs = divs +1
 	end -- for z divs
 	end -- for x divs
-	mobf_warn_long_fct(starttime,"on_mapgen" .. name,"mapgen")
+	mobf_warn_long_fct(starttime,"on_mapgen " .. name,"mapgen")
 	local max_available_tries = divs * maxtries
 	dbg_mobf.spawning_lvl2("MOBF: divide_mapgen II " ..
 			"(" .. divs .. "|" .. attempts .. "|" .. spawned .. "|" .. max_available_tries .. ")")
+	return spawned
 end
 
 ------------------------------------------------------------------------------
@@ -845,6 +850,82 @@ function spawning.register_mob(mob)
 		end
 	else
 		dbg_mobf.spawning_lvl3("MOBF: MOB spawning disabled!")
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: divide_mapgen_jobfunc(mob)
+-- @function [parent=#spawning] divide_mapgen_jobfunc
+--
+--! @brief job wrapper function for divide mapgen
+--! @memberof spawning
+--
+--! @param data job data
+-------------------------------------------------------------------------------
+function spawning.divide_mapgen_jobfunc(data)
+	local spawned = spawning.divide_mapgen(
+			data.minp,
+			data.maxp,
+			data.spawning_data,
+			data.mob_name,
+			data.mob_transform,
+			data.spawnfunc,
+			data.surfacefunc,
+			5
+			)
+	if data.func ~= nil then
+		data.maxtries = data.maxtries -5
+		data.spawned = data.spawned + spawned
+		local stopspawning = 3
+		if data.stopspawning ~= nil then
+			stopspawning = data.stopspawning
+		end
+		if data.spawned < stopspawning and
+			data.maxtries > 0 then
+			--requeue job
+			mobf_job_queue.add_job({callback=data.func,data=data})
+		end
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: divide_mapgen_jobfunc(mob)
+-- @function [parent=#spawning] divide_mapgen_jobfunc
+--
+--! @brief job wrapper function for divide mapgen
+--! @memberof spawning
+--
+--! @param data job data
+-------------------------------------------------------------------------------
+function spawning.divide_mapgen_entity_jobfunc(data)
+	local spawned = spawning.divide_mapgen_entity(
+			data.minp,
+			data.maxp,
+			data.spawning_data,
+			data.mob_name,
+			data.spawnfunc,
+			1
+			)
+	data.maxtries = data.maxtries -1
+	
+	if data.spawned == nil then
+		data.spawned = 0
+	end
+	
+	if data.func ~= nil then
+		mobf_assert_backtrace(spawned ~= nil)
+		data.spawned = data.spawned + spawned
+		local stopspawning = 3
+		if data.stopspawning ~= nil then
+			stopspawning = data.stopspawning
+		end
+		if data.spawned < stopspawning and
+			data.maxtries > 0 then
+			--requeue job
+			mobf_job_queue.add_job({callback=data.func,data=data})
+		end
+	else
+		mobf_assert_backtrace(data.maxtries <= 0)
 	end
 end
 
