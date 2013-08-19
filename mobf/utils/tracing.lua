@@ -55,8 +55,10 @@ statistics.data.user_3 = { current=0,maxabs=0,max=0 }
 --
 -------------------------------------------------------------------------------
 function mobf_statistic_calc(dtime)
+	local refresh_interval = 50 -- in tenth of seconds
 	local now = mobf_get_time_ms()
-	if statistics.lastcalc == nil or now > statistics.lastcalc + 30000 then
+	if statistics.lastcalc == nil or now > statistics.lastcalc + 
+												(refresh_interval*100) then
 		local delta = now - statistics.lastcalc
 		local current_total  = (statistics.total/delta)*100
 		local current_abm    = (statistics.abms/delta)*100
@@ -88,31 +90,31 @@ function mobf_statistic_calc(dtime)
 		statistics.user_3 = 0
 	
 		statistics.data.total.current = current_total
-		statistics.data.total.maxabs = MAX(statistics.data.total.maxabs, math.floor(current_total*300))
+		statistics.data.total.maxabs = MAX(statistics.data.total.maxabs, math.floor(current_total*refresh_interval))
 		statistics.data.total.max = MAX(statistics.data.total.max,current_total)
 		
 		statistics.data.abm.current = current_abm
-		statistics.data.abm.maxabs = MAX(statistics.data.abm.maxabs, math.floor(current_abm*300))
+		statistics.data.abm.maxabs = MAX(statistics.data.abm.maxabs, math.floor(current_abm*refresh_interval))
 		statistics.data.abm.max = MAX(statistics.data.abm.max,current_abm)
 		
 		statistics.data.onstep.current = current_onstep
-		statistics.data.onstep.maxabs = MAX(statistics.data.onstep.maxabs, math.floor(current_onstep*300))
+		statistics.data.onstep.maxabs = MAX(statistics.data.onstep.maxabs, math.floor(current_onstep*refresh_interval))
 		statistics.data.onstep.max = MAX(statistics.data.onstep.max,current_onstep)
 		
 		statistics.data.mapgen.current = current_mapgen
-		statistics.data.mapgen.maxabs = MAX(statistics.data.mapgen.maxabs, math.floor(current_mapgen*300))
+		statistics.data.mapgen.maxabs = MAX(statistics.data.mapgen.maxabs, math.floor(current_mapgen*refresh_interval))
 		statistics.data.mapgen.max = MAX(statistics.data.mapgen.max,current_mapgen)
 		
 		statistics.data.activate.current = current_activate
-		statistics.data.activate.maxabs = MAX(statistics.data.activate.maxabs, math.floor(current_activate*300))
+		statistics.data.activate.maxabs = MAX(statistics.data.activate.maxabs, math.floor(current_activate*refresh_interval))
 		statistics.data.activate.max = MAX(statistics.data.activate.max,current_activate)
 		
 		statistics.data.punch.current = current_punch
-		statistics.data.punch.maxabs = MAX(statistics.data.punch.maxabs, math.floor(current_punch*300))
+		statistics.data.punch.maxabs = MAX(statistics.data.punch.maxabs, math.floor(current_punch*refresh_interval))
 		statistics.data.punch.max = MAX(statistics.data.punch.max,current_punch)
 		
 		statistics.data.spawn_onstep.current = current_spawn_onstep
-		statistics.data.spawn_onstep.maxabs = MAX(statistics.data.spawn_onstep.maxabs, math.floor(current_spawn_onstep*300))
+		statistics.data.spawn_onstep.maxabs = MAX(statistics.data.spawn_onstep.maxabs, math.floor(current_spawn_onstep*refresh_interval))
 		statistics.data.spawn_onstep.max = MAX(statistics.data.spawn_onstep.max,current_spawn_onstep)
 		
 		statistics.data.mobs.current = active_mobs
@@ -122,15 +124,15 @@ function mobf_statistic_calc(dtime)
 		statistics.data.queue.max = MAX(statistics.data.queue.max,#mobf_job_queue.queue)
 		
 		statistics.data.user_1.current = current_user_1
-		statistics.data.user_1.maxabs = MAX(statistics.data.user_1.maxabs, math.floor(current_user_1*300))
+		statistics.data.user_1.maxabs = MAX(statistics.data.user_1.maxabs, math.floor(current_user_1*refresh_interval))
 		statistics.data.user_1.max = MAX(statistics.data.user_1.max,current_user_1)
 		
 		statistics.data.user_2.current = current_user_2
-		statistics.data.user_2.maxabs = MAX(statistics.data.user_2.maxabs, math.floor(current_user_2*300))
+		statistics.data.user_2.maxabs = MAX(statistics.data.user_2.maxabs, math.floor(current_user_2*refresh_interval))
 		statistics.data.user_2.max = MAX(statistics.data.user_2.max,current_user_2)
 		
 		statistics.data.user_3.current = current_user_3
-		statistics.data.user_3.maxabs = MAX(statistics.data.user_3.maxabs, math.floor(current_user_3*300))
+		statistics.data.user_3.maxabs = MAX(statistics.data.user_3.maxabs, math.floor(current_user_3*refresh_interval))
 		statistics.data.user_3.max = MAX(statistics.data.user_3.max,current_user_3)
 		
 		statistics.lastcalc = now
