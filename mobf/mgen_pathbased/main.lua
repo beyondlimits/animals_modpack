@@ -242,8 +242,12 @@ function p_mov_gen.set_target(entity,target)
 	entity.dynamic_data.movement.max_distance = 0.5
 	
 	--try to find path on our own
-	entity.dynamic_data.p_movement.path = 
-		minetest.find_path(current_pos,targetpos,5,1,1,nil)
+	if not mobf_get_world_setting("mobf_disable_pathfinding") then
+		entity.dynamic_data.p_movement.path = 
+			minetest.find_path(current_pos,targetpos,5,1,1,nil)
+	else
+		entity.dynamic_data.p_movement.path = nil
+	end
 				
 	if entity.dynamic_data.p_movement.path ~= nil then
 
