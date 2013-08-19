@@ -37,6 +37,7 @@ end
 --! @param dtime time since last call
 -------------------------------------------------------------------------------
 function mobf_job_queue.process(dtime)
+	local starttime = mobf_get_time_ms()
 	mobf_job_queue.current_interval = mobf_job_queue.current_interval + dtime
 	
 	if mobf_job_queue.current_interval < mobf_job_queue.queue_interval then
@@ -45,7 +46,6 @@ function mobf_job_queue.process(dtime)
 	
 	mobf_job_queue.current_interval = 0
 
-	local starttime = mobf_get_time_ms()
 	local jobs_processed = 0
 	
 	local jobs_before = #mobf_job_queue.queue
@@ -58,7 +58,7 @@ function mobf_job_queue.process(dtime)
 		action.callback(action.data)
 		jobs_processed = jobs_processed + 1
 	end
-
+	mobf_warn_long_fct(starttime,"on_mapgen_entity","delayed_processing")
 --	print("Queue processed " .. jobs_processed .. " of " .. jobs_before 
 --			.. " jobs in " .. string.format("%4.2f",(mobf_get_time_ms() - starttime)) .. "ms")
 end
