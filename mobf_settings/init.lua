@@ -96,8 +96,8 @@ end
 --! @return true/false handled or not
 -------------------------------------------------------------------------------
 function mobf_settings.handle_event(player,formname,fields)
-	print("event handler: form: " .. formname)
-	print("fields: " .. dump(fields))
+	--print("event handler: form: " .. formname)
+	--print("fields: " .. dump(fields))
 	if formname ~= mobf_settings.formname then
 		return false
 	end
@@ -116,7 +116,7 @@ function mobf_settings.handle_event(player,formname,fields)
 		--check admin privs
 		sender_data.is_admin = true
 		
-		print("event handler: tab: #" .. dump(sender_data.tab) .. " btn: " .. dump(sender_data.name)) 
+		--print("event handler: tab: #" .. dump(sender_data.tab) .. " btn: " .. dump(sender_data.name)) 
 	
 		if sender_data.tab <= #mobf_settings.tabs then
 			--make sure no admin tab is shown to non admin users
@@ -139,7 +139,7 @@ function mobf_settings.handle_event(player,formname,fields)
 				end
 			end
 			
-			print("showing tab: #" .. sender_data.tab .. " " .. dump(mobf_settings.tabs[sender_data.tab]))
+			--print("showing tab: #" .. sender_data.tab .. " " .. dump(mobf_settings.tabs[sender_data.tab]))
 			mobf_settings.tabs[sender_data.tab].handler(sender_data)
 		end
 
@@ -446,10 +446,6 @@ function mobf_settings.show_settings_tab(sender_data)
 				"cb_" .. sender_data.tab .. "_delayed_spawning;" ..
 				"Delay spawning at mapgen;" .. 
 				mobf_settings.setting_gettext("mobf_delayed_spawning") .."]"
-	formspec = formspec .. "checkbox[1,6;" .. 
-				"cb_" .. sender_data.tab .. "_queue_processing;" ..
-				"Queue processing;" .. 
-				mobf_settings.setting_gettext("mobf_queue_processing") .."]"
 	--print("formspec: " .. formspec)
 	if formspec ~= nil then
 		minetest.show_formspec(sender_data.player:get_player_name(),
@@ -586,11 +582,6 @@ function mobf_settings.handle_settings_tab_input(sender_data)
 	
 	if sender_data.name == "delayed_spawning" then
 		mobf_set_world_setting("mobf_delayed_spawning",
-								mobf_settings.tobool(sender_data.value))
-	end
-	
-	if sender_data.name == "queue_processing" then
-		mobf_set_world_setting("mobf_queue_processing",
 								mobf_settings.tobool(sender_data.value))
 	end
 end
