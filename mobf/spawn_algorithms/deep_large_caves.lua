@@ -208,67 +208,69 @@ function mobf_spawn_in_deep_large_caves_entity(mob_name,mob_transform,spawning_d
 				self.spawner_last_result = "dlc: mob around"
 			end
 		end)
-
-	--add mob spawner on map generation
-	minetest.register_on_generated(function(minp, maxp, seed)
-	
-		local spawnfunc = function(name,pos,min_y,max_y,spawning_data)
-			
-				if max_y > spawning_data.min_depth then
-					return false
-				end
-			
-				dbg_mobf.spawning_lvl3("MOBF: trying to create a spawner for " .. name .. " at " ..printpos(pos))
-				local surface = mobf_get_surface(pos.x,pos.z,min_y,max_y)
-				
-				if surface then
-					pos.y= surface -1
-					
-					local node = minetest.get_node(pos)
-					
-					if not mobf_contains({ "default:stone","default:gravel","default:dirt","default:sand" },node.name) then
-						dbg_mobf.spawning_lvl3("MOBF: node ain't of correct type: " .. node.name)
-						return false
-					end
-					
-					local pos_above = {x=pos.x,y=pos.y+1,z=pos.z}
-					local node_above = minetest.get_node(pos_above)
-					if not mobf_contains({"air"},node_above.name) then
-						dbg_mobf.spawning_lvl3("MOBF: node above ain't air but: " .. node_above.name)
-						return false
-					end
-					
-					spawning.spawn_and_check(name,"_spawner",pos_above,"deep_large_caves_spawner")
-					return true
-				else
-					dbg_mobf.spawning_lvl3("MOBF: didn't find surface for " .. name .. " spawner at " ..printpos(pos))
-				end
+		
+	local spawnfunc = function(name,pos,min_y,max_y,spawning_data)
+			if max_y > spawning_data.min_depth then
 				return false
 			end
-	
-		if minetest.world_setting_get("mobf_delayed_spawning") then
-			minetest.register_on_generated(function(minp, maxp, seed)
+		
+			dbg_mobf.spawning_lvl3("MOBF: trying to create a spawner for " .. name .. " at " ..printpos(pos))
+			local surface = mobf_get_surface(pos.x,pos.z,min_y,max_y)
 			
-				local job = {
-					
-					callback = spawning.divide_mapgen_entity_jobfunc,
-					data = {
-						minp          = minp,
-						maxp          = maxp,
-						spawning_data = spawning_data,
-						mob_name      = mob_name,
-						spawnfunc     = spawnfunc,
-						maxtries      = 30,
-						spawned       = 0,
-						func          = spawning.divide_mapgen_entity_jobfunc
-						}
-					}
-				mobf_job_queue.add_job(job)
-			end)
-		else
-			spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,spawnfunc)
+			if surface then
+				pos.y= surface -1
+				
+				local node = minetest.get_node(pos)
+				
+				if not mobf_contains({ "default:stone","default:gravel","default:dirt","default:sand" },node.name) then
+					dbg_mobf.spawning_lvl3("MOBF: node ain't of correct type: " .. node.name)
+					return false
+				end
+				
+				local pos_above = {x=pos.x,y=pos.y+1,z=pos.z}
+				local node_above = minetest.get_node(pos_above)
+				if not mobf_contains({"air"},node_above.name) then
+					dbg_mobf.spawning_lvl3("MOBF: node above ain't air but: " .. node_above.name)
+					return false
+				end
+				
+				spawning.spawn_and_check(name,"_spawner",pos_above,"deep_large_caves_spawner")
+				return true
+			else
+				dbg_mobf.spawning_lvl3("MOBF: didn't find surface for " .. name .. " spawner at " ..printpos(pos))
+			end
+			return false
 		end
-	end) --register mapgen
+		
+		
+	if minetest.world_setting_get("mobf_delayed_spawning") then
+	
+		minetest.register_on_generated(function(minp, maxp, seed)
+			local job = {
+						
+						callback = spawning.divide_mapgen_entity_jobfunc,
+						data = {
+							minp          = minp,
+							maxp          = maxp,
+							spawning_data = spawning_data,
+							mob_name      = mob_name,
+							spawnfunc     = spawnfunc,
+							maxtries      = 30,
+							spawned       = 0,
+							func          = spawning.divide_mapgen_entity_jobfunc
+							}
+						}
+			mobf_job_queue.add_job(job)
+		end)
+	else
+		--add mob spawner on map generation
+		minetest.register_on_generated(function(minp, maxp, seed)
+			local starttime = mobf_get_time_ms()
+			spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,spawnfunc)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. mob_name,"mapgen")
+		end) --register mapgen
+	end
+
 end
 --!@}
 
