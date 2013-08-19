@@ -510,6 +510,7 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 	dbg_mobf.spawning_lvl3("MOBF: divide_mapgen I " ..
 			"(" .. divs .. "|" .. attempts .. "|" .. spawned .. "|" .. max_available_tries .. ")")
 	mobf_warn_long_fct(starttime,"on_mapgen_entity","mapgen")
+	mobf_rtd.total_spawned = mobf_rtd.total_spawned + spawned
 	return spawned
 end
 
@@ -618,6 +619,7 @@ function spawning.divide_mapgen(minp,maxp,sp_data,name,secondary_name,spawnfunc,
 	local max_available_tries = divs * maxtries
 	dbg_mobf.spawning_lvl2("MOBF: divide_mapgen II " ..
 			"(" .. divs .. "|" .. attempts .. "|" .. spawned .. "|" .. max_available_tries .. ")")
+	mobf_rtd.total_spawned = mobf_rtd.total_spawned + spawned
 	return spawned
 end
 

@@ -113,8 +113,10 @@ function mobf_settings.handle_event(player,formname,fields)
 		sender_data.formname = formname
 		sender_data.fields = fields
 		
-		--check admin privs
-		sender_data.is_admin = true
+		--TODO check admin privs
+		sender_data.is_admin = 
+			minetest.check_player_privs(player:get_player_name(), {mobfw_admin=true}) or
+			player == "singleplayer"
 		
 		--print("event handler: tab: #" .. dump(sender_data.tab) .. " btn: " .. dump(sender_data.name)) 
 	
@@ -354,16 +356,18 @@ function mobf_settings.show_statistics_tab(sender_data)
 	end
 	
 	formspec = formspec ..
-		"label[0.75,0.5;Info:]" ..
-		"label[0.75,0.75;--------------------------------------------------]" ..
-		"label[0.75,1.25;Timesource:]" ..
-		"label[2.75,1.25;" .. mobf_fixed_size_string(mobf_rtd.timesource,30) .. "]" ..
-		printfac("Active Mobs",statistics.data.mobs,"1.75","%6d") ..
-		printfac("Jobqueue",statistics.data.queue,"2.25","%6d") ..
+		"label[0.75,0.0;Info:]" ..
+		"label[0.75,0.25;--------------------------------------------------]" ..
+		"label[0.75,0.75;Timesource:]" ..
+		"label[2.75,0.75;" .. mobf_fixed_size_string(mobf_rtd.timesource,30) .. "]" ..
+		printfac("Active Mobs",statistics.data.mobs,"1.25","%6d") ..
+		printfac("Jobqueue",statistics.data.queue,"1.75","%6d") ..
 		"label[0.75,3;"	.. mobf_fixed_size_string("Facility",20)
 						.. mobf_fixed_size_string("Current",10)
 						.. mobf_fixed_size_string("Abs.Max",10)
 						.. mobf_fixed_size_string("Maximum",10) .. "]" ..
+		"label[0.75,2.25;Mobs spawned by mapgen this session:]" ..
+		"label[6.4,2.25;" .. mobf_rtd.total_spawned .. "]" ..
 		"label[0.75,3.25;--------------------------------------------------]" ..
 		printfac("Total",statistics.data.total,"3.75","%.2f%%") ..
 		printfac("Onstep",statistics.data.onstep,"4.25","%.2f%%") ..

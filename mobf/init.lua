@@ -42,6 +42,8 @@ mobf_rtd = {
 	registred_mob_data		= {},
 	--!timesource
 	timesource				= "os.clock() (10ms ONLY!)",
+	--!total spawned mobs
+	total_spawned			= 0,
 }
 
 --!path of mod
