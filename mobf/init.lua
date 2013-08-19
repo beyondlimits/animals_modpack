@@ -103,7 +103,7 @@ dofile (mobf_modpath .. "/mgen_jordan4ibanez/mgen_jordan4ibanez.lua")
 dofile (mobf_modpath .. "/mgen_pathbased/main.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "2.1.81"
+mobf_version = "2.1.82"
 
 --! @brief define tools used for more than one mob
 function mobf_init_basic_tools()	
@@ -187,6 +187,7 @@ function mobf_init_framework()
 	end
 
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing mob framework")
+	mobf_job_queue.initialize()
 	mobf_init_basic_tools()
 	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Reading mob blacklist")

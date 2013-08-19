@@ -17,10 +17,6 @@
 
 mobf_job_queue = {}
 
-mobf_job_queue.queue = {}
-mobf_job_queue.current_interval = 0
-mobf_job_queue.queue_interval = 0.040
-
 -------------------------------------------------------------------------------
 -- name: add_job(job)
 --
@@ -41,15 +37,9 @@ end
 --! @param dtime time since last call
 -------------------------------------------------------------------------------
 function mobf_job_queue.process(dtime)
-	--print("Queue handler: " .. dtime .. 
-	--		" CI: " .. mobf_job_queue.current_interval ..
-	--		" QI: " .. mobf_job_queue.queue_interval)
 	mobf_job_queue.current_interval = mobf_job_queue.current_interval + dtime
 	
-	local processing_enabled = minetest.world_setting_get("mobf_queue_processing")
-	
-	if mobf_job_queue.current_interval < mobf_job_queue.queue_interval or 
-		not minetest.world_setting_get("mobf_queue_processing") then
+	if mobf_job_queue.current_interval < mobf_job_queue.queue_interval then
 		return
 	end
 	
@@ -73,6 +63,44 @@ function mobf_job_queue.process(dtime)
 --			.. " jobs in " .. string.format("%4.2f",(mobf_get_time_ms() - starttime)) .. "ms")
 end
 
+-------------------------------------------------------------------------------
+-- name: cleanup()
+--
+--! @brief handle all jobs queued
+--
+-------------------------------------------------------------------------------
+function mobf_job_queue.cleanup()
+	local starttime = mobf_get_time_ms()
+	local processed = 0
+	while (#mobf_job_queue.queue > 0) do
+		if processed % 10 == 0 then
+			--TODO log and broadcast
+		end
+		
+		local action = table.remove(mobf_job_queue.queue)
+		
+		mobf_assert_backtrace(type(action.callback) == "function")
+		action.callback(action.data)
+	
+		processed = processed + 1
+	end
+end
 
---register async handler to global step
-minetest.register_globalstep(mobf_job_queue.process)
+-------------------------------------------------------------------------------
+-- name: initialize()
+--
+--! @brief initialize job queue
+--
+-------------------------------------------------------------------------------
+function mobf_job_queue.initialize(queue_interval)
+
+	mobf_job_queue.queue = {}
+	mobf_job_queue.current_interval = 0
+	mobf_job_queue.queue_interval = queue_interval or 0.040
+	
+	--register async handler to global step
+	minetest.register_globalstep(mobf_job_queue.process)
+	
+	--register cleanup handler
+	minetest.register_on_shutdown(mobf_job_queue.cleanup)
+end
