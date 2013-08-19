@@ -425,7 +425,6 @@ end
 --
 -------------------------------------------------------------------------------
 function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtries)
-	local starttime = mobf_get_time_ms()
 	local density = spawndata.density
 	
 	dbg_mobf.spawning_lvl3("MOBF: divide_mapgen params: ")
@@ -509,7 +508,6 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 	local max_available_tries = divs * maxtries
 	dbg_mobf.spawning_lvl3("MOBF: divide_mapgen I " ..
 			"(" .. divs .. "|" .. attempts .. "|" .. spawned .. "|" .. max_available_tries .. ")")
-	mobf_warn_long_fct(starttime,"on_mapgen_entity","mapgen")
 	mobf_rtd.total_spawned = mobf_rtd.total_spawned + spawned
 	return spawned
 end
@@ -531,7 +529,6 @@ end
 --
 -------------------------------------------------------------------------------
 function spawning.divide_mapgen(minp,maxp,sp_data,name,secondary_name,spawnfunc,surfacefunc,maxtries)
-	local starttime = mobf_get_time_ms()
 	dbg_mobf.spawning_lvl3("MOBF: divide_mapgen params: ")
 	dbg_mobf.spawning_lvl3("MOBF:	" .. dump(density))
 	dbg_mobf.spawning_lvl3("MOBF:	" .. dump(name))
@@ -615,7 +612,6 @@ function spawning.divide_mapgen(minp,maxp,sp_data,name,secondary_name,spawnfunc,
 		divs = divs +1
 	end -- for z divs
 	end -- for x divs
-	mobf_warn_long_fct(starttime,"on_mapgen " .. name,"mapgen")
 	local max_available_tries = divs * maxtries
 	dbg_mobf.spawning_lvl2("MOBF: divide_mapgen II " ..
 			"(" .. divs .. "|" .. attempts .. "|" .. spawned .. "|" .. max_available_tries .. ")")
@@ -670,8 +666,6 @@ function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,en
 					else
 						dbg_mobf.spawning_lvl3("MOBF: not spawning " .. self.spawner_mob_name .. " due to mob being to near " .. mobcount)
 					end
-					
-					mobf_warn_long_fct(starttime,"spawnfunc " .. self.spawner_mob_name,"spawnfunc")
 				end
 				mobf_warn_long_fct(starttime,"spawner_entity_onstep","spawn_onstep")
 			end,

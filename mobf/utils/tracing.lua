@@ -28,7 +28,7 @@ statistics.onstep = 0
 statistics.mapgen = 0
 statistics.lastcalc = 0
 statistics.activate = 0
-statistics.punch = 0
+statistics.queue_load = 0
 statistics.spawn_onstep = 0
 statistics.user_1 = 0
 statistics.user_2 = 0
@@ -39,7 +39,7 @@ statistics.data.abm          = { current=0,maxabs=0,max=0 }
 statistics.data.onstep       = { current=0,maxabs=0,max=0 }
 statistics.data.mapgen       = { current=0,maxabs=0,max=0 }
 statistics.data.activate     = { current=0,maxabs=0,max=0 }
-statistics.data.punch        = { current=0,maxabs=0,max=0 }
+statistics.data.queue_load   = { current=0,maxabs=0,max=0 }
 statistics.data.mobs         = { current=0,maxabs=" ",max=0 }
 statistics.data.queue         = { current=0,maxabs=0,max=0 }
 statistics.data.spawn_onstep = { current=0,maxabs=0,max=0 }
@@ -63,9 +63,10 @@ function mobf_statistic_calc(dtime)
 		local current_total  = (statistics.total/delta)*100
 		local current_abm    = (statistics.abms/delta)*100
 		local current_onstep = (statistics.onstep/delta)*100
+							
 		local current_mapgen = (statistics.mapgen/delta)*100
 		local current_activate = (statistics.activate/delta)*100
-		local current_punch  = (statistics.punch/delta)*100
+		local current_queue_load  = (statistics.queue_load/delta)*100
 		local current_spawn_onstep  = (statistics.spawn_onstep/delta)*100
 		local current_user_1  = (statistics.user_1/delta)*100
 		local current_user_2  = (statistics.user_2/delta)*100
@@ -83,7 +84,7 @@ function mobf_statistic_calc(dtime)
 		statistics.onstep = 0
 		statistics.mapgen = 0
 		statistics.activate = 0
-		statistics.punch = 0
+		statistics.queue_load = 0
 		statistics.spawn_onstep = 0
 		statistics.user_1 = 0
 		statistics.user_2 = 0
@@ -109,9 +110,9 @@ function mobf_statistic_calc(dtime)
 		statistics.data.activate.maxabs = MAX(statistics.data.activate.maxabs, math.floor(current_activate*refresh_interval))
 		statistics.data.activate.max = MAX(statistics.data.activate.max,current_activate)
 		
-		statistics.data.punch.current = current_punch
-		statistics.data.punch.maxabs = MAX(statistics.data.punch.maxabs, math.floor(current_punch*refresh_interval))
-		statistics.data.punch.max = MAX(statistics.data.punch.max,current_punch)
+		statistics.data.queue_load.current = current_queue_load
+		statistics.data.queue_load.maxabs = MAX(statistics.data.queue_load.maxabs, math.floor(current_queue_load*refresh_interval))
+		statistics.data.queue_load.max = MAX(statistics.data.queue_load.max,current_queue_load)
 		
 		statistics.data.spawn_onstep.current = current_spawn_onstep
 		statistics.data.spawn_onstep.maxabs = MAX(statistics.data.spawn_onstep.maxabs, math.floor(current_spawn_onstep*refresh_interval))
@@ -176,7 +177,12 @@ function mobf_warn_long_fct(starttime,fctname,facility)
 		end
 		
 		if facility == "onpunch_total" then
-			statistics.punch = statistics.punch + delta
+			statistics.onstep = statistics.onstep + delta
+			statistics.total = statistics.total + delta
+		end
+		
+		if facility == "delayed_processing" then
+			statistics.queue_load = statistics.queue_load + delta
 			statistics.total = statistics.total + delta
 		end
 		
