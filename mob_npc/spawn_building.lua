@@ -217,7 +217,7 @@ function building_spawner.builder(startpos,blueprint,mobname)
 				z=startpos.z +blueprint.size.z + 1
 			}
 		) then
-		--print("spawning building at " .. printpos(startpos) .. "!")
+		mobf_print("Spawn building: spawning at " .. printpos(startpos) .. "!")
 		for i=1,#blueprint.walls,1 do
 			building_spawner.buid_wall(blueprint.walls[i][1],
 						{
@@ -232,17 +232,23 @@ function building_spawner.builder(startpos,blueprint,mobname)
 						})
 		end
 		
+		--mobf_print("Spawn building: populating with " .. #blueprint.entities .. " entities")
 		for i=1,#blueprint.entities,1 do
 			if mobname == nil then
 				mobname = blueprint.entities[i][2]
 			end
-			local object = minetest.add_entity( {
+			
+			local entitypos = {
 								x=startpos.x + blueprint.entities[i][1].x,
 								y=startpos.y + blueprint.entities[i][1].y,
-								z=startpos.z + blueprint.entities[i][1].z},
-								mobname)
+								z=startpos.z + blueprint.entities[i][1].z}
+			
+			local object = minetest.add_entity(entitypos,mobname)
 			if object ~= nil then
+				--mobf_print("Spawn building: spawned " .. dump(mobname) .. " at " .. printpos(entitypos))
 				object:setyaw(blueprint.entities[i][3])
+			else
+				--mobf_print("Spawn building: failed to spawn " .. dump(mobname))
 			end
 		end
 		
