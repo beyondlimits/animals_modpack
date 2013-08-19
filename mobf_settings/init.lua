@@ -192,7 +192,7 @@ end
 ------------------------------------------------------------------------------
 -- name: handle_statistics_tab
 --
---! @brief handle events from main tab
+--! @brief handle events from statistics tab
 --! @ingroup mobf_settings
 --
 --! @param sender_data all information gatered
@@ -202,6 +202,22 @@ end
 function mobf_settings.handle_statistics_tab(sender_data)
 
 	mobf_settings.show_statistics_tab(sender_data)
+
+end
+
+------------------------------------------------------------------------------
+-- name: handle_info_tab
+--
+--! @brief handle events from info tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+--!
+--! @return sender information
+-------------------------------------------------------------------------------
+function mobf_settings.handle_info_tab(sender_data)
+
+	mobf_settings.show_info_tab(sender_data)
 
 end
 
@@ -333,6 +349,59 @@ function mobf_settings.show_tools_tab(sender_data)
 end
 
 ------------------------------------------------------------------------------
+-- name: printfac
+--
+--! @brief update formspec to tools tab
+--! @ingroup mobf_settings
+--
+--! @param name of facility
+--! @param data data to add label
+--! @param yval ypos of label
+--! @param vs formatstring
+--
+--! @return formspec label element string
+-------------------------------------------------------------------------------
+function mobf_settings.printfac(name,data,yval,fs)
+	return 
+		"label[0.75," .. yval .. ";" .. mobf_fixed_size_string(name,20) .. "]" ..
+		"label[2.75," .. yval .. ";" .. 
+			mobf_fixed_size_string(string.format(fs,data.current),10).. "]" ..
+		"label[4.25," .. yval .. ";" .. 
+			mobf_fixed_size_string(data.maxabs,10).. "]" ..
+		"label[6," .. yval .. ";" .. 
+			mobf_fixed_size_string(string.format(fs,data.max),10).. "]"
+
+end
+
+------------------------------------------------------------------------------
+-- name: show_info_tab
+--
+--! @brief update formspec to tools tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.show_info_tab(sender_data)
+	local formspec = mobf_settings.formspec_header(sender_data)
+	
+	formspec = formspec ..
+		"label[0.75,0.25;Timesource:]" ..
+		"label[2.75,0.25;" .. mobf_fixed_size_string(mobf_rtd.timesource,30) .. "]" ..
+		"label[0.75,0.75;Daytime:]" .. 
+		"label[6.4,0.75;" .. string.format("%.2f",minetest.get_timeofday()) .. "]" ..
+		mobf_settings.printfac("Active Mobs",statistics.data.mobs,"1.25","%6d") ..
+		mobf_settings.printfac("Jobqueue",statistics.data.queue,"1.75","%6d") ..
+		"label[0.75,2.25;Mobs spawned by mapgen this session:]" ..
+		"label[6.4,2.25;" .. mobf_rtd.total_spawned .. "]"
+		
+	if formspec ~= nil then
+		minetest.show_formspec(sender_data.player:get_player_name(),
+							sender_data.formname,
+							formspec)
+	end
+end
+
+------------------------------------------------------------------------------
 -- name: show_statistics_tab
 --
 --! @brief update formspec to tools tab
@@ -343,42 +412,23 @@ end
 function mobf_settings.show_statistics_tab(sender_data)
 	local formspec = mobf_settings.formspec_header(sender_data)
 	
-	local printfac = function(name,data,yval,fs)
-		return 
-			"label[0.75," .. yval .. ";" .. mobf_fixed_size_string(name,20) .. "]" ..
-			"label[2.75," .. yval .. ";" .. 
-				mobf_fixed_size_string(string.format(fs,data.current),10).. "]" ..
-			"label[4.25," .. yval .. ";" .. 
-				mobf_fixed_size_string(data.maxabs,10).. "]" ..
-			"label[6," .. yval .. ";" .. 
-				mobf_fixed_size_string(string.format(fs,data.max),10).. "]"
-
-	end
-	
 	formspec = formspec ..
-		"label[0.75,0.0;Info:]" ..
-		"label[0.75,0.25;--------------------------------------------------]" ..
-		"label[0.75,0.75;Timesource:]" ..
-		"label[2.75,0.75;" .. mobf_fixed_size_string(mobf_rtd.timesource,30) .. "]" ..
-		printfac("Active Mobs",statistics.data.mobs,"1.25","%6d") ..
-		printfac("Jobqueue",statistics.data.queue,"1.75","%6d") ..
-		"label[0.75,3;"	.. mobf_fixed_size_string("Facility",20)
+	
+		"label[0.75,0;"	.. mobf_fixed_size_string("Facility",20)
 						.. mobf_fixed_size_string("Current",10)
 						.. mobf_fixed_size_string("Abs.Max",10)
 						.. mobf_fixed_size_string("Maximum",10) .. "]" ..
-		"label[0.75,2.25;Mobs spawned by mapgen this session:]" ..
-		"label[6.4,2.25;" .. mobf_rtd.total_spawned .. "]" ..
-		"label[0.75,3.25;--------------------------------------------------]" ..
-		printfac("Total",statistics.data.total,"3.75","%.2f%%") ..
-		printfac("Onstep",statistics.data.onstep,"4.25","%.2f%%") ..
-		printfac("Punch",statistics.data.punch,"4.75","%.2f%%") ..
-		printfac("ABM",statistics.data.abm,"5.25","%.2f%%") ..
-		printfac("MapGen",statistics.data.mapgen,"5.75","%.2f%%") ..
-		printfac("Spawn onstep",statistics.data.spawn_onstep,"6.25","%.2f%%") ..
-		printfac("Activate",statistics.data.activate,"6.75","%.2f%%") ..
-		printfac("User 1",statistics.data.user_1,"7.5","%.2f%%") ..
-		printfac("User 2",statistics.data.user_2,"8","%.2f%%") ..
-		printfac("User 3",statistics.data.user_3,"8.5","%.2f%%")
+		mobf_settings.printfac("Total",statistics.data.total,"0.5","%.2f%%") ..
+		"label[0.75,0.25;--------------------------------------------------]" ..
+		mobf_settings.printfac("Onstep",statistics.data.onstep,"1","%.2f%%") ..
+		mobf_settings.printfac("Job processing",statistics.data.queue_load,"1.5","%.2f%%") ..
+		mobf_settings.printfac("ABM",statistics.data.abm,"2","%.2f%%") ..
+		mobf_settings.printfac("MapGen",statistics.data.mapgen,"2.5","%.2f%%") ..
+		mobf_settings.printfac("Spawn onstep",statistics.data.spawn_onstep,"3","%.2f%%") ..
+		mobf_settings.printfac("Activate",statistics.data.activate,"3.5","%.2f%%") ..
+		mobf_settings.printfac("User 1",statistics.data.user_1,"7.5","%.2f%%") ..
+		mobf_settings.printfac("User 2",statistics.data.user_2,"8","%.2f%%") ..
+		mobf_settings.printfac("User 3",statistics.data.user_3,"8.5","%.2f%%")
 
 	if formspec ~= nil then
 		minetest.show_formspec(sender_data.player:get_player_name(),
@@ -450,6 +500,10 @@ function mobf_settings.show_settings_tab(sender_data)
 				"cb_" .. sender_data.tab .. "_delayed_spawning;" ..
 				"Delay spawning at mapgen;" .. 
 				mobf_settings.setting_gettext("mobf_delayed_spawning") .."]"
+	formspec = formspec .. "checkbox[1,6;" .. 
+				"cb_" .. sender_data.tab .. "_disable_pathfinding;" ..
+				"Disable core pathfinding support;" .. 
+				mobf_settings.setting_gettext("mobf_disable_pathfinding") .."]"
 	--print("formspec: " .. formspec)
 	if formspec ~= nil then
 		minetest.show_formspec(sender_data.player:get_player_name(),
@@ -588,6 +642,11 @@ function mobf_settings.handle_settings_tab_input(sender_data)
 		mobf_set_world_setting("mobf_delayed_spawning",
 								mobf_settings.tobool(sender_data.value))
 	end
+	
+	if sender_data.name == "disable_pathfinding" then
+		mobf_set_world_setting("mobf_disable_pathfinding",
+								mobf_settings.tobool(sender_data.value))
+	end
 end
 
 ------------------------------------------------------------------------------
@@ -693,6 +752,8 @@ mobf_settings.register_tab("Tools",     false,mobf_settings.handle_tools_tab)
 if minetest.world_setting_get("mobf_enable_statistics") then
 	mobf_settings.register_tab("Statistics",     false,mobf_settings.handle_statistics_tab)
 end
+
+mobf_settings.register_tab("Info",     false,mobf_settings.handle_info_tab)
 
 ------------------------------------------------------------------------------
 -- register handler for pressed buttons
