@@ -127,9 +127,11 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 	
 	spawning.register_spawner_entity(mob_name,mob_transform,spawning_data,environment,
 		function(self)
+		
+			--first check reasons to not spawn a mob right now
 			local gametime = minetest.get_timeofday()
 				
-			if gametime > 0.25 and
+			if gametime > 0.20 and
 				gametime < 0.75 then
 				dbg_mobf.spawning_lvl3("MOBF: wrong time for at night spawner")
 				self.spawner_last_result = "daytime"
@@ -185,23 +187,22 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 				reason = "wrong light: " .. light_day .. " " .. light_midnight
 				good = false
 			end
+			
+			local current_light = minetest.get_node_light(newpos)
+			--check if current light is dark enough
+			if not current_light or current_light > 6 then
+				self.spawner_last_result = "at_night: to much light"
+				good = false
+			end
 				
 			if not good then
-				dbg_mobf.spawning_lvl2("MOBF: not spawning " 
-				.. self.spawner_mob_name .. " spawner somehow got to bad place: " 
+				dbg_mobf.spawning_lvl2("MOBF: not spawning at position not suitable" 
+				.. self.spawner_mob_name .. " reason: " 
 				.. reason)
-				--TODO try to move spawner to better place
-				
-				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
+				--Invalid position,
+				--reduced delay to next retry
+				self.spawner_time_passed = (self.spawner_mob_spawndata.respawndelay/4)
 				self.spawner_last_result = "at_night:" .. dump(reason)
-				return
-			end
-			
-			
-			--check if current light is dark enough
-			if minetest.get_node_light(pos) > 6 then
-				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
-				self.spawner_last_result = "at_night: to much light"
 				return
 			end
 
@@ -222,6 +223,7 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 				end
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
 			else
+				--too many mobs around full delay
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
 				dbg_mobf.spawning_lvl2("MOBF: not spawning " .. self.spawner_mob_name .. " there's a mob around")
 				self.spawner_last_result = "at_night: to much mobs around"
@@ -285,8 +287,9 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 	else	
 		--add mob spawner on map generation
 		minetest.register_on_generated(function(minp, maxp, seed)
-		
+			local starttime = mobf_get_time_ms()
 			spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,spawnfunc)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. mob_name,"mapgen")
 		end) --register mapgen
 	end
  end --end spawn algo
