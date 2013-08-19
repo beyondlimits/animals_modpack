@@ -417,6 +417,37 @@ function direction_control.precheck_movement(entity,movement_state,pos_predicted
 			end
 		end
 		
+		local geom_ok = 
+			environment.evaluate_state(	pos_predicted_quality, 
+					{	old_state=nil,
+						min_media=MQ_IN_MEDIA,
+						min_geom=GQ_PARTIAL,
+						min_geom_center=nil,
+						min_min_surface=nil,
+						min_max_surface=nil,
+						min_center_surface=nil	})
+		if geom_ok and
+			pos_predicted_quality.surface_quality_max == SQ_WRONG then
+			dbg_mobf.pmovement_lvl2("MOBF: wrong surface detected trying to find better pos")
+			local new_pos = 
+				environment.get_suitable_pos_same_level(movement_state.basepos,1,entity)
+				
+			if new_pos == nil then
+				new_pos = environment.get_suitable_pos_same_level(movement_state.basepos,2,entity)
+			end
+				
+			if new_pos ~= nil then
+				dbg_mobf.pmovement_lvl2("MOBF: redirecting to better position .. " .. printpos(new_pos))
+				movement_state.accel_to_set = movement_generic.get_accel_to(new_pos,entity)
+				movement_state.changed = true
+				return
+			else
+				--try generic
+				movement_state.force_change = true
+				return
+			end
+		end
+		
 		mobf_print("Unhandled suboptimal state:" .. pos_predicted_quality.tostring(pos_predicted_quality))
 		movement_state.force_change = true
 	end
