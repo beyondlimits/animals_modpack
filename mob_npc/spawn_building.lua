@@ -38,10 +38,10 @@ blueprint_hut = {
 		{"default:wood",{x=3,y=1,z=1},{x=3,y=1,z=2}},
 		
 	--torches
-		{"default:torch",{x=2,y=2,z=1},{x=2,y=2,z=1}},
+		{"default:torch",{x=2,y=2,z=1},{x=2,y=2,z=1},5},
 	},
 	entities = {
-		{ {x=4.5,y=1,z=1.5},"mob_npc:npc_trader__default",-math.pi }
+		{ {x=4,y=1,z=1.5},"mob_npc:npc_trader__default",-math.pi }
 	}
 }
 
@@ -82,11 +82,11 @@ blueprint_normalhouse = {
 		{"default:glass",{x=8,y=2,z=4},{x=8,y=3,z=5}},
 
 	--torches
-		{"default:torch",{x=1,y=3,z=7},{x=1,y=3,z=7}},
-		{"default:torch",{x=3,y=3,z=9},{x=3,y=3,z=9}},
-		{"default:torch",{x=5,y=3,z=9},{x=5,y=3,z=9}},
-		{"default:torch",{x=3,y=4,z=3},{x=3,y=4,z=3}},
-		{"default:torch",{x=5,y=4,z=3},{x=5,y=4,z=3}},
+		{"default:torch",{x=1,y=3,z=7},{x=1,y=3,z=7},3}, --left
+		{"default:torch",{x=3,y=3,z=9},{x=3,y=3,z=9},4}, --back
+		{"default:torch",{x=5,y=3,z=9},{x=5,y=3,z=9},4}, --back
+		{"default:torch",{x=3,y=4,z=3},{x=3,y=4,z=3},0}, --ceiling
+		{"default:torch",{x=5,y=4,z=3},{x=5,y=4,z=3},0}, --ceiling
 		
 	--
 		{"default:wood",{x=1,y=1,z=4},{x=3,y=1,z=4}},
@@ -103,14 +103,14 @@ blueprint_normalhouse = {
 		{"default:lava_source",{x=1,y=0,z=8},{x=1,y=0,z=8}},
 	},
 	entities = {
-			{ {x=3.5,y=1,z=5.5},"mob_npc:npc_trader__default",-1.14 }
+			{ {x=3,y=1,z=5},"mob_npc:npc_trader__default",-1.14 }
 		}
 }
 
 table.insert(mob_npc_houses,blueprint_normalhouse)
 table.insert(mob_npc_houses,blueprint_hut)
 
-function building_spawner.buid_wall(material,startpos,endpos)
+function building_spawner.buid_wall(material,startpos,endpos,param2)
 
 	--print("builder: wall: ".. dump(material) .. " " .. dump(startpos) .. " " .. dump(endpos))
 
@@ -130,7 +130,7 @@ function building_spawner.buid_wall(material,startpos,endpos)
 	
 		for y=startpos.y,endpos.y,1 do
 		for z=startpos.z,endpos.z,1 do
-			minetest.set_node({x=startpos.x,y=y,z=z},{ name=material } )
+			minetest.set_node({x=startpos.x,y=y,z=z},{ name=material,param2=param2 } )
 		end
 		end
 	end
@@ -138,7 +138,7 @@ function building_spawner.buid_wall(material,startpos,endpos)
 	if startpos.y == endpos.y then
 		for x=startpos.x,endpos.x,1 do
 		for z=startpos.z,endpos.z,1 do
-			minetest.set_node({x=x,y=startpos.y,z=z},{ name=material })
+			minetest.set_node({x=x,y=startpos.y,z=z},{ name=material,param2=param2 })
 		end
 		end	
 	end
@@ -146,7 +146,7 @@ function building_spawner.buid_wall(material,startpos,endpos)
 	if startpos.z == endpos.z then
 		for y=startpos.y,endpos.y,1 do
 		for x=startpos.x,endpos.x,1 do
-			minetest.set_node({x=x,y=y,z=startpos.z},{ name=material })
+			minetest.set_node({x=x,y=y,z=startpos.z},{ name=material,param2=param2 })
 		end
 		end	
 	end
@@ -229,7 +229,8 @@ function building_spawner.builder(startpos,blueprint,mobname)
 							x=startpos.x + blueprint.walls[i][3].x,
 							y=startpos.y + blueprint.walls[i][3].y,
 							z=startpos.z + blueprint.walls[i][3].z
-						})
+						},
+						blueprint.walls[i][4])
 		end
 		
 		--mobf_print("Spawn building: populating with " .. #blueprint.entities .. " entities")
@@ -275,6 +276,9 @@ function mob_npc_spawn_building(mob_name,mob_transform,spawning_data,environment
 			
 			if math.random() < 0.25 then
 				local blueprint = mob_npc_houses[math.random(1,#mob_npc_houses)]
+				
+				pos.x = math.floor(pos.x)
+				pos.z = math.floor(pos.z)
 				
 				if building_spawner.builder(pos,blueprint,mob_name .."__default") then
 					return true
