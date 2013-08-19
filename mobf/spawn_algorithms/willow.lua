@@ -132,6 +132,7 @@ function mobf_spawn_on_willow_mapgen(mob_name,mob_transform,spawning_data,enviro
 	else
 		--add mob on map generation
 		minetest.register_on_generated(function(minp, maxp, seed)
+			local starttime = mobf_get_time_ms()
 			spawning.divide_mapgen(minp,maxp,
 									spawning_data.density,
 									mob_name,
@@ -139,6 +140,7 @@ function mobf_spawn_on_willow_mapgen(mob_name,mob_transform,spawning_data,enviro
 									spawnfunc,
 									mobf_get_sunlight_surface,
 									5)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. mob_name,"mapgen")
 		end)
 	end
  end --end spawn algo

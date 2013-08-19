@@ -79,7 +79,7 @@ function mobf_spawn_in_air1(mob_name,mob_transform,spawning_data,environment)
 				else
 					--print("Try to spawn mob: "..mob_name)				
 
-                    if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
+					if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
 
 						spawning.spawn_and_check(mob_name,"__default",pos_spawn,"in_air1")
 					end
@@ -183,7 +183,9 @@ function mobf_spawn_in_air1_spawner(mob_name,mob_transform,spawning_data,environ
 	else	
 		--add mob spawner on map generation
 		minetest.register_on_generated(function(minp, maxp, seed)
+				local starttime = mobf_get_time_ms()
 				spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,spawnfunc)
+				mobf_warn_long_fct(starttime,"on_mapgen " .. mob_name,"mapgen")
 			end) --register mapgen
 	end
 

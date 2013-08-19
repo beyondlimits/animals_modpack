@@ -292,7 +292,9 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 	else	
 		--add mob spawner on map generation
 		minetest.register_on_generated(function(minp, maxp, seed)
+			local starttime = mobf_get_time_ms()
 			spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,spawnfunc)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. mob_name,"mapgen")
 		end) --register mapgen
 	end
 end
