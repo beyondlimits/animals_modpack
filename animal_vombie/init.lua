@@ -76,7 +76,7 @@ function vombie_on_activate_handler(entity)
 	
 	if current_light == nil then
 		minetest.log(LOGLEVEL_ERROR,
-			"ANIMALS: Bug!!! didn't get a light value for ".. printpos(pos))
+			"ANIMALS:Vombie Bug!!! didn't get a light value for ".. printpos(pos))
 		return
 	end
 	--check if animal is in sunlight
@@ -128,7 +128,7 @@ vombie_prototype = {
 					primary_algorithms = {
 							{
 								rate=0.05,
-								density=30,
+								density=20,
 								algorithm="at_night_spawner",
 								height=2,
 								respawndelay=10,
