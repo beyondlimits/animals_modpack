@@ -274,7 +274,7 @@ function attention.callback(entity,now)
 	end
 		
 	--check if top attention exceeds current + offset
-	if 	top_attention_value > current_attention_value + target_switch_offset then
+	if top_attention_value > current_attention_value + target_switch_offset then
 		--update top attention object
 		entity.dynamic_data.attention.most_relevant_target = top_attention_object
 		current_attention_value = top_attention_value
@@ -297,6 +297,7 @@ function attention.callback(entity,now)
 	end
 		
 	if entity.data.attention.attack_threshold ~= nil and
+		attack_attention_value ~= nil and
 		attack_attention_value > entity.data.attention.attack_threshold then
 		
 		local current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
