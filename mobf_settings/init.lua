@@ -222,6 +222,24 @@ function mobf_settings.handle_info_tab(sender_data)
 end
 
 ------------------------------------------------------------------------------
+-- name: handle_factions_tab
+--
+--! @brief handle events from main tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+--!
+--! @return sender information
+-------------------------------------------------------------------------------
+function mobf_settings.handle_factions_tab(sender_data)
+
+	mobf_settings.handle_factions_tab_input(sender_data)
+		
+	mobf_settings.show_factions_tab(sender_data)
+
+end
+
+------------------------------------------------------------------------------
 -- name: handle_main_tab
 --
 --! @brief handle events from main tab
@@ -437,6 +455,59 @@ function mobf_settings.show_statistics_tab(sender_data)
 	end
 end
 ------------------------------------------------------------------------------
+-- name: show_factions_tab
+--
+--! @brief update formspec to tools tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.show_factions_tab(sender_data)
+	local formspec = mobf_settings.formspec_header(sender_data)
+	
+	formspec = formspec .. 
+		"textlist[0.25,0.25;3.5,7.75;factionlist;"
+		
+	local factionlist = factions.get_faction_list()
+	
+	if #factionlist ~= 0 then
+		for i=1,#factionlist,1 do
+			formspec = formspec .. factionlist[i] .. ","
+		end
+	else
+		formspec = formspec .. "no factions available"
+	end
+	
+	formspec = formspec .. ";;true]"
+	local playername = sender_data.player:get_player_name()
+	if minetest.check_player_privs(playername, {faction_admin=true}) 
+		or playername == "singleplayer" then
+		formspec = formspec .. 
+			"button[0.25,8.25;3.75,0.5;btn_" .. sender_data.tab .. "_delete;Delete]" ..
+			"field[4.3,2.5;4,0.5;te_factionname;New Faction;]" ..
+			"button[4,3;4,0.5;btn_" .. sender_data.tab .. "_create;Create]"
+	end
+	
+	if minetest.check_player_privs(playername, {faction_admin=true}) or
+		minetest.check_player_privs(playername, {faction_user=true})
+		or playername == "singleplayer" then
+		formspec = formspec .. 
+			"field[4.3,5;4,0.5;te_inviteename;Invite player to faction;]" ..
+			"button[4,5.5;4,0.5;btn_" .. sender_data.tab .. "_invite;Invite]"
+	end
+	
+	if sender_data.errormessage then
+		formspec = formspec .. 
+			"label[0.25,-0.25;" .. sender_data.errormessage .. "]"
+	end
+	
+	if formspec ~= nil then
+		minetest.show_formspec(sender_data.player:get_player_name(),
+							sender_data.formname,
+							formspec)
+	end
+end
+------------------------------------------------------------------------------
 -- name: show_settings_tab
 --
 --! @brief update formspec to settings tab
@@ -542,6 +613,45 @@ function mobf_settings.handle_tools_tab_input(sender_data)
 end
 
 ------------------------------------------------------------------------------
+-- name: handle_factions_tab_input
+--
+--! @brief handle input from main tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.handle_factions_tab_input(sender_data)
+	print("factions tab handler " .. dump(sender_data))
+	if sender_data.name == "delete" then
+	
+	end
+	
+	if sender_data.name == "create" then
+		if sender_data.fields["te_factionname"] ~= nil then
+			
+			if sender_data.fields["te_factionname"] == "" then
+				sender_data.errormessage ="Refusing to create faction with no name!"
+			elseif not factions.exists(sender_data.fields["te_factionname"]) then
+				if not factions.add_faction(sender_data.fields["te_factionname"]) then
+					sender_data.errormessage = "Failed to add faction \"" 
+						.. sender_data.fields["te_factionname"] .. "\""
+						
+				end
+			else
+				sender_data.errormessage = "Faction \"" 
+					.. sender_data.fields["te_factionname"] .. "\" already exists"
+			end
+		end
+	end
+	
+	if sender_data.name == "invite" then
+		--TODO get faction from faction list
+		--TODO check if player is in faction he wants to invite for
+		
+	end
+end
+
+------------------------------------------------------------------------------
 -- name: handle_main_tab_input
 --
 --! @brief handle input from main tab
@@ -592,7 +702,7 @@ end
 --! @param sender_data all information gatered
 -------------------------------------------------------------------------------
 function mobf_settings.handle_settings_tab_input(sender_data)
-	print("settings tab handler " .. dump(sender_data))
+	--print("settings tab handler " .. dump(sender_data))
 	if sender_data.name == "disable_animal_spawning" then
 		mobf_set_world_setting("mobf_disable_animal_spawning",
 								mobf_settings.tobool(sender_data.value))
@@ -750,10 +860,14 @@ mobf_settings.register_tab("Settings",  true, mobf_settings.handle_settings_tab)
 mobf_settings.register_tab("Tools",     false,mobf_settings.handle_tools_tab)
 
 if minetest.world_setting_get("mobf_enable_statistics") then
-	mobf_settings.register_tab("Statistics",     false,mobf_settings.handle_statistics_tab)
+	mobf_settings.register_tab("Stats",     false,mobf_settings.handle_statistics_tab)
 end
 
 mobf_settings.register_tab("Info",     false,mobf_settings.handle_info_tab)
+
+if mobf_rtd.factions_available then
+	mobf_settings.register_tab("Factions",     false,mobf_settings.handle_factions_tab)
+end
 
 ------------------------------------------------------------------------------
 -- register handler for pressed buttons
