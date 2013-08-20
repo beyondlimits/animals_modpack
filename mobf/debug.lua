@@ -427,14 +427,15 @@ function mobf_debug.rightclick_callback(entity,player)
 		for k,v in pairs(entity.dynamic_data.attention.watched_objects) do
 			print("MOBF: \t\t " .. k .. ": " .. v.value)
 		end
+	
+		local attention_name = tostring(entity.dynamic_data.attention.most_relevant_target)
+		
+		if (entity.dynamic_data.attention.most_relevant_target:is_player()) then
+			attention_name = entity.dynamic_data.attention.most_relevant_target:get_player_name()
+		end
+		print("MOBF: \tTop attention object:       " .. attention_name)
 	end
 	
-	local attention_name = tostring(entity.dynamic_data.attention.most_relevant_target)
-	
-	if (entity.dynamic_data.attention.most_relevant_target:is_player()) then
-		attention_name = entity.dynamic_data.attention.most_relevant_target:get_player_name()
-	end
-	print("MOBF: \tTop attention object:       " .. attention_name)
 	if entity.dynamic_data.graphics.last_fps ~= nil then
 		print("MOBF: Animating with: " .. entity.dynamic_data.graphics.last_fps .. " fps")
 	end
