@@ -26,6 +26,13 @@ oerkki_prototype = {
 		name="oerkki",
 		modname="mob_oerkki",
 		
+		factions = {
+			member = {
+				"underground",
+				"monsters"
+				}
+			},
+		
 		generic = {
 					description="Oerkki",
 					base_health=3,

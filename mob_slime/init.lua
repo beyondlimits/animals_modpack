@@ -84,6 +84,12 @@ end
 
 local prototype_mob_slime_L = {
 
+	factions = {
+			member = {
+				"underground",
+				}
+			},
+
 	--! @brief [MANDATORY] name of mob @b (alphanumeric and "_" only!!)
 	name = "slime_L",
 	--! @brief [MANDATORY] name of mod defining the mob
@@ -224,6 +230,12 @@ local prototype_mob_slime_L = {
 	
 local prototype_mob_slime_S = {
 
+	factions = {
+			member = {
+				"underground",
+				}
+			},
+			
 	--! @brief [MANDATORY] name of mob @b (alphanumeric and "_" only!!)
 	name = "slime_S",
 	--! @brief [MANDATORY] name of mod defining the mob
@@ -346,6 +358,12 @@ local prototype_mob_slime_S = {
 	}
 	
 local prototype_mob_slime_M = {
+
+	factions = {
+			member = {
+				"underground",
+				}
+			},
 
 	--! @brief [MANDATORY] name of mob @b (alphanumeric and "_" only!!)
 	name = "slime_M",

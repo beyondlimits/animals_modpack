@@ -26,6 +26,13 @@ local selectionbox_wolf = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
 wolf_prototype = {
 		name="wolf",
 		modname="animal_wolf",
+		
+		factions = {
+			member = {
+				"animals",
+				"forrest_animals"
+				}
+			},
 	
 		generic = {
 					description="Wolf",

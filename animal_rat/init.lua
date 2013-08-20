@@ -26,6 +26,12 @@ local rat_groups = {
 rat_prototype = {
 		name="rat", 
 		modname="animal_rat",
+		
+		factions = {
+			member = {
+				"animals",
+				}
+			},
 	
 		generic = {
 					description="Rat (Animals)",

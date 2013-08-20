@@ -27,6 +27,12 @@ dofile (modpath .. "/spawn_building.lua")
 npc_prototype = {
 		name="npc",
 		modname="mob_npc",
+		
+		factions = {
+			member = {
+				"npc",
+				}
+			},
 	
 		generic = {
 					description="NPC",
@@ -95,6 +101,12 @@ npc_prototype = {
 npc_trader_prototype = {
 		name="npc_trader",
 		modname="mob_npc",
+		
+		factions = {
+			member = {
+				"npc",
+				}
+			},
 	
 		generic = {
 					description="Trader",

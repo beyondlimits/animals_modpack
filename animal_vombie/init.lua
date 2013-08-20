@@ -89,6 +89,13 @@ end
 vombie_prototype = {
 		name="vombie",
 		modname="animal_vombie",
+		
+		factions = {
+			member = {
+				"monsters",
+				"undead"
+				}
+			},
 	
 		generic = {
 					description="Vombie",

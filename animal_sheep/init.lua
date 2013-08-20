@@ -30,6 +30,13 @@ sheep_prototype = {
 		name="sheep",
 		modname="animal_sheep",
 	
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
+			
 		generic = {
 					description="Sheep",
 					base_health=10,
@@ -162,6 +169,13 @@ sheep_prototype = {
 lamb_prototype = {
 		name="lamb",
 		modname="animal_sheep",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 	
 		generic = {
 					description="Lamp",
@@ -277,7 +291,14 @@ lamb_prototype = {
 	
 sheep_naked_prototype = {
 		name="sheep_naked",
-		modname="animal_sheep", 
+		modname="animal_sheep",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 	
 		generic = {
 					description="Naked sheep",

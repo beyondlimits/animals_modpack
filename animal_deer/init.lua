@@ -25,7 +25,14 @@ local selectionbox_deer = {-0.7, -1.25, -0.7, 0.7, 0.8, 0.7}
 
 deer_prototype = {
 		name="deer_m",
-		modname = "animal_deer", 
+		modname = "animal_deer",
+		
+		factions = {
+			member = {
+				"animals",
+				"forrest_animals"
+				}
+			},
 
 		generic = {
 					description="Deer (m)",

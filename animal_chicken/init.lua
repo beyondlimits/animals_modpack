@@ -42,6 +42,13 @@ end
 chicken_prototype = {
 		name="chicken",
 		modname="animal_chicken",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 	
 		generic = {
 					description="Chicken",
@@ -144,6 +151,13 @@ chicken_prototype = {
 rooster_prototype = {   
 		name="rooster",
 		modname="animal_chicken",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 
 		generic = {
 					description="Rooster",
@@ -239,6 +253,13 @@ chick_m_prototype = {
 		name="chick_m",
 		modname="animal_chicken",
 		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
+		
 		generic = {
 				description="Chick - male",
 				base_health=5,
@@ -319,6 +340,13 @@ chick_m_prototype = {
 chick_f_prototype = {   
 		name="chick_f",
 		modname="animal_chicken",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 		
 		generic = {
 				description="Chick - female",

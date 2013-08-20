@@ -26,6 +26,13 @@ local selectionbox_gull = {-1, -0.3, -1, 1, 0.3, 1}
 gull_prototype = {   
 		name="gull",
 		modname="animal_gull",
+		
+		factions = {
+			member = {
+				"animals",
+				"birds"
+				}
+			},
 	
 		generic = {
 					description="Gull",

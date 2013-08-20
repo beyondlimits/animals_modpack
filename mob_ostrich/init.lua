@@ -38,6 +38,13 @@ end
 ostrich_f_prototype = {
 		name="ostrich_f",
 		modname="mob_ostrich",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 	
 		generic = {
 					description="Ostrich (f)",
@@ -132,6 +139,13 @@ ostrich_f_prototype = {
 ostrich_m_prototype = {   
 		name="ostrich_m",
 		modname="mob_ostrich",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 
 		generic = {
 					description="Ostrich (m)",

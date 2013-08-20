@@ -23,6 +23,13 @@ local archer_groups = {
 archer_prototype = {
 		name="archer",
 		modname="mob_archer",
+		
+		factions = {
+			member = {
+				"npc",
+				"hireling"
+				}
+			},
 	
 		generic = {
 					description="Archer",

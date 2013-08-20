@@ -26,6 +26,12 @@ local selectionbox_creeper = {-1, -1, -1, 1, 1, 1}
 creeper_prototype = {
 		name="creeper",
 		modname="animal_creeper",
+		
+		factions = {
+			member = {
+				"monsters"
+				}
+			},
 	
 		generic = {
 					description="BoomBomb",

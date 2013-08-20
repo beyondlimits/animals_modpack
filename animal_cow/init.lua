@@ -27,6 +27,13 @@ local selectionbox_baby_calf = {-0.8, -0.8, -0.5, 0.8, 0.8, 0.5}
 cow_prototype = {   
 		name="cow",
 		modname="animal_cow",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 	
 		generic = {
 					description="Cow",
@@ -140,6 +147,13 @@ cow_prototype = {
 steer_prototype = {   
         name="steer",
         modname="animal_cow",
+        
+        factions = {
+            member = {
+                "animals",
+                "grassland_animals"
+                }
+            },
     
         generic = {
                     description="Steer",
@@ -247,6 +261,13 @@ steer_prototype = {
 baby_calf_f_prototype = {
 		name="baby_calf_f",
 		modname="animal_cow",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 
 		generic = {
 			description="Baby Calf female",
@@ -338,6 +359,13 @@ baby_calf_f_prototype = {
 baby_calf_m_prototype = {   
 		name="baby_calf_m",
 		modname="animal_cow",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 
 		generic = {
 				description="Baby Calf male",

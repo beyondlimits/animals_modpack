@@ -25,6 +25,13 @@ local selectionbox_dm = {-0.75, -1, -0.75, 0.75, 1, 0.75}
 dm_prototype = {   
 		name="dm",
 		modname="animal_dm",
+		
+		factions = {
+			member = {
+				"underground",
+				"monsters"
+				}
+			},
 	
 		generic = {
 					description="Dungeonmaster (MOBF)",

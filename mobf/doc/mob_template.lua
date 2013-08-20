@@ -34,6 +34,16 @@ local mob_template = {
 	--! @brief [MANDATORY] name of mod defining the mob
 	modname = "name of mod",
 	
+	--! @brief [OPTIONAL] factions configuration
+	factions = {
+				member = {  
+					"faction_1",
+					"faction_2",
+					"faction_3",
+					"faction_4"
+					},
+				},
+	
 	--! @brief [MANDATORY] generic parameters for mob
 	generic = {
 		--! @brief [MANDATORY] description to show on mouse over in inventory	
