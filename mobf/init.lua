@@ -237,7 +237,11 @@ function mobf_init_framework()
 		description = "Player may change mobf settings",
 		give_to_singleplayer = true
 	})
-
+	
+	if  minetest.get_modpath("factions")then
+		mobf_rtd.factions_available = true
+	end
+	
 	print("MOD: mob framework mod "..mobf_version.." loaded")
 end
 
