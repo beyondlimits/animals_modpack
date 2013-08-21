@@ -16,7 +16,7 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
-
+mobf_assert_backtrace(weapons_spacer == nil)
 local weapons_spacer = {} --unused to fix lua doxygen bug only
 
 -------------------------------------------------------------------------------
@@ -101,6 +101,7 @@ function mobf_do_node_damage(pos,immune_list,range,chance)
 	end
 end
 
+mobf_assert_backtrace(MOBF_FIREBALL_ENTITY == nil)
 --! @class MOBF_FIREBALL_ENTITY
 --! @ingroup weapons
 --! @brief a fireball weapon entity
@@ -231,6 +232,7 @@ function MOBF_FIREBALL_ENTITY.on_step(self, dtime)
 end
 
 
+mobf_assert_backtrace(MOBF_PLASMABALL_ENTITY == nil)
 --! @class MOBF_PLASMABALL_ENTITY
 --! @ingroup weapons
 --! @brief a plasmaball weapon entity
@@ -344,6 +346,7 @@ end
 -- Code Below is by far extent taken from throwing mod by PilzAdam
 -- -----------------------------------------------------------------------------
 
+mobf_assert_backtrace(MOBF_ARROW_ENTITY == nil)
 --! @class MOBF_ARROW_ENTITY
 --! @ingroup weapons
 --! @brief a arrow entity

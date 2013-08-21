@@ -17,7 +17,7 @@
 --! @{
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
-
+mobf_assert_backtrace(sound == nil)
 --! @class sound
 sound =  {}
 

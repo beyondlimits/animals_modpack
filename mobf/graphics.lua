@@ -14,6 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
+mobf_assert_backtrace(graphics == nil)
 --! @class graphics
 --! @brief graphic features
 graphics = {}

@@ -19,10 +19,10 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+mobf_assert_backtrace(mob_preserve == nil)
 --! @class mob_preserve
 --! @brief mob preserve features
 --!@}
-
 mob_preserve = {}
 mob_preserve.entrys_per_page = 10
 

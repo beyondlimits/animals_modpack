@@ -18,6 +18,7 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+mobf_assert_backtrace(mob_state == nil)
 --! @class mob_state
 --! @brief state handling class
 --! @}

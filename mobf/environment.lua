@@ -18,9 +18,10 @@
 --! @{
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
-
+mobf_assert_backtrace(environment == nil)
 environment = {}
 
+mobf_assert_backtrace(environment_list == nil)
 --! @brief list of known environments
 --! @memberof environment
 environment_list = {}

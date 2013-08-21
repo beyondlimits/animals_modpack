@@ -25,6 +25,7 @@ MOBF_AGRESSION_FACTOR = 5
 
 --!@}
 
+mobf_assert_backtrace(fighting == nil)
 --! @brief fighting class reference
 fighting = {}
 

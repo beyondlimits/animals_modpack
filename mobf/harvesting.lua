@@ -18,6 +18,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
+mobf_assert_backtrace(harvesting == nil)
 --! @class harvesting
 --! @brief harvesting features
 harvesting = {}

@@ -17,7 +17,7 @@
 --! @{
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
-
+mobf_assert_backtrace(random_drop == nil)
 --! @class random_drop
 --! @brief random drop features e.g lay eggs
 --!@}

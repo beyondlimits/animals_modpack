@@ -19,10 +19,10 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+mobf_assert_backtrace(mobf == nil)
 --! @class mobf
 --! @brief basic management component of mob functions
 --!@}
-
 mobf = {}
 
 mobf.on_step_callbacks = {}

@@ -18,6 +18,7 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+mobf_assert_backtrace(mob_inventory == nil)
 --! @class mob_inventory
 --! @brief inventory handling for trader like mobs
 --! @}

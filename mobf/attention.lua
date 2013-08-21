@@ -22,6 +22,7 @@
 
 --!@}
 
+mobf_assert_backtrace(attention == nil)
 --! @brief attention handling class reference
 --TODO rename to fix documentation issues
 attention = {}

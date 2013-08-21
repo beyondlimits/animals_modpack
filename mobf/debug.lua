@@ -14,11 +14,11 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
+mobf_assert_backtrace(mobf_debug == nil)
 --! @defgroup debug_in_game In game debugging functions
 --! @brief debugging functions to be called from in game
 --! @ingroup framework_int
 --! @{
-
 mobf_debug = {}
 
 -------------------------------------------------------------------------------

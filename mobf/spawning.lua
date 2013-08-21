@@ -22,12 +22,14 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+mobf_assert_backtrace(spawning == nil)
 --! @class spawning
 --! @brief spawning features
 spawning = {}
 
 --!@}
 
+mobf_assert_backtrace(mobf_spawn_algorithms == nil)
 --! @brief registry for spawn algorithms
 --! @memberof spawning
 --! @private

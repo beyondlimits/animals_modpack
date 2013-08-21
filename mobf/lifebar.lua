@@ -18,10 +18,10 @@
 --! @{
 -- Contact: sapier a t gmx net
 -------------------------------------------------------------------------------
+mobf_assert_backtrace(mobf_lifebar == nil)
 --! @class mobf_lifebar
 --! @brief a simple lifebar implementation
 --!@}
-
 mobf_lifebar = {}
 
 -------------------------------------------------------------------------------
