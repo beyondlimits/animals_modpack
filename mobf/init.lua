@@ -143,56 +143,12 @@ end
 --! @brief main initialization function
 function mobf_init_framework()
 
-	--try to get timesource with best accuracy
-	if type(minetest.get_us_time) == "function" then
-		mobf_get_time_ms = function()
-				return minetest.get_us_time() / 1000
-			end
-		mobf_rtd.timesource = "minetest.get_us_time()"
-	else
-		if socket == nil then
-			local status, module = pcall(require, 'socket')
-			
-			if status and type(module.gettime) == "function" then
-				mobf_get_time_ms = function()
-						return socket.gettime()*1000
-					end
-				mobf_rtd.timesource = "socket.gettime()"
-			end
-		end
-	end
-	
-	--try to catch all mobf abms
-	if minetest.world_setting_get("mobf_enable_statistics") then
-		local abm_register_call = minetest.register_abm
-		
-		minetest.register_abm = function(spec)
-			local modname = minetest.get_current_modname()
-			
-			local mob_start,mob_end = string.find(modname,"mob")
-			local animal_start,animal_end = string.find(modname,"animal")
-			local mobf_start,mobf_end = string.find(modname,"mobf")
-			
-			if mob_start == 1 or animal_start == 1 or mobf_start == 1 then
-				local action = spec.action
-				
-				spec.action = function(pos, node, active_object_count, active_object_count_wider)
-						local starttime = mobf_get_time_ms()
-						local retval = action(pos, node, active_object_count, active_object_count_wider)
-						mobf_warn_long_fct(starttime,"auto_abm","abm")
-						return retval
-					end
-					
-				minetest.log(LOGLEVEL_WARNING,"MOBF: tracing enabled instrumenting abm for mod " .. modname)
-			end
-			abm_register_call(spec)
-		end
-	end
-
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing mob framework")
-	mobf_job_queue.initialize()
+	
+	
+
+	
 	mobf_init_basic_tools()
-	mobf_factions.init()
 	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Reading mob blacklist")
 	local mobf_mob_blacklist_string = minetest.world_setting_get("mobf_blacklist")
@@ -205,6 +161,18 @@ function mobf_init_framework()
 			mobf_rtd.registred_mob = {}
 		end
 	end
+	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize timesource...")
+	mobf_init_timesource()
+	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize statistics...")
+	mobf_init_statistics()
+	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize asynchronous job handling...")
+	mobf_job_queue.initialize()
+	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize factions support...")
+	mobf_factions.init()
 	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize external mod dependencys...")
 	mobf_init_mod_deps()

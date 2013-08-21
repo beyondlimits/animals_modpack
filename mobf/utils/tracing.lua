@@ -294,9 +294,69 @@ function mobf_bug_warning(level,text)
 	end
 end
 
---initialize statistics
-if minetest.world_setting_get("mobf_enable_statistics") then
-	minetest.register_globalstep(mobf_statistic_calc)
+-------------------------------------------------------------------------------
+-- name: mobf_init_timesource()
+--
+--! @brief select timesource to be used by mobf
+--
+-------------------------------------------------------------------------------
+function mobf_init_timesource()
+	--try to get timesource with best accuracy
+	if type(minetest.get_us_time) == "function" then
+		mobf_get_time_ms = function()
+				return minetest.get_us_time() / 1000
+			end
+		mobf_rtd.timesource = "minetest.get_us_time()"
+	else
+		if socket == nil then
+			local status, module = pcall(require, 'socket')
+			
+			if status and type(module.gettime) == "function" then
+				mobf_get_time_ms = function()
+						return socket.gettime()*1000
+					end
+				mobf_rtd.timesource = "socket.gettime()"
+			end
+		end
+	end
 end
 
+-------------------------------------------------------------------------------
+-- name: mobf_init_statistics()
+--
+--! @brief initialize profiling/statistics support
+--
+-------------------------------------------------------------------------------
+function mobf_init_statistics()
+
+	--initialize statistics callback
+	if minetest.world_setting_get("mobf_enable_statistics") then
+		minetest.register_globalstep(mobf_statistic_calc)
+		
+		local abm_register_call = minetest.register_abm
+		
+		minetest.register_abm = function(spec)
+			local modname = minetest.get_current_modname()
+			
+			local mob_start,mob_end = string.find(modname,"mob")
+			local animal_start,animal_end = string.find(modname,"animal")
+			local mobf_start,mobf_end = string.find(modname,"mobf")
+			
+			if mob_start == 1 or animal_start == 1 or mobf_start == 1 then
+				local action = spec.action
+				
+				spec.action = function(pos, node, active_object_count, active_object_count_wider)
+						local starttime = mobf_get_time_ms()
+						local retval = action(pos, node, active_object_count, active_object_count_wider)
+						mobf_warn_long_fct(starttime,"auto_abm","abm")
+						return retval
+					end
+					
+				minetest.log(LOGLEVEL_NOTICE,"MOBF: tracing enabled instrumenting abm for mod " .. modname)
+			end
+			abm_register_call(spec)
+		end
+	end
+	
+end
 --!@}
