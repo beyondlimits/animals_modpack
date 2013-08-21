@@ -21,6 +21,7 @@ mobf_job_queue = {}
 -- name: add_job(job)
 --
 --! @brief queue a job to asynchronous job handling
+--! @memberof mobf_job_queue
 --
 --! @param job to do
 -------------------------------------------------------------------------------
@@ -33,6 +34,7 @@ end
 -- name: process(dtime)
 --
 --! @brief job processing handler
+--! @memberof mobf_job_queue
 --
 --! @param dtime time since last call
 -------------------------------------------------------------------------------

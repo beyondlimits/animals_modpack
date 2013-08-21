@@ -412,23 +412,12 @@ function mobf.activate_handler(self,staticdata)
 	end
 	
 	--initialize factions
-	if mobf_rtd.factions_available and self.data.factions ~= nil and
-		self.data.factions.member ~= nil then
-		
-		for i=1,#self.data.factions.member,1 do
-		
-			if not factions.exists(self.data.factions.member[i]) then
-				factions.add_faction(self.data.factions.member[i])
-			end
-			
-			factions.member_add(self.data.factions.member[i],self)
-		end
-	end
+	mobf_factions.setupentity(self)
 
 	--initialize height level
 	environment.fix_base_pos(self, self.collisionbox[2] * -1)
 	
-	--initialize mob factions
+	--join factions
 	mobf.init_factions(self)
 
 	--custom on activate handler

@@ -93,6 +93,7 @@ dofile (mobf_modpath .. "/mob_state.lua")
 dofile (mobf_modpath .. "/inventory.lua")
 dofile (mobf_modpath .. "/mob_preserve.lua")
 dofile (mobf_modpath .. "/path.lua")
+dofile (mobf_modpath .. "/factions.lua")
 
 --include spawning support
 dofile (mobf_modpath .. "/spawning.lua")
@@ -191,6 +192,7 @@ function mobf_init_framework()
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing mob framework")
 	mobf_job_queue.initialize()
 	mobf_init_basic_tools()
+	mobf_factions.init()
 	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Reading mob blacklist")
 	local mobf_mob_blacklist_string = minetest.world_setting_get("mobf_blacklist")
@@ -237,10 +239,6 @@ function mobf_init_framework()
 		description = "Player may change mobf settings",
 		give_to_singleplayer = true
 	})
-	
-	if  minetest.get_modpath("factions")then
-		mobf_rtd.factions_available = true
-	end
 	
 	print("MOD: mob framework mod "..mobf_version.." loaded")
 end

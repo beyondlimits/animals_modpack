@@ -94,8 +94,10 @@ function mobf_add_mob(mob)
 		minetest.log(LOGLEVEL_WARNING,"MOBF: no movement pattern specified!")
 	end
 	
-	
 	spawning.register_mob(mob)
+	
+	--register factions required by mob
+	mobf_factions.setupmob(mob.factions)
 
 	if mob.generic.stepheight == nil then
 		mob.generic.stepheight = 0
