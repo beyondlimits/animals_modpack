@@ -310,7 +310,6 @@ function mobf.activate_handler(self,staticdata)
 	
 	mobf.init_on_step_callbacks(self,now)
 	mobf.init_on_punch_callbacks(self,now)
-	mobf.init_on_rightclick_callbacks(self,now)
 	
 	--initialize ride support
 	mobf_ride.init(self)
@@ -419,12 +418,15 @@ function mobf.activate_handler(self,staticdata)
 	
 	--join factions
 	mobf.init_factions(self)
-
+	
 	--custom on activate handler
 	if (self.data.generic.custom_on_activate_handler ~= nil) then
 		self.data.generic.custom_on_activate_handler(self)
 	end
 	
+	--check may need data present after initialization has completed
+	mobf.init_on_rightclick_callbacks(self,now)
+		
 	--add lifebar
 	if minetest.world_setting_get("mobf_lifebar") then
 		self.lifebar = mobf_lifebar.add(self)

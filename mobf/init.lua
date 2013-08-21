@@ -397,6 +397,13 @@ function mobf_init_modules()
 			handler		= mobf_path.mob_rightclick_callback,
 			configcheck	= mobf_path.config_check
 			})
+			
+	mobf.register_on_rightclick_callback({
+			name = "factions",
+			visiblename = "Factions",
+			handler		= mobf_factions.mob_rightclick_callback,
+			configcheck	= mobf_factions.config_check
+			})
 end
 
 mobf_init_framework()

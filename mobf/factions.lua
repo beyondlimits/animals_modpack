@@ -72,3 +72,34 @@ function mobf_factions.setupentity(entity)
 	end
 end
 
+
+-------------------------------------------------------------------------------
+-- name: mob_rightclick_callback(entity,player)
+--
+--! @brief show factions rightclick menu
+--! @memberof mobf_factions
+--
+--! @param entity to modify
+--! @param player issuing rightclick
+--
+-------------------------------------------------------------------------------
+function mobf_factions.mob_rightclick_callback(entity,player)
+end
+
+
+-------------------------------------------------------------------------------
+-- name: mob_rightclick_callback(entity,player)
+--
+--! @brief show factions rightclick menu
+--! @memberof mobf_factions
+--
+--! @param entity clicked
+--
+-------------------------------------------------------------------------------
+function mobf_factions.config_check(entity)
+	print("checking for spawner: " .. dump(entity.dynamic_data.spawning.spawner))
+	if entity.dynamic_data.spawning.spawner ~= nil then
+		return true
+	end
+	return false
+end
