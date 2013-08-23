@@ -847,14 +847,13 @@ function fighting.melee_attack_handler(entity,now,distance)
 		return false
 	end
 	
+	mobf_assert_backtrace( entity.dynamic_data.combat.target ~= nil)
 	local ownpos = entity.object:getpos()
-	local target_obj = entity.dynamic_data.combat.target.object
+	local target_obj = entity.dynamic_data.combat.target.object	
 	
-	mobf_assert_backtrace(target ~= nil)
-	if target:is_player() then
+	if target_obj == nil then
 		target_obj = entity.dynamic_data.combat.target
 	end
-	mobf_assert_backtrace(target_obj ~= nil)
 	
 	if distance <= entity.data.combat.melee.range
 		and mobf_line_of_sight(ownpos,target_obj:getpos()) then
