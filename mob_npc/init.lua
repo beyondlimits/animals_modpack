@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_npc mod loading ...")
 
-local version = "0.0.13"
+local version = "0.0.14"
 local npc_groups = {
 						not_in_creative_inventory=1
 					}
@@ -185,12 +185,12 @@ npc_trader_prototype = {
 		},
 		trader_inventory = {
 				goods = {
-							{ "default:mese 1", "default:dirt 99", "default:cobble 60"},
+							{ "default:mese 1", "default:iron_lump 30",},
 							{ "doors:door_wood 1", "default:mese_crystal 1", "default:cobble 10"},
 							{ "default:fence_wood 20", "default:mese_crystal 5", "default:cobble 25"},
 							{ "animalmaterials:saddle 1", "default:mese 1", "default:cobble 50"},
 							{ "default:sword_steel 1", "default:mese_crystal 4", "default:stone 20"},
-							{ "bucket:bucket_empty 1", "default:cobble 10", "default:stone 2"},
+							{ "default:iron_lump 1", "default:dirt 99", "default:cobble 50"},
 							{ "default:pick_mese 1", "default:mese_crystal 12", "default:stone 60"},
 							{ "default:shovel_steel 1", "default:mese_crystal 2", "default:stone 10"},
 							{ "default:axe_steel 1", "default:mese_crystal 2", "default:stone 22"},
