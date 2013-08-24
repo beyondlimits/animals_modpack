@@ -69,6 +69,10 @@ function explode_textlist_event(text)
 	local retval = {}
 	retval.typ = "INV"
 	
+	if text == nil then
+		return retval
+	end
+	
 	local parts = text:split(":")
 				
 	if #parts == 2 then
@@ -465,40 +469,102 @@ end
 function mobf_settings.show_factions_tab(sender_data)
 	local formspec = mobf_settings.formspec_header(sender_data)
 	
-	formspec = formspec .. 
-		"textlist[0.25,0.25;3.5,7.75;factionlist;"
+	local new_dataid = ""
+	local own_data = sender_data.factions_tab_data
+	
+	print("got: " .. dump(own_data))
+	
+	if own_data == nil then
+		own_data = {}
+		own_data.available_factions_selected=0
+		own_data.faction_reputation_selected=0
+	end
+	
+	new_dataid = mobf_global_data_store(own_data)
+	
+	formspec = formspec ..
+		"label[0.25,-0.25;Available factions:]" ..
+		"textlist[0.25,0.25;3.5,7.5;" ..
+			"tl_" .. sender_data.tab .."_available_factions:" .. new_dataid .. ";"
 		
 	local factionlist = factions.get_faction_list()
 	
+	local first_element = true
 	if #factionlist ~= 0 then
 		for i=1,#factionlist,1 do
-			formspec = formspec .. factionlist[i] .. ","
+			if not first_element then
+				formspec = formspec .. ","
+			else
+				first_element = false
+			end
+			formspec = formspec .. factionlist[i]
 		end
 	else
 		formspec = formspec .. "no factions available"
 	end
 	
-	formspec = formspec .. ";;true]"
+	formspec = formspec .. ";" .. own_data.available_factions_selected .. "]"
 	local playername = sender_data.player:get_player_name()
 	if minetest.check_player_privs(playername, {faction_admin=true}) 
 		or playername == "singleplayer" then
 		formspec = formspec .. 
-			"button[0.25,8.25;3.75,0.5;btn_" .. sender_data.tab .. "_delete;Delete]" ..
-			"field[4.3,2.5;4,0.5;te_factionname;New Faction;]" ..
-			"button[4,3;4,0.5;btn_" .. sender_data.tab .. "_create;Create]"
+			"button[0.25,8;3.75,0.5;btn_" .. sender_data.tab .. "_delete:" .. new_dataid .. ";Delete]" ..
+			"field[4.3,0.75;4,0.5;te_factionname;New Faction;]" ..
+			"button[4,1.25;4,0.25;btn_" .. sender_data.tab .. "_create:" .. new_dataid .. ";Create]"
 	end
 	
 	if minetest.check_player_privs(playername, {faction_admin=true}) or
 		minetest.check_player_privs(playername, {faction_user=true})
 		or playername == "singleplayer" then
 		formspec = formspec .. 
-			"field[4.3,5;4,0.5;te_inviteename;Invite player to faction;]" ..
-			"button[4,5.5;4,0.5;btn_" .. sender_data.tab .. "_invite;Invite]"
+			"field[4.3,2.75;4,0.5;te_inviteename;Playername:;]" ..
+			"button[4,3.25;4,0.25;btn_" .. sender_data.tab .. "_invite:" .. new_dataid .. ";Invite]"
 	end
+	
+	
+	local selected_rep = ""
+	formspec = formspec ..
+		"label[4,3.75;Base reputation:]" ..
+		"textlist[4,4.25;3.75,3.5;tl_" .. sender_data.tab .. "_faction_reputation:" .. new_dataid .. ";"
+	
+	if own_data.available_factions_selected > 0 and
+		own_data.available_factions_selected <= #factionlist then
+		local first_rep = true
+		for i=1,#factionlist,1 do
+			local current_rep = factions.get_base_reputation(
+					factionlist[i],
+					factionlist[own_data.available_factions_selected])
+					
+			if not first_rep then
+				formspec = formspec .. ","
+			else
+				first_rep = false
+			end
+			if tonumber(current_rep) > 0 then
+				formspec = formspec .. COLOR_GREEN
+			elseif tonumber(current_rep) < 0 then
+				formspec = formspec .. COLOR_RED
+			end
+			formspec = formspec .. "(" .. current_rep .. ") " .. factionlist[i]
+		end
+		
+		if own_data.faction_reputation_selected > 0 and
+			own_data.faction_reputation_selected <= #factionlist then
+			selected_rep = factions.get_base_reputation(
+					factionlist[own_data.faction_reputation_selected],
+					factionlist[own_data.available_factions_selected])
+		end
+	end
+	
+	formspec = formspec ..
+		";" .. own_data.faction_reputation_selected .."]" ..
+		"label[4,7.9;New Baserep:]" ..
+		"field[6.2,8.3;1.1,0.5;te_baserep;;" .. selected_rep .."]" ..
+		"button[6.9,8;1,0.5;btn_" .. sender_data.tab .. "_set_reputation:" .. new_dataid .. ";set]"
 	
 	if sender_data.errormessage then
 		formspec = formspec .. 
-			"label[0.25,-0.25;" .. sender_data.errormessage .. "]"
+			"label[0.25,8.5;" .. sender_data.errormessage .. "]"
 	end
 	
 	if formspec ~= nil then
@@ -621,12 +687,20 @@ end
 --! @param sender_data all information gatered
 -------------------------------------------------------------------------------
 function mobf_settings.handle_factions_tab_input(sender_data)
-	print("factions tab handler " .. dump(sender_data))
-	if sender_data.name == "delete" then
+	
+	local parts = string.split(sender_data.name,":")
+	local action = parts[1]
+	local dataid = parts[2]
+	
+	local data = mobf_global_data_get(dataid)
+	
+	sender_data.factions_tab_data = data
+	
+	if action == "delete" then
 	
 	end
 	
-	if sender_data.name == "create" then
+	if action == "create" then
 		if sender_data.fields["te_factionname"] ~= nil then
 			
 			if sender_data.fields["te_factionname"] == "" then
@@ -635,7 +709,9 @@ function mobf_settings.handle_factions_tab_input(sender_data)
 				if not factions.add_faction(sender_data.fields["te_factionname"]) then
 					sender_data.errormessage = "Failed to add faction \"" 
 						.. sender_data.fields["te_factionname"] .. "\""
-						
+				else
+					factions.member_add(sender_data.fields["te_factionname"],sender_data.player)
+					factions.set_admin(sender_data.fields["te_factionname"],sender_data.player,true)
 				end
 			else
 				sender_data.errormessage = "Faction \"" 
@@ -644,10 +720,70 @@ function mobf_settings.handle_factions_tab_input(sender_data)
 		end
 	end
 	
-	if sender_data.name == "invite" then
-		--TODO get faction from faction list
-		--TODO check if player is in faction he wants to invite for
+	if action == "invite" then
+		--get faction from faction list
+		local factionlist = factions.get_faction_list()
+		if sender_data.factions_tab_data.available_factions_selected > 0 and
+			sender_data.factions_tab_data.available_factions_selected < #factionlist then
 		
+			local faction_to_invite = factionlist[sender_data.factions_tab_data.available_factions_selected]
+			
+			--check if player is in faction he wants to invite for
+			--TODO privs check
+			if factions.is_admin(faction_to_invite,sender_data.player:get_player_name()) or
+				factions.is_free(faction_to_invite) then
+				if sender_data.fields["te_inviteename"] ~= nil and
+					sender_data.fields["te_inviteename"] ~= "" then
+						factions.member_invite(faction_to_invite,sender_data.fields["te_inviteename"])
+				else
+					sender_data.errormessage = "You can't invite nobody!"
+				end
+			else
+				sender_data.errormessage = "Not allowed to invite for faction " .. faction_to_invite
+			end
+		else
+			sender_data.errormessage = "No faction selected to invite to"
+		end
+	end
+	
+	if action == "set_reputation" then
+		if sender_data.factions_tab_data.available_factions_selected ==
+			sender_data.factions_tab_data.faction_reputation_selected then
+			sender_data.errormessage = "Can't set base reputation of faction to itself!"
+		else
+			local factionlist = factions.get_faction_list()
+			local faction1 = factionlist[sender_data.factions_tab_data.available_factions_selected]
+			local faction2 = factionlist[sender_data.factions_tab_data.faction_reputation_selected]
+			
+			if faction1 ~= nil and faction2 ~= nil and
+				sender_data.fields["te_baserep"] ~= nil and sender_data.fields["te_baserep"] ~= "" then
+				if not factions.set_base_reputation(faction1,faction2,sender_data.fields["te_baserep"]) then
+					sender_data.errormessage = "Failed to set base reputation"
+				end
+			else
+				sender_data.errormessage = "Only one faction selected or no value given!"
+			end
+		end
+	end
+	
+	if action == "available_factions" then
+		if sender_data.value ~= nil then
+			local event = explode_textlist_event(sender_data.value)
+			
+			if event.typ ~= "INV" then
+				sender_data.factions_tab_data.available_factions_selected = event.index
+			end
+		end
+	end
+	
+	if action == "faction_reputation" then
+		if sender_data.value ~= nil then
+			local event = explode_textlist_event(sender_data.value)
+			
+			if event.typ ~= "INV" then
+				sender_data.factions_tab_data.faction_reputation_selected = event.index
+			end
+		end
 	end
 end
 
