@@ -326,36 +326,36 @@ function mobf.activate_handler(self,staticdata)
 	end
 	
 	--restore saved data
-	local retval = mobf_deserialize_permanent_entity_data(staticdata)
+	local preserved_data = mobf_deserialize_permanent_entity_data(staticdata)
 	
 	if self.dynamic_data.spawning ~= nil then
-		if mobf_pos_is_zero(retval.spawnpoint) ~= true then
-			self.dynamic_data.spawning.spawnpoint = retval.spawnpoint
+		if mobf_pos_is_zero(preserved_data.spawnpoint) ~= true then
+			self.dynamic_data.spawning.spawnpoint = preserved_data.spawnpoint
 		else
 			self.dynamic_data.spawning.spawnpoint = mobf_round_pos(pos)
 		end
-		self.dynamic_data.spawning.player_spawned = retval.playerspawned
+		self.dynamic_data.spawning.player_spawned = preserved_data.playerspawned
 		
-		if retval.original_spawntime ~= -1 then
-			self.dynamic_data.spawning.original_spawntime = retval.original_spawntime
+		if preserved_data.original_spawntime ~= -1 then
+			self.dynamic_data.spawning.original_spawntime = preserved_data.original_spawntime
 		end
 		
-		if retval.spawner ~= nil then
+		if preserved_data.spawner ~= nil then
 			minetest.log(LOGLEVEL_INFO,"MOBF: setting spawner to: " 
-				.. retval.spawner)
-			self.dynamic_data.spawning.spawner = retval.spawner
+				.. preserved_data.spawner)
+			self.dynamic_data.spawning.spawner = preserved_data.spawner
 		end
 		
 		--only relevant if mob has different states
-		if retval.state ~= nil and
+		if preserved_data.state ~= nil and
 			self.dynamic_data.state ~= nil then
 			minetest.log(LOGLEVEL_INFO,"MOBF: setting current state to: " 
-				.. retval.state)
-			self.dynamic_data.state.current = retval.state
+				.. preserved_data.state)
+			self.dynamic_data.state.current = preserved_data.state
 		end
 	end
 	
-	self.dynamic_data.custom_persistent = retval.custom_persistent
+	self.dynamic_data.custom_persistent = preserved_data.custom_persistent
 	
 	local current_state = mob_state.get_state_by_name(self,
 												self.dynamic_data.state.current)
@@ -411,13 +411,10 @@ function mobf.activate_handler(self,staticdata)
 	end
 	
 	--initialize factions
-	mobf_factions.setupentity(self)
+	mobf_factions.setupentity(self,preserved_data.factions)
 
 	--initialize height level
 	environment.fix_base_pos(self, self.collisionbox[2] * -1)
-	
-	--join factions
-	mobf.init_factions(self)
 	
 	--custom on activate handler
 	if (self.data.generic.custom_on_activate_handler ~= nil) then

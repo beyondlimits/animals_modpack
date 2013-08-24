@@ -80,16 +80,8 @@ function mobf_factions.setupentity(entity,preserved_data)
 		
 				
 		if preserved_data ~= nil then
-			for k,v in pairs(preserved_data) do
-				reputation = factions.get_reputation(k,entity.object)
-				
-				if reputation ~= 0 and reputation ~= v then
-					local delta = v - reputation
-					
-					factions.modify_reputation(k,entity.object,delta)
-				else
-					factions.modify_reputation(k,entity.object,v)
-				end
+			for i=1,#preserved_data,1 do
+				factions.member_add(preserved_data[i],entity)
 			end
 		end
 	end
@@ -106,19 +98,7 @@ end
 --
 -------------------------------------------------------------------------------
 function mobf_factions.cleanupentity(entity)
-	local retval = {}
-	
-	local factionlist = factions.get_faction_list()
-	
-	for i=1,#factionlist,1 do
-		reputation = factions.get_reputation(factionlist[i],entity.object)
-		
-		if reputation ~= 0 then
-			retval[factionlist[i]] = reputation
-		end
-	end
-	
-	return retval
+	return factions.get_factions(entity.object)
 end
 
 -------------------------------------------------------------------------------
