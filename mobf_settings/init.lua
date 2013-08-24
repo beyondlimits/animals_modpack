@@ -17,7 +17,7 @@ minetest.log("action","MOD: mobf_settings mod loading ... ")
 
 mobf_settings = {}
 mobf_settings.tabs = {}
-mobf_settings.version = "0.9.0"
+mobf_settings.version = "0.9.1"
 mobf_settings.formname = "mobf_settings"
 
 local COLOR_RED   = "#FF0000"
@@ -117,16 +117,32 @@ function mobf_settings.handle_event(player,formname,fields)
 		sender_data.formname = formname
 		sender_data.fields = fields
 		
-		--TODO check admin privs
-		sender_data.is_admin = 
-			minetest.check_player_privs(player:get_player_name(), {mobfw_admin=true}) or
-			player == "singleplayer"
+		local playername = player:get_player_name()
 		
-		--print("event handler: tab: #" .. dump(sender_data.tab) .. " btn: " .. dump(sender_data.name)) 
+		local privs = minetest.get_player_privs(playername)
+		
+		--check admin privs
+		local privcheck = minetest.check_player_privs(playername, {mobfw_admin=true})
+		
+		sender_data.is_admin = 
+			privcheck or (player:get_player_name() == "singleplayer")
+			
+		local realtabidx = sender_data.tab
+		
+		if not sender_data.is_admin then
+			for i=1,#mobf_settings.tabs,1 do
+				if mobf_settings.tabs[i].admin then
+					realtabidx = realtabidx+1
+				end
+				if i == realtabidx then
+					break
+				end
+			end
+		end
 	
-		if sender_data.tab <= #mobf_settings.tabs then
+		if realtabidx <= #mobf_settings.tabs then
 			--make sure no admin tab is shown to non admin users
-			if mobf_settings.tabs[sender_data.tab].admin then
+			if mobf_settings.tabs[realtabidx].admin then
 				if not sender_data.is_admin then
 					local fixed = false
 					for i=1,#mobf_settings.tabs,1 do
@@ -146,7 +162,7 @@ function mobf_settings.handle_event(player,formname,fields)
 			end
 			
 			--print("showing tab: #" .. sender_data.tab .. " " .. dump(mobf_settings.tabs[sender_data.tab]))
-			mobf_settings.tabs[sender_data.tab].handler(sender_data)
+			mobf_settings.tabs[realtabidx].handler(sender_data)
 		end
 
 	end
@@ -471,8 +487,6 @@ function mobf_settings.show_factions_tab(sender_data)
 	
 	local new_dataid = ""
 	local own_data = sender_data.factions_tab_data
-	
-	print("got: " .. dump(own_data))
 	
 	if own_data == nil then
 		own_data = {}
@@ -964,7 +978,7 @@ function mobf_settings.formspec_header(sender_data)
 			toadd = toadd .. mobf_settings.tabs[i].caption
 		end
 	end
-	
+
 	retval = retval .. toadd .. ";" .. sender_data.tab .. ";true;false]"
 	
 	return retval
