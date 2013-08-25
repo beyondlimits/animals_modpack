@@ -50,11 +50,31 @@ function mobf_do_area_damage(pos,immune,damage_groups,range)
 
 		--don't do damage to issuer
 		if obj ~= immune and obj ~= nil then
+			
+			--TODO as long as minetest still crashes without puncher use this workaround
+			
+			local worst_damage = 0
+			if type(damage_groups) == "table" then
+				for k,v in pairs(damage_groups) do
+					if v > worst_damage then
+						worst_damage = v
+					end
+				end
+			elseif type(damage_groups) == "number" then
+				worst_damage =  damage_groups
+			else
+				mobf_assert_backtrace("invalid damage_groups" == "selected")
+			end
+
+			
+			local current_hp = obj:get_hp()
+			obj:set_hp(current_hp - worst_damage)
+			
 			--punch
-			obj:punch(nil, 1.0, {
-				full_punch_interval=1.0,
-				damage_groups = damage_groups,
-			}, nil)
+			--obj:punch(nil, 1.0, {
+			--	full_punch_interval=1.0,
+			--	damage_groups = damage_groups,
+			--}, nil)
 		end
 	end
 end
