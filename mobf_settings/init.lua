@@ -724,8 +724,14 @@ function mobf_settings.handle_factions_tab_input(sender_data)
 					sender_data.errormessage = "Failed to add faction \"" 
 						.. sender_data.fields["te_factionname"] .. "\""
 				else
-					factions.member_add(sender_data.fields["te_factionname"],sender_data.player)
-					factions.set_admin(sender_data.fields["te_factionname"],sender_data.player,true)
+					if not factions.member_add(
+							sender_data.fields["te_factionname"],sender_data.player) then
+						sender_data.errormessage = "Unable to add creator to faction!"
+					elseif not factions.set_admin(
+							sender_data.fields["te_factionname"],
+							sender_data.player:get_player_name(),true) then
+						sender_data.errormessage = "Unable to give admin privileges to creator!"
+					end
 				end
 			else
 				sender_data.errormessage = "Faction \"" 
