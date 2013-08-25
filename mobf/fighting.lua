@@ -659,15 +659,23 @@ function fighting.get_target(entity)
 				if entity.data.combat.attack_hostile_mobs then
 					dbg_mobf.fighting_lvl2("MOBF: " .. entity.data.name .. 
 							" trying to attack hostile mobs too")
-							
+					
+					local same_origin_protection = false
+					if mobf_rtd.factions_available then
+						same_origin_protection = not attention.is_enemy(entity,v)
+					else
+						same_origin_protection = 
+							target_entity.dynamic_data.spawning.spawner ==
+									entity.dynamic_data.spawning.spawner
+					end
+					
 					local target_entity = v:get_luaentity()
 					if	target_entity ~= nil and
 						target_entity ~= entity and
 						target_entity.data ~= nil and
 						target_entity.data.combat ~= nil and
 						target_entity.data.combat.starts_attack and
-						target_entity.dynamic_data.spawning.spawner ~=
-						entity.dynamic_data.spawning.spawner then
+						not same_origin_protection then
 						
 						table.insert(possible_targets,v)
 						dbg_mobf.fighting_lvl3(target_entity.data.name 
