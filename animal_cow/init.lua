@@ -14,14 +14,14 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_cow mod loading ...")
-local version = "0.0.20"
+local version = "0.0.21"
 
 local cow_groups = {
 						not_in_creative_inventory=1
 					}
 
-local selectionbox_cow = {-1.5, -1.5, -0.75, 1.5, 0.6, 0.75}
-local selectionbox_steer = {-1.5*1.1, -1.5*1.1, -0.75*1.1, 1.5*1.1, 0.6*1.1, 0.75*1.1}
+local selectionbox_cow = {-1.5, -1.5, -0.75, 1.5, 0.7, 0.75}
+local selectionbox_steer = {-1.5*1.1, -1.5*1.1, -0.75*1.1, 1.5*1.1, 0.7*1.1, 0.75*1.1}
 local selectionbox_baby_calf = {-0.8, -0.8, -0.5, 0.8, 0.8, 0.5}
 
 cow_prototype = {   
