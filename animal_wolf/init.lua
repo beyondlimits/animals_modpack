@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_wolf loading ...")
 
-local version = "0.0.16"
+local version = "0.0.17"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
