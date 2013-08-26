@@ -332,6 +332,8 @@ function mobf_settings.show_main_tab(sender_data)
 	local formspec = mobf_settings.formspec_header(sender_data)
 	
 	formspec = formspec .. "label[0.5,0;Mobs:]"
+						.. "label[0.5,8.5;doubleclick to change!]" 
+						.. "label[4,8.5;green=enabled, red=disabled]"
 	formspec = formspec .. "textlist[0.5,0.5;7,8;tl_" .. sender_data.tab .. "_mobs;"
 	
 	local mobf_mob_blacklist_string = minetest.world_setting_get("mobf_blacklist")
@@ -964,7 +966,8 @@ end
 -------------------------------------------------------------------------------
 function mobf_settings.formspec_header(sender_data)
 	local retval = "size[8,9]" ..
-				"label[-0.25,8.98;MOBF version: " ..mobf_get_version().."]" ..
+				--"label[5.5,-0.4;MOBF version: " ..mobf_get_version().."]" ..
+				"label[-0.25,8.9;MOBF version: " ..mobf_get_version().."]" ..
 				"tabheader[-0.3,-0.99;th_" .. sender_data.tab .. "_maintab;"
 
 	local toadd = ""
