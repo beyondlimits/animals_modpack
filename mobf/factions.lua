@@ -98,7 +98,11 @@ end
 --
 -------------------------------------------------------------------------------
 function mobf_factions.cleanupentity(entity)
-	return factions.get_factions(entity.object)
+	if mobf_rtd.factions_available then
+		return factions.get_factions(entity.object)
+	else
+		return ""
+	end
 end
 
 -------------------------------------------------------------------------------
