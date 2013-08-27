@@ -153,6 +153,14 @@ call /mobf_settings in game
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.1.85
+-Faction support
+-Updated mobf menu
+-Improved probabilistic movement gen
+-Asynchronous mob spawning
+-additional secondary spawners
+-Fixed lots of bugs
+
 Changes 2.1.2
 -fix crash when trying to get name from non entity fight target
 -make sure only players and luaentitys can be set as attack target
