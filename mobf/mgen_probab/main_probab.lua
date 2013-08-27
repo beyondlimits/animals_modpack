@@ -501,7 +501,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 				if targetpos == nil then
 					targetpos = entity.dynamic_data.movement.last_pos_in_env
 				else
-					targetpos.y = targetpos.y+1 --TODO use collision box 
+					targetpos.y = targetpos.y - entity.collisionbox[2]
 				end
 				
 				minetest.log(LOGLEVEL_WARNING,"MOBF: Your mob " .. 
@@ -509,8 +509,8 @@ function movement_gen.fix_current_pos(entity,movement_state)
 						printpos(targetpos).." state: "..
 						environment.pos_is_ok(targetpos,entity))
 				entity.object:moveto(targetpos)
-				movement_state.current_velocity.x = movement_state.current_velocity.x/10
-				movement_state.current_velocity.z = movement_state.current_velocity.z/10
+				movement_state.current_velocity.x = 0 --movement_state.current_velocity.x/10
+				movement_state.current_velocity.z = 0 --movement_state.current_velocity.z/10
 				entity.object:setvelocity(movement_state.current_velocity)
 				movement_state.centerpos = targetpos
 				movement_state.basepos = entity.getbasepos(entity)
