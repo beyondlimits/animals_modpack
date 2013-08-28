@@ -150,6 +150,8 @@ function attention.callback(entity,now)
 		for i = 1 , #objectlist, 1 do
 			local continue = true
 			
+			dbg_mobf.attention_lvl3("MOBF: checking " .. tostring(objectlist[i]))
+			
 			if not objectlist[i]:is_player() then
 				local lua_entity = objectlist[i]:get_luaentity()
 				
@@ -256,19 +258,22 @@ function attention.callback(entity,now)
 											" new value " .. 
 											new_objecttable[table_id].value)
 				
+				--update overall atttention values
 				if new_objecttable[table_id].value > top_attention_value then
 					top_attention_value = new_objecttable[table_id].value
 					top_attention_object = objectlist[i]
 				end
 				
-				if new_objecttable[table_id].value > top_attention_enemy_value and
-					attention.is_enemy(objectlist[i]) then
-					top_attention_enemy_value = new_objecttable[table_id].value
-					top_attention_enemy = objectlist[i]
-				end
-				
+				--update value of old most relevant target only
 				if objectlist[i] == entity.dynamic_data.attention.most_relevant_target then
 					current_attention_value = new_objecttable[table_id].value
+				end
+			
+				--update enemy attention values
+				if new_objecttable[table_id].value > top_attention_enemy_value and
+					attention.is_enemy(entity,objectlist[i]) then
+					top_attention_enemy_value = new_objecttable[table_id].value
+					top_attention_enemy = objectlist[i]
 				end
 			end
 		end
@@ -280,8 +285,8 @@ function attention.callback(entity,now)
 		entity.dynamic_data.attention.most_relevant_target = top_attention_object
 		current_attention_value = top_attention_value
 	end
-	dbg_mobf.attention_lvl3("MOBF: " .. current_attention_value .. " " ..
-		dump(entity.data.attention.attack_threshold) .. " " ..
+	dbg_mobf.attention_lvl3("MOBF: value=" .. current_attention_value .. " attack_threshold=" ..
+		dump(entity.data.attention.attack_threshold) .. "watch_threshold= " ..
 		dump(entity.data.attention.watch_threshold))
 		
 	local toattack = nil
@@ -376,18 +381,23 @@ end
 --! @return true/false
 -------------------------------------------------------------------------------
 function attention.is_enemy(entity,object)
+	mobf_assert_backtrace(entity ~= nil)
+	mobf_assert_backtrace(object ~= nil)
 	if mobf_rtd.factions_available then
 	
 		local remote_factions = factions.get_factions(object)
 				
-		if remote_factions == nil then
-			return
+		if remote_factions == nil or
+			#remote_factions < 1 then
+			dbg_mobf.attention_lvl3("MOBF: no remote factions for: " .. tostring(object))
+			return false
 		end
 	
 		for j=1, #remote_factions, 1 do
 			local rep = factions.get_reputation(remote_factions[j],entity)
 				
 			if rep < 0 then
+				dbg_mobf.attention_lvl3("MOBF: ".. remote_factions[j] .. " " .. tostring(object) .. " is enemy: " .. rep)
 				return true
 			end
 		end

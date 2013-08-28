@@ -184,7 +184,7 @@ function environment.is_media_element( nodename, media )
 
 	--security check
 	if media == false then
-	    mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! no environment specified!")
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! no environment specified!")
 		return false
 	end
 	
