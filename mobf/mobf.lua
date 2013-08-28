@@ -293,8 +293,8 @@ function mobf.activate_handler(self,staticdata)
 	local objectlist = minetest.get_objects_inside_radius(pos,0.25)
 	
 	if #objectlist > 1 then
-		minetest.log(LOGLEVEL_ERROR,
-			"MOBF: trying to activate mob within something else! removing")
+		minetest.log(LOGLEVEL_WARNING,
+			"MOBF: trying to activate mob within something else! --> removing")
 		
 		spawning.remove_uninitialized(self,staticdata)
 		return
@@ -305,6 +305,7 @@ function mobf.activate_handler(self,staticdata)
 			.. self.data.name .. " at invalid position")
 		minetest.log(LOGLEVEL_WARNING,"	Activation at: " 
 			.. current_node.name .. " --> removing")
+		--TODO try to move 1 block up
 		spawning.remove_uninitialized(self,staticdata)
 		return
 	end

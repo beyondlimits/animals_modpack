@@ -217,7 +217,7 @@ function building_spawner.builder(startpos,blueprint,mobname)
 				z=startpos.z +blueprint.size.z + 1
 			}
 		) then
-		mobf_print("Spawn building: spawning at " .. printpos(startpos) .. "!")
+		--mobf_print("Spawn building: spawning at " .. printpos(startpos) .. "!")
 		for i=1,#blueprint.walls,1 do
 			building_spawner.buid_wall(blueprint.walls[i][1],
 						{
