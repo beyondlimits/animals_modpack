@@ -64,7 +64,7 @@ table.foreach(mobf_env_plants,
 	
 table.foreach(mobf_env_flowers,
 	function(index) 
-		table.insert(env_meadow.media,mobf_env_flowers[index]) 
+		table.insert(env_on_ground_2.media,mobf_env_flowers[index]) 
 	end)
 		
 environment.register("on_ground_2", env_on_ground_2)
