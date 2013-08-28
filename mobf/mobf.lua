@@ -271,8 +271,7 @@ end
 --! @param self entity to initialize onstep handler
 --! @param staticdata data to use for initialization
 -------------------------------------------------------------------------------
-function mobf.activate_handler(self,staticdata)
-	
+function mobf.activate_handler(self,staticdata)	
 	
 	--do some initial checks
 	local pos = self.object:getpos()
@@ -280,8 +279,8 @@ function mobf.activate_handler(self,staticdata)
 	if pos == nil then
 		minetest.log(LOGLEVEL_ERROR,"MOBF: mob at nil pos!")
 	end
-	local current_node = minetest.get_node(pos)
 	
+	local current_node = minetest.get_node(pos)	
 	
 	if current_node == nil then
 		minetest.log(LOGLEVEL_ERROR,
@@ -289,8 +288,17 @@ function mobf.activate_handler(self,staticdata)
 		
 		spawning.remove_uninitialized(self,staticdata)
 		return
-	end
+	end	
+
+	local objectlist = minetest.get_objects_inside_radius(pos,0.25)
 	
+	if #objectlist > 1 then
+		minetest.log(LOGLEVEL_ERROR,
+			"MOBF: trying to activate mob within something else! removing")
+		
+		spawning.remove_uninitialized(self,staticdata)
+		return
+	end
 
 	if environment.is_media_element(current_node.name,self.environment.media) == false then
 		minetest.log(LOGLEVEL_WARNING,"MOBF: trying to activate mob " 
@@ -300,8 +308,6 @@ function mobf.activate_handler(self,staticdata)
 		spawning.remove_uninitialized(self,staticdata)
 		return
 	end
-	
-	
 	
 	--do initialization of dynamic modules
 	local now = mobf_get_current_time()
