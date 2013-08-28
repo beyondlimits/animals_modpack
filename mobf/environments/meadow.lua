@@ -25,7 +25,8 @@ env_meadow = {
 					},
 			surfaces = {
 						good = {
-							"default:dirt_with_grass"
+							"default:dirt_with_grass",
+							"default:dirt_with_grass_footsteps"
 							},
 						possible = {
 							"default:dirt",
@@ -43,6 +44,11 @@ table.foreach(mobf_env_placable_items,
 table.foreach(mobf_env_plants,
 	function(index) 
 		table.insert(env_meadow.media,mobf_env_plants[index]) 
+	end)
+	
+table.foreach(mobf_env_flowers,
+	function(index) 
+		table.insert(env_meadow.media,mobf_env_flowers[index]) 
 	end)
 
 environment.register("meadow", env_meadow)

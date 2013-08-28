@@ -30,8 +30,22 @@ mobf_env_plants = {
 	"default:junglegrass",
 	"default:papyrus",
 	"default:sapling",
-	"default:apple"
-	
+	"default:apple",
+	"default:grass_1",
+	"default:grass_2",
+	"default:grass_3",
+	"default:grass_4",
+	"default:gradd_5"
 }
+
+mobf_env_flowers = {
+	"flowers:dandelion_white",
+	"flowers:dandelion_yellow",
+	"flowers:geranium",
+	"flowers:rose",
+	"flowers:tulip",
+	"flowers:viola"
+}
+
 --@}
 --@}
