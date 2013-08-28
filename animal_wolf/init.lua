@@ -30,7 +30,8 @@ wolf_prototype = {
 		factions = {
 			member = {
 				"animals",
-				"forrest_animals"
+				"forrest_animals",
+				"wolfs"
 				}
 			},
 	
@@ -246,6 +247,11 @@ tamed_wolf_prototype = {
 				},
 			}
 		}
+		
+if factions~= nil and
+	type(factions.set_base_reputation) == "function" then
+	factions.set_base_reputation("wolfs","players",-25)
+end
 		
 minetest.log("action","\tadding mob "..wolf_prototype.name)
 mobf_add_mob(wolf_prototype)
