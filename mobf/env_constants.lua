@@ -41,6 +41,7 @@ Q_UNKNOWN   =   0
 
 --define some common limits for convenience
 
+--! @brief a position where mob is in media, has full surface contact and is at least on a possible surface
 LT_GOOD_POS = {
 	old_state=nil,
 	min_media=MQ_IN_MEDIA,
@@ -51,6 +52,7 @@ LT_GOOD_POS = {
 	min_center_surface=nil
 }
 
+--! @brief a position where mob is in media, has surface contact and is at least on a possible surface
 LT_SAFE_POS = {
 	old_state=nil,
 	min_media=MQ_IN_MEDIA,
@@ -61,6 +63,7 @@ LT_SAFE_POS = {
 	min_center_surface=nil
 }
 
+--! @brief a position where mob is in media, it's center has surface contact and is at least on a possible surface
 LT_SAFE_EDGE_POS = {
 	old_state=nil,
 	min_media=MQ_IN_MEDIA,
@@ -71,6 +74,7 @@ LT_SAFE_EDGE_POS = {
 	min_center_surface=nil
 }
 
+--! @brief a position where mob is in media, it's center has surface contact and is on a possible surface
 LT_SAFE_POSSIBLE_EDGE_POS = {
 	old_state=nil,
 	min_media=MQ_IN_MEDIA,
@@ -81,6 +85,7 @@ LT_SAFE_POSSIBLE_EDGE_POS = {
 	min_center_surface=nil
 }
 
+--! @brief a position where mob is in media, it's center has surface contact and it's center is at least on a possible surface
 LT_EDGE_POS_POSSIBLE_CENTER = {
 	old_state=nil,
 	min_media=MQ_IN_MEDIA,
@@ -91,6 +96,7 @@ LT_EDGE_POS_POSSIBLE_CENTER = {
 	min_center_surface=SQ_POSSIBLE
 }
 
+--! @brief a position where mob is in media, it's center has surface contact and it's center is at least on a good surface
 LT_EDGE_POS_GOOD_CENTER = {
 	old_state=nil,
 	min_media=MQ_IN_MEDIA,
@@ -101,6 +107,7 @@ LT_EDGE_POS_GOOD_CENTER = {
 	min_center_surface=SQ_OK
 }
 
+--! @brief a position where mob is in media, has at least partial contact and is at least on possible surface
 LT_EDGE_POS = {
 	old_state=nil,
 	min_media=MQ_IN_MEDIA,
@@ -111,6 +118,7 @@ LT_EDGE_POS = {
 	min_center_surface=nil
 }
 
+--! @brief a position where mob is in media, has at least partial contact but no contact at center
 LT_DROP_PENDING = {
 	old_state=nil,
 	min_media=MQ_IN_MEDIA,
