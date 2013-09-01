@@ -26,6 +26,14 @@ big_red_prototype = {
 		name="big_red",
 		modname="animal_big_red",
 		
+		factions = {
+			member = {
+				"underground",
+				"monsters",
+				"daemonic"
+				}
+			},
+		
 		generic = {
 					description="Big Red",
 					base_health=8,

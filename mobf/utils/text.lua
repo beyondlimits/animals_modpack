@@ -30,12 +30,26 @@
 function printpos(pos)
 	if pos ~= nil then
 		if pos.y ~= nil then
-			return "("..pos.x..","..pos.y..","..pos.z..")"
+			return "("..string.format("%3f",pos.x)..","
+						..string.format("%3f",pos.y)..","
+						..string.format("%3f",pos.z)..")"
 		else
-			return "("..pos.x..", ? ,"..pos.z..")"
+			return "("..string.format("%3f",pos.x)..", ? ,"
+						..string.format("%3f",pos.z)..")"
 		end
 	end
 	return ""
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_print(text)
+--
+--! @brief print adding timestamp in front of text
+--
+--! @param text to show
+-------------------------------------------------------------------------------
+function mobf_print(text)
+	print("[" .. string.format("%10f",os.clock()) .. "]" .. text)
 end
 
 -------------------------------------------------------------------------------

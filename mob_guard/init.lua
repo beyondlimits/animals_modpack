@@ -23,6 +23,13 @@ local guard_groups = {
 guard_prototype = {
 		name="guard",
 		modname="mob_guard",
+		
+		factions = {
+			member = {
+				"npc",
+				"hireling"
+				}
+			},
 	
 		generic = {
 					description="Guard",

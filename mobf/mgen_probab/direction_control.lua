@@ -35,21 +35,27 @@ direction_control = {}
 -------------------------------------------------------------------------------
 function direction_control.changeaccel(pos,entity,current_velocity)
 
+	local maxtries = 5
+	local old_quality = environment.pos_quality(pos,entity)
+
 	local new_accel = direction_control.get_random_acceleration(entity.data.movement.min_accel,
 														entity.data.movement.max_accel,entity.object:getyaw(),0)
-
 	local pos_predicted = movement_generic.predict_next_block(pos,current_velocity,new_accel)
+	
+	local new_quality = environment.pos_quality(pos_predicted,entity)
+	local prefered_state = 
+		environment.evaluate_state(	new_quality,
+									old_quality,
+									MQ_IN_MEDIA,
+									nil,
+									GQ_FULL,
+									SQ_POSSIBLE,
+									SQ_OK)
 
-	local maxtries = 5
-
-	local state = environment.pos_is_ok(pos_predicted,entity)
-
-	--below_limit and above_limit are ok too respective to movement handled by this component is xz only
-	while  state ~= "ok" and
-			state == "above_limit" and
-			state == "below_limit"do
-		dbg_mobf.pmovement_lvl1("MOBF: predicted pos " .. printpos(pos_predicted) .. " isn't ok " .. maxtries .. " tries left, state: " .. state)
-		local done = false
+	while not prefered_state do
+		dbg_mobf.pmovement_lvl1("MOBF: predicted pos " .. printpos(pos_predicted) 
+			.. " isn't perfect " .. maxtries .. " tries left, state: " 
+			.. new_quality.tostring(new_quality))
 
 		--don't loop forever get to save mode and try next time
 		if maxtries <= 0 then
@@ -68,46 +74,54 @@ function direction_control.changeaccel(pos,entity,current_velocity)
 						z=0 }
 		end
 		
-		--in case mob is already at non perfect surface it's not that bad to get on it again
-		if not done and (state == "possible_surface") then
-			local current_state = environment.pos_is_ok(pos,entity)
-			local probab = math.random()
+		local probab = math.random()
+		
+		--accept possible surface in rare cases
+		if probab < 0.3 then
+			local acceptable_state = 
+				environment.evaluate_state(new_quality,
+									nil,
+									MQ_IN_MEDIA,
+									GQ_PARTIAL,
+									nil,
+									SQ_WRONG,
+									SQ_POSSIBLE)
 			
-			if current_state == "wrong_surface" or
-				current_state == "possible_surface" then
-				if probab < 0.3 then
-					done = true
-				end
-			else
-				if probab < 0.05 then
-					done = true
-				end
+			if acceptable_state then
+				return new_accel
+			end
+		end
+		
+		--accept possible surface in rare cases
+		if probab < 0.2 then
+			local acceptable_state = 
+				environment.evaluate_state(new_quality,
+									nil,
+									MQ_IN_MEDIA,
+									nil,
+									GQ_FULL,
+									SQ_WRONG,
+									SQ_POSSIBLE)
+			
+			if acceptable_state then
+				return new_accel
 			end
 		end
 
-		--first try to invert acceleration on collision
---		if not done and (state == "collision" or
---			state == "collision_jumpable") then
---			new_accel = { 	x= new_accel.x * -1,
---					y= new_accel.y,
---					z= new_accel.z * -1}
-
---			pos_predicted = movement_generic.predict_next_block(pos,current_velocity,new_accel)
---			if environment.pos_is_ok(pos_predicted,entity) == "ok" then
---				done = true
---			end
-
---		end
-
-		--generic way to find new acceleration
-		if not done then
-			new_accel = direction_control.get_random_acceleration(entity.data.movement.min_accel,
+		--try another acceleration
+		new_accel = direction_control.get_random_acceleration(entity.data.movement.min_accel,
 														entity.data.movement.max_accel,entity.object:getyaw(),1.57)
-		
-			pos_predicted = movement_generic.predict_next_block(pos,current_velocity,new_accel)
-		end
+		pos_predicted = movement_generic.predict_next_block(pos,current_velocity,new_accel)
 
-		state = environment.pos_is_ok(pos_predicted,entity)
+
+		local prefered_state = 
+			environment.evaluate_state(	new_quality,
+									old_quality,
+									MQ_IN_MEDIA,
+									nil,
+									GQ_FULL,
+									SQ_POSSIBLE,
+									SQ_OK)
 		maxtries = maxtries -1
 	end
 
@@ -129,7 +143,7 @@ end
 --! @return x/y/z acceleration
 -------------------------------------------------------------------------------
 function direction_control.get_random_acceleration(minaccel,maxaccel,current_yaw, minrotation)
-
+	
 	local direction = 1
 	if math.random() < 0.5 then
 		direction = -1
@@ -168,7 +182,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: precheck_movement(entity,movement_state)
+-- name: precheck_movement(entity,movement_state,pos_predicted,pos_predicted_quality)
 --
 --! @brief check if x/z movement results in invalid position and change
 --         movement if required
@@ -177,157 +191,265 @@ end
 --! @param entity mob to generate movement
 --! @param movement_state current state of movement
 --! @param pos_predicted position mob will be next
---! @param pos_predicted_state suitability state of predicted position
+--! @param pos_predicted_quality quality of predicted position
 --! @return movement_state is changed!
 -------------------------------------------------------------------------------
-function direction_control.precheck_movement(entity,movement_state,pos_predicted,pos_predicted_state)
+function direction_control.precheck_movement(entity,movement_state,pos_predicted,pos_predicted_quality)
 
-	--next block mob is to be isn't a place where it can be so we need to change something
-	if pos_predicted_state ~= "ok" and
-		pos_predicted_state ~= "above_limit" and
-		pos_predicted_state ~= "below_limit" then
+	if movement_state.changed then
+		--someone already changed something
+		return
+	end
 
-		-- mob would walk onto water or drop
-		if movement_state.changed == false and 
-			( pos_predicted_state == "above_water" or
-			  pos_predicted_state == "drop" or
-			  pos_predicted_state == "drop_above_water")
-			then
-			dbg_mobf.pmovement_lvl1("MOBF: mob " .. entity.data.name .. " is going to walk on water or drop")
-			local new_pos = environment.get_suitable_pos_same_level(movement_state.basepos,1,entity)
+	local prefered_quality = 
+		environment.evaluate_state(	pos_predicted_quality, LT_GOOD_POS)
+	
+	-- ok predicted pos isn't as good as we'd wanted it to be let's find out why
+	if not prefered_quality then
+	
+		local mob_is_safe = environment.evaluate_state(	pos_predicted_quality,LT_SAFE_POS)
+	
+		if movement_state.current_quality == nil then
+			movement_state.current_quality = environment.pos_quality(
+												movement_state.basepos,
+												entity
+												)
+		end
 
-			--try to find at least a possible position
+		if environment.compare_state(movement_state.current_quality,pos_predicted_quality) > 0 and
+			pos_predicted_quality.media_quality == MQ_IN_MEDIA then
+			--movement state is better than old one so we're fine
+			return
+		end
+		
+		local walking_at_edge = 
+			environment.evaluate_state(	pos_predicted_quality,LT_SAFE_EDGE_POS)
+									
+		if walking_at_edge then
+			--mob center still on ground but at worst walking at edge, do nothing
+			return
+		end
+		
+		local drop_pending = 
+				(pos_predicted_quality.geometry_quality <= GQ_PARTIAL and
+				 pos_predicted_quality.center_geometry_quality <= GQ_NONE) or
+				 pos_predicted_quality.surface_quality_min <= SQ_WATER
+
+		if drop_pending then
+			dbg_mobf.pmovement_lvl2("MOBF: mob " .. entity.data.name .. " is going to walk on water or drop")
+			
+			local new_pos = environment.get_pos_same_level(movement_state.basepos,1,entity,
+						function(quality)
+							return environment.evaluate_state(quality,LT_SAFE_EDGE_POS)
+						end
+						)
+						
 			if new_pos == nil then
-				dbg_mobf.pmovement_lvl1("MOBF: mob " .. entity.data.name .. " no prefect fitting position found")
-				new_pos = environment.get_suitable_pos_same_level(movement_state.basepos,1,entity,true)
+				dbg_mobf.pmovement_lvl2("MOBF: mob " .. entity.data.name .. " trying edge pos")
+				new_pos = environment.get_pos_same_level(movement_state.basepos,1,entity,
+						function(quality)
+							return environment.evaluate_state(quality,LT_EDGE_POS)
+						end
+						)
 			end
-
+			
+			if new_pos == nil then
+				dbg_mobf.pmovement_lvl2("MOBF: mob " .. entity.data.name .. " trying relaxed surface")
+				new_pos = environment.get_pos_same_level(movement_state.basepos,1,entity,
+						function(quality)
+							return environment.evaluate_state(quality,LT_EDGE_POS_GOOD_CENTER)
+						end
+						)
+			end
+			
+			if new_pos == nil then
+				dbg_mobf.pmovement_lvl2("MOBF: mob " .. entity.data.name .. " trying even more relaxed surface")
+				new_pos = environment.get_pos_same_level(movement_state.basepos,1,entity,
+						function(quality)
+							return environment.evaluate_state(quality,LT_EDGE_POS_POSSIBLE_CENTER)
+						end
+						)
+			end
+			
 			if new_pos ~= nil then
 				dbg_mobf.pmovement_lvl2("MOBF: redirecting to safe position .. " .. printpos(new_pos))
 				movement_state.accel_to_set = movement_generic.get_accel_to(new_pos,entity)
-				pos_predicted = movement_generic.predict_next_block( movement_state.basepos,
-																movement_state.current_velocity,
-																movement_state.accel_to_set)
-				pos_predicted_state = environment.pos_is_ok({x=pos_predicted.x,y=pos_predicted.y+1,z=pos_predicted.z},entity)
-				for i=0,10,1 do
-					if pos_predicted_state == "ok" or 
-						pos_predicted_state == "possible_surface" then
-						break
-					end
-					movement_state.accel_to_set = movement_generic.get_accel_to(new_pos,entity)
-					pos_predicted = movement_generic.predict_next_block( movement_state.basepos,
-																movement_state.current_velocity,
-																movement_state.accel_to_set)
-					pos_predicted_state = environment.pos_is_ok({x=pos_predicted.x,y=pos_predicted.y+1,z=pos_predicted.z},entity)
-				end
-				
-				if pos_predicted_state == "ok" or 
-						pos_predicted_state == "possible_surface" then
-					dbg_mobf.pmovement_lvl1("MOBF: redirecting to safe position .. " .. printpos(new_pos) .. " failed!")
-				end
 				movement_state.changed = true
+				return
 			else
-				local current_state = environment.pos_is_ok(movement_state.basepos,entity)
-				
-				--animal is safe atm stop it to avoid doing silly things
-				if current_state == "ok" or
-					current_state == "possible_surface" then
+				--no suitable pos found, if mob is safe atm just stop it
+				if mob_is_safe then
 					entity.object:setvelocity({x=0,y=0,z=0})
 					movement_state.accel_to_set = {x=0,y=nil,z=0}
 					movement_state.changed = true
-					dbg_mobf.pmovement_lvl2("MOBF: couldn't find acceleration but mob is safe where it is") 
-				else
-					--apply random acceleration to avoid permanent stuck mobs maybe mobs should be deleted instead
-					movement_state.accel_to_set = direction_control.get_random_acceleration(entity.data.movement.min_accel,
-															entity.data.movement.max_accel,entity.object:getyaw(),0)
-					movement_state.changed = true
-					dbg_mobf.pmovement_lvl2("MOBF: couldn't find acceleration mob ain't safe either, just move on with random movement") 
 				end
 			end
+			
+			dbg_mobf.pmovement_lvl2("MOBF: mob " .. entity.data.name .. " didn't find a way to fix drop trying random")
+			--make mgen change direction randomly
+			movement_state.force_change = true
+			return
 		end
 
-		if movement_state.changed == false and pos_predicted_state == "collision_jumpable" then
-			dbg_mobf.movement_lvl1("mob is about to collide")
-			if environment.pos_is_ok({x=pos_predicted.x,y=pos_predicted.y+1,z=pos_predicted.z},entity) == "ok" then
-				if math.random() < ( entity.dynamic_data.movement.mpattern.jump_up * PER_SECOND_CORRECTION_FACTOR) then
-					local node_at_predicted_pos = minetest.env:get_node(pos_predicted)
-					dbg_mobf.pmovement_lvl2("MOBF: velocity is:" .. printpos(movement_state.current_velocity) .. " position is: "..printpos(pos) ) 
-					dbg_mobf.pmovement_lvl2("MOBF: estimated position was: "..printpos(pos_predicted))
-					dbg_mobf.pmovement_lvl2("MOBF: predicted node state is: " .. environment.pos_is_ok(pos_predicted,entity))
-					--if node_at_predicted_pos ~= nil then
-						--dbg_mobf.movement_lvl1("MOBF: jumping onto: " .. node_at_predicted_pos.name)
-					--end
-					movement_state.accel_to_set = { x=0,y=nil,z=0 }
-					movement_state.changed = true
-					
-					--todo check if y pos is ok?!
-					local jumppos = {x=pos_predicted.x,y=movement_state.centerpos.y+1,z=pos_predicted.z}
-					
-					dbg_mobf.pmovement_lvl2("MOBF: mob " ..entity.data.name .. " is jumping, moving to:" .. printpos(jumppos))
-					dbg_mobf.pmovement_lvl2("MOBF: target pos node state is: " .. environment.pos_is_ok(jumppos,entity))
-					
-					entity.object:moveto(jumppos)
-					--TODO set movement state positions
-					--movement_state.basepos=
-					--movement_state.centerpos=
-				end
-			end
-		end
-
-		--redirect mob to block thats not above its current level
-		--or jump if possible
-		if movement_state.changed == false and pos_predicted_state == "collision" then
-			dbg_mobf.pmovement_lvl1("MOBF: mob is about to collide")
-
-			local new_pos = environment.get_suitable_pos_same_level(movement_state.basepos,1,entity)
+		--check if mob is going to be somewhere where it can't be
+		if pos_predicted_quality.media_quality ~= MQ_IN_MEDIA then
+			dbg_mobf.pmovement_lvl2("MOBF: collision pending " 
+				.. printpos(movement_state.basepos) .. "-->" 
+				.. printpos(pos_predicted))
+			
+			--try to find a better position at same level
+			local new_pos = 
+				environment.get_suitable_pos_same_level(movement_state.basepos,1,entity)
 		
+			if new_pos == nil then
+				new_pos = environment.get_suitable_pos_same_level(movement_state.basepos,1,entity,true)
+			end
+			
 			--there is at least one direction to go
-			if new_pos ~= nil then				
+			if new_pos ~= nil then
+				dbg_mobf.pmovement_lvl2("MOBF: mob " ..entity.data.name 
+					.. " redirecting to:" .. printpos(new_pos))
+				local new_predicted_state = nil
+				local new_predicted_pos = nil
+				for i=1,5,1 do
+					movement_state.accel_to_set = movement_generic.get_accel_to(new_pos,entity)
+					--TODO check if acceleration is enough
+					new_predicted_pos = 
+						movement_generic.predict_enter_next_block( entity,
+												movement_state.basepos,
+												movement_state.current_velocity,
+												movement_state.accel_to_set)
+					new_predicted_state = environment.pos_quality(
+												new_predicted_pos,
+												entity
+												)
+					if new_predicted_state.media_quality == MQ_IN_MEDIA then
+						break
+					end
+				end
+				if new_predicted_state.media_quality ~= MQ_IN_MEDIA then
+					movement_state.accel_to_set = movement_state.current_acceleration
+					
+					dbg_mobf.pmovement_lvl2("MOBF: mob " ..entity.data.name 
+						.. " acceleration not enough to avoid collision try to jump")
+					if math.random() < 
+						( entity.dynamic_data.movement.mpattern.jump_up * PER_SECOND_CORRECTION_FACTOR) then
+						local upper_pos = {
+										x= pos_predicted.x,
+										y= pos_predicted.y +1,
+										z= pos_predicted.z
+										}
+						
+						local upper_quality = environment.pos_quality(
+													upper_pos,
+													entity
+													)
+													
+						if environment.evaluate_state(	upper_quality,LT_EDGE_POS) then
+						
+							entity.object:setvelocity(
+									{x=movement_state.current_velocity.x,
+									y=5,
+									z=movement_state.current_velocity.z})
+						end
+					end
+				end
+				movement_state.changed = true
+				return
+			end
+			
+			--try to find a better position above
+			new_pos = environment.get_suitable_pos_same_level({ x=movement_state.basepos.x,
+														 y=movement_state.basepos.y+1,
+														 z=movement_state.basepos.z},
+														1,entity)
+														
+			if new_pos == nil then 
+				new_pos = environment.get_suitable_pos_same_level({ x=movement_state.basepos.x,
+											 y=movement_state.basepos.y+1,
+											 z=movement_state.basepos.z},
+											1,entity)
+			end
+			
+			if new_pos ~= nil then
+				dbg_mobf.pmovement_lvl2("MOBF: mob " ..entity.data.name 
+					.. " seems to be locked in, jumping to:" .. printpos(new_pos))
+				
+				entity.object:setvelocity({x=0,
+											y=5.5,
+											z=0})
 				movement_state.accel_to_set = movement_generic.get_accel_to(new_pos,entity)
 				movement_state.changed = true
-			
+				return
+			end
+		
+			dbg_mobf.pmovement_lvl2("MOBF: mob " ..entity.data.name 
+					.. " unable to fix collision try random")
+			--a collision is going to happen force change of direction
+			movement_state.force_change = true
+			return
+		end
+		
+		local suboptimal_surface = 
+			environment.evaluate_state(	pos_predicted_quality, 
+					{	old_state=nil,
+						min_media=MQ_IN_MEDIA,
+						min_geom=GQ_PARTIAL,
+						min_geom_center=nil,
+						min_min_surface=SQ_WRONG,
+						min_max_surface=SQ_POSSIBLE,
+						min_center_surface=nil	})
+						
+		if suboptimal_surface then
+			dbg_mobf.pmovement_lvl2("MOBF: suboptimal positiond detected trying to find better pos")
+			--try to find a better position at same level
+			local new_pos = 
+				environment.get_suitable_pos_same_level(movement_state.basepos,1,entity)
+				
+			if new_pos ~= nil then
+				dbg_mobf.pmovement_lvl2("MOBF: redirecting to better position .. " .. printpos(new_pos))
+				movement_state.accel_to_set = movement_generic.get_accel_to(new_pos,entity)
+				movement_state.changed = true
+				return
 			else
-				local jumppos = nil
-				--there ain't any acceptable pos at same level try to find one above current position
-				new_pos = environment.get_suitable_pos_same_level({ x=movement_state.basepos.x,
-																		 y=movement_state.basepos.y+1,
-																		 z=movement_state.basepos.z},
-																		1,entity)
-				
-				if new_pos ~= nil then
-					jumppos = {x=new_pos.x,y=movement_state.centerpos.y+1,z=new_pos.z}
-				end
-				
-				--there ain't any acceptable pos at same level try to find one below current position
-				new_pos = environment.get_suitable_pos_same_level({ x=movement_state.basepos.x,
-																		 y=movement_state.basepos.y-1,
-																		 z=movement_state.basepos.z},
-																		1,entity)
-				
-				if new_pos ~= nil then
-					jumppos = {x=new_pos.x,y=movement_state.centerpos.y-1,z=new_pos.z}
-				end
-				
-				
-				if jumppos ~= nil then
-					dbg_mobf.pmovement_lvl2("MOBF: mob " ..entity.data.name .. " seems to be locked in, moving to:" .. printpos(jumppos))
-					entity.object:moveto(jumppos)
-					
-					movement_state.accel_to_set = { x=0,y=nil,z=0 }
-					movement_state.changed = true
-				end				
+				-- pos isn't critical don't do anything
+				return
 			end
 		end
 		
-		--generic try to solve situation eg wrong surface
-		if movement_state.changed == false then
-			dbg_mobf.pmovement_lvl1("MOBF: generic try to resolve state " .. pos_predicted_state .. " for mob " .. entity.data.name .. " "..printpos(movement_state.basepos))
-			movement_state.accel_to_set = direction_control.changeaccel(movement_state.basepos,
-										entity,movement_state.current_velocity)
-			if movement_state.accel_to_set ~= nil then
-				movement_state.changed = true	
+		local geom_ok = 
+			environment.evaluate_state(	pos_predicted_quality, 
+					{	old_state=nil,
+						min_media=MQ_IN_MEDIA,
+						min_geom=GQ_PARTIAL,
+						min_geom_center=nil,
+						min_min_surface=nil,
+						min_max_surface=nil,
+						min_center_surface=nil	})
+		if geom_ok and
+			pos_predicted_quality.surface_quality_max == SQ_WRONG then
+			dbg_mobf.pmovement_lvl2("MOBF: wrong surface detected trying to find better pos")
+			local new_pos = 
+				environment.get_suitable_pos_same_level(movement_state.basepos,1,entity)
+				
+			if new_pos == nil then
+				new_pos = environment.get_suitable_pos_same_level(movement_state.basepos,2,entity)
+			end
+				
+			if new_pos ~= nil then
+				dbg_mobf.pmovement_lvl2("MOBF: redirecting to better position .. " .. printpos(new_pos))
+				movement_state.accel_to_set = movement_generic.get_accel_to(new_pos,entity)
+				movement_state.changed = true
+				return
+			else
+				--try generic
+				movement_state.force_change = true
+				return
 			end
 		end
+		
+		mobf_print("Unhandled suboptimal state:" .. pos_predicted_quality.tostring(pos_predicted_quality))
+		movement_state.force_change = true
 	end
 end
 
@@ -342,7 +464,7 @@ end
 --! @return movement_state is modified!
 -------------------------------------------------------------------------------
 function direction_control.random_movement_handler(entity,movement_state)
-	dbg_mobf.pmovement_lvl1("MOBF: random movement handler called")
+	dbg_mobf.pmovement_lvl2("MOBF: random movement handler called")
 	if movement_state.changed == false and
 		(math.random() < (entity.dynamic_data.movement.mpattern.random_acceleration_change * PER_SECOND_CORRECTION_FACTOR) or 
 		movement_state.force_change) then

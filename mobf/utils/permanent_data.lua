@@ -206,6 +206,8 @@ function mobf_serialize_permanent_entity_data(entity)
 			end
 		end
 		
+		local factions = mobf_factions.cleanupentity(entity)
+		
 		local toserialize = {
 								spawnpoint = entity.dynamic_data.spawning.spawnpoint,
 								playerspawned = entity.dynamic_data.spawning.player_spawned,
@@ -217,6 +219,7 @@ function mobf_serialize_permanent_entity_data(entity)
 								pathowner = pathowner,
 								pathname = pathname,
 								custom_persistent = entity.dynamic_data.custom_persistent,
+								factions = factions,
 							}
 		local serialized = minetest.serialize(toserialize)
 		--print("DEBUG: serialized -> " .. serialized)

@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_ostrich mod loading ...")
-local version = "0.0.6"
+local version = "0.0.8"
 
 local ostrich_groups = {
 						not_in_creative_inventory=1
@@ -38,6 +38,13 @@ end
 ostrich_f_prototype = {
 		name="ostrich_f",
 		modname="mob_ostrich",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 	
 		generic = {
 					description="Ostrich (f)",
@@ -47,7 +54,8 @@ ostrich_f_prototype = {
 						fleshy=90,
 					},
 					groups = ostrich_groups,
-					envid = "meadow"
+					envid = "meadow",
+					stepheight=1.1,
 				},
 		movement =  {
 					min_accel=0.05,
@@ -74,6 +82,14 @@ ostrich_f_prototype = {
 						algorithm="willow_mapgen",
 						height=2
 						},
+					},
+					secondary_algorithms = {
+						{
+						rate=0.001,
+						density=600,
+						algorithm="willow",
+						height=2
+						},
 					}
 				},
 		ride = {
@@ -88,6 +104,7 @@ ostrich_f_prototype = {
 				walk = {
 					start_frame = 41,
 					end_frame   = 81,
+					basevelocity = 0.28,
 					},
 				stand = {
 					start_frame = 1,
@@ -122,6 +139,13 @@ ostrich_f_prototype = {
 ostrich_m_prototype = {   
 		name="ostrich_m",
 		modname="mob_ostrich",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 
 		generic = {
 					description="Ostrich (m)",
@@ -131,7 +155,8 @@ ostrich_m_prototype = {
 						fleshy=90,
 					},
 					groups = ostrich_groups,
-					envid = "meadow"
+					envid = "meadow",
+					stepheight=1.1,
 				},
 		movement =  {
 					min_accel=0.05,
@@ -167,6 +192,7 @@ ostrich_m_prototype = {
 				walk = {
 					start_frame = 41,
 					end_frame   = 81,
+					basevelocity = 0.28,
 					},
 				stand = {
 					start_frame = 1,

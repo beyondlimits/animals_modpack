@@ -27,6 +27,13 @@ end
 fish_blue_white_prototype = {
 		name="fish_blue_white",
 		modname="animal_fish_blue_white",
+		
+		factions = {
+			member = {
+				"animals",
+				"fish"
+				}
+			},
 	
 		generic = {
 					description="Blue white fish",

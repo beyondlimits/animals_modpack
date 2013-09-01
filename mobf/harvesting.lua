@@ -18,6 +18,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
+mobf_assert_backtrace(harvesting == nil)
 --! @class harvesting
 --! @brief harvesting features
 harvesting = {}
@@ -64,7 +65,7 @@ function harvesting.callback(entity,player,now)
 		entity.data.catching.tool ~= "" then
 		
 		--grief protection
-		if minetest.setting_getbool("mobf_grief_protection") and
+		if minetest.world_setting_get("mobf_grief_protection") and
 			entity.dynamic_data.spawning.player_spawned and
 			entity.dynamic_data.spawning.spawner ~= player:get_player_name() then
 			dbg_mobf.harvesting_lvl1("MOBF: anti gief triggered catching aborted")

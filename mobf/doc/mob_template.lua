@@ -269,6 +269,90 @@ local mob_template = {
 			max_hear_distance = 100,
 			},
 		},
+		
+	--! @brief [OPTIONAL] parameters for rideable mobs
+	ride = {
+		--! @brief [OPTIONAL] speed when walking
+		walkspeed  = 7.8,
+		--! @brief [OPTIONAL] speed when sneaking
+		sneakspeed = 0.8,
+		--! @brief [OPTIONAL] inital jumpspeed
+		jumpspeed  = 58,
+		--! @brief [OPTIONAL] offset to center player is put to
+		attacheoffset = { x=0,y=2,z=0},					
+		--! @brief [OPTIONAL] texture modifier when player is attached
+		texturemod = "^mob_ostrich_ostrich_saddle_mesh.png",
+		--! @brief [OPTIONAL] animation to show when riding
+		walk_anim = "walk",
+	},
+	
+	--! @brief [OPTIONAL] description of animations
+	animation = {
+		--! @brief [OPTIONAL] one or many animation descriptions
+		animationname = {
+			--! @brief [MANDATORY] start frame of animation
+			start_frame = 1,
+			--! @brief [MANDATORY] end frame of animation
+			end_frame   = 2,
+			},
+		},
+	
+	--! @brief [OPTIONAL] configuration for a trader mob
+	trader_inventory = {
+				--! @brief [MANDATORY] goodlist to be sold
+				goods = {
+							--! @brief [MANDOTORY] first element in list
+							{ "default:mese 1", "default:dirt 99", "default:cobble 50"},
+							--! @brief [OPTIONAL] any further element
+							{ "default:steel_ingot 1", "default:dirt 50", "default:cobble 20"},
+						},
+				--! @brief [MANDATORY] list of names randomly choosen for trader
+				random_names = { "Name1","Name2","Name3"},
+			},
+	
+	--! @brief [OPTIONAL] configuration for attention handling
+	attention = {
+				--! @brief [OPTIONAL] hear distance value
+				hear_distance = 3,
+				--! @brief [UPPER_VALUE_DEPENDENT | MANDATORY] value to add if within hear distance
+				hear_distance_value = 0.5,
+				
+				--! @brief [OPTIONAL] view angle to consider
+				view_angle = nil,
+				--! @brief [UPPER_VALUE_DEPENDENT | MANDATORY] value to add if someone is within view angke
+				own_view_value = 0,
+				
+				--! @brief [OPTIONAL] is remove view angle relevant?
+				remote_view = false,
+				--! @brief [UPPER_VALUE_DEPENDENT | MANDATORY] value to add if remote target looks at mob
+				remote_view_value = 0,
+				
+				--! @brief [OPTIONAL] value to add if within attention distance
+				attention_distance_value = 0.2,
+				
+				--! @brief [OPTIONAL] threshold to issue watch callback
+				watch_threshold = 2,
+				
+				--! @brief [OPTIONAL] threshold to issue attack callback
+				attack_threshold = nil,
+				
+				--! @brief [MANDATORY] maximum distance to consider objects for attantion
+				attention_distance = 7.5,
+				
+				--! @brief [MANDATORY] maximum amount of attention any object can draw
+				attention_max = 10,
+		},
+		
+	--! @brief [OPTIONAL] factions configuration
+	factions = {
+			--! @brief [OPTIONAL] define factions to be member in
+			member = {
+				"faction_1",
+				"faction_2",
+				"faction_3",
+				"faction_4"
+				},
+			},
 	--! @brief [OPTIONAL] used to specify different movement/model states, 
 	--! you may specify as many states as you like
 	states = {
@@ -328,73 +412,4 @@ local mob_template = {
 				state_mode = "auto",
 			},
 		},
-	--! @brief [OPTIONAL] description of animations
-	animation = {
-		--! @brief [OPTIONAL] one or many animation descriptions
-		animationname = {
-			--! @brief [MANDATORY] start frame of animation
-			start_frame = 1,
-			--! @brief [MANDATORY] end frame of animation
-			end_frame   = 2,
-			},
-		},
-	--! @brief [OPTIONAL] parameters for rideable mobs
-	ride = {
-					--! @brief [OPTIONAL] speed when walking
-					walkspeed  = 7.8,
-					--! @brief [OPTIONAL] speed when sneaking
-					sneakspeed = 0.8,
-					--! @brief [OPTIONAL] inital jumpspeed
-					jumpspeed  = 58,
-					--! @brief [OPTIONAL] offset to center player is put to
-					attacheoffset = { x=0,y=2,z=0},					
-					--! @brief [OPTIONAL] texture modifier when player is attached
-					texturemod = "^mob_ostrich_ostrich_saddle_mesh.png",
-					--! @brief [OPTIONAL] animation to show when riding
-					walk_anim = "walk"
-			},
-	--! @brief [OPTIONAL] configuration for a trader mob
-	trader_inventory = {
-				--! @brief [MANDATORY] goodlist to be sold
-				goods = {
-							--! @brief [MANDOTORY] first element in list
-							{ "default:mese 1", "default:dirt 99", "default:cobble 50"},
-							--! @brief [OPTIONAL] any further element
-							{ "default:steel_ingot 1", "default:dirt 50", "default:cobble 20"},
-						},
-				--! @brief [MANDATORY] list of names randomly choosen for trader
-				random_names = { "Name1","Name2","Name3"},
-			},
-	--! @brief [OPTIONAL] configuration for attention handling
-	attention = {
-				--! @brief [OPTIONAL] hear distance value
-				hear_distance = 3,
-				--! @brief [UPPER_VALUE_DEPENDENT | MANDATORY] value to add if within hear distance
-				hear_distance_value = 0.5,
-				
-				--! @brief [OPTIONAL] view angle to consider
-				view_angle = nil,
-				--! @brief [UPPER_VALUE_DEPENDENT | MANDATORY] value to add if someone is within view angke
-				own_view_value = 0,
-				
-				--! @brief [OPTIONAL] is remove view angle relevant?
-				remote_view = false,
-				--! @brief [UPPER_VALUE_DEPENDENT | MANDATORY] value to add if remote target looks at mob
-				remote_view_value = 0,
-				
-				--! @brief [OPTIONAL] value to add if within attention distance
-				attention_distance_value = 0.2,
-				
-				--! @brief [OPTIONAL] threshold to issue watch callback
-				watch_threshold = 2,
-				
-				--! @brief [OPTIONAL] threshold to issue attack callback
-				attack_threshold = nil,
-				
-				--! @brief [MANDATORY] maximum distance to consider objects for attantion
-				attention_distance = 7.5,
-				
-				--! @brief [MANDATORY] maximum amount of attention any object can draw
-				attention_max = 10,
-		},
-	} 
+	}

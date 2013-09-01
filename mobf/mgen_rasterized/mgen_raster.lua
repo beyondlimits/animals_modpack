@@ -182,7 +182,7 @@ function mgen_raster.onground(entity,now,basepos)
 		local fp = { x= posbelow.x + (0.5*dx),
 					  y= posbelow.y,
 					  z= posbelow.z + (0.5*dz) }
-		local n = minetest.env:get_node(fp)
+		local n = minetest.get_node(fp)
 		if mobf_is_walkable(n) then
 			return true
 		end

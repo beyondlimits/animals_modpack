@@ -242,20 +242,21 @@ function p_mov_gen.set_target(entity,target)
 	entity.dynamic_data.movement.max_distance = 0.5
 	
 	--try to find path on our own
-	if type(minetest.env.find_path) == "function" then
-		print("trying to find path to: " .. printpos(targetpos))
+	if not mobf_get_world_setting("mobf_disable_pathfinding") then
 		entity.dynamic_data.p_movement.path = 
 			minetest.find_path(current_pos,targetpos,5,1,1,nil)
-					
-		if entity.dynamic_data.p_movement.path ~= nil then
-
-			--a valid path has at least 2 positions
-			mobf_assert_backtrace(#entity.dynamic_data.p_movement.path > 1)
-			entity.dynamic_data.movement.target = 
-					entity.dynamic_data.p_movement.path[2]
-			return true
-		end
+	else
+		entity.dynamic_data.p_movement.path = nil
 	end
+				
+	if entity.dynamic_data.p_movement.path ~= nil then
+		--a valid path has at least 2 positions
+		mobf_assert_backtrace(#entity.dynamic_data.p_movement.path > 1)
+		entity.dynamic_data.movement.target = 
+				entity.dynamic_data.p_movement.path[2]
+		return true
+	end
+
 	
 	if entity.dynamic_data.p_movement.path == nil then
 		print(

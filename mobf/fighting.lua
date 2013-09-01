@@ -25,6 +25,7 @@ MOBF_AGRESSION_FACTOR = 5
 
 --!@}
 
+mobf_assert_backtrace(fighting == nil)
 --! @brief fighting class reference
 fighting = {}
 
@@ -190,7 +191,7 @@ function fighting.hit(entity,attacker)
 				end
 			else
 				--todo check if spawning a stack is possible
-				minetest.env:add_item(mob_pos,result)
+				minetest.add_item(mob_pos,result)
 			end
 			spawning.remove(entity, "killed")
 		else
@@ -633,7 +634,7 @@ function fighting.get_target(entity)
 			range = entity.data.combat.distance.range
 		end
 	
-		local objectlist = minetest.env:get_objects_inside_radius(
+		local objectlist = minetest.get_objects_inside_radius(
 												entity.object:getpos(),range)
 
 		local count = 0
@@ -658,15 +659,23 @@ function fighting.get_target(entity)
 				if entity.data.combat.attack_hostile_mobs then
 					dbg_mobf.fighting_lvl2("MOBF: " .. entity.data.name .. 
 							" trying to attack hostile mobs too")
-							
+					
+					local same_origin_protection = false
+					if mobf_rtd.factions_available then
+						same_origin_protection = not attention.is_enemy(entity,v)
+					else
+						same_origin_protection = 
+							target_entity.dynamic_data.spawning.spawner ==
+									entity.dynamic_data.spawning.spawner
+					end
+					
 					local target_entity = v:get_luaentity()
 					if	target_entity ~= nil and
 						target_entity ~= entity and
 						target_entity.data ~= nil and
 						target_entity.data.combat ~= nil and
 						target_entity.data.combat.starts_attack and
-						target_entity.dynamic_data.spawning.spawner ~=
-						entity.dynamic_data.spawning.spawner then
+						not same_origin_protection then
 						
 						table.insert(possible_targets,v)
 						dbg_mobf.fighting_lvl3(target_entity.data.name 
@@ -796,10 +805,10 @@ function fighting.self_destruct_handler(entity,now)
 				for k=pos.z-entity.data.combat.self_destruct.range/2, 
 						pos.z+entity.data.combat.self_destruct.range/2, 1 do
 				
-					local current = minetest.env:get_node({x=i,y=j,z=k})
+					local current = minetest.get_node({x=i,y=j,z=k})
 					
 					if (current.name == "air") then
-						minetest.env:set_node({x=i,y=j,z=k}, 
+						minetest.set_node({x=i,y=j,z=k}, 
 											{name="fire:basic_flame"})
 					end
 				
@@ -846,10 +855,16 @@ function fighting.melee_attack_handler(entity,now,distance)
 		return false
 	end
 	
+	mobf_assert_backtrace( entity.dynamic_data.combat.target ~= nil)
+	local ownpos = entity.object:getpos()
+	local target_obj = entity.dynamic_data.combat.target.object	
+	
+	if target_obj == nil then
+		target_obj = entity.dynamic_data.combat.target
+	end
+	
 	if distance <= entity.data.combat.melee.range
-		then
-		
-		local target = entity.dynamic_data.combat.target
+		and mobf_line_of_sight(ownpos,target_obj:getpos()) then
 
 		--save time of attack
 		entity.dynamic_data.combat.ts_last_attack = now
@@ -869,7 +884,7 @@ function fighting.melee_attack_handler(entity,now,distance)
 			--do damage
 			target:set_hp(target_health -damage_done)
 		else
-			target:punch(entity.object, 1.0, {
+			target_obj:punch(entity.object, 1.0, {
 							full_punch_interval=1.0,
 							groupcaps={
 								fleshy={times={	[1]=1/(damage_done-2), 
@@ -944,7 +959,7 @@ function fighting.distance_attack_handler(entity,targetpos,mob_pos,now,distance)
 				sound.play(mob_pos,entity.data.sound.distance);
 			end
 				
-			local newobject=minetest.env:add_entity({	x=mob_pos.x+dir.x,
+			local newobject=minetest.add_entity({	x=mob_pos.x+dir.x,
 														y=mob_pos.y+dir.y+1,
 														z=mob_pos.z+dir.z
 														},
@@ -1022,7 +1037,7 @@ function fighting.sun_damage_handler(entity,now)
 		local pos = entity.object:getpos()
 		local current_state = mob_state.get_state_by_name(entity,
 											entity.dynamic_data.state.current)
-		local current_light = minetest.env:get_node_light(pos)
+		local current_light = minetest.get_node_light(pos)
 			
 		if current_light == nil then
 			minetest.log(LOGLEVEL_ERROR,"MOBF: Bug!!! didn't get a light value for "
@@ -1129,7 +1144,7 @@ function fighting.set_target(entity,target)
 	if entity.dynamic_data.combat.target ~= nil then
 		dbg_mobf.fighting_lvl2("MOBF: switching attack target")
 		
-		--set target
+		--set movement target
 		entity.dynamic_data.current_movement_gen.set_target(entity,target)
 		
 		--set attack target
@@ -1138,7 +1153,7 @@ function fighting.set_target(entity,target)
 		if entity.dynamic_data.combat.target ~= target then
 			
 			local attackername = fighting.get_target_name(target)
-			dbg_mobf.fighting_lvl2("MOBF: initial attack at: "..attackername)
+			dbg_mobf.fighting_lvl2("MOBF: initial attack at: ".. attackername)
 			
 			if entity.dynamic_data.combat.target == nil then
 				fighting.switch_to_combat_state(entity,mobf_get_current_time(),target)

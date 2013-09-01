@@ -19,10 +19,10 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+mobf_assert_backtrace(mob_preserve == nil)
 --! @class mob_preserve
 --! @brief mob preserve features
 --!@}
-
 mob_preserve = {}
 mob_preserve.entrys_per_page = 10
 
@@ -114,7 +114,6 @@ end
 function mob_preserve.handle_command(name,param)
 
 	local formspec = mob_preserve.get_formspec(name,0)
-
 	minetest.show_formspec(name,"mob_preserve:main",formspec)
 end
 

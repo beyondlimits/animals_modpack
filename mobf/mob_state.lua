@@ -18,6 +18,7 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+mobf_assert_backtrace(mob_state == nil)
 --! @class mob_state
 --! @brief state handling class
 --! @}
@@ -250,7 +251,7 @@ function mob_state.switch_entity(entity,state)
 	--switch entity
 	local state_has_model = false
 	
-	if minetest.setting_getbool("mobf_disable_3d_mode") then
+	if minetest.world_setting_get("mobf_disable_3d_mode") then
 		if state.graphics ~= nil then
 			state_has_model = true
 		end
@@ -539,7 +540,7 @@ function mob_state.prepare_states(mob)
 			 		local pos = self.object:getpos()
 			 		self.object:remove()
 			 		
-			 		minetest.env:add_entity(pos,self.new_name)
+			 		minetest.add_entity(pos,self.new_name)
 			 	end
 			 })
 		

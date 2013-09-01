@@ -63,7 +63,7 @@ function mobf_spawn_on_willow(mob_name,mob_transform,spawning_data,environment)
 					return
 				end
 
-				local node_above = minetest.env:get_node(pos_above)
+				local node_above = minetest.get_node(pos_above)
 
 				if mob_name == nil then
 					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! mob name not available")
@@ -72,7 +72,7 @@ function mobf_spawn_on_willow(mob_name,mob_transform,spawning_data,environment)
 					if node_above.name == "air" then
 						--print("Find mobs of same type around:"..mob_name.. " pop dens: ".. population_density)
 					   if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
-							local newobject = minetest.env:add_entity(pos_above,mob_name .. "__default")
+							local newobject = minetest.add_entity(pos_above,mob_name .. "__default")
 
 							local newentity = mobf_find_entity(newobject)
 							
@@ -100,13 +100,8 @@ end
 -------------------------------------------------------------------------------
 function mobf_spawn_on_willow_mapgen(mob_name,mob_transform,spawning_data,environment)
 	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering willow mapgen spawn mapgen callback for mob "..mob_name)
-	
-	--add mob on map generation
-	minetest.register_on_generated(function(minp, maxp, seed)
-		spawning.divide_mapgen(minp,maxp,spawning_data.density,mob_name,mob_transform,
-		
-		function(name,pos,min_y,max_y)
-			
+
+	local spawnfunc = function(name,pos,min_y,max_y)
 			--check if there s enough space above to place mob
 			if mobf_air_above(pos,spawning_data.height) then
 				dbg_mobf.spawning_lvl3("enough air above " ..printpos(centerpos) .. " minimum is: " .. spawning_data.height )
@@ -115,10 +110,39 @@ function mobf_spawn_on_willow_mapgen(mob_name,mob_transform,spawning_data,enviro
 				return true
 			end -- air_above
 			return false
-		end,
-		mobf_get_sunlight_surface,
-		5)
-	end)
+		end
+
+	if minetest.world_setting_get("mobf_delayed_spawning") then
+		minetest.register_on_generated(function(minp, maxp, seed)
+			local job = {
+				callback = spawning.divide_mapgen_jobfunc,
+				data = {
+					minp          = minp,
+					maxp          = maxp,
+					spawning_data = spawning_data,
+					mob_name      = mob_name,
+					mob_transform = mob_transform,
+					spawnfunc     = spawnfunc,
+					surfacefunc   = mobf_get_sunlight_surface,
+					maxtries      = 5
+					}
+				}
+			mobf_job_queue.add_job(job)
+		end)
+	else
+		--add mob on map generation
+		minetest.register_on_generated(function(minp, maxp, seed)
+			local starttime = mobf_get_time_ms()
+			spawning.divide_mapgen(minp,maxp,
+									spawning_data.density,
+									mob_name,
+									mob_transform,
+									spawnfunc,
+									mobf_get_sunlight_surface,
+									5)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. mob_name,"mapgen")
+		end)
+	end
  end --end spawn algo
 --!@}
 

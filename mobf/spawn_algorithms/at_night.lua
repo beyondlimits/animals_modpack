@@ -45,11 +45,11 @@ function mobf_spawn_at_night(mob_name,mob_transform,spawning_data,environment)
 			interval = 20,
 			chance = math.floor(1/spawning_data.rate),
 			action = function(pos, node, active_object_count, active_object_count_wider)
-			
-				local gametime = minetest.env:get_timeofday()
+				local gametime = minetest.get_timeofday()
 				
 				if gametime > 0.25 and
 					gametime < 0.75 then
+					mobf_warn_long_fct(starttime,"at_night_abm","abm")
 					return
 				end
 			
@@ -64,16 +64,18 @@ function mobf_spawn_at_night(mob_name,mob_transform,spawning_data,environment)
 				--used to find bugs in initial spawnpoint setting code
 				if mobf_pos_is_zero(pos) then
 					mobf_warn_long_fct(starttime,"mobf_spawn_at_night")
+					mobf_warn_long_fct(starttime,"at_night_abm","abm")
 					return
 				end
 
 				--check if there s enough space above to place mob
 				if mobf_air_above(pos,spawning_data.height) ~= true then
 					mobf_warn_long_fct(starttime,"mobf_spawn_at_night")
+					mobf_warn_long_fct(starttime,"at_night_abm","abm")
 					return
 				end
 				
-				local gametime = minetest.env:get_timeofday()
+				local gametime = minetest.get_timeofday()
 				
 				if gametime > 0.25 and
 					gametime < 0.75 then
@@ -81,7 +83,7 @@ function mobf_spawn_at_night(mob_name,mob_transform,spawning_data,environment)
 				end
 
 
-				local node_above = minetest.env:get_node(pos_above)
+				local node_above = minetest.get_node(pos_above)
 
 
 				if mob_name == nil then
@@ -89,9 +91,9 @@ function mobf_spawn_at_night(mob_name,mob_transform,spawning_data,environment)
 				else
 					--print("Find mobs of same type around:"..mob_name.. " pop dens: ".. population_density)
 					if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
-						if minetest.env:get_node_light(pos_above,0.5) == LIGHT_MAX +1 and 
-							minetest.env:get_node_light(pos_above,0.0) < 7 and
-							minetest.env:get_node_light(pos_above) < 6 then
+						if minetest.get_node_light(pos_above,0.5) == LIGHT_MAX +1 and 
+							minetest.get_node_light(pos_above,0.0) < 7 and
+							minetest.get_node_light(pos_above) < 6 then
 							
 							local entity = spawning.spawn_and_check(mob_name,"__default",pos_above,"at_night_spawner")
 							
@@ -125,11 +127,15 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 	
 	spawning.register_spawner_entity(mob_name,mob_transform,spawning_data,environment,
 		function(self)
-			local gametime = minetest.env:get_timeofday()
+		
+			--first check reasons to not spawn a mob right now
+			local gametime = minetest.get_timeofday()
 				
-			if gametime > 0.25 and
+			if gametime > 0.20 and
 				gametime < 0.75 then
 				dbg_mobf.spawning_lvl3("MOBF: wrong time for at night spawner")
+				self.spawner_last_result = "daytime"
+				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
 				return
 			end
 			
@@ -159,7 +165,7 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 			
 			--check if own position is good
 			local pos_below = {x=newpos.x,y=newpos.y-1,z=newpos.z}
-			local node_below = minetest.env:get_node(pos_below)
+			local node_below = minetest.get_node(pos_below)
 			
 			if good and not mobf_contains(at_night_surfaces,node_below.name) then
 				reason = "wrong surface"
@@ -172,8 +178,8 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 				good = false
 			end
 			
-			local light_day = minetest.env:get_node_light(newpos,0.5)
-			local light_midnight = minetest.env:get_node_light(newpos,0.0)
+			local light_day = minetest.get_node_light(newpos,0.5)
+			local light_midnight = minetest.get_node_light(newpos,0.0)
 			
 			--check if area is in day/night cycle
 			if good and (light_day ~= LIGHT_MAX +1 or
@@ -181,21 +187,22 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 				reason = "wrong light: " .. light_day .. " " .. light_midnight
 				good = false
 			end
+			
+			local current_light = minetest.get_node_light(newpos)
+			--check if current light is dark enough
+			if not current_light or current_light > 6 then
+				self.spawner_last_result = "at_night: to much light"
+				good = false
+			end
 				
 			if not good then
-				dbg_mobf.spawning_lvl2("MOBF: not spawning " 
-				.. self.spawner_mob_name .. " spawner somehow got to bad place: " 
+				dbg_mobf.spawning_lvl2("MOBF: not spawning at position not suitable" 
+				.. self.spawner_mob_name .. " reason: " 
 				.. reason)
-				--TODO try to move spawner to better place
-				
-				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
-				return
-			end
-			
-			
-			--check if current light is dark enough
-			
-			if minetest.env:get_node_light(pos) > 6 then
+				--Invalid position,
+				--reduced delay to next retry
+				self.spawner_time_passed = (self.spawner_mob_spawndata.respawndelay/4)
+				self.spawner_last_result = "at_night:" .. dump(reason)
 				return
 			end
 
@@ -210,27 +217,28 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 					entity.dynamic_data ~= nil and
 					entity.dynamic_data.spawning ~= nil then
 					entity.dynamic_data.spawning.spawner = "at_night_mapgen"
+					self.spawner_last_result = "at_night successfull"
+				else
+					self.spawner_last_result = "at_night failed to spawn"
 				end
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
 			else
+				--too many mobs around full delay
 				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
 				dbg_mobf.spawning_lvl2("MOBF: not spawning " .. self.spawner_mob_name .. " there's a mob around")
+				self.spawner_last_result = "at_night: to much mobs around"
 			end
 		end,
 		"_at_night")
 		
-	--add mob spawner on map generation
-	minetest.register_on_generated(function(minp, maxp, seed)
-	
-		spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,
-			function(name,pos,min_y,max_y)
+	local spawnfunc = function(name,pos,min_y,max_y)
 				dbg_mobf.spawning_lvl3("MOBF: trying to create a spawner for " .. name .. " at " ..printpos(pos))
 				local surface = mobf_get_surface(pos.x,pos.z,min_y,max_y)
 				
 				if surface then
 					pos.y= surface -1
 					
-					local node = minetest.env:get_node(pos)
+					local node = minetest.get_node(pos)
 					
 					if not mobf_contains(at_night_surfaces,node.name) then
 						dbg_mobf.spawning_lvl3("MOBF: node ain't of correct type: " .. node.name)
@@ -238,13 +246,13 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 					end
 					
 					local pos_above = {x=pos.x,y=pos.y+1,z=pos.z}
-					local node_above = minetest.env:get_node(pos_above)
+					local node_above = minetest.get_node(pos_above)
 					if not mobf_contains({"air"},node_above.name) then
 						dbg_mobf.spawning_lvl3("MOBF: node above ain't air but: " .. node_above.name)
 						return false
 					end
 					
-					local light_day = minetest.env:get_node_light(pos_above,0.5)
+					local light_day = minetest.get_node_light(pos_above,0.5)
 					
 					if light_day ~= (LIGHT_MAX +1) then
 						dbg_mobf.spawning_lvl3("MOBF: node above ain't in sunlight")
@@ -258,8 +266,32 @@ function mobf_spawn_at_night_entity(mob_name,mob_transform,spawning_data,environ
 					dbg_mobf.spawning_lvl3("MOBF: didn't find surface for " .. name .. " spawner at " ..printpos(pos))
 				end
 				return false
-			end)
-    end) --register mapgen
+			end
+			
+	if minetest.world_setting_get("mobf_delayed_spawning") then
+		minetest.register_on_generated(function(minp, maxp, seed)
+			local job = {
+				callback = spawning.divide_mapgen_entity_jobfunc,
+				data = {
+					minp          = minp,
+					maxp          = maxp,
+					spawning_data = spawning_data,
+					mob_name      = mob_name,
+					spawnfunc     = spawnfunc,
+					maxtries      = 5,
+					func          = spawning.divide_mapgen_entity_jobfunc,
+					}
+				}
+			mobf_job_queue.add_job(job)
+		end)
+	else	
+		--add mob spawner on map generation
+		minetest.register_on_generated(function(minp, maxp, seed)
+			local starttime = mobf_get_time_ms()
+			spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,spawnfunc)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. mob_name,"mapgen")
+		end) --register mapgen
+	end
  end --end spawn algo
 
 --!@}

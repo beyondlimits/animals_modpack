@@ -14,19 +14,26 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_cow mod loading ...")
-local version = "0.0.20"
+local version = "0.0.21"
 
 local cow_groups = {
 						not_in_creative_inventory=1
 					}
 
-local selectionbox_cow = {-1.5, -1.5, -0.75, 1.5, 0.6, 0.75}
-local selectionbox_steer = {-1.5*1.1, -1.5*1.1, -0.75*1.1, 1.5*1.1, 0.6*1.1, 0.75*1.1}
+local selectionbox_cow = {-1.5, -1.5, -0.75, 1.5, 0.7, 0.75}
+local selectionbox_steer = {-1.5*1.1, -1.5*1.1, -0.75*1.1, 1.5*1.1, 0.7*1.1, 0.75*1.1}
 local selectionbox_baby_calf = {-0.8, -0.8, -0.5, 0.8, 0.8, 0.5}
 
 cow_prototype = {   
 		name="cow",
 		modname="animal_cow",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 	
 		generic = {
 					description="Cow",
@@ -64,6 +71,14 @@ cow_prototype = {
 						rate=0.001,
 						density=200,
 						algorithm="big_willow_mapgen",
+						height=2
+						},
+					},
+					secondary_algorithms = {
+						{
+						rate=0.001,
+						density=200,
+						algorithm="big_willow",
 						height=2
 						},
 					}
@@ -116,6 +131,7 @@ cow_prototype = {
 				walk = {
 					start_frame = 170,
 					end_frame   = 250,
+					basevelocity = 0.35,
 					},
 				stand = {
 					start_frame = 0,
@@ -131,6 +147,13 @@ cow_prototype = {
 steer_prototype = {   
         name="steer",
         modname="animal_cow",
+        
+        factions = {
+            member = {
+                "animals",
+                "grassland_animals"
+                }
+            },
     
         generic = {
                     description="Steer",
@@ -159,23 +182,31 @@ steer_prototype = {
         spawning = {
 					primary_algorithms = {
 						{
-	                    rate=0.001,
-	                    density=200,
-	                    algorithm="big_willow_mapgen",
-	                    height=2
-	                    },
-	                }
-	           },
-        sound = {
-                    random = {
-                                name="Mudchute_cow_1",
-                                min_delta = 30,
-                                chance = 0.5,
-                                gain = 1,
-                                max_hear_distance = 10,
-                                },
-                    },
-        states = {
+						rate=0.001,
+						density=200,
+						algorithm="big_willow_mapgen",
+						height=2
+						},
+					},
+					secondary_algorithms = {
+						{
+						rate=0.001,
+						density=200,
+						algorithm="big_willow",
+						height=2
+						},
+					}
+				},
+		sound = {
+					random = {
+						name="Mudchute_cow_1",
+						min_delta = 30,
+						chance = 0.5,
+						gain = 1,
+						max_hear_distance = 10,
+						},
+					},
+		states = {
 				{ 
 				name = "walking",
 				movgen = "probab_mov_gen",
@@ -214,6 +245,7 @@ steer_prototype = {
 				walk = {
 					start_frame = 170,
 					end_frame   = 250,
+					basevelocity = 0.35,
 					},
 				stand = {
 					start_frame = 0,
@@ -229,6 +261,13 @@ steer_prototype = {
 baby_calf_f_prototype = {
 		name="baby_calf_f",
 		modname="animal_cow",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 
 		generic = {
 			description="Baby Calf female",
@@ -280,6 +319,7 @@ baby_calf_f_prototype = {
 				walk = {
 					start_frame = 1,
 					end_frame   = 40,
+					basevelocity = 0.15,
 					},
 				stand = {
 					start_frame = 41,
@@ -319,6 +359,13 @@ baby_calf_f_prototype = {
 baby_calf_m_prototype = {   
 		name="baby_calf_m",
 		modname="animal_cow",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 
 		generic = {
 				description="Baby Calf male",
@@ -369,6 +416,7 @@ baby_calf_m_prototype = {
 				walk = {
 					start_frame = 1,
 					end_frame   = 40,
+					basevelocity = 0.15,
 					},
 				stand = {
 					start_frame = 41,

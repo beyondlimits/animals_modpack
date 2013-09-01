@@ -93,7 +93,6 @@ end
 --! @param entity mob to generate movement for
 -------------------------------------------------------------------------------
 function movement_gen.callback(entity)
-
 	mobf_assert_backtrace(entity ~= nil)
 	
 	if entity.dynamic_data == nil or
@@ -127,7 +126,7 @@ function movement_gen.callback(entity)
 	--                                                                       --
 	---------------------------------------------------------------------------
 	---------------------------------------------------------------------------
-	dbg_mobf.pmovement_lvl1("MOBF: position check for mob ".. entity.data.name .. 
+	dbg_mobf.pmovement_lvl2("MOBF: position check for mob ".. entity.data.name .. 
 		" "..printpos(movement_state.basepos))
 	movement_state.default_y_accel = 
 			environment.get_default_gravity(movement_state.basepos,
@@ -161,11 +160,17 @@ function movement_gen.callback(entity)
 	--                                                                       --
 	---------------------------------------------------------------------------
 	---------------------------------------------------------------------------
-	dbg_mobf.pmovement_lvl1("MOBF: movement hard limits check for mob ".. 
+	dbg_mobf.pmovement_lvl2("MOBF: movement hard limits check for mob ".. 
 		entity.data.name .. " "..printpos(movement_state.basepos))
 	
 	movement_gen.fix_runaway(entity,movement_state)
-	movement_gen.fix_to_slow(entity,movement_state)
+	
+	--don't do slowness check each callback
+	if entity.dynamic_data.movement.ts_last_slowcheck == nil or
+		entity.dynamic_data.movement.ts_last_slowcheck +2 < movement_state.now then
+		movement_gen.fix_to_slow(entity,movement_state)
+		entity.dynamic_data.movement.ts_last_slowcheck = movement_state.now
+	end
 	
 	---------------------------------------------------------------------------
 	---------------------------------------------------------------------------
@@ -175,7 +180,7 @@ function movement_gen.callback(entity)
 	--                                                                       --
 	---------------------------------------------------------------------------
 	---------------------------------------------------------------------------
-	dbg_mobf.pmovement_lvl1("MOBF: movement check for mob ".. entity.data.name 
+	dbg_mobf.pmovement_lvl2("MOBF: movement check for mob ".. entity.data.name 
 		.. " "..printpos(movement_state.basepos))
 	
 	--skip if movement already got changed
@@ -185,20 +190,27 @@ function movement_gen.callback(entity)
 			movement_generic.predict_next_block( movement_state.basepos,
 											movement_state.current_velocity,
 											movement_state.current_acceleration)
+											
+		--local pos_predicted = 
+		--	movement_generic.predict_enter_next_block(entity, movement_state.basepos,
+		--									movement_state.current_velocity,
+		--									movement_state.current_acceleration)
 																
 		local pos_predicted_state = environment.pos_is_ok(pos_predicted,entity)
 		dbg_mobf.pmovement_lvl3("MOBF: Pos predicted state ".. entity.data.name 
 			.. ": " .. pos_predicted_state)
+			
 		-- Y-Movement
 		if movement_state.changed == false then
 			height_level_control.precheck_movement(entity,movement_state,
 											pos_predicted,pos_predicted_state)
 		end	
 		
+		local pos_predicted_quality = environment.pos_quality(pos_predicted,entity)
 		-- X/Z-Movement
 		if movement_state.changed == false then
 			direction_control.precheck_movement(entity,movement_state,
-											pos_predicted,pos_predicted_state)
+											pos_predicted,pos_predicted_quality)
 		end	
 
 	end
@@ -212,7 +224,7 @@ function movement_gen.callback(entity)
 	--                                                                       --
 	---------------------------------------------------------------------------
 	---------------------------------------------------------------------------	
-	dbg_mobf.pmovement_lvl1("MOBF: randomized movement for mob ".. 
+	dbg_mobf.pmovement_lvl2("MOBF: randomized movement for mob ".. 
 					entity.data.name .. " "..printpos(movement_state.basepos))
 	
 	--do randomized changes if not fighting
@@ -272,7 +284,7 @@ function movement_gen.apply_movement_changes(entity,movement_state)
 			end
 		end
 
-		dbg_mobf.pmovement_lvl1("MOBF: setting acceleration to " 
+		dbg_mobf.pmovement_lvl2("MOBF: setting acceleration to " 
 										..printpos(movement_state.accel_to_set))
 		entity.dynamic_data.movement.acceleration = movement_state.accel_to_set
 		entity.object:setacceleration(movement_state.accel_to_set)
@@ -308,6 +320,7 @@ function movement_gen.init_dynamic_data(entity,now)
 			ts_orientation_upd  = now,
 			mpattern            = mobf_rtd.movement_patterns[entity.data.movement.pattern],
 			orientation_fix_needed              = true,
+			ts_last_slowcheck   = now,
 			}
 	
 	entity.dynamic_data.movement = data
@@ -398,7 +411,7 @@ function movement_gen.fix_to_slow(entity,movement_state)
 		xzspeed < entity.data.movement.min_speed) or
 		xzspeed == nil then
 		
-		dbg_mobf.pmovement_lvl3("MOBF: too slow! vxz=" .. xzspeed)
+		dbg_mobf.pmovement_lvl2("MOBF: too slow! vxz=" .. xzspeed)
 		--use normal speed change handling
 		movement_state.force_change = true
 	end
@@ -446,7 +459,8 @@ function movement_gen.fix_current_pos(entity,movement_state)
 		current_state ~= "below_limit" and
 		current_state ~= "above_limit" then
 		dbg_mobf.movement_lvl1("MOBF: BUG !!! somehow your mob managed to get"
-									.." where it shouldn't be, trying to fix")
+									.." where it shouldn't be (" 
+									.. current_state .. "), trying to fix")
 
 		--stop mob from moving at all
 		entity.object:setacceleration({x=0,y=movement_state.default_y_accel,z=0})
@@ -487,7 +501,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 				if targetpos == nil then
 					targetpos = entity.dynamic_data.movement.last_pos_in_env
 				else
-					targetpos.y = targetpos.y+1 --TODO use collision box 
+					targetpos.y = targetpos.y - entity.collisionbox[2]
 				end
 				
 				minetest.log(LOGLEVEL_WARNING,"MOBF: Your mob " .. 
@@ -495,8 +509,8 @@ function movement_gen.fix_current_pos(entity,movement_state)
 						printpos(targetpos).." state: "..
 						environment.pos_is_ok(targetpos,entity))
 				entity.object:moveto(targetpos)
-				movement_state.current_velocity.x = movement_state.current_velocity.x/10
-				movement_state.current_velocity.z = movement_state.current_velocity.z/10
+				movement_state.current_velocity.x = 0 --movement_state.current_velocity.x/10
+				movement_state.current_velocity.z = 0 --movement_state.current_velocity.z/10
 				entity.object:setvelocity(movement_state.current_velocity)
 				movement_state.centerpos = targetpos
 				movement_state.basepos = entity.getbasepos(entity)
@@ -555,15 +569,16 @@ function movement_gen.fix_current_pos(entity,movement_state)
 	end
 	
 	if current_state == "collision" then
+
 		local current_pos = mobf_round_pos(movement_state.basepos);
-		local current_node = minetest.env:get_node( current_pos );
+		local current_node = minetest.get_node( current_pos );
 		
 		local walkable = false
 		if minetest.registered_nodes[current_node.name] then
 			walkable = minetest.registered_nodes[current_node.name].walkable
 		end
 		
-		dbg_mobf.movement_lvl3( "MOBF: Mob collided with "..
+		dbg_mobf.movement_lvl2( "MOBF: Mob collided with "..
 			tostring( current_pos.x )..":"..
 			tostring( current_pos.y )..":"..
 			tostring( current_pos.z ).." Nodename:"..
@@ -583,7 +598,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 			end
 			
 			if targetpos == nil then
-				local targetpos = 
+				targetpos = 
 					environment.get_suitable_pos_same_level({x=current_pos.x,
 															y=current_pos.y+1,
 															z=current_pos.z},
@@ -592,7 +607,8 @@ function movement_gen.fix_current_pos(entity,movement_state)
 			end
 			
 			if targetpos ~= nil then
-				minetest.log(LOGLEVEL_WARNING,"MOBF: Your mob " ..
+				minetest.log(LOGLEVEL_WARNING,
+							"MOBF: Your mob " ..
 							entity.data.name ..
 							" is within solid block moving to"..
 							printpos(targetpos).." state: "..
@@ -610,6 +626,9 @@ function movement_gen.fix_current_pos(entity,movement_state)
 				abort_processing = true
 				spawning.remove(entity, "mgen probab solidblockcheck")
 			end
+		else
+			dbg_mobf.movement_lvl2( "MOBF: mob is on walkable surface " .. 
+				"so no forced repositioning" )
 		end
 		
 		handled = true

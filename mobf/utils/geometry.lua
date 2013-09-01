@@ -179,10 +179,83 @@ end
 function mobf_balistic_start_speed(heightdiff,time,acceleration)
 	mobf_assert_backtrace(heightdiff ~= nil)
 	mobf_assert_backtrace(time ~= nil)
-	mobf_assert_backtrace(time ~= nil)
 	mobf_assert_backtrace(acceleration ~= nil)
 	
 	return (heightdiff - (acceleration/2) * (time*time)) / time	
 end
 
+-------------------------------------------------------------------------------
+-- name: mobf_calc_travel_time(distance,velocity,acceleration)
+--
+--! @brief assert in case value is false
+--
+--! @param distance distance to target
+--! @param velocity to start with
+--! @param acceleration acceleratio to use
+--
+--! @return time to target
+-------------------------------------------------------------------------------
+function mobf_calc_travel_time(distance,velocity,acceleration)
+	mobf_assert_backtrace(distance ~= nil)
+	mobf_assert_backtrace(velocity ~= nil)
+	mobf_assert_backtrace(acceleration ~= nil)
+	
+	if acceleration == 0 then
+		--print("no accel shortcut time calculation")
+		return distance/velocity
+	end
+	
+	local a = acceleration/2
+	local b = velocity
+	local c = -distance
+	
+	--print("a=" .. a .. " b=" .. b .. " c=" .. c)
+	
+	local det = b*b - 4*a*c
+	
+	--print("det=" .. det)
+	
+	if det < 0 then
+		return nil
+	end
+	
+	local ret1 = (-b + math.sqrt(det))/(2*a)
+	local ret2 = (-b - math.sqrt(det))/(2*a)
+	
+	--print("x1=" .. ret1 .. " x2=" .. ret2)
+	
+	if ret1 > 0 then
+		return ret1
+	end
+	
+	return ret2
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_same_quadrant(x1,z1,x2,z2)
+--
+--! @brief check if two points are in same quadrant
+--
+--! @param x1 x of point1
+--! @param z1 z of point1
+--! @param x2 x of point2
+--! @param z2 z of point2
+--
+--! @return true/false
+-------------------------------------------------------------------------------
+function mobf_same_quadrant(x1,z1,x2,z2)
+
+	if x1 > 0 and x2 < 0 or
+		x1 < 0 and x2 >0 then
+			return false
+	end
+	
+	if z1 > 0 and z2 < 0 or
+		z1 < 0 and z2 >0 then
+			return false
+	end
+	
+	return true
+
+end
 --!@}

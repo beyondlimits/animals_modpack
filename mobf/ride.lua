@@ -19,6 +19,7 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+mobf_assert_backtrace(mobf_ride == nil)
 --! @class mobf_ride
 --! @brief contains all riding specific functions
 --! @}

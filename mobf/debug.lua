@@ -14,11 +14,11 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
+mobf_assert_backtrace(mobf_debug == nil)
 --! @defgroup debug_in_game In game debugging functions
 --! @brief debugging functions to be called from in game
 --! @ingroup framework_int
 --! @{
-
 mobf_debug = {}
 
 -------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ function mobf_debug.spawn_mob(name,param)
 	else
 		--todo find random pos
 
-		local player = minetest.env:get_player_by_name(name)
+		local player = minetest.get_player_by_name(name)
 		
 		if player == nil then
 		
@@ -168,6 +168,30 @@ function mobf_debug.list_active_mobs(name,param)
 end
 
 -------------------------------------------------------------------------------
+-- name: list_spawners(name,param)
+--
+--! @brief print list of all spawners around player
+--
+--! @param name name of player
+--! @param param parameters received
+------------------------------------------------------------------------------
+function mobf_debug.list_spawners(name,param)
+	
+	for index,value in pairs(minetest.luaentities) do 
+		if value ~= nil and value.spawner_mob_name ~= nil then
+			local resultline = "SPW: " 
+				.. mobf_fixed_size_string(value.spawner_mob_name,24) .. " "
+				.. mobf_fixed_size_string(printpos(value.object:getpos()),16)
+				.. "  STATE: " 
+				.. mobf_fixed_size_string(dump(value.spawner_last_result),32)
+				.. " TIME: " .. value.spawner_time_passed
+			
+			print(resultline)
+		end
+	end
+end
+
+-------------------------------------------------------------------------------
 -- name: mob_count(name,param)
 --
 --! @brief count active mobs
@@ -196,7 +220,7 @@ end
 --! @param param parameters received
 ------------------------------------------------------------------------------
 function mobf_debug.add_tools(name,param)
-	local player = minetest.env:get_player_by_name(name)
+	local player = minetest.get_player_by_name(name)
 	
 	if player ~= nil then
 		player:get_inventory():add_item("main", "animalmaterials:lasso 20")
@@ -274,6 +298,14 @@ function mobf_debug.init()
 							end 
 		})
 		
+	minetest.register_chatcommand("listspawners",
+		{
+			params		= "",
+			description = "debug info about spawner entities" ,
+			privs		= {mobfw_admin=true},
+			func		= mobf_debug.list_spawners
+		})
+		
 	minetest.register_chatcommand("mobf_count",
 		{
 			params		= "",
@@ -317,7 +349,7 @@ end
 ------------------------------------------------------------------------------
 function mobf_debug.rightclick_callback(entity,player)
 	local lifetime = mobf_get_current_time() - entity.dynamic_data.spawning.original_spawntime
-	print("MOBF: " .. entity.data.name .. " is alive for " .. lifetime .. " seconds")
+	print("MOBF: " .. entity.data.name .. " " .. tostring(entity) .. " is alive for " .. lifetime .. " seconds")
 	print("MOBF: \tAbsolute spawntime:          " .. entity.dynamic_data.spawning.original_spawntime)
 	print("MOBF: \tCurrent state:               " .. entity.dynamic_data.state.current )
 	print("MOBF: \tCurrent movgen:              " .. entity.dynamic_data.current_movement_gen.name )
@@ -346,7 +378,7 @@ function mobf_debug.rightclick_callback(entity,player)
 			print("MOBF: \t\tpath:                        " .. dump(entity.dynamic_data.p_movement.path))
 		if entity.dynamic_data.p_movement.path ~= nil then
 			for i,v in ipairs(entity.dynamic_data.p_movement.path) do
-				local objects = minetest.env:get_objects_inside_radius(v,0.5)
+				local objects = minetest.get_objects_inside_radius(v,0.5)
 				local found = false;
 				for i=1,#objects,1 do
 					local luaentity = objects[i]:get_luaentity()
@@ -357,7 +389,7 @@ function mobf_debug.rightclick_callback(entity,player)
 					end
 				end
 				
-				local node_at = minetest.env:get_node(v)
+				local node_at = minetest.get_node(v)
 				
 				if not found and 
 					node_at.name ~= nil and
@@ -375,9 +407,11 @@ function mobf_debug.rightclick_callback(entity,player)
 			entity.object:getvelocity(),
 			entity.object:getacceleration())
 	local pos_state  = environment.pos_is_ok(predicted_pos,entity)
+	local detailed_state = environment.pos_quality(entity.getbasepos(entity),entity)
 	
 	print("MOBF: \tTime to state change:        " .. entity.dynamic_data.state.time_to_next_change .. " seconds")
 	print("MOBF: \tCurrent environmental state: " .. environment.pos_is_ok(entity.getbasepos(entity),entity))
+	print("MOBF: \tCurrent detailed state:      " .. detailed_state.tostring(detailed_state))
 	print("MOBF: \tCurrent accel:               " .. printpos(entity.object:getacceleration()))
 	print("MOBF: \tCurrent speed:               " .. printpos(entity.object:getvelocity()))
 	print("MOBF: \tSpawnpoint:                  " .. printpos(entity.dynamic_data.spawning.spawnpoint))
@@ -393,6 +427,19 @@ function mobf_debug.rightclick_callback(entity,player)
 		for k,v in pairs(entity.dynamic_data.attention.watched_objects) do
 			print("MOBF: \t\t " .. k .. ": " .. v.value)
 		end
+	
+		if entity.dynamic_data.attention.most_relevant_target ~= nil then
+			local attention_name = tostring(entity.dynamic_data.attention.most_relevant_target)
+			
+			if (entity.dynamic_data.attention.most_relevant_target:is_player()) then
+				attention_name = entity.dynamic_data.attention.most_relevant_target:get_player_name()
+			end
+			print("MOBF: \tTop attention object:       " .. attention_name)
+		end
+	end
+	
+	if entity.dynamic_data.graphics.last_fps ~= nil then
+		print("MOBF: Animating with: " .. entity.dynamic_data.graphics.last_fps .. " fps")
 	end
 	return false
 end

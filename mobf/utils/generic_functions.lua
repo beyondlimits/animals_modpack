@@ -3,7 +3,7 @@
 -- 
 -- You may copy, use, modify or do nearly anything except removing this
 -- copyright notice. 
--- And of course you are NOT allow to pretend you have written it.
+-- And of course you are NOT allowed to pretend you have written it.
 --
 --! @file generic_functions.lua
 --! @brief generic functions used in many different places
@@ -19,10 +19,6 @@
 --! @ingroup framework_int
 --! @{
 
-if minetest.setting_getbool("mobf_enable_socket_trace") then
-    require "socket"
-end
-
 -------------------------------------------------------------------------------
 -- name: mobf_get_time_ms()
 --
@@ -31,11 +27,8 @@ end
 --! @return current time in ms
 -------------------------------------------------------------------------------
 function mobf_get_time_ms()
-	if minetest.setting_getbool("mobf_enable_socket_trace") then
-		return socket.gettime()*1000
-	else
-	    return 0
-	end
+	--this fct is overwritten on init with best timesource available atm
+	return os.clock() * 1000
 end
 
 -------------------------------------------------------------------------------
@@ -185,10 +178,10 @@ function mobf_max_light_around(pos,distance,daytime)
 	for z_run=pos.z-distance,pos.z+distance,1 do
 	for x_run=pos.x-distance,pos.x+distance,1 do
 		local current_pos = {x=x_run,y=y_run,z=z_run }
-		local node = minetest.env:get_node(current_pos)
+		local node = minetest.get_node(current_pos)
 
 		if node.name == "air" then 
-			local current_light = minetest.env:get_node_light(current_pos,daytime)
+			local current_light = minetest.get_node_light(current_pos,daytime)
 
 			if current_light > max_light then
 				max_light = current_light
@@ -218,8 +211,9 @@ function mobf_mob_around(mob_name,mob_transform,pos,range,ignore_playerspawned)
 	local objectcount = 0
 	
 	mobf_assert_backtrace(range ~= nil)
+	mobf_assert_backtrace(pos ~= nil)
 
-	local objectlist = minetest.env:get_objects_inside_radius(pos,range)
+	local objectlist = minetest.get_objects_inside_radius(pos,range)
 	
 	if mob_transform == nil then
 		mob_transform = ""
@@ -282,7 +276,7 @@ function mobf_spawner_around(mob_name,pos,range)
 	local count = 0
 	local objectcount = 0
 
-	local objectlist = minetest.env:get_objects_inside_radius(pos,range)
+	local objectlist = minetest.get_objects_inside_radius(pos,range)
 	
 	for index,value in pairs(objectlist) do 
 
@@ -318,53 +312,13 @@ end
 -- name: mobf_line_of_sightX(pos1,pos2)
 --
 --! @brief is there a line of sight between two specified positions
--- TODO add code to minetest to get this working!
 --
 --! @param pos1 start position of los check
 --! @param pos2 end position of los check
 --! @return: true/false
 -------------------------------------------------------------------------------
-function mobf_line_of_sightX(pos1,pos2)
-	return minetest.env:get_line_of_sight(pos1,pos2)
-end
-
--------------------------------------------------------------------------------
--- name: mobf_line_of_sight(pos1,pos2)
---
---! @brief is there a line of sight between two specified positions
---
---! @param pos1 start position of los check
---! @param pos2 end position of los check
---! @return: true/false
--------------------------------------------------------------------------------
-function mobf_line_of_sight(pos1,pos2) 
-
-	--print("Checking line of sight between "..printpos(pos1).." and "..printpos(pos2))
-	local distance = mobf_calc_distance(pos1,pos2)
-
-	local normalized_vector = {	x=(pos2.x-pos1.x)/distance,
-					y=(pos2.y-pos1.y)/distance,
-					z=(pos2.z-pos1.z)/distance}
-
-
-	local line_of_sight = true	
-
-	for i=1,distance, 1 do
-		local tocheck = { x=pos1.x + (normalized_vector.x * i),
-					y=pos1.y + (normalized_vector.y *i),
-					z=pos1.z + (normalized_vector.z *i)}
-		
-		local node = minetest.env:get_node(tocheck)
-
-
-		if minetest.registered_nodes[node.name] == nil or 
-			minetest.registered_nodes[node.name].sunlight_propagates ~= true then
-			line_of_sight = false
-			break
-		end
-	end
-
-	return line_of_sight
+function mobf_line_of_sight(pos1,pos2)
+	return minetest.line_of_sight(pos1,pos2)
 end
 
 -------------------------------------------------------------------------------
@@ -402,7 +356,7 @@ function mobf_air_above(pos,height)
 			y = pos.y + 1,
 			z = pos.z
 			}
-		local node_above = minetest.env:get_node(pos_above)
+		local node_above = minetest.get_node(pos_above)
 
 		if node_above.name ~= "air" then
 			return false
@@ -418,22 +372,27 @@ end
 --
 --! @brief get number of blocks above solid ground
 --
---! @param pos position to check
+--! @param pos_raw position to check
 --! @param media table of blocks not considered to be ground
 --! @return number of blocks to ground
 -------------------------------------------------------------------------------
-function mobf_ground_distance(pos,media)
+function mobf_ground_distance(pos_raw,media)
 
-	local node_to_check = minetest.env:get_node(pos)
+	local pos = {
+					x=pos_raw.x,
+					y=math.floor(pos_raw.y + 0.5),
+					z=pos_raw.z
+				}
+
+	local node_to_check = minetest.get_node(pos)
 
 	local count = 0
 	
 	while node_to_check ~= nil and mobf_contains(media,node_to_check.name) and
 			count < 32 do
-		
 		count = count +1
 		pos = {x=pos.x,y=pos.y-1,z=pos.z};
-		node_to_check = minetest.env:get_node(pos)
+		node_to_check = minetest.get_node(pos)
 	end
 
 	return count
@@ -449,7 +408,7 @@ end
 -------------------------------------------------------------------------------
 function mobf_surface_distance(pos)
 
-	local node_to_check = minetest.env:get_node(pos)
+	local node_to_check = minetest.get_node(pos)
 
 	local count = 0
 	
@@ -460,7 +419,7 @@ function mobf_surface_distance(pos)
 		count = count +1
 		
 		pos = {x=pos.x,y=pos.y-1,z=pos.z};
-		node_to_check = minetest.env:get_node(pos)
+		node_to_check = minetest.get_node(pos)
 	end
 
 	return count
@@ -476,7 +435,7 @@ end
 -------------------------------------------------------------------------------
 function mobf_air_distance(pos)
 
-	local node_to_check = minetest.env:get_node(pos)
+	local node_to_check = minetest.get_node(pos)
 
 	local count = 0
 	
@@ -486,7 +445,7 @@ function mobf_air_distance(pos)
 		
 		count = count +1		
 		pos = {x=pos.x,y=pos.y+1,z=pos.z};
-		node_to_check = minetest.env:get_node(pos)
+		node_to_check = minetest.get_node(pos)
 	end
 
 	if node_to_check.name == "air" then
@@ -506,13 +465,13 @@ end
 -------------------------------------------------------------------------------
 function mobf_above_water(pos)
 
-	local node_to_check = minetest.env:get_node(pos)
+	local node_to_check = minetest.get_node(pos)
 	
 	while node_to_check ~= nil and 
 			node_to_check.name == "air" do
 			
 			pos = {x=pos.x,y=pos.y-1,z=pos.z};
-			node_to_check = minetest.env:get_node(pos)
+			node_to_check = minetest.get_node(pos)
 	end
 	
 	if node_to_check.name == "default:water_source" or
@@ -537,7 +496,7 @@ end
 function mobf_get_sunlight_surface(x,z, min_y, max_y)
     for runy = min_y, max_y,1 do
         local pos = { x=x,y=runy, z=z }
-        local node_to_check = minetest.env:get_node(pos)
+        local node_to_check = minetest.get_node(pos)
         
         if node_to_check.name == "default:dirt_with_grass" then
             return pos.y
@@ -559,28 +518,34 @@ end
 --! @return y value of surface or nil
 -------------------------------------------------------------------------------
 function mobf_get_surface(x,z, min_y, max_y)
-
+	local starttime = mobf_get_time_ms()
 	mobf_assert_backtrace(min_y ~= nil)
 	mobf_assert_backtrace(max_y ~= nil)
 	mobf_assert_backtrace(x ~= nil)
 	mobf_assert_backtrace(z ~= nil)
 	
-	if type(minetest.env.get_surface) == "function" then
-	return minetest.env:get_surface({x=x,y=min_y,z=z},max_y-min_y)
+	if type(minetest.get_surface) == "function" then
+		local basepos = {x=x,y=min_y,z=z}
+		local offset = max_y-min_y
+		local retval = minetest.get_surface(basepos,offset)
+		mobf_warn_long_fct(starttime,"on_mapgen_entity_spawnfunc","user_3")
+		return retval
 	end
 
-	local last_node = minetest.env:get_node({ x=x,y=min_y, z=z })
-    for runy = min_y+1, max_y,1 do
-        local pos = { x=x,y=runy, z=z }
-        local node_to_check = minetest.env:get_node(pos)
-        if node_to_check.name == "air" and
-        	last_node.name ~= "air" and
-        	last_node.mame ~= "ignore" then
-            return pos.y
-        end
-        last_node = node_to_check
-    end
-    return nil
+	local last_node = minetest.get_node({ x=x,y=min_y, z=z })
+	for runy = min_y+1, max_y,1 do
+		local pos = { x=x,y=runy, z=z }
+		local node_to_check = minetest.get_node(pos)
+		if node_to_check.name == "air" and
+			last_node.name ~= "air" and
+			last_node.mame ~= "ignore" then
+			mobf_warn_long_fct(starttime,"on_mapgen_entity_spawnfunc","user_3")
+			return pos.y
+		end
+		last_node = node_to_check
+	end
+	mobf_warn_long_fct(starttime,"on_mapgen_entity_spawnfunc","user_3")
+	return nil
 end
 
 -------------------------------------------------------------------------------
@@ -593,7 +558,7 @@ end
 -------------------------------------------------------------------------------
 function entity_at_loaded_pos(pos)
 
-	local current_node = minetest.env:get_node(pos)
+	local current_node = minetest.get_node(pos)
 
 	if current_node ~= nil then
 		if current_node.name == "ignore" then
@@ -691,21 +656,5 @@ function mobf_is_pos(value)
 	
 	return true
 end
-
--------------------------------------------------------------------------------
--- name: mobf_assert_backtrace(value)
---
---! @brief assert in case value is false
---
---! @param value to evaluate
--------------------------------------------------------------------------------
-function mobf_assert_backtrace(value)
-	if value == false then
-		print(debug.traceback("Current Callstack:\n"))
-		assert(value)
-	end
-end
-
-
 
 --!@}

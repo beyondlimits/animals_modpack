@@ -3,7 +3,7 @@
 -- 
 -- You may copy, use, modify or do nearly anything except removing this
 -- copyright notice. 
--- And of course you are NOT allow to pretend you have written it.
+-- And of course you are NOT allowed to pretend you have written it.
 --
 --! @file init.lua
 --! @brief main module file responsible for including all parts of mob framework mod
@@ -31,13 +31,19 @@ mobf_rtd = {
 	--!do we have luatrace
 	luatrace_enabled		= false,
 	--!do we have inventory plus support
-	inventory_plus_enabled = false,
+	inventory_plus_enabled	= false,
+	--!do we have factions support
+	factions_available		= false,
 	--!registry for movement patterns
 	movement_patterns		= {},
 	--!registry of mobs
 	registred_mob			= {},
 	--!registred mobs_data
 	registred_mob_data		= {},
+	--!timesource
+	timesource				= "os.clock() (10ms ONLY!)",
+	--!total spawned mobs
+	total_spawned			= 0,
 }
 
 --!path of mod
@@ -55,17 +61,20 @@ if mobf_rtd.luatrace_enabled then
 end
 
 --include debug trace functions
+dofile (mobf_modpath .. "/utils/text.lua")
 dofile (mobf_modpath .. "/debug_trace.lua")
 
 --include engine
-dofile (mobf_modpath .. "/utils/generic_functions.lua")
+dofile (mobf_modpath .. "/utils/error_handling.lua")
 dofile (mobf_modpath .. "/utils/settings.lua")
+dofile (mobf_modpath .. "/utils/generic_functions.lua")
 dofile (mobf_modpath .. "/utils/data_storage.lua")
 dofile (mobf_modpath .. "/utils/tracing.lua")
 dofile (mobf_modpath .. "/utils/geometry.lua")
-dofile (mobf_modpath .. "/utils/text.lua")
 dofile (mobf_modpath .. "/utils/permanent_data.lua")
+dofile (mobf_modpath .. "/job_queue.lua")
 dofile (mobf_modpath .. "/lifebar.lua")
+dofile (mobf_modpath .. "/env_constants.lua")
 dofile (mobf_modpath .. "/environment.lua")
 dofile (mobf_modpath .. "/attention.lua")
 dofile (mobf_modpath .. "/movement_generic.lua")
@@ -84,6 +93,7 @@ dofile (mobf_modpath .. "/mob_state.lua")
 dofile (mobf_modpath .. "/inventory.lua")
 dofile (mobf_modpath .. "/mob_preserve.lua")
 dofile (mobf_modpath .. "/path.lua")
+dofile (mobf_modpath .. "/factions.lua")
 
 --include spawning support
 dofile (mobf_modpath .. "/spawning.lua")
@@ -96,7 +106,7 @@ dofile (mobf_modpath .. "/mgen_jordan4ibanez/mgen_jordan4ibanez.lua")
 dofile (mobf_modpath .. "/mgen_pathbased/main.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "2.1.2"
+mobf_version = "2.1.85"
 
 --! @brief define tools used for more than one mob
 function mobf_init_basic_tools()	
@@ -132,11 +142,16 @@ end
 
 --! @brief main initialization function
 function mobf_init_framework()
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing mob framework")
+	
+	
+
+	
 	mobf_init_basic_tools()
 	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Reading mob blacklist")
-	local mobf_mob_blacklist_string = minetest.setting_get("mobf_blacklist")
+	local mobf_mob_blacklist_string = minetest.world_setting_get("mobf_blacklist")
 	
 	if mobf_mob_blacklist_string ~= nil then
 		mobf_rtd.registred_mob = minetest.deserialize(mobf_mob_blacklist_string)
@@ -146,6 +161,18 @@ function mobf_init_framework()
 			mobf_rtd.registred_mob = {}
 		end
 	end
+	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize timesource...")
+	mobf_init_timesource()
+	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize statistics...")
+	mobf_init_statistics()
+	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize asynchronous job handling...")
+	mobf_job_queue.initialize()
+	
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize factions support...")
+	mobf_factions.init()
 	
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize external mod dependencys...")
 	mobf_init_mod_deps()
@@ -180,7 +207,7 @@ function mobf_init_framework()
 		description = "Player may change mobf settings",
 		give_to_singleplayer = true
 	})
-
+	
 	print("MOD: mob framework mod "..mobf_version.." loaded")
 end
 
@@ -294,9 +321,9 @@ function mobf_init_modules()
 
 	--visual change hook
 	mobf.register_on_step_callback({
-			name = "update_orientation",
-			handler = graphics.update_orientation,
-			init = nil,
+			name = "update_graphics",
+			handler = graphics.update,
+			init = graphics.init_dynamic_data,
 			configcheck = function(entity)
 					return true
 				end
@@ -369,6 +396,13 @@ function mobf_init_modules()
 			visiblename = mobf_path.buttontext,
 			handler		= mobf_path.mob_rightclick_callback,
 			configcheck	= mobf_path.config_check
+			})
+			
+	mobf.register_on_rightclick_callback({
+			name = "factions",
+			visiblename = "Factions",
+			handler		= mobf_factions.mob_rightclick_callback,
+			configcheck	= mobf_factions.config_check
 			})
 end
 

@@ -3,105 +3,25 @@
 -- 
 -- You may copy, use, modify or do nearly anything except removing this
 -- copyright notice. 
--- And of course you are NOT allow to pretend you have written it.
+-- And of course you are NOT allowed to pretend you have written it.
 --
 --! @file init.lua
 --! @brief settings gui for mobf
 --! @copyright Sapier
 --! @author Sapier
---! @date 2012-12-27
+--! @date 2013-05-20
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mobf_settings mod loading ... ")
 
 mobf_settings = {}
-mobf_settings.version = "0.0.20"
-mobf_settings.max_list_page_num = 5
-mobf_settings.buttons = {}
-mobf_settings.buttons[1] = {}
-mobf_settings.buttons[2] = {}
-mobf_settings.tool_buttons = {}
-mobf_settings.tool_buttons[1] = {}
-mobf_settings.tool_buttons[2] = {}
-mobf_settings.menubutton = "button_exit[11,9.5;2,0.5;main; Exit]"
-mobf_settings.formspechandler = function(player,formspec)
-			name = player:get_player_name()
-			minetest.show_formspec(name,"mobf_settings:mainform",formspec)
-		end
-		
-mobf_settings_debug = function () end
-------------------------------------------------------------------------------
--- name: save
---
---! @brief save current config to config file
---! @ingroup mobf_settings
---
--------------------------------------------------------------------------------
-function mobf_settings.save()
-	if not minetest.is_singleplayer() then
-		minetest.setting_save()
-	end
-	--singleplayer saves automaticaly
-end
+mobf_settings.tabs = {}
+mobf_settings.version = "0.9.1"
+mobf_settings.formname = "mobf_settings"
 
-------------------------------------------------------------------------------
--- name: get_animal_list
---
---! @brief get animal list form element for a page
---! @ingroup mobf_settings
---
---! @param page_number number of page to get list for
---!
---! @return formspec for page
--------------------------------------------------------------------------------
-function mobf_settings.get_animal_list(page_number)
-
-    local mobf_mob_blacklist_string = minetest.setting_get("mobf_blacklist")
-    local mobf_mobs_blacklisted = nil
-    if mobf_mob_blacklist_string ~= nil then
-        mobf_mobs_blacklisted = minetest.deserialize(mobf_mob_blacklist_string)
-    end
-
-    local retval = ""
-    local line = 3
-
-    local start_at = page_number -1
-
-    for i,val in ipairs(mobf_rtd.registred_mob) do
-        
-        if i > (start_at*16) then
-	        if i <= (start_at*16 + 8) then
-	            retval = retval .. "label[1.0," .. line .. ";" .. val .. "]"
-	            local line_btn = line + 0.25
-	            if contains(mobf_mobs_blacklisted,val) then
-	               retval = retval .. "button[0.5," .. line_btn .. ";0.5,0.25;page"..page_number.."_enable_" .. val .. "; ]"
-	            else
-	               retval = retval .. "button[0.5," .. line_btn .. ";0.5,0.25;page"..page_number.."_disable_" .. val .. ";x]"
-	            end
-	        end
-	        
-	        if i > (start_at*16 + 8 ) and
-	            i <= (start_at*16 + 16) then
-	            
-	            local temp_line = line - (8*0.75)
-	            retval = retval .. "label[7.0," .. temp_line .. ";" .. val .. "]"
-	            
-	            local line_btn = temp_line +0.25
-	            if contains(mobf_mobs_blacklisted,val) then
-                   retval = retval .. "button[6.5," .. line_btn .. ";0.5,0.25;page"..page_number.."_enable_" .. val .. "; ]"
-                else
-                   retval = retval .. "button[6.5," .. line_btn .. ";0.5,0.25;page"..page_number.."_disable_" .. val .. ";x]"
-                end
-	        end
-	        
-	        line = line + 0.75
-	    end
-    end
-
-    return retval
-end
-
+local COLOR_RED   = "#FF0000"
+local COLOR_GREEN = "#00FF00"
 
 ------------------------------------------------------------------------------
 -- name: contains
@@ -116,508 +36,1007 @@ end
 -------------------------------------------------------------------------------
 function contains(cur_table,element)
 
-    if cur_table == nil then
-        --print("looking in empty table")
-        return false
-    end
-    
-    --print("looking for " .. dump(element) .. " in " .. dump(cur_table))
-    
-    for i,v in ipairs(cur_table) do
-        if v == element then
-            --print("found: " .. element .. " in table")
-            return true
-        end
-    end
-    
-    --print("didn't find " .. element)
-    return false
-end
-
-------------------------------------------------------------------------------
--- name: contains_key
---
---! @brief check if table contains key
---! @ingroup mobf_settings
---
---! @param cur_table table to check for element
---! @param element element to find in table
---!
---! @return true/false
--------------------------------------------------------------------------------
-function get_value(cur_table,key)
-
-    if cur_table == nil or
-        key == nil then
-        --print("looking in empty table")
-        return nil
-    end
-    
-    --print("looking for " .. dump(element) .. " in " .. dump(cur_table))
-    
-    for k,v in pairs(cur_table) do
-        if k == key then
-            --print("found: " .. element .. " in table")
-            return v
-        end
-    end
-    
-    --print("didn't find " .. element)
-    return nil
-end
-
-
-------------------------------------------------------------------------------
--- name: get_known_animals_form
---
---! @brief create page to be shown
---! @ingroup mobf_settings
---
---! @param page name of page
---!
---! @return formspec of page
--------------------------------------------------------------------------------
-function mobf_settings.get_main_settings_form(page)
-	local retval = ""
-	
-	for i=0,mobf_settings.max_list_page_num,1 do
-		if page == "mobf_list_page" .. i then
-			local nextpage = i +1
-			local prevpage = i -1
-			retval = "label[0.5,2.25;Known Mobs, Page ".. i .. "]"
-				.."label[0.5,2.5;-------------------------------------------]"
-				.."label[6.5,2.5;----------------------------------------]"
-				.. mobf_settings.get_animal_list(i)
-			
-			if i ~= mobf_settings.max_list_page_num then
-				retval = retval .."button[3,9.5;2,0.5;mobf_list_page" .. nextpage ..";Next]"
-			end
-			if i ~= 1 then
-				retval = retval .."button[0.5,9.5;2,0.5;mobf_list_page" .. prevpage ..";Prev]"
-			end
-			
-			return retval
-		end
+	if cur_table == nil then
+		--print("looking in empty table")
+		return false
 	end
 	
-	if page == "mobf_restart_required" then
-		retval = "label[0.5,2.25;This settings require to restart Game!]"
-			.."label[0.5,2.5;-------------------------------------------]"
-			.."label[6.5,2.5;----------------------------------------]"
-		
-			retval = retval .. mobf_settings.draw_buttons(mobf_settings.buttons[1],0.5)
-			retval = retval .. mobf_settings.draw_buttons(mobf_settings.buttons[2],6.5)
-		
-		return retval
-	end
+	--print("looking for " .. dump(element) .. " in " .. dump(cur_table))
 	
-	if page == "mobf_tools" then
-		retval = "label[0.5,2.25;Tools to be used with mobf]"
-			.."label[0.5,2.5;-------------------------------------------]"
-			.."label[6.5,2.5;----------------------------------------]"
-			
-			retval = retval .. mobf_settings.draw_tool_buttons(mobf_settings.tool_buttons[1],0.5)
-			retval = retval .. mobf_settings.draw_tool_buttons(mobf_settings.tool_buttons[2],6.5)
-			
-		return retval
-	end
-	
-	return ""
-end
-
-------------------------------------------------------------------------------
--- name: draw_buttons
---
---! @brief get formspec for button drawing
---! @ingroup mobf_settings
---
---! @param buttons buttons to show
---! @param xpos pos to show buttons at
---!
---! @return formspec for button list
--------------------------------------------------------------------------------
-function mobf_settings.draw_buttons(buttons,xpos)
-	local retval = ""
-	
-	local y_pos = 3.75
-		
-	for i=1,#buttons,1 do
-		local current_setting = minetest.setting_getbool(buttons[i].value)
-		
-		if buttons[i].inverted then
-			if not current_setting then
-				retval = retval .. "button[" .. xpos .. ",".. y_pos .. ";6,0.5;" .. 
-				"en_" .. buttons[i].value .. ";" .. 
-				buttons[i].text .. " is enabled]"
-			else
-				retval = retval .. "button[" .. xpos .. ",".. y_pos .. ";6,0.5;" .. 
-				"dis_" .. buttons[i].value .. ";" .. 
-				buttons[i].text .. " is disabled]"
-			end
-		
-		else
-			if current_setting then
-				retval = retval .. "button[" .. xpos .. ",".. y_pos .. ";6,0.5;" .. 
-				"dis_" .. buttons[i].value .. ";" .. 
-				buttons[i].text .. " is enabled]"
-			else
-				retval = retval .. "button[" .. xpos .. ",".. y_pos .. ";6,0.5;" .. 
-				"en_" .. buttons[i].value .. ";" .. 
-				buttons[i].text .. " is disabled]"
-			end
-		end
-		
-		y_pos = y_pos + 0.75
-	end
-
-	return retval
-end
-
-------------------------------------------------------------------------------
--- name: draw_tool_buttons
---
---! @brief get formspec for button drawing
---! @ingroup mobf_settings
---
---! @param buttons buttons to show
---! @param xpos pos to show buttons at
---!
---! @return formspec for button list
--------------------------------------------------------------------------------
-function mobf_settings.draw_tool_buttons(buttons,xpos)
-	local retval = ""
-	
-	local y_pos = 3.75
-		
-	for i=1,#buttons,1 do
-		
-		retval = retval .. "button[" .. xpos .. ",".. y_pos .. ";6,0.5;" .. 
-			buttons[i].id .. ";" .. 
-			buttons[i].text .."]"
-		
-		y_pos = y_pos + 0.75
-	end
-
-	return retval
-end
-
-------------------------------------------------------------------------------
--- name: handle_mob_en_disable_button
---
---! @brief handle press of en_disable button for a mob
---! @ingroup mobf_settings
---
---! @param fields
---!
---! @return
--------------------------------------------------------------------------------
-function mobf_settings.handle_mob_en_disable_button(fields)
-	for i,val in ipairs(mobf_rtd.registred_mob) do
-		
-        local page = nil
-        
-        for i = 0 , 5 , 1 do
-            if fields["page".. i .. "_enable_" .. val] ~= nil then
-                local mobf_mob_blacklist_string = minetest.setting_get("mobf_blacklist")
-                local mobf_mobs_blacklisted = nil
-                if mobf_mob_blacklist_string ~= nil then
-                    mobf_mobs_blacklisted = minetest.deserialize(mobf_mob_blacklist_string)
-                end
-                
-                if mobf_mobs_blacklisted == nil then
-                    mobf_settings_debug("MOBF_SETTINGS: trying to enable mob but no mobs were blacklisted!?")
-                else
-                
-                    local new_blacklist = {}
-                    
-                    for i,v in ipairs(mobf_mobs_blacklisted) do
-                        if v ~= val then
-                            table.insert(new_blacklist,v)
-                        end
-                    end
-                    
-                    minetest.setting_set("mobf_blacklist",minetest.serialize(new_blacklist))
-                    mobf_settings_debug("MOBF_SETTINGS: Enabling: " .. val .. " blacklist is now: " .. dump(new_blacklist))
-                end
-                page = i
-            end
-        end
-        
-        for i = 0 , 5 , 1 do
-            if fields["page".. i .. "_disable_" .. val] ~= nil then
-            
-                local mobf_mob_blacklist_string = minetest.setting_get("mobf_blacklist")
-                local mobf_mobs_blacklisted = nil
-                if mobf_mob_blacklist_string ~= nil then
-                    mobf_mobs_blacklisted = minetest.deserialize(mobf_mob_blacklist_string)
-                end
-                
-                if mobf_mobs_blacklisted == nil then
-                    mobf_mobs_blacklisted = {}
-                end
-                
-                table.insert(mobf_mobs_blacklisted,val)
-                    
-                minetest.setting_set("mobf_blacklist",minetest.serialize(mobf_mobs_blacklisted))
-                page = i
-                mobf_settings_debug("MOBF_SETTINGS: Disabling: " .. val)
-            end
-        end
-        
-        if page ~= nil then
-            mobf_settings.save()
-            return "mobf_list_page" .. page
-        end
-    end
-    
-    mobf_settings.save()
-    return nil
-end
-
-
-------------------------------------------------------------------------------
--- name: handle_config_changed_button
---
---! @brief handle press of a settings button
---! @ingroup mobf_settings
---
---! @param fields
---!
---! @return
--------------------------------------------------------------------------------
-function mobf_settings.handle_config_changed_button(fields)
-
-	local config_setting = nil
-	local enable  = false
-
-	for j=1,2,1 do
-		for i=1,#mobf_settings.buttons[j],1 do
-			local fieldname = "en_" .. mobf_settings.buttons[j][i].value
-			if fields[fieldname] ~= nil then
-				config_setting = mobf_settings.buttons[j][i]
-				enable = true
-				break
-			end
-			
-			fieldname = "dis_" .. mobf_settings.buttons[j][i].value
-			if fields[fieldname] ~= nil then
-				config_setting = mobf_settings.buttons[j][i]
-				enable = false
-				break
-			end
-		end
-	end
-
-	if config_setting ~= nil then
-		mobf_settings_debug("MOBF_SETTINGS: detected changed value " .. config_setting.value)
-		if enable then
-			minetest.setting_set(config_setting.value,"true")
-		else
-			minetest.setting_set(config_setting.value,"false")
-		end
-		mobf_settings.save()
-		return true
-	end
-	
-	return false
-end
-
-
-------------------------------------------------------------------------------
--- name: handle_tool_button
---
---! @brief handle press of a settings button
---! @ingroup mobf_settings
---
---! @param player whoever clicked the button
---! @param fields
---!
---! @return
--------------------------------------------------------------------------------
-function mobf_settings.handle_tool_button(player,fields)
-
-	for i=1,2,1 do
-		for j=1,#mobf_settings.tool_buttons[i],1 do
-			local id = nil
-			
-			if mobf_settings.tool_buttons[i][j] ~= nil then
-				id = mobf_settings.tool_buttons[i][j].id
-			end
-			
-			local value = get_value(fields,id)
-			if value ~= nil then
-			
-				if type(mobf_settings.tool_buttons[i][j].param) == "function" then
-					mobf_settings.tool_buttons[i][j].param(player,fields)
-				else
-					mobf_settings_debug("MOBF_SETTINGS: invalid use of tool_button")
-				end
-				return true
-			end
-		end
-	end
-	return false
-end
-
-------------------------------------------------------------------------------
--- name: get_formspec
---
---! @brief generate page form for mobf_settings
---! @ingroup mobf_settings
---
---! @param player player to create page for
---! @param page pagename to create
--------------------------------------------------------------------------------
-function mobf_settings.get_formspec(player,page)
-    local version = "< 1.4.5"
-    
-    if (type(mobf_get_version) == "function") then
-        version = mobf_get_version()
-    end
-    
-    local playername = player:get_player_name()
-    
-	if minetest.check_player_privs(playername, {mobfw_admin=true}) then
-		local pageform = mobf_settings.get_main_settings_form(page)
-		    
-		return "size[13,10]"
-			..mobf_settings.menubutton
-			.."button[0.5,0.75;3,0.5;mobf_list_page1; Known Mobs ]"
-			.."button[4,0.75;3,0.5;mobf_restart_required; Settings ]"
-			.."button[7.5,0.75;3,0.5;mobf_tools; Tools ]"
-			.."label[5.5,0;MOBF " .. version .. "]"
-			.. pageform
-	else
-		local pageform = mobf_settings.get_main_settings_form("mobf_tools")
-		return "size[13,10]"
-			..mobf_settings.menubutton
-			.."label[0.5,0.75;You are not allowed to change any setting!]"
-			.."label[5.5,0;MOBF " .. version .. "]"
-			..pageform
-	end
-
-end
-
-
-------------------------------------------------------------------------------
--- name: set_mob_list_page(fields)
---
---! @brief check if requested page is a list page and show it
---! @ingroup mobf_settings
---
---! @oaram player 
---! @param fields data for callback
---
---! @return true if handled false if not
--------------------------------------------------------------------------------
-function mobf_settings.set_mob_list_page(player,fields)
-	if fields.mobf then
-		mobf_settings.formspechandler(player, mobf_settings.get_formspec(player,"mobf_list_page1"))
-		return true
-	end
-	
-	
-	for i=1,5,1 do
-		local namestring = "mobf_list_page" .. i
-
-		if fields[namestring] ~= nil then
-			mobf_settings.formspechandler(player, mobf_settings.get_formspec(player,namestring))
+	for i,v in ipairs(cur_table) do
+		if v == element then
+			--print("found: " .. element .. " in table")
 			return true
 		end
 	end
-
+	
+	--print("didn't find " .. element)
 	return false
 end
 
 ------------------------------------------------------------------------------
--- name: register_config_button(index,configvalue,buttontext,inverted)
+-- name: explode_textlist_event
 --
---! @brief register a button to be shown on config page
+--! @brief fetch data from textlist event
 --! @ingroup mobf_settings
 --
---! @param index column to draw button at
---! @param configvalue config value to change by this button
---! @param buttontext to set for this value
---! @param inverted invert enable/disable text on button
---
+--! @param text data to parse
+--!
+--! @return textlist event
 -------------------------------------------------------------------------------
-function mobf_settings.register_config_button(index,configvalue,buttontext,inverted)
-
-	local toadd = {
-					value		= configvalue,
-					text		= buttontext,
-					inverted	= inverted,
-					}
+function explode_textlist_event(text)
 	
-	table.insert(mobf_settings.buttons[index],toadd)
+	local retval = {}
+	retval.typ = "INV"
+	
+	if text == nil then
+		return retval
+	end
+	
+	local parts = text:split(":")
+				
+	if #parts == 2 then
+		retval.typ = parts[1]:trim()
+		retval.index= tonumber(parts[2]:trim())
+		
+		if type(retval.index) ~= "number" then
+			retval.typ = "INV"
+		end
+	end
+	
+	return retval
 end
 
 ------------------------------------------------------------------------------
--- name: register_tool_button(index,id,buttontext,param)
+-- name: handle_event
 --
---! @brief register a button to be shown on config page
+--! @brief do actions according to event
 --! @ingroup mobf_settings
 --
---! @param index column to draw button at
---! @param id to use for button (has to be unique)
---! @param buttontext to set for this value
---! @param param function to call
---
+--! @param player issuing the formspec
+--! @param formname form to be shown
+--! @param fields event information
+--!
+--! @return true/false handled or not
 -------------------------------------------------------------------------------
-function mobf_settings.register_tool_button(index,id,buttontext,param)
-
-	local toadd = {
-					param		= param,
-					text		= buttontext,
-					id			= id,
-					}
+function mobf_settings.handle_event(player,formname,fields)
+	--print("event handler: form: " .. formname)
+	--print("fields: " .. dump(fields))
+	if formname ~= mobf_settings.formname then
+		return false
+	end
 	
-	table.insert(mobf_settings.tool_buttons[index],toadd)
+	local sender_data = mobf_settings.get_sender_data(fields)
+	
+	if sender_data ~= nil and sender_data.name == "maintab" then
+		sender_data.tab = tonumber(sender_data.value)
+	end
+	
+	if sender_data ~= nil then
+		sender_data.player = player
+		sender_data.formname = formname
+		sender_data.fields = fields
+		
+		local playername = player:get_player_name()
+		
+		local privs = minetest.get_player_privs(playername)
+		
+		--check admin privs
+		local privcheck = minetest.check_player_privs(playername, {mobfw_admin=true})
+		
+		sender_data.is_admin = 
+			privcheck or (player:get_player_name() == "singleplayer")
+			
+		local realtabidx = sender_data.tab
+		
+		if not sender_data.is_admin then
+			for i=1,#mobf_settings.tabs,1 do
+				if mobf_settings.tabs[i].admin then
+					realtabidx = realtabidx+1
+				end
+				if i == realtabidx then
+					break
+				end
+			end
+		end
+	
+		if realtabidx <= #mobf_settings.tabs then
+			--make sure no admin tab is shown to non admin users
+			if mobf_settings.tabs[realtabidx].admin then
+				if not sender_data.is_admin then
+					local fixed = false
+					for i=1,#mobf_settings.tabs,1 do
+						if not mobf_settings.tabs[i].admin then
+							sender_data.tab = i
+							sender_data.name = "ukn"
+							sender_data.fields = {}
+							sender_data.type = "ukn"
+							fixed = true
+						end
+					end
+					
+					if not fixed then
+						return
+					end
+				end
+			end
+			
+			--print("showing tab: #" .. sender_data.tab .. " " .. dump(mobf_settings.tabs[sender_data.tab]))
+			mobf_settings.tabs[realtabidx].handler(sender_data)
+		end
+
+	end
+	return true
+end
+
+------------------------------------------------------------------------------
+-- name: get_sender_data
+--
+--! @brief find caller of formspec
+--! @ingroup mobf_settings
+--
+--! @param fields to look for sender
+--!
+--! @return sender information
+-------------------------------------------------------------------------------
+function mobf_settings.get_sender_data(fields)
+	for key,value in pairs(fields) do
+		local parts = key:split("_")
+		
+		if #parts >= 3 then
+			if parts[1] == "btn" or
+				parts[1] == "cb" or
+				parts[1] == "tl" or
+				parts[1] == "th" then
+				
+				local name = ""
+				for i=3, #parts,1 do
+					if name ~= "" then
+						name = name .. "_"
+					end
+					name = name .. parts[i]
+				end
+				
+				return {
+					type = parts[1],
+					tab = tonumber(parts[2]),
+					name = name,
+					value = value
+				}
+			end
+		end
+	end
+	return nil
+end
+
+------------------------------------------------------------------------------
+-- name: handle_statistics_tab
+--
+--! @brief handle events from statistics tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+--!
+--! @return sender information
+-------------------------------------------------------------------------------
+function mobf_settings.handle_statistics_tab(sender_data)
+
+	mobf_settings.show_statistics_tab(sender_data)
+
+end
+
+------------------------------------------------------------------------------
+-- name: handle_info_tab
+--
+--! @brief handle events from info tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+--!
+--! @return sender information
+-------------------------------------------------------------------------------
+function mobf_settings.handle_info_tab(sender_data)
+
+	mobf_settings.show_info_tab(sender_data)
+
+end
+
+------------------------------------------------------------------------------
+-- name: handle_factions_tab
+--
+--! @brief handle events from main tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+--!
+--! @return sender information
+-------------------------------------------------------------------------------
+function mobf_settings.handle_factions_tab(sender_data)
+
+	mobf_settings.handle_factions_tab_input(sender_data)
+		
+	mobf_settings.show_factions_tab(sender_data)
+
+end
+
+------------------------------------------------------------------------------
+-- name: handle_main_tab
+--
+--! @brief handle events from main tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+--!
+--! @return sender information
+-------------------------------------------------------------------------------
+function mobf_settings.handle_main_tab(sender_data)
+	--check player privs
+	if sender_data.is_admin then
+		
+		mobf_settings.handle_main_tab_input(sender_data)
+		
+		mobf_settings.show_main_tab(sender_data)
+	else
+		
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: handle_settings_tab
+--
+--! @brief handle events from main tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+--!
+--! @return sender information
+-------------------------------------------------------------------------------
+function mobf_settings.handle_settings_tab(sender_data)
+	--check player privs
+	if sender_data.is_admin then
+		
+		mobf_settings.handle_settings_tab_input(sender_data)
+		
+		mobf_settings.show_settings_tab(sender_data)
+	else
+		
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: handle_main_tab
+--
+--! @brief handle events from main tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+--!
+--! @return sender information
+-------------------------------------------------------------------------------
+function mobf_settings.handle_tools_tab(sender_data)
+	if mobf_settings.handle_tools_tab_input(sender_data) then
+		mobf_settings.show_tools_tab(sender_data)
+	end
+end
+
+
+------------------------------------------------------------------------------
+-- name: show_main_tab
+--
+--! @brief update formspec to main tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.show_main_tab(sender_data)
+	local formspec = mobf_settings.formspec_header(sender_data)
+	
+	formspec = formspec .. "label[0.5,0;Mobs:]"
+						.. "label[0.5,8.5;doubleclick to change!]" 
+						.. "label[4,8.5;green=enabled, red=disabled]"
+	formspec = formspec .. "textlist[0.5,0.5;7,8;tl_" .. sender_data.tab .. "_mobs;"
+	
+	local mobf_mob_blacklist_string = minetest.world_setting_get("mobf_blacklist")
+	local mobf_mobs_blacklisted = nil
+	if mobf_mob_blacklist_string ~= nil then
+		mobf_mobs_blacklisted = minetest.deserialize(mobf_mob_blacklist_string)
+	end
+	
+	
+	local toadd = ""
+	
+	for i,val in ipairs(mobf_rtd.registred_mob) do
+		if toadd ~= "" then
+			toadd = toadd .. ","
+		end
+		if contains(mobf_mobs_blacklisted,val) then
+			toadd = toadd .. COLOR_RED .. val
+		else
+			toadd = toadd .. COLOR_GREEN .. val
+		end	
+	end
+	
+	formspec = formspec .. toadd .. ";0]"
+	
+	if formspec ~= nil then
+		minetest.show_formspec(sender_data.player:get_player_name(),
+							sender_data.formname,
+							formspec)
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: show_tools_tab
+--
+--! @brief update formspec to tools tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.show_tools_tab(sender_data)
+	local formspec = mobf_settings.formspec_header(sender_data)
+	
+	formspec = formspec .. 
+		"button[1.5,1;4,0.5;btn_" .. sender_data.tab .. "_pathmaker_tool;Give pathmarker tool]" ..
+		"button[1.5,1.75;4,0.5;btn_" .. sender_data.tab .. "_preserved_mobs;Show preserved mobs gui]" ..
+		"button[1.5,2.5;4,0.5;btn_" .. sender_data.tab .. "_path_manager;Show path manager]"
+	
+	if formspec ~= nil then
+		minetest.show_formspec(sender_data.player:get_player_name(),
+							sender_data.formname,
+							formspec)
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: printfac
+--
+--! @brief update formspec to tools tab
+--! @ingroup mobf_settings
+--
+--! @param name of facility
+--! @param data data to add label
+--! @param yval ypos of label
+--! @param vs formatstring
+--
+--! @return formspec label element string
+-------------------------------------------------------------------------------
+function mobf_settings.printfac(name,data,yval,fs)
+	return 
+		"label[0.75," .. yval .. ";" .. mobf_fixed_size_string(name,20) .. "]" ..
+		"label[2.75," .. yval .. ";" .. 
+			mobf_fixed_size_string(string.format(fs,data.current),10).. "]" ..
+		"label[4.25," .. yval .. ";" .. 
+			mobf_fixed_size_string(data.maxabs,10).. "]" ..
+		"label[6," .. yval .. ";" .. 
+			mobf_fixed_size_string(string.format(fs,data.max),10).. "]"
+
+end
+
+------------------------------------------------------------------------------
+-- name: show_info_tab
+--
+--! @brief update formspec to tools tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.show_info_tab(sender_data)
+	local formspec = mobf_settings.formspec_header(sender_data)
+	
+	formspec = formspec ..
+		"label[0.75,0.25;Timesource:]" ..
+		"label[2.75,0.25;" .. mobf_fixed_size_string(mobf_rtd.timesource,30) .. "]" ..
+		"label[0.75,0.75;Daytime:]" .. 
+		"label[6.4,0.75;" .. string.format("%.2f",minetest.get_timeofday()) .. "]" ..
+		mobf_settings.printfac("Active Mobs",statistics.data.mobs,"1.25","%6d") ..
+		mobf_settings.printfac("Jobqueue",statistics.data.queue,"1.75","%6d") ..
+		"label[0.75,2.25;Mobs spawned by mapgen this session:]" ..
+		"label[6.4,2.25;" .. mobf_rtd.total_spawned .. "]"
+		
+	if formspec ~= nil then
+		minetest.show_formspec(sender_data.player:get_player_name(),
+							sender_data.formname,
+							formspec)
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: show_statistics_tab
+--
+--! @brief update formspec to tools tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.show_statistics_tab(sender_data)
+	local formspec = mobf_settings.formspec_header(sender_data)
+	
+	formspec = formspec ..
+	
+		"label[0.75,0;"	.. mobf_fixed_size_string("Facility",20)
+						.. mobf_fixed_size_string("Current",10)
+						.. mobf_fixed_size_string("Abs.Max",10)
+						.. mobf_fixed_size_string("Maximum",10) .. "]" ..
+		mobf_settings.printfac("Total",statistics.data.total,"0.5","%.2f%%") ..
+		"label[0.75,0.25;--------------------------------------------------]" ..
+		mobf_settings.printfac("Onstep",statistics.data.onstep,"1","%.2f%%") ..
+		mobf_settings.printfac("Job processing",statistics.data.queue_load,"1.5","%.2f%%") ..
+		mobf_settings.printfac("ABM",statistics.data.abm,"2","%.2f%%") ..
+		mobf_settings.printfac("MapGen",statistics.data.mapgen,"2.5","%.2f%%") ..
+		mobf_settings.printfac("Spawn onstep",statistics.data.spawn_onstep,"3","%.2f%%") ..
+		mobf_settings.printfac("Activate",statistics.data.activate,"3.5","%.2f%%") ..
+		mobf_settings.printfac("User 1",statistics.data.user_1,"7.5","%.2f%%") ..
+		mobf_settings.printfac("User 2",statistics.data.user_2,"8","%.2f%%") ..
+		mobf_settings.printfac("User 3",statistics.data.user_3,"8.5","%.2f%%")
+
+	if formspec ~= nil then
+		minetest.show_formspec(sender_data.player:get_player_name(),
+							sender_data.formname,
+							formspec)
+	end
+end
+------------------------------------------------------------------------------
+-- name: show_factions_tab
+--
+--! @brief update formspec to tools tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.show_factions_tab(sender_data)
+	local formspec = mobf_settings.formspec_header(sender_data)
+	
+	local new_dataid = ""
+	local own_data = sender_data.factions_tab_data
+	
+	if own_data == nil then
+		own_data = {}
+		own_data.available_factions_selected=0
+		own_data.faction_reputation_selected=0
+	end
+	
+	new_dataid = mobf_global_data_store(own_data)
+	
+	formspec = formspec ..
+		"label[0.25,-0.25;Available factions:]" ..
+		"textlist[0.25,0.25;3.5,7.5;" ..
+			"tl_" .. sender_data.tab .."_available_factions:" .. new_dataid .. ";"
+		
+	local factionlist = factions.get_faction_list()
+	
+	local first_element = true
+	if #factionlist ~= 0 then
+		for i=1,#factionlist,1 do
+			if not first_element then
+				formspec = formspec .. ","
+			else
+				first_element = false
+			end
+			formspec = formspec .. factionlist[i]
+		end
+	else
+		formspec = formspec .. "no factions available"
+	end
+	
+	formspec = formspec .. ";" .. own_data.available_factions_selected .. "]"
+	local playername = sender_data.player:get_player_name()
+	if minetest.check_player_privs(playername, {faction_admin=true}) 
+		or playername == "singleplayer" then
+		formspec = formspec .. 
+			"button[0.25,8;3.75,0.5;btn_" .. sender_data.tab .. "_delete:" .. new_dataid .. ";Delete]" ..
+			"field[4.3,0.75;4,0.5;te_factionname;New Faction;]" ..
+			"button[4,1.25;4,0.25;btn_" .. sender_data.tab .. "_create:" .. new_dataid .. ";Create]"
+	end
+	
+	if minetest.check_player_privs(playername, {faction_admin=true}) or
+		minetest.check_player_privs(playername, {faction_user=true})
+		or playername == "singleplayer" then
+		formspec = formspec .. 
+			"field[4.3,2.75;4,0.5;te_inviteename;Playername:;]" ..
+			"button[4,3.25;4,0.25;btn_" .. sender_data.tab .. "_invite:" .. new_dataid .. ";Invite]"
+	end
+	
+	
+	local selected_rep = ""
+	formspec = formspec ..
+		"label[4,3.75;Base reputation:]" ..
+		"textlist[4,4.25;3.75,3.5;tl_" .. sender_data.tab .. "_faction_reputation:" .. new_dataid .. ";"
+	
+	if own_data.available_factions_selected > 0 and
+		own_data.available_factions_selected <= #factionlist then
+		local first_rep = true
+		for i=1,#factionlist,1 do
+			local current_rep = factions.get_base_reputation(
+					factionlist[i],
+					factionlist[own_data.available_factions_selected])
+					
+			if not first_rep then
+				formspec = formspec .. ","
+			else
+				first_rep = false
+			end
+			if tonumber(current_rep) > 0 then
+				formspec = formspec .. COLOR_GREEN
+			elseif tonumber(current_rep) < 0 then
+				formspec = formspec .. COLOR_RED
+			end
+			formspec = formspec .. "(" .. current_rep .. ") " .. factionlist[i]
+		end
+		
+		if own_data.faction_reputation_selected > 0 and
+			own_data.faction_reputation_selected <= #factionlist then
+			selected_rep = factions.get_base_reputation(
+					factionlist[own_data.faction_reputation_selected],
+					factionlist[own_data.available_factions_selected])
+		end
+	end
+	
+	formspec = formspec ..
+		";" .. own_data.faction_reputation_selected .."]" ..
+		"label[4,7.9;New Baserep:]" ..
+		"field[6.2,8.3;1.1,0.5;te_baserep;;" .. selected_rep .."]" ..
+		"button[6.9,8;1,0.5;btn_" .. sender_data.tab .. "_set_reputation:" .. new_dataid .. ";set]"
+	
+	if sender_data.errormessage then
+		formspec = formspec .. 
+			"label[0.25,8.5;" .. sender_data.errormessage .. "]"
+	end
+	
+	if formspec ~= nil then
+		minetest.show_formspec(sender_data.player:get_player_name(),
+							sender_data.formname,
+							formspec)
+	end
+end
+------------------------------------------------------------------------------
+-- name: show_settings_tab
+--
+--! @brief update formspec to settings tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.show_settings_tab(sender_data)
+	local formspec = mobf_settings.formspec_header(sender_data)
+	
+	formspec = formspec .. "checkbox[1,0.5;" .. 
+				"cb_" .. sender_data.tab .. "_disable_animal_spawning;" ..
+				"Disable mob spawning;" .. 
+				mobf_settings.setting_gettext("mobf_disable_animal_spawning") .."]"
+				
+	formspec = formspec .. "checkbox[1,1;" .. 
+				"cb_" .. sender_data.tab .. "_disable_3d_mode;" ..
+				"Disable 3D mobs;" .. 
+				mobf_settings.setting_gettext("mobf_disable_3d_mode") .."]"
+				
+	formspec = formspec .. "checkbox[1,1.5;" .. 
+				"cb_" .. sender_data.tab .. "_animal_spawning_secondary;" ..
+				"Enable secondary spawning;" .. 
+				mobf_settings.setting_gettext("mobf_animal_spawning_secondary") .."]"
+				
+	formspec = formspec .. "checkbox[1,2;" .. 
+				"cb_" .. sender_data.tab .. "_delete_disabled_mobs;" ..
+				"Delete disabled mobs+spawners;" .. 
+				mobf_settings.setting_gettext("mobf_delete_disabled_mobs") .."]"
+				
+	formspec = formspec .. "checkbox[1,2.5;" .. 
+				"cb_" .. sender_data.tab .. "_log_bug_warnings;" ..
+				"Log MOBF bug warnings;" .. 
+				mobf_settings.setting_gettext("mobf_log_bug_warnings") .."]"
+				
+	formspec = formspec .. "checkbox[1,3;" .. 
+				"cb_" .. sender_data.tab .. "_vombie_3d_burn_animation_enabled;" ..
+				"Vombie 3D burn animation;" .. 
+				mobf_settings.setting_gettext("vombie_3d_burn_animation_enabled") .."]"
+				
+	formspec = formspec .. "checkbox[1,3.5;" .. 
+				"cb_" .. sender_data.tab .. "_log_removed_entities;" ..
+				"Log all removed mobs;" .. 
+				mobf_settings.setting_gettext("mobf_log_removed_entities") .."]"
+				
+	formspec = formspec .. "checkbox[1,4;" .. 
+				"cb_" .. sender_data.tab .. "_grief_protection;" ..
+				"Enable grief protection;" .. 
+				mobf_settings.setting_gettext("mobf_grief_protection") .."]"
+				
+	formspec = formspec .. "checkbox[1,4.5;" .. 
+				"cb_" .. sender_data.tab .. "_lifebar;" ..
+				"Show mob lifebar;" .. 
+				mobf_settings.setting_gettext("mobf_lifebar") .."]"
+				
+	formspec = formspec .. "checkbox[1,5;" .. 
+				"cb_" .. sender_data.tab .. "_enable_statistics;" ..
+				"Enable statistics;" .. 
+				mobf_settings.setting_gettext("mobf_enable_statistics") .."]"
+	formspec = formspec .. "checkbox[1,5.5;" .. 
+				"cb_" .. sender_data.tab .. "_delayed_spawning;" ..
+				"Delay spawning at mapgen;" .. 
+				mobf_settings.setting_gettext("mobf_delayed_spawning") .."]"
+	formspec = formspec .. "checkbox[1,6;" .. 
+				"cb_" .. sender_data.tab .. "_disable_pathfinding;" ..
+				"Disable core pathfinding support;" .. 
+				mobf_settings.setting_gettext("mobf_disable_pathfinding") .."]"
+	--print("formspec: " .. formspec)
+	if formspec ~= nil then
+		minetest.show_formspec(sender_data.player:get_player_name(),
+							sender_data.formname,
+							formspec)
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: handle_tools_tab_input
+--
+--! @brief handle input from tools tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.handle_tools_tab_input(sender_data)
+
+	if sender_data.name == "pathmaker_tool" then
+		sender_data.player:get_inventory():add_item("main", "mobf:path_marker 1")
+	end
+	
+	local name = sender_data.player:get_player_name()
+	
+	if sender_data.name == "preserved_mobs" then
+		mob_preserve.handle_command(name,nil)
+		return false
+	end
+	
+	if sender_data.name == "path_manager" then
+		mobf_path.show_manage_menu(name,nil)
+		return false
+	end
+
+	return true
+end
+
+------------------------------------------------------------------------------
+-- name: handle_factions_tab_input
+--
+--! @brief handle input from main tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.handle_factions_tab_input(sender_data)
+	
+	local parts = string.split(sender_data.name,":")
+	local action = parts[1]
+	local dataid = parts[2]
+	
+	local data = mobf_global_data_get(dataid)
+	
+	sender_data.factions_tab_data = data
+	
+	if action == "delete" then
+	
+	end
+	
+	if action == "create" then
+		if sender_data.fields["te_factionname"] ~= nil then
+			
+			if sender_data.fields["te_factionname"] == "" then
+				sender_data.errormessage ="Refusing to create faction with no name!"
+			elseif not factions.exists(sender_data.fields["te_factionname"]) then
+				if not factions.add_faction(sender_data.fields["te_factionname"]) then
+					sender_data.errormessage = "Failed to add faction \"" 
+						.. sender_data.fields["te_factionname"] .. "\""
+				else
+					if not factions.member_add(
+							sender_data.fields["te_factionname"],sender_data.player) then
+						sender_data.errormessage = "Unable to add creator to faction!"
+					elseif not factions.set_admin(
+							sender_data.fields["te_factionname"],
+							sender_data.player:get_player_name(),true) then
+						sender_data.errormessage = "Unable to give admin privileges to creator!"
+					end
+				end
+			else
+				sender_data.errormessage = "Faction \"" 
+					.. sender_data.fields["te_factionname"] .. "\" already exists"
+			end
+		end
+	end
+	
+	if action == "invite" then
+		--get faction from faction list
+		local factionlist = factions.get_faction_list()
+		if sender_data.factions_tab_data.available_factions_selected > 0 and
+			sender_data.factions_tab_data.available_factions_selected < #factionlist then
+		
+			local faction_to_invite = factionlist[sender_data.factions_tab_data.available_factions_selected]
+			
+			--check if player is in faction he wants to invite for
+			--TODO privs check
+			if factions.is_admin(faction_to_invite,sender_data.player:get_player_name()) or
+				factions.is_free(faction_to_invite) then
+				if sender_data.fields["te_inviteename"] ~= nil and
+					sender_data.fields["te_inviteename"] ~= "" then
+						factions.member_invite(faction_to_invite,sender_data.fields["te_inviteename"])
+				else
+					sender_data.errormessage = "You can't invite nobody!"
+				end
+			else
+				sender_data.errormessage = "Not allowed to invite for faction " .. faction_to_invite
+			end
+		else
+			sender_data.errormessage = "No faction selected to invite to"
+		end
+	end
+	
+	if action == "set_reputation" then
+		if sender_data.factions_tab_data.available_factions_selected ==
+			sender_data.factions_tab_data.faction_reputation_selected then
+			sender_data.errormessage = "Can't set base reputation of faction to itself!"
+		else
+			local factionlist = factions.get_faction_list()
+			local faction1 = factionlist[sender_data.factions_tab_data.available_factions_selected]
+			local faction2 = factionlist[sender_data.factions_tab_data.faction_reputation_selected]
+			
+			if faction1 ~= nil and faction2 ~= nil and
+				sender_data.fields["te_baserep"] ~= nil and sender_data.fields["te_baserep"] ~= "" then
+				if not factions.set_base_reputation(faction1,faction2,sender_data.fields["te_baserep"]) then
+					sender_data.errormessage = "Failed to set base reputation"
+				end
+			else
+				sender_data.errormessage = "Only one faction selected or no value given!"
+			end
+		end
+	end
+	
+	if action == "available_factions" then
+		if sender_data.value ~= nil then
+			local event = explode_textlist_event(sender_data.value)
+			
+			if event.typ ~= "INV" then
+				sender_data.factions_tab_data.available_factions_selected = event.index
+			end
+		end
+	end
+	
+	if action == "faction_reputation" then
+		if sender_data.value ~= nil then
+			local event = explode_textlist_event(sender_data.value)
+			
+			if event.typ ~= "INV" then
+				sender_data.factions_tab_data.faction_reputation_selected = event.index
+			end
+		end
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: handle_main_tab_input
+--
+--! @brief handle input from main tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.handle_main_tab_input(sender_data)
+	
+	if sender_data.name == "mobs" then
+		local tl_event = explode_textlist_event(sender_data.value)
+		if tl_event.typ == "DCL" and
+			tl_event.index < #mobf_rtd.registred_mob then
+			local clicked_mob = mobf_rtd.registred_mob[tl_event.index]
+		
+			local mobf_mob_blacklist_string = minetest.world_setting_get("mobf_blacklist")
+			local mobf_mobs_blacklisted = nil
+			if mobf_mob_blacklist_string ~= nil then
+				mobf_mobs_blacklisted = minetest.deserialize(mobf_mob_blacklist_string)
+			else
+				mobf_mobs_blacklisted = {}
+			end
+			
+			local new_blacklist = {}
+			
+			if contains(mobf_mobs_blacklisted,clicked_mob) then
+				for i=1,#mobf_mobs_blacklisted,1 do
+					if mobf_mobs_blacklisted[i] ~= clicked_mob then
+						table.insert(new_blacklist,mobf_mobs_blacklisted[i])
+					end
+				end
+			else
+				new_blacklist = mobf_mobs_blacklisted
+				table.insert(mobf_mobs_blacklisted,clicked_mob)
+			end
+			
+			minetest.world_setting_set("mobf_blacklist",minetest.serialize(new_blacklist))
+		end
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: handle_settings_tab_input
+--
+--! @brief handle input from settings tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.handle_settings_tab_input(sender_data)
+	--print("settings tab handler " .. dump(sender_data))
+	if sender_data.name == "disable_animal_spawning" then
+		mobf_set_world_setting("mobf_disable_animal_spawning",
+								mobf_settings.tobool(sender_data.value))
+	end
+	
+	if sender_data.name == "disable_3d_mode" then
+		mobf_set_world_setting("mobf_disable_3d_mode",
+								mobf_settings.tobool(sender_data.value))
+	end
+	
+	if sender_data.name == "animal_spawning_secondary" then
+		mobf_set_world_setting("mobf_animal_spawning_secondary",
+								mobf_settings.tobool(sender_data.value))
+	end
+	
+	if sender_data.name == "delete_disabled_mobs" then
+		mobf_set_world_setting("mobf_delete_disabled_mobs",
+								mobf_settings.tobool(sender_data.value))
+	end
+	
+	if sender_data.name == "log_bug_warnings" then
+		mobf_set_world_setting("mobf_log_bug_warnings",
+								mobf_settings.tobool(sender_data.value))
+	end
+	
+	if sender_data.name == "vombie_3d_burn_animation_enabled" then
+		mobf_set_world_setting("vombie_3d_burn_animation_enabled",
+								mobf_settings.tobool(sender_data.value))
+	end
+
+	if sender_data.name == "log_removed_entities" then
+		mobf_set_world_setting("mobf_log_removed_entities",
+								mobf_settings.tobool(sender_data.value))
+	end
+	
+	if sender_data.name == "grief_protection" then
+		mobf_set_world_setting("mobf_grief_protection",
+								mobf_settings.tobool(sender_data.value))
+	end
+	
+	if sender_data.name == "lifebar" then
+		mobf_set_world_setting("mobf_lifebar",
+								mobf_settings.tobool(sender_data.value))
+	end
+	
+	if sender_data.name == "enable_statistics" then
+		mobf_set_world_setting("mobf_enable_statistics",
+								mobf_settings.tobool(sender_data.value))
+	end
+	
+	if sender_data.name == "delayed_spawning" then
+		mobf_set_world_setting("mobf_delayed_spawning",
+								mobf_settings.tobool(sender_data.value))
+	end
+	
+	if sender_data.name == "disable_pathfinding" then
+		mobf_set_world_setting("mobf_disable_pathfinding",
+								mobf_settings.tobool(sender_data.value))
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: tobool(value)
+--
+--! @brief convert string to bool value
+--! @ingroup mobf_settings
+--
+--! @param value string
+-------------------------------------------------------------------------------
+function mobf_settings.tobool(value)
+	if value == "true" then
+		return true
+	else
+		return false
+	end
+end
+
+------------------------------------------------------------------------------
+-- name: setting_getbool(name)
+--
+--! @brief convert string to bool value
+--! @ingroup mobf_settings
+--
+--! @param value string
+-------------------------------------------------------------------------------
+function mobf_settings.setting_gettext(value)
+	
+	local value = mobf_get_world_setting(value)
+	
+	if value == nil then
+		return "false"
+	end
+	
+	if value then
+		return "true"
+	end
+	
+	return "false"
+end
+
+------------------------------------------------------------------------------
+-- name: formspec_header
+--
+--! @brief handle input from settings tab
+--! @ingroup mobf_settings
+--
+--! @param sender_data all information gatered
+-------------------------------------------------------------------------------
+function mobf_settings.formspec_header(sender_data)
+	local retval = "size[8,9]" ..
+				--"label[5.5,-0.4;MOBF version: " ..mobf_get_version().."]" ..
+				"label[-0.25,8.9;MOBF version: " ..mobf_get_version().."]" ..
+				"tabheader[-0.3,-0.99;th_" .. sender_data.tab .. "_maintab;"
+
+	local toadd = ""
+	
+	for i=1,#mobf_settings.tabs,1 do
+		if mobf_settings.tabs[i].admin then
+			if sender_data.is_admin then
+				if toadd ~= "" then
+					toadd = toadd .. ","
+				end
+				toadd = toadd .. mobf_settings.tabs[i].caption
+			end
+		else
+			if toadd ~= "" then
+				toadd = toadd .. ","
+			end
+			toadd = toadd .. mobf_settings.tabs[i].caption
+		end
+	end
+
+	retval = retval .. toadd .. ";" .. sender_data.tab .. ";true;false]"
+	
+	return retval
+end
+
+------------------------------------------------------------------------------
+-- name: register_tab(caption,adminrequired,tabhandler)
+--
+--! @brief handle input from settings tab
+--! @ingroup mobf_settings
+--
+--! @param caption of tab button
+--! @param adminrequired should this tab be shown to admin only?
+--! @param tabhandler function called to handle this tab
+-------------------------------------------------------------------------------
+function mobf_settings.register_tab(caption,adminrequired,tabhandler)
+
+	local tab_to_add = {
+				admin = adminrequired,
+				handler = tabhandler,
+				caption = caption
+			}
+	table.insert(mobf_settings.tabs,tab_to_add)
+end
+
+
+mobf_settings.register_tab("Known Mobs",true, mobf_settings.handle_main_tab)
+mobf_settings.register_tab("Settings",  true, mobf_settings.handle_settings_tab)
+mobf_settings.register_tab("Tools",     false,mobf_settings.handle_tools_tab)
+
+if minetest.world_setting_get("mobf_enable_statistics") then
+	mobf_settings.register_tab("Stats",     false,mobf_settings.handle_statistics_tab)
+end
+
+mobf_settings.register_tab("Info",     false,mobf_settings.handle_info_tab)
+
+if mobf_rtd.factions_available then
+	mobf_settings.register_tab("Factions",     false,mobf_settings.handle_factions_tab)
 end
 
 ------------------------------------------------------------------------------
 -- register handler for pressed buttons
 ------------------------------------------------------------------------------
-minetest.register_on_player_receive_fields(function(player, formname, fields)
-	--if one of your page buttons is pressed show another moblist page
-	if mobf_settings.set_mob_list_page(player,fields) then
-		mobf_settings_debug("mobf_settings: abort button processing")
-		return true
-	end
-	
-	--handle tool buttons (no redraw of menu as this could be done by fct
-	if mobf_settings.handle_tool_button(player,fields) then
-		mobf_settings_debug("mobf_settings: abort button processing")
-		return true
-	end
-	
-	--handle menu buttons
-	if mobf_settings.handle_config_changed_button(fields) or
-		fields.mobf_tools ~= nil or fields.mobf_restart_required ~= nil then 
-		local page = "mobf_restart_required"
-		if fields.mobf_tools ~= nil then
-			page = "mobf_tools"
-			mobf_settings_debug("MOBF_SETTINGS: show tool page")
-		else
-			mobf_settings_debug("MOBF_SETTINGS: settings have been changed, show settings page: " .. dump(fields.mobf_restart_required))
-		end
-		 
-		mobf_settings.formspechandler(player, mobf_settings.get_formspec(player,page))
-		mobf_settings_debug("mobf_settings: abort button processing")
-		return true
-	end
-	
-	local blacklist_changed_page = mobf_settings.handle_mob_en_disable_button(fields)
-	
-	if blacklist_changed_page ~= nil then
-		mobf_settings.formspechandler(player, mobf_settings.get_formspec(player,blacklist_changed_page))
-		mobf_settings_debug("mobf_settings: abort button processing")
-		return true
-	end
-	
-	return false
-end)
-
+minetest.register_on_player_receive_fields(mobf_settings.handle_event)
 
 --register chatcommand
 minetest.register_chatcommand("mobf_settings",
@@ -626,45 +1045,20 @@ minetest.register_chatcommand("mobf_settings",
 		description = "show mobf settings" ,
 		privs		= {},
 		func		= function(name,param)
-				local player = minetest.env:get_player_by_name(name)
-				mobf_settings.formspechandler(player,mobf_settings.get_formspec(player,"mobf_list_page1"))
+				minetest.chat_send_player(name, "MOBF: >mobf_settings< is DEPRECATED use >mobf<")
+				local player = minetest.get_player_by_name(name)
+				mobf_settings.handle_event(player,mobf_settings.formname,{btn_1_init="init"})
 			end
 	})
-
-------------------------------------------------------------------------------
--- register mobf_settings buttons
-------------------------------------------------------------------------------
-mobf_settings.register_config_button(1,"mobf_disable_animal_spawning","Animal spawning",true)
-mobf_settings.register_config_button(1,"mobf_disable_3d_mode","3D mode",true)
-mobf_settings.register_config_button(1,"mobf_animal_spawning_secondary","Secondary spawning algorithm",false)
-mobf_settings.register_config_button(1,"mobf_delete_disabled_mobs","Delete disabled mob entities",false)
-mobf_settings.register_config_button(1,"mobf_log_bug_warnings","Show noisy bug warnings",false)
-mobf_settings.register_config_button(1,"vombie_3d_burn_animation_enabled","Vombie 3d burn animation",false)
-mobf_settings.register_config_button(1,"mobf_log_removed_entities","Log all removed mobs",false)
-mobf_settings.register_config_button(1,"mobf_grief_protection","Disallow mob stealing",false)
-mobf_settings.register_config_button(2,"mobf_lifebar","lifebar",false)
-
-mobf_settings.register_tool_button(1,"give_pathmaker_tool","Give pathmaker tool",
-	function(player)
-		player:get_inventory():add_item("main", "mobf:path_marker 1")	
-	end)
-	
-mobf_settings.register_tool_button(1,"show_mobstore","Show preserved mobs",
-	function(player)
-		local name = player:get_player_name()
-		
-		if name ~= nil then
-			mob_preserve.handle_command(name,nil)
-		end
-	end)
-
-mobf_settings.register_tool_button(1,"show_pathmanager","Manage paths",
-	function(player)
-		local name = player:get_player_name()
-		
-		if name ~= nil then
-			mobf_path.show_manage_menu(name,nil)
-		end
-	end)
-
+--"mobf_settings" will be removed
+minetest.register_chatcommand("mobf",
+	{
+		params		= "",
+		description = "show mobf settings" ,
+		privs		= {},
+		func		= function(name,param)
+				local player = minetest.get_player_by_name(name)
+				mobf_settings.handle_event(player,mobf_settings.formname,{btn_1_init="init"})
+			end
+	})
 minetest.log("action","MOD: mobf_settings mod           version "..mobf_settings.version.." loaded")

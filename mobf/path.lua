@@ -13,7 +13,7 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
-
+mobf_assert_backtrace(mobf_path == nil)
 mobf_path = {}
 
 -------------------------------------------------------------------------------
@@ -328,7 +328,7 @@ function mobf_path.button_handler(player, formname, fields)
 				
 				if data.buttonid == "show_points" then
 					for i,v in ipairs(mobf_rtd.path_data.users[data.ownername].paths[data.pathname].points) do
-						local objects = minetest.env:get_objects_inside_radius(v,0.5)
+						local objects = minetest.get_objects_inside_radius(v,0.5)
 						
 						dbg_mobf.path_lvl3("MOBF: got " .. #objects .. 
 							" around pos checking for marker")
@@ -342,7 +342,7 @@ function mobf_path.button_handler(player, formname, fields)
 							end
 						end
 						
-						local node_at = minetest.env:get_node(v)
+						local node_at = minetest.get_node(v)
 						
 						if not found and 
 							node_at.name ~= nil and

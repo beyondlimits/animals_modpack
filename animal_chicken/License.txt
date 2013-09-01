@@ -2,13 +2,12 @@ Licenses
 
 CC0
 	sounds/animal_chicken_eggdrop.ogg
-	
-Sampling+ 1.0 
-	http://www.freesound.org/people/pionium/
-	
+	sounds/animal_chicken_random_1.ogg
+	sounds/animal_chicken_random_2.ogg
+	sounds/animal_chicken_random_3.ogg
+	sounds/animal_chicken_random_4.ogg
+	sounds/animal_chicken_random_5.ogg
 	sounds/animal_chicken_random_rooster.ogg
-	sounds/animal_chicken_random_chicken.ogg
-
 
 Everything not mentioned:
 	CC-BY-SA, Author sapier

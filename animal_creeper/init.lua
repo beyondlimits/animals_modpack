@@ -26,6 +26,12 @@ local selectionbox_creeper = {-1, -1, -1, 1, 1, 1}
 creeper_prototype = {
 		name="creeper",
 		modname="animal_creeper",
+		
+		factions = {
+			member = {
+				"monsters"
+				}
+			},
 	
 		generic = {
 					description="BoomBomb",
@@ -121,7 +127,7 @@ minetest.register_entity("animal_creeper:creeper_spawner",
 	on_activate = function(self,staticdata)
 	
 		local pos = self.object:getpos();
-		minetest.env:add_entity(pos,"animal_creeper:creeper_spawner_at_night")
+		minetest.add_entity(pos,"animal_creeper:creeper_spawner_at_night")
 		self.object:remove()
 	end,
 })

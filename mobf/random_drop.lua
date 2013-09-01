@@ -17,7 +17,7 @@
 --! @{
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
-
+mobf_assert_backtrace(random_drop == nil)
 --! @class random_drop
 --! @brief random drop features e.g lay eggs
 --!@}
@@ -54,7 +54,7 @@ function random_drop.callback(entity,now)
 				local toput = environment.get_suitable_pos_same_level(entitybasepos,1,entity)
 
 				if toput ~= nil then
-					minetest.env:add_entity(toput,entity.data.random_drop.result.."_ent")
+					minetest.add_entity(toput,entity.data.random_drop.result.."_ent")
 					dbg_mobf.random_drop_lvl3("MOBF: adding random drop for "..entity.data.name .. ": "..entity.data.random_drop.result.."_ent" .. " at " .. printpos(toput))
 					if entity.data.sound ~= nil then
 						sound.play(entitybasepos,entity.data.sound.random_drop)
@@ -101,7 +101,7 @@ function random_drop.register(random_drop)
 		local ent_graphics = {}
 		local id = drop_basename .. "_" .. drop_itemname
 		
-		if minetest.setting_getbool("mobf_disable_3d_mode") or 
+		if minetest.world_setting_get("mobf_disable_3d_mode") or 
 			animalmaterialsdata[id] == nil or
 			animalmaterialsdata[id].graphics_3d == nil then
 			ent_graphics.visual = "sprite"

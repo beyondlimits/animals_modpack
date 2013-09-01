@@ -70,15 +70,12 @@ function mobf_global_data_get(id)
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_global_data_store(value)
+-- name: mobf_global_data_cleanup()
 --
---! @brief pop data from global store
+--! @brief periodic cleanup handler
 --
---! @param id to pop
---
---! @return stored value
 -------------------------------------------------------------------------------
-function mobf_global_data_cleanup(id)
+function mobf_global_data_cleanup()
 
 	if mobf_global_data.last_cleanup + 500 < 
 											mobf_get_current_time() then

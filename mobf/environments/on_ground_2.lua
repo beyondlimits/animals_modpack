@@ -27,8 +27,19 @@ env_on_ground_2 = {
 			surfaces = {
 						good = {
 							"default:dirt_with_grass",
+							"default:dirt_with_grass_footsteps",
 							"default:dirt",
-							"default:stone"
+							"default:stone",
+							"default:gravel",
+							"default:cobble",
+							"default:mossycobble",
+							"default:desert_stone",
+							"default:stone_with_coal",
+							"default:stone_with_iron",
+							"default:stone_with_copper",
+							"default:stone_with_mese",
+							"default:stone_with_gold",
+							"default:stone_with_diamond"
 							},
 						},
 
@@ -49,6 +60,11 @@ table.foreach(mobf_env_placable_items,
 table.foreach(mobf_env_plants,
 	function(index) 
 		table.insert(env_on_ground_2.media,mobf_env_plants[index]) 
+	end)
+	
+table.foreach(mobf_env_flowers,
+	function(index) 
+		table.insert(env_on_ground_2.media,mobf_env_flowers[index]) 
 	end)
 		
 environment.register("on_ground_2", env_on_ground_2)

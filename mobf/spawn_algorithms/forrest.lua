@@ -64,7 +64,7 @@ function mobf_spawn_in_forrest(mob_name,mob_transform,spawning_data,environment)
 				end
 
 
-				local node_above = minetest.env:get_node(pos_above)
+				local node_above = minetest.get_node(pos_above)
 
 				if mob_name == nil then
 					minetest.log(LOGLEVEL_ERROR,"MOBF Bug!!!: mob name not available")
@@ -75,10 +75,10 @@ function mobf_spawn_in_forrest(mob_name,mob_transform,spawning_data,environment)
 						--print("Find mobs of same type around:"..mob_name.. " pop dens: ".. population_density)
 					if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
 
-							if minetest.env:find_node_near(pos, 3, { "default:leaves",
+							if minetest.find_node_near(pos, 3, { "default:leaves",
 																	"default:tree"} ) ~= nil then
 
-								local newobject = minetest.env:add_entity(pos_above,mob_name .. "__default")
+								local newobject = minetest.add_entity(pos_above,mob_name .. "__default")
 
 								local newentity = mobf_find_entity(newobject)
 								
@@ -99,21 +99,16 @@ end
 function mobf_spawn_in_forrest_mapgen(mob_name,mob_transform,spawning_data,environment)
 
 	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering forrest spawn mapgen callback for mob "..mob_name)
-	
-	--add mob on map generation
-	minetest.register_on_generated(function(minp, maxp, seed)
-		spawning.divide_mapgen(minp,maxp,spawning_data.density,mob_name,mob_transform,
-		
-		function(name,pos,min_y,max_y)
+	local spawnfunc = function(name,pos,min_y,max_y)
 			
 			--check if there s enough space above to place mob
 			if mobf_air_above(pos,spawning_data.height) then
 				dbg_mobf.spawning_lvl3("enough air above " ..printpos(centerpos) 
 				.. " minimum is: " .. spawning_data.height )
 				
-				if minetest.env:find_node_near(pos, 3, { "default:leaves",
+				if minetest.find_node_near(pos, 3, { "default:leaves",
 														"default:tree"} ) ~= nil or
-					minetest.env:find_node_near(pos, 3, growing_trees_nodes ) ~= nil then
+					minetest.find_node_near(pos, 3, growing_trees_nodes ) ~= nil then
 					local spawnpos = {x=pos.x,y=pos.y+1,z=pos.z}
 					spawning.spawn_and_check(name,"__default",spawnpos,"in_forrest_mapgen")
 					return true
@@ -123,10 +118,35 @@ function mobf_spawn_in_forrest_mapgen(mob_name,mob_transform,spawning_data,envir
 				.. " for mob ".. name .. " minimum is: " .. spawning_data.height )
 			end -- air_above
 			return false
-		end,
-		mobf_get_sunlight_surface,
-		5)
-	end) --register mapgen
+		end
+		
+	if minetest.world_setting_get("mobf_delayed_spawning") then
+		minetest.register_on_generated(function(minp, maxp, seed)
+		
+			local job = {
+				callback = spawning.divide_mapgen_jobfunc,
+				data = {
+					minp          = minp,
+					maxp          = maxp,
+					spawning_data = spawning_data,
+					mob_name      = mob_name,
+					mob_transform = mob_transform,
+					spawnfunc     = spawnfunc,
+					surfacefunc   = mobf_get_sunlight_surface,
+					maxtries      = 5
+					}
+				}
+			mobf_job_queue.add_job(job)
+		end)
+	else
+		--add mob on map generation
+		minetest.register_on_generated(function(minp, maxp, seed)
+			local starttime = mobf_get_time_ms()
+			spawning.divide_mapgen(minp,maxp,spawning_data.density,mob_name,mob_transform,
+									spawnfunc,mobf_get_sunlight_surface,5)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. mob_name,"mapgen")
+			end) --register mapgen
+	end
 end --end spawn algo
 
 --!@}

@@ -14,6 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
+mobf_assert_backtrace(mgen_none == nil)
 --! @class mgen_none
 --! @brief a movement generator doing nothing
 mgen_none = {}

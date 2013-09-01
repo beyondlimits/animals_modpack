@@ -30,7 +30,7 @@ function mob_slime_bounce(entity)
 	local pos = entity.object:getpos()
 	local current_velocity = entity.object:getvelocity()
 	
-	local node_below = minetest.env:get_node({x=pos.x,y=pos.y + entity.collisionbox[2] -0.01,z=pos.z})
+	local node_below = minetest.get_node({x=pos.x,y=pos.y + entity.collisionbox[2] -0.01,z=pos.z})
 	
 	if not mobf_is_walkable(node_below) then
 		entity.object:setvelocity( {x=current_velocity.x,y=entity.data.movement.bounce,z=current_velocity.z})
@@ -83,6 +83,12 @@ function mob_slime_kill(entity,player)
 end
 
 local prototype_mob_slime_L = {
+
+	factions = {
+			member = {
+				"underground",
+				}
+			},
 
 	--! @brief [MANDATORY] name of mob @b (alphanumeric and "_" only!!)
 	name = "slime_L",
@@ -224,6 +230,12 @@ local prototype_mob_slime_L = {
 	
 local prototype_mob_slime_S = {
 
+	factions = {
+			member = {
+				"underground",
+				}
+			},
+			
 	--! @brief [MANDATORY] name of mob @b (alphanumeric and "_" only!!)
 	name = "slime_S",
 	--! @brief [MANDATORY] name of mod defining the mob
@@ -346,6 +358,12 @@ local prototype_mob_slime_S = {
 	}
 	
 local prototype_mob_slime_M = {
+
+	factions = {
+			member = {
+				"underground",
+				}
+			},
 
 	--! @brief [MANDATORY] name of mob @b (alphanumeric and "_" only!!)
 	name = "slime_M",

@@ -38,10 +38,10 @@ blueprint_hut = {
 		{"default:wood",{x=3,y=1,z=1},{x=3,y=1,z=2}},
 		
 	--torches
-		{"default:torch",{x=2,y=2,z=1},{x=2,y=2,z=1}},
+		{"default:torch",{x=2,y=2,z=1},{x=2,y=2,z=1},5},
 	},
 	entities = {
-		{ {x=4,y=1,z=1},"mob_npc:npc_trader__default",math.pi }
+		{ {x=4,y=1,z=1.5},"mob_npc:npc_trader__default",-math.pi }
 	}
 }
 
@@ -82,11 +82,11 @@ blueprint_normalhouse = {
 		{"default:glass",{x=8,y=2,z=4},{x=8,y=3,z=5}},
 
 	--torches
-		{"default:torch",{x=1,y=3,z=7},{x=1,y=3,z=7}},
-		{"default:torch",{x=3,y=3,z=9},{x=3,y=3,z=9}},
-		{"default:torch",{x=5,y=3,z=9},{x=5,y=3,z=9}},
-		{"default:torch",{x=3,y=4,z=3},{x=3,y=4,z=3}},
-		{"default:torch",{x=5,y=4,z=3},{x=5,y=4,z=3}},
+		{"default:torch",{x=1,y=3,z=7},{x=1,y=3,z=7},3}, --left
+		{"default:torch",{x=3,y=3,z=9},{x=3,y=3,z=9},4}, --back
+		{"default:torch",{x=5,y=3,z=9},{x=5,y=3,z=9},4}, --back
+		{"default:torch",{x=3,y=4,z=3},{x=3,y=4,z=3},0}, --ceiling
+		{"default:torch",{x=5,y=4,z=3},{x=5,y=4,z=3},0}, --ceiling
 		
 	--
 		{"default:wood",{x=1,y=1,z=4},{x=3,y=1,z=4}},
@@ -110,7 +110,7 @@ blueprint_normalhouse = {
 table.insert(mob_npc_houses,blueprint_normalhouse)
 table.insert(mob_npc_houses,blueprint_hut)
 
-function building_spawner.buid_wall(material,startpos,endpos)
+function building_spawner.buid_wall(material,startpos,endpos,param2)
 
 	--print("builder: wall: ".. dump(material) .. " " .. dump(startpos) .. " " .. dump(endpos))
 
@@ -130,7 +130,7 @@ function building_spawner.buid_wall(material,startpos,endpos)
 	
 		for y=startpos.y,endpos.y,1 do
 		for z=startpos.z,endpos.z,1 do
-			minetest.env:set_node({x=startpos.x,y=y,z=z},{ name=material } )
+			minetest.set_node({x=startpos.x,y=y,z=z},{ name=material,param2=param2 } )
 		end
 		end
 	end
@@ -138,7 +138,7 @@ function building_spawner.buid_wall(material,startpos,endpos)
 	if startpos.y == endpos.y then
 		for x=startpos.x,endpos.x,1 do
 		for z=startpos.z,endpos.z,1 do
-			minetest.env:set_node({x=x,y=startpos.y,z=z},{ name=material })
+			minetest.set_node({x=x,y=startpos.y,z=z},{ name=material,param2=param2 })
 		end
 		end	
 	end
@@ -146,7 +146,7 @@ function building_spawner.buid_wall(material,startpos,endpos)
 	if startpos.z == endpos.z then
 		for y=startpos.y,endpos.y,1 do
 		for x=startpos.x,endpos.x,1 do
-			minetest.env:set_node({x=x,y=y,z=startpos.z},{ name=material })
+			minetest.set_node({x=x,y=y,z=startpos.z},{ name=material,param2=param2 })
 		end
 		end	
 	end
@@ -172,7 +172,7 @@ function building_spawner.checkfloor(startpos,endpos)
 		local found_ground	= false
 		local found_air		= false
 		for y=startpos.y-1,startpos.y+2,1 do
-			local node_to_check	= minetest.env:get_node({x=x,y=y,z=z})
+			local node_to_check	= minetest.get_node({x=x,y=y,z=z})
 
 			if node_to_check ~= nil and
 				node_to_check.name ~= "ignore" then
@@ -217,7 +217,7 @@ function building_spawner.builder(startpos,blueprint,mobname)
 				z=startpos.z +blueprint.size.z + 1
 			}
 		) then
-		--print("spawning building at " .. printpos(startpos) .. "!")
+		--mobf_print("Spawn building: spawning at " .. printpos(startpos) .. "!")
 		for i=1,#blueprint.walls,1 do
 			building_spawner.buid_wall(blueprint.walls[i][1],
 						{
@@ -229,20 +229,27 @@ function building_spawner.builder(startpos,blueprint,mobname)
 							x=startpos.x + blueprint.walls[i][3].x,
 							y=startpos.y + blueprint.walls[i][3].y,
 							z=startpos.z + blueprint.walls[i][3].z
-						})
+						},
+						blueprint.walls[i][4])
 		end
 		
+		--mobf_print("Spawn building: populating with " .. #blueprint.entities .. " entities")
 		for i=1,#blueprint.entities,1 do
 			if mobname == nil then
 				mobname = blueprint.entities[i][2]
 			end
-			local object = minetest.env:add_entity( {
+			
+			local entitypos = {
 								x=startpos.x + blueprint.entities[i][1].x,
 								y=startpos.y + blueprint.entities[i][1].y,
-								z=startpos.z + blueprint.entities[i][1].z},
-								mobname)
+								z=startpos.z + blueprint.entities[i][1].z}
+			
+			local object = minetest.add_entity(entitypos,mobname)
 			if object ~= nil then
+				--mobf_print("Spawn building: spawned " .. dump(mobname) .. " at " .. printpos(entitypos))
 				object:setyaw(blueprint.entities[i][3])
+			else
+				--mobf_print("Spawn building: failed to spawn " .. dump(mobname))
 			end
 		end
 		
@@ -265,24 +272,47 @@ end
 function mob_npc_spawn_building(mob_name,mob_transform,spawning_data,environment)
 	minetest.log(LOGLEVEL_INFO,"MOBF:\tspawn_building spawner for mob "..mob_name)
 	
-	--add mob on map generation
-	minetest.register_on_generated(function(minp, maxp, seed)
-		spawning.divide_mapgen(minp,maxp,spawning_data.density,mob_name,mob_transform,
-		
-		function(name,pos,min_y,max_y)
+	local spawnfunc = function(name,pos,min_y,max_y)
 			
 			if math.random() < 0.25 then
 				local blueprint = mob_npc_houses[math.random(1,#mob_npc_houses)]
+				
+				pos.x = math.floor(pos.x)
+				pos.z = math.floor(pos.z)
 				
 				if building_spawner.builder(pos,blueprint,mob_name .."__default") then
 					return true
 				end
 			end
 			return false
-		end,
-		mobf_get_sunlight_surface,
-		20)
-	end)
+		end
+	
+	if minetest.world_setting_get("mobf_delayed_spawning") then
+		minetest.register_on_generated(function(minp, maxp, seed)
+			local job = {
+				callback = spawning.divide_mapgen_jobfunc,
+				data = {
+					minp          = minp,
+					maxp          = maxp,
+					spawning_data = spawning_data,
+					mob_name      = mob_name,
+					mob_transform = mob_transform,
+					spawnfunc     = spawnfunc,
+					surfacefunc   = mobf_get_sunlight_surface,
+					maxtries      = 20,
+					spawned       = 0,
+					func          = spawning.divide_mapgen_jobfunc
+					}
+				}
+			mobf_job_queue.add_job(job)
+		end)
+	else
+		--add mob on map generation
+		minetest.register_on_generated(function(minp, maxp, seed)
+			spawning.divide_mapgen(minp,maxp,spawning_data.density,mob_name,
+				mob_transform,spawnfunc,mobf_get_sunlight_surface,20)
+		end)
+	end
 end --end spawn algo
 
 function build_house_cmd_handler(name,param)

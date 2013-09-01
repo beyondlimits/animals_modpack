@@ -31,9 +31,16 @@ function clownfish_drop()
 	return result
 end
 
-clownfish_prototype = {   
+clownfish_prototype = {
 		name="clownfish",
 		modname="animal_clownfish",
+		
+		factions = {
+			member = {
+				"animals",
+				"fish"
+				}
+			},
 	
 		generic = {
 					description="Clownfish",

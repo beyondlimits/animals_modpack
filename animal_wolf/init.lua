@@ -3,7 +3,7 @@
 -- 
 -- You may copy, use, modify or do nearly anything except removing this
 -- copyright notice. 
--- And of course you are NOT allow to pretend you have written it.
+-- And of course you are NOT allowed to pretend you have written it.
 --
 --! @file init.lua
 --! @brief wolf implementation
@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_wolf loading ...")
 
-local version = "0.0.15"
+local version = "0.0.17"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
@@ -26,6 +26,14 @@ local selectionbox_wolf = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
 wolf_prototype = {
 		name="wolf",
 		modname="animal_wolf",
+		
+		factions = {
+			member = {
+				"animals",
+				"forrest_animals",
+				"wolfs"
+				}
+			},
 	
 		generic = {
 					description="Wolf",
@@ -72,6 +80,14 @@ wolf_prototype = {
 						height=2
 						},
 					},
+				secondary_algorithms = {
+						{
+						rate=0.002,
+						density=800,
+						algorithm="forrest",
+						height=2
+						},
+					}
 				},
 		sound = {
 					random = nil,
@@ -166,7 +182,7 @@ tamed_wolf_prototype = {
 						print("ANIMAL tamed wolf: custom on activate handler called")
 						if (entity.dynamic_data.spawning.spawner ~= nil) then
 							print("ANIMAL tamed wolf: setting target to: " .. entity.dynamic_data.spawning.spawner )
-							entity.dynamic_data.movement.target = minetest.env:get_player_by_name(entity.dynamic_data.spawning.spawner)
+							entity.dynamic_data.movement.target = minetest.get_player_by_name(entity.dynamic_data.spawning.spawner)
 						end
 					end,
 					custom_on_step_handler = function(entity,now,dstep)
@@ -231,6 +247,11 @@ tamed_wolf_prototype = {
 				},
 			}
 		}
+		
+if factions~= nil and
+	type(factions.set_base_reputation) == "function" then
+	factions.set_base_reputation("wolfs","players",-25)
+end
 		
 minetest.log("action","\tadding mob "..wolf_prototype.name)
 mobf_add_mob(wolf_prototype)

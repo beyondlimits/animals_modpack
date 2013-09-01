@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_chicken mod loading ...")
-local version = "0.0.17"
+local version = "0.0.19"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
@@ -42,6 +42,13 @@ end
 chicken_prototype = {
 		name="chicken",
 		modname="animal_chicken",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 	
 		generic = {
 					description="Chicken",
@@ -87,7 +94,13 @@ chicken_prototype = {
 						max_hear_distance = 5,
 						},
 					random = {
-						name="animal_chicken_random_chicken",
+						name= {
+							"animal_chicken_random_chicken_1",
+							"animal_chicken_random_chicken_2",
+							"animal_chicken_random_chicken_3",
+							"animal_chicken_random_chicken_4",
+							"animal_chicken_random_chicken_5",
+							},
 						min_delta = 60,
 						chance = 0.5,
 						gain = 1,
@@ -138,6 +151,13 @@ chicken_prototype = {
 rooster_prototype = {   
 		name="rooster",
 		modname="animal_chicken",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 
 		generic = {
 					description="Rooster",
@@ -169,6 +189,14 @@ rooster_prototype = {
 							algorithm="willow_mapgen",
 							height=1
 						}
+					},
+				secondary_algorithms = {
+						{
+						rate=0.001,
+						density=75,
+						algorithm="willow",
+						height=2
+						},
 					}
 				},
 		sound = {
@@ -224,6 +252,13 @@ rooster_prototype = {
 chick_m_prototype = {
 		name="chick_m",
 		modname="animal_chicken",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 		
 		generic = {
 				description="Chick - male",
@@ -305,6 +340,13 @@ chick_m_prototype = {
 chick_f_prototype = {   
 		name="chick_f",
 		modname="animal_chicken",
+		
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 		
 		generic = {
 				description="Chick - female",

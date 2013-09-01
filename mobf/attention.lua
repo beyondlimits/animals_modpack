@@ -22,6 +22,7 @@
 
 --!@}
 
+mobf_assert_backtrace(attention == nil)
 --! @brief attention handling class reference
 --TODO rename to fix documentation issues
 attention = {}
@@ -104,6 +105,8 @@ function attention.callback(entity,now)
 	
 	local top_attention_object = nil
 	local top_attention_value = 0
+	local top_attention_enemy = nil
+	local top_attention_enemy_value = 0
 	
 	local current_attention_value = 0
 	
@@ -141,11 +144,13 @@ function attention.callback(entity,now)
 	
 	--get list of all objects in attention range
 	local objectlist = 
-		minetest.env:get_objects_inside_radius(own_pos,attention_distance)
+		minetest.get_objects_inside_radius(own_pos,attention_distance)
 	
 	if #objectlist > 0 then
 		for i = 1 , #objectlist, 1 do
 			local continue = true
+			
+			dbg_mobf.attention_lvl3("MOBF: checking " .. tostring(objectlist[i]))
 			
 			if not objectlist[i]:is_player() then
 				local lua_entity = objectlist[i]:get_luaentity()
@@ -253,36 +258,62 @@ function attention.callback(entity,now)
 											" new value " .. 
 											new_objecttable[table_id].value)
 				
+				--update overall atttention values
 				if new_objecttable[table_id].value > top_attention_value then
 					top_attention_value = new_objecttable[table_id].value
 					top_attention_object = objectlist[i]
 				end
 				
+				--update value of old most relevant target only
 				if objectlist[i] == entity.dynamic_data.attention.most_relevant_target then
 					current_attention_value = new_objecttable[table_id].value
+				end
+			
+				--update enemy attention values
+				if new_objecttable[table_id].value > top_attention_enemy_value and
+					attention.is_enemy(entity,objectlist[i]) then
+					top_attention_enemy_value = new_objecttable[table_id].value
+					top_attention_enemy = objectlist[i]
 				end
 			end
 		end
 	end
 		
 	--check if top attention exceeds current + offset
-	if 	top_attention_value > current_attention_value + target_switch_offset then
+	if top_attention_value > current_attention_value + target_switch_offset then
 		--update top attention object
 		entity.dynamic_data.attention.most_relevant_target = top_attention_object
 		current_attention_value = top_attention_value
 	end
-	dbg_mobf.attention_lvl3("MOBF: " .. current_attention_value .. " " ..
-		dump(entity.data.attention.attack_threshold) .. " " ..
+	dbg_mobf.attention_lvl3("MOBF: value=" .. current_attention_value .. " attack_threshold=" ..
+		dump(entity.data.attention.attack_threshold) .. "watch_threshold= " ..
 		dump(entity.data.attention.watch_threshold))
+		
+	local toattack = nil
+	
+	if mobf_rtd.factions_available then
+		if top_attention_enemy ~= nil then
+			attack_attention_value	= top_attention_enemy_value
+			toattack 				= top_attention_enemy
+		end
+		--don't attack anyone if factions mod is available and no enemy is found
+	else
+		attack_attention_value	= top_attention_value
+		toattack				= top_attention_object
+	end
+		
 	if entity.data.attention.attack_threshold ~= nil and
-		current_attention_value > entity.data.attention.attack_threshold then
+		attack_attention_value ~= nil and
+		attack_attention_value > entity.data.attention.attack_threshold then
+		
 		local current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
 		
-		--TODO add faction check
 		if entity.data.combat.starts_attack then
-			dbg_mobf.attention_lvl3("MOBF: attack thhreshold exceeded starting attack of " .. 
+			dbg_mobf.attention_lvl3("MOBF: attack threshold exceeded starting attack of " .. 
 				dump(entity.dynamic_data.attention.most_relevant_target))
-			fighting.set_target(entity,entity.dynamic_data.attention.most_relevant_target)
+			entity.dynamic_data.attention.most_relevant_target = toattack
+			current_attention_value = attack_attention_value
+			fighting.set_target(entity,toattack)
 		end
 	else
 		if entity.data.attention.watch_threshold ~= nil and
@@ -337,4 +368,40 @@ function attention.increase_attention_level(entity,source,value)
 			entity.dynamic_data.attention.watched_objects[table_id].value + value
 			
 	end
+end
+
+-------------------------------------------------------------------------------
+-- name: is_enemy(entity,object) 
+--
+--! @brief initialize all dynamic data on activate
+--! @memberof attention
+--
+--! @param entity mob to do action
+--! @param object to check if it's an enemy
+--! @return true/false
+-------------------------------------------------------------------------------
+function attention.is_enemy(entity,object)
+	mobf_assert_backtrace(entity ~= nil)
+	mobf_assert_backtrace(object ~= nil)
+	if mobf_rtd.factions_available then
+	
+		local remote_factions = factions.get_factions(object)
+				
+		if remote_factions == nil or
+			#remote_factions < 1 then
+			dbg_mobf.attention_lvl3("MOBF: no remote factions for: " .. tostring(object))
+			return false
+		end
+	
+		for j=1, #remote_factions, 1 do
+			local rep = factions.get_reputation(remote_factions[j],entity)
+				
+			if rep < 0 then
+				dbg_mobf.attention_lvl3("MOBF: ".. remote_factions[j] .. " " .. tostring(object) .. " is enemy: " .. rep)
+				return true
+			end
+		end
+	end
+	
+	return false
 end

@@ -1,4 +1,4 @@
-local version = "0.0.22"
+local version = "0.0.25"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -27,21 +27,21 @@ end
 
 function vombie_on_step_handler(entity,now,dtime)
 	local pos = entity.getbasepos(entity)
-	local current_light = minetest.env:get_node_light(pos)
+	local current_light = minetest.get_node_light(pos)
 	
 	--print("vombie on step: current_light:" .. current_light .. " max light: " 
-	--	.. LIGHT_MAX .. " 3dmode:" .. dump(minetest.setting_getbool("disable_animals_3d_mode")))
+	--	.. LIGHT_MAX .. " 3dmode:" .. dump(minetest.world_setting_get("disable_animals_3d_mode")))
 
 	if current_light ~= nil and
 		current_light > LIGHT_MAX and
-		minetest.setting_getbool("mobf_disable_3d_mode") ~= true and
-		minetest.setting_getbool("vombie_3d_burn_animation_enabled") == true then
+		minetest.world_setting_get("mobf_disable_3d_mode") ~= true and
+		minetest.world_setting_get("vombie_3d_burn_animation_enabled") == true then
 		
 		
 		local xdelta = (math.random()-0.5)
 		local zdelta = (math.random()-0.5)
 		--print("receiving sun damage: " .. xdelta .. " " .. zdelta)
-		local newobject=minetest.env:add_entity( {	x=pos.x + xdelta,
+		local newobject=minetest.add_entity( {	x=pos.x + xdelta,
 													y=pos.y,
 													z=pos.z + zdelta },
 										"animal_vombie:vombie_flame")
@@ -50,13 +50,14 @@ function vombie_on_step_handler(entity,now,dtime)
 	end
 	if entity.dynamic_data.spawning.spawner == "at_night" or
 		entity.dynamic_data.spawning.spawner == "at_night_mapgen" then
-		local current_time = minetest.env:get_timeofday()
+		local current_time = minetest.get_timeofday()
 		if (current_time > 0.15) and
 			(current_time < 0.30) then
 			if entity.last_time ~= nil then
 				local last_step_size = dtime /  86400 -- (24*3600)
 				local time_step = current_time - entity.last_time
-				if time_step > last_step_size * 10 then
+				if time_step > last_step_size * 1000 then
+					print("Vombie: time jump detected removing mob: " .. time_step .. " last_step_size: " .. (last_step_size * 1000))
 					spawning.remove(entity)
 					--return false to abort procession of other hooks
 					return false
@@ -72,11 +73,11 @@ function vombie_on_activate_handler(entity)
 
 	local pos = entity.object:getpos()
 	
-	local current_light = minetest.env:get_node_light(pos)
+	local current_light = minetest.get_node_light(pos)
 	
 	if current_light == nil then
 		minetest.log(LOGLEVEL_ERROR,
-			"ANIMALS: Bug!!! didn't get a light value for ".. printpos(pos))
+			"ANIMALS:Vombie Bug!!! didn't get a light value for ".. printpos(pos))
 		return
 	end
 	--check if animal is in sunlight
@@ -89,6 +90,13 @@ end
 vombie_prototype = {
 		name="vombie",
 		modname="animal_vombie",
+		
+		factions = {
+			member = {
+				"monsters",
+				"undead"
+				}
+			},
 	
 		generic = {
 					description="Vombie",
@@ -128,14 +136,14 @@ vombie_prototype = {
 					primary_algorithms = {
 							{
 								rate=0.05,
-								density=30,
+								density=20,
 								algorithm="at_night_spawner",
 								height=2,
 								respawndelay=10,
 							},
 							{
 								rate=0.05,
-								density=100,
+								density=25,
 								algorithm="shadows_spawner",
 								height=2,
 								respawndelay = 300,
@@ -219,7 +227,7 @@ minetest.register_entity("animal_vombie:vombie_spawner",
 	on_activate = function(self,staticdata)
 	
 		local pos = self.object:getpos();
-		minetest.env:add_entity(pos,"animal_vombie:vombie_spawner_at_night")
+		minetest.add_entity(pos,"animal_vombie:vombie_spawner_at_night")
 		self.object:remove()
 	end,
 })

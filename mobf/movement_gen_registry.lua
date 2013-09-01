@@ -13,7 +13,7 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
-
+mobf_assert_backtrace(movement_generators == nil)
 movement_generators = {}
 
 

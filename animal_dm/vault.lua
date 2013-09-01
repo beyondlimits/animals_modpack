@@ -187,7 +187,7 @@ vault.make_vault_part = function(p, part, seed)
         local p2 = {x=p.x,y=p.y+dy,z=p.z}
  
         --get node at position
-        local oldn = minetest.env:get_node(p2)
+        local oldn = minetest.get_node(p2)
         local n = ns[i]
  
         --don't do anything if no new node is specified or
@@ -195,7 +195,7 @@ vault.make_vault_part = function(p, part, seed)
         if n and oldn.name ~= "air" then
             --possibly add mossy if it's a cobble node
             if n.name == 'default:cobble' then
-                local perlin = minetest.env:get_perlin(123, 2, 0.8, 2.0)
+                local perlin = minetest.get_perlin(123, 2, 0.8, 2.0)
                 if perlin:get3d(p2) >= 0.0 then
                     n.name = 'default:mossycobble'
                 end
@@ -203,12 +203,12 @@ vault.make_vault_part = function(p, part, seed)
             
             --set node
             --dm_debug("pos: " .. minetest.pos_to_string(p2) .. " replacing " .. oldn.name .. " by " .. n.name)
-            minetest.env:set_node(p2, ns[i])
+            minetest.set_node(p2, ns[i])
             
             --special handling for chests
             if n.inv then
                 dm_debug("adding chest at " .. minetest.pos_to_string(p2) )
-                local meta = minetest.env:get_meta(p2)
+                local meta = minetest.get_meta(p2)
                 local inv = meta:get_inventory()
                 for _,itemstring in ipairs(n.inv) do
                     inv:add_item('main', itemstring)
@@ -221,7 +221,7 @@ vault.make_vault_part = function(p, part, seed)
     end
     if mob then
         --dm_debug("adding dm at " .. minetest.pos_to_string({x=p.x,y=p.y+1,z=p.z}) )
-        local newobject = minetest.env:add_entity({x=p.x,y=p.y+1,z=p.z}, mob)
+        local newobject = minetest.add_entity({x=p.x,y=p.y+1,z=p.z}, mob)
         local newentity = mobf_find_entity(newobject)
         
         if newentity and
@@ -428,7 +428,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
         
         --get information of current node to check
         local p = {x=x*d, y=dungeon_level_y, z=z}
-        local n = minetest.env:get_node(p)
+        local n = minetest.get_node(p)
         
         --save values from last loop
         last_empty = is_empty
@@ -436,7 +436,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
         
         --get new values
         is_empty = not vault.node_is_solid(n)
-        light = minetest.env:get_node_light(p, 0.5)
+        light = minetest.get_node_light(p, 0.5)
         
         --if last node was known
         if last_node_known then
@@ -463,10 +463,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
                 local p5 = vault.add(p1, {x=3,  y=1, z=-2})
                 
                 --if all nodes are solid
-                if  vault.node_is_solid(minetest.env:get_node(p2)) and
-                    vault.node_is_solid(minetest.env:get_node(p3)) and
-                    vault.node_is_solid(minetest.env:get_node(p4)) and
-                    vault.node_is_solid(minetest.env:get_node(p5))
+                if  vault.node_is_solid(minetest.get_node(p2)) and
+                    vault.node_is_solid(minetest.get_node(p3)) and
+                    vault.node_is_solid(minetest.get_node(p4)) and
+                    vault.node_is_solid(minetest.get_node(p5))
                 then
                     local entrance = {
                         p = p1,
@@ -487,10 +487,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
                 local p5 = vault.add(p1, {x=3,  y=1, z=2})
                 
                 --if all nodes are solid
-                if vault.node_is_solid(minetest.env:get_node(p2)) and
-                    vault.node_is_solid(minetest.env:get_node(p3)) and
-                    vault.node_is_solid(minetest.env:get_node(p4)) and
-                    vault.node_is_solid(minetest.env:get_node(p5))
+                if vault.node_is_solid(minetest.get_node(p2)) and
+                    vault.node_is_solid(minetest.get_node(p3)) and
+                    vault.node_is_solid(minetest.get_node(p4)) and
+                    vault.node_is_solid(minetest.get_node(p5))
                 then
                     local entrance = {
                         p = p1,

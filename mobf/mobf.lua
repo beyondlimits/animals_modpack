@@ -19,10 +19,10 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+mobf_assert_backtrace(mobf == nil)
 --! @class mobf
 --! @brief basic management component of mob functions
 --!@}
-
 mobf = {}
 
 mobf.on_step_callbacks = {}
@@ -241,7 +241,7 @@ end
 -------------------------------------------------------------------------------
 function mobf.get_basepos(entity)
 	local pos = entity.object:getpos()
-	local nodeatpos = minetest.env:get_node(pos)
+	local nodeatpos = minetest.get_node(pos)
 	
 	dbg_mobf.mobf_core_helper_lvl3("MOBF: " .. entity.data.name 
 		.. " Center Position: " .. printpos(pos) .. " is: " .. nodeatpos.name)
@@ -254,7 +254,7 @@ function mobf.get_basepos(entity)
 			.. entity.collisionbox[2])
 	end
 
-	nodeatpos = minetest.env:get_node(pos)
+	nodeatpos = minetest.get_node(pos)
 	dbg_mobf.mobf_core_helper_lvl3("MOBF: Base Position: " .. printpos(pos) 
 		.. " is: " .. nodeatpos.name)
 
@@ -271,8 +271,7 @@ end
 --! @param self entity to initialize onstep handler
 --! @param staticdata data to use for initialization
 -------------------------------------------------------------------------------
-function mobf.activate_handler(self,staticdata)
-	
+function mobf.activate_handler(self,staticdata)	
 	
 	--do some initial checks
 	local pos = self.object:getpos()
@@ -280,8 +279,8 @@ function mobf.activate_handler(self,staticdata)
 	if pos == nil then
 		minetest.log(LOGLEVEL_ERROR,"MOBF: mob at nil pos!")
 	end
-	local current_node = minetest.env:get_node(pos)
 	
+	local current_node = minetest.get_node(pos)	
 	
 	if current_node == nil then
 		minetest.log(LOGLEVEL_ERROR,
@@ -289,19 +288,47 @@ function mobf.activate_handler(self,staticdata)
 		
 		spawning.remove_uninitialized(self,staticdata)
 		return
+	end	
+
+	local objectlist = minetest.get_objects_inside_radius(pos,0.25)
+	
+	local cleaned_objectcount = 0
+	
+	for i=1,#objectlist,1 do
+		local luaentity = objectlist[i]:get_luaentity()
+		if luaentity ~= nil then
+			if not luaentity.mobf_spawner then
+				cleaned_objectcount = cleaned_objectcount + 1
+			end
+		else
+			cleaned_objectcount = cleaned_objectcount + 1
+		end
 	end
 	
+	if cleaned_objectcount > 1 then
+		minetest.log(LOGLEVEL_WARNING,
+			"MOBF: trying to activate mob within something else! --> removing")
+		for i=1,#objectlist,1 do
+			local luaentity = objectlist[i]:get_luaentity()
+			if luaentity ~= nil then
+				print(i .. " " .. dump(luaentity))
+			else
+				print(i .. " " .. tostring(objectlist[i]))
+			end
+		end
+		spawning.remove_uninitialized(self,staticdata)
+		return
+	end
 
 	if environment.is_media_element(current_node.name,self.environment.media) == false then
 		minetest.log(LOGLEVEL_WARNING,"MOBF: trying to activate mob " 
 			.. self.data.name .. " at invalid position")
 		minetest.log(LOGLEVEL_WARNING,"	Activation at: " 
 			.. current_node.name .. " --> removing")
+		--TODO try to move 1 block up
 		spawning.remove_uninitialized(self,staticdata)
 		return
 	end
-	
-	
 	
 	--do initialization of dynamic modules
 	local now = mobf_get_current_time()
@@ -310,7 +337,6 @@ function mobf.activate_handler(self,staticdata)
 	
 	mobf.init_on_step_callbacks(self,now)
 	mobf.init_on_punch_callbacks(self,now)
-	mobf.init_on_rightclick_callbacks(self,now)
 	
 	--initialize ride support
 	mobf_ride.init(self)
@@ -327,36 +353,36 @@ function mobf.activate_handler(self,staticdata)
 	end
 	
 	--restore saved data
-	local retval = mobf_deserialize_permanent_entity_data(staticdata)
+	local preserved_data = mobf_deserialize_permanent_entity_data(staticdata)
 	
 	if self.dynamic_data.spawning ~= nil then
-		if mobf_pos_is_zero(retval.spawnpoint) ~= true then
-			self.dynamic_data.spawning.spawnpoint = retval.spawnpoint
+		if mobf_pos_is_zero(preserved_data.spawnpoint) ~= true then
+			self.dynamic_data.spawning.spawnpoint = preserved_data.spawnpoint
 		else
 			self.dynamic_data.spawning.spawnpoint = mobf_round_pos(pos)
 		end
-		self.dynamic_data.spawning.player_spawned = retval.playerspawned
+		self.dynamic_data.spawning.player_spawned = preserved_data.playerspawned
 		
-		if retval.original_spawntime ~= -1 then
-			self.dynamic_data.spawning.original_spawntime = retval.original_spawntime
+		if preserved_data.original_spawntime ~= -1 then
+			self.dynamic_data.spawning.original_spawntime = preserved_data.original_spawntime
 		end
 		
-		if retval.spawner ~= nil then
+		if preserved_data.spawner ~= nil then
 			minetest.log(LOGLEVEL_INFO,"MOBF: setting spawner to: " 
-				.. retval.spawner)
-			self.dynamic_data.spawning.spawner = retval.spawner
+				.. preserved_data.spawner)
+			self.dynamic_data.spawning.spawner = preserved_data.spawner
 		end
 		
 		--only relevant if mob has different states
-		if retval.state ~= nil and
+		if preserved_data.state ~= nil and
 			self.dynamic_data.state ~= nil then
 			minetest.log(LOGLEVEL_INFO,"MOBF: setting current state to: " 
-				.. retval.state)
-			self.dynamic_data.state.current = retval.state
+				.. preserved_data.state)
+			self.dynamic_data.state.current = preserved_data.state
 		end
 	end
 	
-	self.dynamic_data.custom_persistent = retval.custom_persistent
+	self.dynamic_data.custom_persistent = preserved_data.custom_persistent
 	
 	local current_state = mob_state.get_state_by_name(self,
 												self.dynamic_data.state.current)
@@ -410,17 +436,23 @@ function mobf.activate_handler(self,staticdata)
 	if self.data.generic.armor_groups ~= nil then
 		self.object:set_armor_groups(self.data.generic.armor_groups)
 	end
+	
+	--initialize factions
+	mobf_factions.setupentity(self,preserved_data.factions)
 
 	--initialize height level
 	environment.fix_base_pos(self, self.collisionbox[2] * -1)
-
+	
 	--custom on activate handler
 	if (self.data.generic.custom_on_activate_handler ~= nil) then
 		self.data.generic.custom_on_activate_handler(self)
 	end
 	
+	--check may need data present after initialization has completed
+	mobf.init_on_rightclick_callbacks(self,now)
+		
 	--add lifebar
-	if minetest.setting_getbool("mobf_lifebar") then
+	if minetest.world_setting_get("mobf_lifebar") then
 		self.lifebar = mobf_lifebar.add(self)
 		mobf_lifebar.set(self.lifebar,self.object:get_hp()/self.hp_max)
 	end
@@ -429,8 +461,23 @@ function mobf.activate_handler(self,staticdata)
 end
 
 
+------------------------------------------------------------------------------
+-- name: init_factions(entityn)
+--
+--! @brief register mob to factions nod
+--! @memberof mobf
+--! @private
+--
+--! @param entity entity to initialize
+-------------------------------------------------------------------------------
+function mobf.init_factions(entity)
 
-
+	if not mobf_rtd.factions_available then
+		return
+	end
+	
+	
+end
 
 ------------------------------------------------------------------------------
 -- name: register_entity(entityname,graphics)
@@ -460,24 +507,26 @@ function mobf.register_entity(name, graphics, mob)
 				automatic_rotate = true,
 				groups          = mob.generic.groups,
 				hp_max          = mob.generic.base_health,
-				
+				stepheight      = mob.generic.stepheight,
+				automatic_face_movement_dir = true,
 
 
 
 		--	actions to be done by mob on its own
 			on_step = function(self, dtime)
-			
 				local starttime = mobf_get_time_ms()
 				
 				if self.removed ~= false then
 					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: on_step: " 
 						.. self.data.name .. " on_step for removed entity????")
+					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
 					return
 				end
 				
 				if self.dynamic_data == nil then
 					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: on_step: " 
 						.. "no dynamic data available!")
+					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
 					return
 				end
 			
@@ -486,12 +535,14 @@ function mobf.register_entity(name, graphics, mob)
 						mobf.activate_handler(self,self.dynamic_data.last_static_data)
 						self.dynamic_data.last_static_data = nil
 					else
+						mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
 						return
 					end
 				end
 				
 				--do special ride callback
 				if mobf_ride.on_step_callback(self) then
+					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
 					return
 				end
 			
@@ -500,12 +551,14 @@ function mobf.register_entity(name, graphics, mob)
 				local now = mobf_get_current_time()
 						
 				if self.current_dtime < 0.25 then
+					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
 					return
 				end
 				
 				--check lifetime
 				if spawning.lifecycle(self,now) == false then
-				    return
+					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
+					return
 				end
 				
 				mobf_warn_long_fct(starttime,"on_step lifecycle","lifecycle")
@@ -547,11 +600,13 @@ function mobf.register_entity(name, graphics, mob)
 				for i = 1, #self.on_punch_hooks, 1 do
 					if self.on_punch_hooks[i](self,hitter,now,
 							time_from_last_punch, tool_capabilities, dir) then
+						mobf_warn_long_fct(starttime,"onpunch_total","onpunch_total")
 						return
 					end
 					mobf_warn_long_fct(starttime,"callback nr " .. i,
 						"callback_op_".. self.data.name .. "_" .. i)
 				end
+				mobf_warn_long_fct(starttime,"onpunch_total","onpunch_total")
 				end,
 
 		--rightclick handler
@@ -559,15 +614,15 @@ function mobf.register_entity(name, graphics, mob)
 
 		--do basic mob initialization on activation
 			on_activate = function(self,staticdata)
-				
-				self.dynamic_data = {}
-				self.dynamic_data.initialized = false
-				
-				--make sure entity is in loaded area at initialization
-				local pos = self.object:getpos()
-				
-				if pos ~= nil and
-					entity_at_loaded_pos(pos) then
+					local starttime = mobf_get_time_ms()
+					self.dynamic_data = {}
+					self.dynamic_data.initialized = false
+					
+					--make sure entity is in loaded area at initialization
+					local pos = self.object:getpos()
+					
+					if pos ~= nil and
+						entity_at_loaded_pos(pos) then
 						mobf.activate_handler(self,staticdata)
 					else
 						minetest.log(LOGLEVEL_INFO,
@@ -575,6 +630,7 @@ function mobf.register_entity(name, graphics, mob)
 							"delaying activation")
 						self.dynamic_data.last_static_data = staticdata
 					end
+					mobf_warn_long_fct(starttime,"onactivate_total","onactivate_total")
 				end,
 			
 			getbasepos       = mobf.get_basepos,
@@ -589,7 +645,7 @@ function mobf.register_entity(name, graphics, mob)
 					local fp = { x= posbelow.x + (0.5*dx),
 								  y= posbelow.y,
 								  z= posbelow.z + (0.5*dz) }
-					local n = minetest.env:get_node(fp)
+					local n = minetest.get_node(fp)
 					if not mobf_is_walkable(n) then
 						return true
 					end
@@ -786,7 +842,7 @@ function mobf.blacklisthandling(mob)
 	local on_activate_fct = nil
 	
 	--remove unknown animal objects
-	if minetest.setting_getbool("mobf_delete_disabled_mobs") then
+	if minetest.world_setting_get("mobf_delete_disabled_mobs") then
 		on_activate_fct = function(self,staticdata)
 				self.object:remove()
 			end

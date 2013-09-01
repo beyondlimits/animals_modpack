@@ -18,10 +18,10 @@
 --! @{
 -- Contact: sapier a t gmx net
 -------------------------------------------------------------------------------
+mobf_assert_backtrace(mobf_lifebar == nil)
 --! @class mobf_lifebar
 --! @brief a simple lifebar implementation
 --!@}
-
 mobf_lifebar = {}
 
 -------------------------------------------------------------------------------
@@ -72,9 +72,14 @@ end
 function mobf_lifebar.add(entity)
 	local pos = entity.object:getpos()
 	local BS = 10
-	pos.y = pos.y + entity.collisionbox[5] + 0.1
+	
+	local lifebar_offset = (MAX(entity.collisionbox[4]-entity.collisionbox[1],
+								entity.collisionbox[6]-entity.collisionbox[3]) / 0.5) * 0.4
+	lifebar_offset = lifebar_offset * lifebar_offset
+	
+	pos.y = pos.y + entity.collisionbox[5] + lifebar_offset
 
-	local lifebar = minetest.env:add_entity(pos,"mobf:lifebar")
+	local lifebar = minetest.add_entity(pos,"mobf:lifebar")
 	
 	if lifebar ~= nil then
 

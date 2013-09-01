@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_deer mod loading ... ")
 
-local version = "0.0.12"
+local version = "0.0.14"
 
 local deer_groups = {
 						not_in_creative_inventory=1
@@ -25,7 +25,14 @@ local selectionbox_deer = {-0.7, -1.25, -0.7, 0.7, 0.8, 0.7}
 
 deer_prototype = {
 		name="deer_m",
-		modname = "animal_deer", 
+		modname = "animal_deer",
+		
+		factions = {
+			member = {
+				"animals",
+				"forrest_animals"
+				}
+			},
 
 		generic = {
 					description="Deer (m)",
@@ -42,6 +49,7 @@ deer_prototype = {
 					min_accel=0.2,
 					max_accel=0.4,
 					max_speed=2,
+					min_speed=0.02,
 					pattern="stop_and_go",
 					canfly=false,
 					},		
@@ -59,12 +67,21 @@ deer_prototype = {
 						algorithm="forrest_mapgen",
 						height=2
 						},
+					},
+					secondary_algorithms = {
+						{
+						rate=0.002,
+						density=200,
+						algorithm="forrest",
+						height=2
+						},
 					}
 				},
 		animation = {
 				walk = {
 					start_frame = 0,
 					end_frame   = 60,
+					basevelocity = 0.225,
 					},
 				stand = {
 					start_frame = 61,
@@ -132,7 +149,7 @@ deer_prototype = {
 minetest.register_entity(":animal_deer:deer__default",
 	{
 		on_activate = function(self,staticdata)
-			minetest.env:add_entity(self.object:getpos(),"animal_deer:deer_m__default")
+			minetest.add_entity(self.object:getpos(),"animal_deer:deer_m__default")
 			self.object:remove()
 		end
 	})

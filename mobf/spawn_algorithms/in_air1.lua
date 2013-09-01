@@ -51,7 +51,7 @@ function mobf_spawn_in_air1(mob_name,mob_transform,spawning_data,environment)
 					z = pos.z
 				}
 				
-				local node_above = minetest.env:get_node(pos_above)
+				local node_above = minetest.get_node(pos_above)
 				
 				if node_above.name ~= "air" then
 					mobf_warn_long_fct(starttime,"mobf_spawn_in_air1")
@@ -65,7 +65,7 @@ function mobf_spawn_in_air1(mob_name,mob_transform,spawning_data,environment)
 					z = pos.z
 				}
 				
-				local node_spawn = minetest.env:get_node(pos_spawn)
+				local node_spawn = minetest.get_node(pos_spawn)
 
 
 
@@ -79,7 +79,7 @@ function mobf_spawn_in_air1(mob_name,mob_transform,spawning_data,environment)
 				else
 					--print("Try to spawn mob: "..mob_name)				
 
-                    if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
+					if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
 
 						spawning.spawn_and_check(mob_name,"__default",pos_spawn,"in_air1")
 					end
@@ -113,7 +113,7 @@ function mobf_spawn_in_air1_spawner(mob_name,mob_transform,spawning_data,environ
 			for y=pos.y-1,pos.y+1,1 do
 			for z=pos.z-1,pos.z+1,1 do
 			
-				local node_to_check = minetest.env:get_node({x=x,y=y,z=z})
+				local node_to_check = minetest.get_node({x=x,y=y,z=z})
 				
 				if node_to_check == nil then
 					good = false
@@ -149,25 +149,45 @@ function mobf_spawn_in_air1_spawner(mob_name,mob_transform,spawning_data,environ
 			end
 		end)
 		
-	--add mob spawner on map generation
-	minetest.register_on_generated(function(minp, maxp, seed)
-	
-		spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,
-			function(name,pos,min_y,max_y)
-				dbg_mobf.spawning_lvl3("MOBF: trying to create a spawner for " .. name .. " at " ..printpos(pos))
-				local surface = mobf_get_surface(pos.x,pos.z,min_y,max_y)
+	local spawnfunc = function(name,pos,min_y,max_y)
+			dbg_mobf.spawning_lvl3("MOBF: trying to create a spawner for " .. name .. " at " ..printpos(pos))
+			local surface = mobf_get_surface(pos.x,pos.z,min_y,max_y)
+			
+			if surface then
+				pos.y=surface + 8 + math.random(0,5)
 				
-				if surface then
-					pos.y=surface + 8 + math.random(0,5)
-					
-					if mobf_air_above(pos,10) then
-						spawning.spawn_and_check(name,"_spawner",pos,"in_air1_spawner")
-						return true
-					end
+				if mobf_air_above(pos,10) then
+					spawning.spawn_and_check(name,"_spawner",pos,"in_air1_spawner")
+					return true
 				end
-				return false
-			end)
-    end) --register mapgen
+			end
+			return false
+		end
+		
+	if minetest.world_setting_get("mobf_delayed_spawning") then
+		minetest.register_on_generated(function(minp, maxp, seed)
+			local job = {
+				callback = spawning.divide_mapgen_entity_jobfunc,
+				data = {
+					minp          = minp,
+					maxp          = maxp,
+					spawning_data = spawning_data,
+					mob_name      = mob_name,
+					spawnfunc     = spawnfunc,
+					maxtries      = 5,
+					func          = spawning.divide_mapgen_entity_jobfunc,
+					}
+				}
+			mobf_job_queue.add_job(job)
+		end)
+	else	
+		--add mob spawner on map generation
+		minetest.register_on_generated(function(minp, maxp, seed)
+				local starttime = mobf_get_time_ms()
+				spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,spawnfunc)
+				mobf_warn_long_fct(starttime,"on_mapgen " .. mob_name,"mapgen")
+			end) --register mapgen
+	end
 
 end
 

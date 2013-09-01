@@ -18,6 +18,7 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+mobf_assert_backtrace(mob_inventory == nil)
 --! @class mob_inventory
 --! @brief inventory handling for trader like mobs
 --! @}
@@ -574,14 +575,47 @@ end
 --! @param trader_inventory to put goods
 -------------------------------------------------------------------------------
 function mob_inventory.add_goods(entity,trader_inventory)
+
+	local goods_to_add = nil
+
+	if entity.data.trader_inventory.goodlist ~= nil then
+		local total_sum_chances = 0
+		
+		for i=1,#entity.data.trader_inventory.goodlist,1 do
+			total_sum_chances = total_sum_chances + 
+				entity.data.trader_inventory.goodlist[i].chance
+		end
+		
+		local rand_value = math.random(0,total_sum_chances)
+		
+		local selected_index=1
+		local runvalue = 0
+		
+		for j=1,#entity.data.trader_inventory.goodlist,1 do
+		
+			runvalue = runvalue + 
+				entity.data.trader_inventory.goodlist[j].chance
+				
+			if runvalue < rand_value then
+				selected_index=j
+				break;
+			end
+		end
+		
+		goods_to_add = 
+			entity.data.trader_inventory.goodlist[selected_index].goods
+	else
+		goods_to_add = entity.data.trader_inventory.goods
+	end
+
 	dbg_mobf.trader_inv_lvl3("MOBF: adding " 
-		.. #entity.data.trader_inventory.goods 
+		.. #goods_to_add 
 		.. " goods for trader")
-	for i=1,#entity.data.trader_inventory.goods,1 do
+	for i=1,#goods_to_add,1 do
 		dbg_mobf.trader_inv_lvl3("MOBF:\tadding " .. 
-			entity.data.trader_inventory.goods[i][1])
+			goods_to_add[i][1])
 		trader_inventory.set_stack(trader_inventory,"goods", i,
-									entity.data.trader_inventory.goods[i][1])
+									goods_to_add[i][1])
 	end
 
 end

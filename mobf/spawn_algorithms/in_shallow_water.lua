@@ -69,12 +69,12 @@ function mobf_spawn_in_shallow_water(mob_name,mob_transform,spawning_data,enviro
 				else
 					--print("Try to spawn mob: "..mob_name)
 				
-                    if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
+					if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
 
-						if minetest.env:find_node_near(pos, 10, {"default:dirt",
-                                                                "default:dirt_with_grass"}) ~= nil then
+						if minetest.find_node_near(pos, 10, {"default:dirt",
+								"default:dirt_with_grass"}) ~= nil then
 
-							local newobject = minetest.env:add_entity(pos,mob_name .. "__default")
+							local newobject = minetest.add_entity(pos,mob_name .. "__default")
 
 							local newentity = mobf_find_entity(newobject)
 
@@ -115,7 +115,7 @@ function mobf_spawn_in_shallow_water_entity(mob_name,mob_transform,spawning_data
 			dbg_mobf.spawning_lvl3("MOBF: " .. dump(self.spawner_mob_env))
 			
 			--check if own position is good
-			local node_to_check = minetest.env:get_node(pos)
+			local node_to_check = minetest.get_node(pos)
 			
 			if node_to_check ~= nil and
 				node_to_check.name ~= "default:water_flowing" and
@@ -124,7 +124,7 @@ function mobf_spawn_in_shallow_water_entity(mob_name,mob_transform,spawning_data
 				good = false
 			end
 			
-			local found_nodes = minetest.env:find_nodes_in_area({x=pos.x-1,y=pos.y-1,z=pos.z-1},
+			local found_nodes = minetest.find_nodes_in_area({x=pos.x-1,y=pos.y-1,z=pos.z-1},
 																{x=pos.x+1,y=pos.y+1,z=pos.z+1},
 																{ "default:water_flowing","default:water_source"} )
 			if #found_nodes < 4 then
@@ -139,7 +139,7 @@ function mobf_spawn_in_shallow_water_entity(mob_name,mob_transform,spawning_data
 			end
 			
 			--make sure we're near green coast
-			if minetest.env:find_node_near(pos, 10, 
+			if minetest.find_node_near(pos, 10, 
 				{"default:dirt","default:dirt_with_grass"}) == nil then
 				dbg_mobf.spawning_lvl2("MOBF: spawner " .. printpos(pos) .. " no dirt around")
 				good = false
@@ -167,18 +167,15 @@ function mobf_spawn_in_shallow_water_entity(mob_name,mob_transform,spawning_data
 			end
 		end)
 		
-	--add mob spawner on map generation
-	minetest.register_on_generated(function(minp, maxp, seed)
-	
-		spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,
-			function(name,pos,min_y,max_y)
+		
+	local spawnfunc = function(name,pos,min_y,max_y)
 				dbg_mobf.spawning_lvl3("MOBF: trying to create a spawner for " .. name .. " at " ..printpos(pos))
 				local surface = mobf_get_surface(pos.x,pos.z,min_y,max_y)
 				
 				if surface then
 					pos.y=surface - math.random(2,10)
 					
-					local node_to_check = minetest.env:get_node(pos)
+					local node_to_check = minetest.get_node(pos)
 					
 					if node_to_check ~= nil and	
 						node_to_check.name == "default:water_source" or
@@ -192,10 +189,32 @@ function mobf_spawn_in_shallow_water_entity(mob_name,mob_transform,spawning_data
 					dbg_mobf.spawning_lvl3("MOBF:	unable to find surface")
 				end
 				return false
-			end,
-			15
-			)
-    end) --register mapgen
+			end
+			
+	if minetest.world_setting_get("mobf_delayed_spawning") then
+		minetest.register_on_generated(function(minp, maxp, seed)
+			local job = {
+				callback = spawning.divide_mapgen_entity_jobfunc,
+				data = {
+					minp          = minp,
+					maxp          = maxp,
+					spawning_data = spawning_data,
+					mob_name      = mob_name,
+					spawnfunc     = spawnfunc,
+					maxtries      = 15,
+					func          = spawning.divide_mapgen_entity_jobfunc,
+					}
+				}
+			mobf_job_queue.add_job(job)
+		end)
+	else
+		--add mob spawner on map generation
+		minetest.register_on_generated(function(minp, maxp, seed)
+			local starttime = mobf_get_time_ms()
+			spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,spawnfunc,15)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. mob_name,"mapgen")
+		end) --register mapgen
+	end
  end --end spawn algo
 --!@}
 
