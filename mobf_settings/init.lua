@@ -885,6 +885,11 @@ function mobf_settings.handle_settings_tab_input(sender_data)
 		mobf_set_world_setting("mobf_log_bug_warnings",
 								mobf_settings.tobool(sender_data.value))
 	end
+	
+	if sender_data.name == "vombie_3d_burn_animation_enabled" then
+		mobf_set_world_setting("vombie_3d_burn_animation_enabled",
+								mobf_settings.tobool(sender_data.value))
+	end
 
 	if sender_data.name == "log_removed_entities" then
 		mobf_set_world_setting("mobf_log_removed_entities",
