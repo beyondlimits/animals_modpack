@@ -354,7 +354,7 @@ end
 --! @ingroup environment
 --
 --! @param pos position to check
---! @param entity mob to check
+--! @param media media description to check
 --!
 --! @return 100 = in media 10 collision 0 invalid, nodename
 -------------------------------------------------------------------------------

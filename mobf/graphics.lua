@@ -25,8 +25,8 @@ graphics = {}
 --! @brief initialize values required by graphics
 --! @memberof graphics
 --
---! @param entity mob to calculate direction
---! @param current_velocity data to calculate direction from
+--! @param entity mob initialize
+--! @param now current time
 -------------------------------------------------------------------------------
 function graphics.init_dynamic_data(entity,now)
 	local data = {

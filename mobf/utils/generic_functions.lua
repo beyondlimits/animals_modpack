@@ -211,6 +211,7 @@ function mobf_mob_around(mob_name,mob_transform,pos,range,ignore_playerspawned)
 	local objectcount = 0
 	
 	mobf_assert_backtrace(range ~= nil)
+	mobf_assert_backtrace(pos ~= nil)
 
 	local objectlist = minetest.get_objects_inside_radius(pos,range)
 	
@@ -371,7 +372,7 @@ end
 --
 --! @brief get number of blocks above solid ground
 --
---! @param pos position to check
+--! @param pos_raw position to check
 --! @param media table of blocks not considered to be ground
 --! @return number of blocks to ground
 -------------------------------------------------------------------------------

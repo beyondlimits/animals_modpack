@@ -15,6 +15,9 @@
 -------------------------------------------------------------------------------
 
 mobf_assert_backtrace(mobf_job_queue == nil)
+
+--! @class mobf_job_queue
+--! @brief delayed job handling features
 mobf_job_queue = {}
 
 -------------------------------------------------------------------------------
@@ -69,6 +72,7 @@ end
 -- name: cleanup()
 --
 --! @brief handle all jobs queued
+--! @memberof mobf_job_queue
 --
 -------------------------------------------------------------------------------
 function mobf_job_queue.cleanup()
@@ -92,6 +96,7 @@ end
 -- name: initialize()
 --
 --! @brief initialize job queue
+--! @memberof mobf_job_queue
 --
 -------------------------------------------------------------------------------
 function mobf_job_queue.initialize(queue_interval)

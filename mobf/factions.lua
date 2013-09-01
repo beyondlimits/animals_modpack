@@ -15,6 +15,8 @@
 -------------------------------------------------------------------------------
 
 mobf_assert_backtrace(mobf_factions == nil)
+--! @class mobf_factions
+--! @brief faction mod support for mobf
 mobf_factions = {}
 
 
@@ -41,7 +43,7 @@ end
 --! @brief creat factions a mob may be member of
 --! @memberof mobf_factions
 --
---! @param factions_data of mob
+--! @param factionsdata data to set for mob
 --
 -------------------------------------------------------------------------------
 function mobf_factions.setupmob(factionsdata)
@@ -94,7 +96,6 @@ end
 --! @memberof mobf_factions
 --
 --! @param entity to be cleant up
---! @param preserved_data mob reputation data
 --
 -------------------------------------------------------------------------------
 function mobf_factions.cleanupentity(entity)
@@ -149,8 +150,9 @@ end
 --! @brief show factions rightclick menu
 --! @memberof mobf_factions
 --
---! @param entity to modify
 --! @param player issuing rightclick
+--! @param formname name of form being transmitted
+--! @param fields date for fields in current form
 --
 -------------------------------------------------------------------------------
 function mobf_factions.button_handler(player, formname, fields)

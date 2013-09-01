@@ -522,7 +522,7 @@ end
 --! @memberof spawning
 --! @param minp minimum 3d point of map block
 --! @param maxp maximum 3d point of map block
---! @param density chunk size
+--! @param sp_data spawning data or density (auto detected)
 --! @param name name of entity to spawn
 --! @param secondary_name secondary name of entity
 --! @param spawnfunc function to use for spawning

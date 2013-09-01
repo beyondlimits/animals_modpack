@@ -137,6 +137,7 @@ end
 --
 --! @brief predict next block based on pos velocity and acceleration
 --
+--! @param entity entitiy to do prediction for
 --! @param pos current position
 --! @param velocity current velocity
 --! @param acceleration current acceleration
