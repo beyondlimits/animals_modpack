@@ -56,7 +56,8 @@ function vombie_on_step_handler(entity,now,dtime)
 			if entity.last_time ~= nil then
 				local last_step_size = dtime /  86400 -- (24*3600)
 				local time_step = current_time - entity.last_time
-				if time_step > last_step_size * 10 then
+				if time_step > last_step_size * 1000 then
+					print("Vombie: time jump detected removing mob: " .. time_step .. " last_step_size: " .. (last_step_size * 1000))
 					spawning.remove(entity)
 					--return false to abort procession of other hooks
 					return false
