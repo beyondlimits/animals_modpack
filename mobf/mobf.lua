@@ -292,10 +292,30 @@ function mobf.activate_handler(self,staticdata)
 
 	local objectlist = minetest.get_objects_inside_radius(pos,0.25)
 	
-	if #objectlist > 1 then
+	local cleaned_objectcount = 0
+	
+	for i=1,#objectlist,1 do
+		local luaentity = objectlist[i]:get_luaentity()
+		if luaentity ~= nil then
+			if not luaentity.mobf_spawner then
+				cleaned_objectcount = cleaned_objectcount + 1
+			end
+		else
+			cleaned_objectcount = cleaned_objectcount + 1
+		end
+	end
+	
+	if cleaned_objectcount > 1 then
 		minetest.log(LOGLEVEL_WARNING,
 			"MOBF: trying to activate mob within something else! --> removing")
-		
+		for i=1,#objectlist,1 do
+			local luaentity = objectlist[i]:get_luaentity()
+			if luaentity ~= nil then
+				print(i .. " " .. dump(luaentity))
+			else
+				print(i .. " " .. tostring(objectlist[i]))
+			end
+		end
 		spawning.remove_uninitialized(self,staticdata)
 		return
 	end
