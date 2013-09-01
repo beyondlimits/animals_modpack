@@ -10,149 +10,21 @@ Big thanks to rinoux for providing graphics and all others for their
 suggestions too!
 -------------------------------------------------------------------------------
 
+Documentation:
+https://github.com/sapier/animals_modpack/wiki/User-documentation
 
-No what is in?
--------------------------------------------------------------------------------
-
---hostile mobs--
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	Vombies
-	Hostile mobs spawning at night in unlighted areas. They can't withstand the 
-	sun and will burn as sun rises
-	
-	Dungeonmasters
-	Just dungenmasters throwing fireballs they spawn in dark stony areas too.
-	
-	Big Red
-	Beware of their plasma balls! Big red
-	spawns in dark stony areas
-	
-	Boombomb
-	Don't get near they will explode
-	
-	Slime
-	will bounce in large caves below surface
-	
-	Oerkki
-	will attack you underground
-
---semi hostile mobs --
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	Wolf
-	A animal hiding in the woods that can be tamed to follow you
-
---friendly mobs --
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	Chicken
-	Cicken droping egs now and then
-	
-	Sheep
-	Sheep that can be sheered, their wool will grow again. They randomly will 
-	spawn on willows
-	
-	Cow
-	Cows will spawn on willows and produce milk.
-	
-	Deer
-	Will spawn below trees.
-	
-	Rat 
-	Just a small animal jumping around
-	
-	Blue White Fish
-	Just a swimming animal
-	
-	Gull
-	flys around over your head!
-	
-	Clownfish
-	A funny small quick fish swiming around
-	
-	Ostrich
-
---npc--
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	Trader
-	will sell goods
-	
-	Archer
-	Shoots arrows to enemys
-	
-	Guard
-	defends his place
-
-
-What can you do with them?
--------------------------------------------------------------------------------
-
-Sheep      -> take scissors and sheer them
-Cow        -> take an empty glass and get milk
-Chicken    -> collect eggs
-Vombie     -> drops bone on kill
-Clownfish  -> drops golden scale on kill
-Wolf       -> tame it!
-NPC trader -> trading of course
-Oerkki     -> ride
-
-How to catch mobs? Take a lasso or net to catch them, create a farm. Sheep,
-chicken and cow will even breed if there's a filled barn nearby
-
-
-Recieps:
--------------------------------------------------------------------------------
-
-Lasso
-
-none  wool  none
-wool  none  wool
-none  wool  none
-
-Scissors
-
-none  iron_ingot none
-none  iron_ingot none
-stick    none    stick
-
-Net
-
-wool  none  wool
-none  wool  none
-wool  none  wool
-
-Barn
-
-stick stick stick
-wood  wood  wood
-
-Small barn
-
-stick stick
-wood  wood
-
-Vombie trap
-
-wood       wood     wood
-wood  scale_golden  wood
-wood       wood     wood
-
-Saddle
-
-<no reciep>
-
-Contract
-
-paper
-paper
-
-
-Settings: 
--------------------------------------------------------------------------------
-call /mobf_settings in game 
-(you need to be singleplayer or have priv mobf_admin)
-
+FAQ:
+https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.2
+-Fix doxygen documentation
+-Improve spawn algorithms to avoid spawning within existing mobs
+-Fix wolfs not attacking player
+-Add support for new minetest game nodes
+-Fix varios other small bugs (see github commit list)
+
 Changes 2.1.85
 -Faction support
 -Updated mobf menu
