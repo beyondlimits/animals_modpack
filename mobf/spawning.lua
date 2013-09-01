@@ -589,27 +589,30 @@ function spawning.divide_mapgen(minp,maxp,sp_data,name,secondary_name,spawnfunc,
 		
 		dbg_mobf.spawning_lvl3("MOBF: center is (" .. x_center .. "," .. z_center .. ") --> (".. x_delta .."," .. z_delta .. ")")
 		
-		local mobs_around = mobf_mob_around(name,secondary_name,centerpos,density,true)
-		if mobs_around == 0 then
-			dbg_mobf.spawning_lvl3("no " .. name .. " within range of " .. density .. " around " ..printpos(centerpos))
+		for i = 0, maxtries, 1 do
+			attempts = attempts +1
+			local x_try = math.random(-x_delta,x_delta)
+			local z_try = math.random(-z_delta,z_delta)
 			
-			for i = 0, maxtries, 1 do
-				attempts = attempts +1
-				local x_try = math.random(-x_delta,x_delta)
-				local z_try = math.random(-z_delta,z_delta)
-				
-				local pos = { x= x_center + x_try,
-								z= z_center + z_try }
-				local starttime = mobf_get_time_ms()
-				pos.y = surfacefunc(pos.x,pos.z,min_y,max_y)
-				mobf_warn_long_fct(starttime,"surface_detection","user_1")
-				
-				if pos.y and spawnfunc(name,pos,min_y,max_y,spawning_data) then
+			local pos = { x= x_center + x_try,
+							z= z_center + z_try }
+							
+			pos.y = surfacefunc(pos.x,pos.z,min_y,max_y)
+			local mobs_around = -1
+			
+			if pos.y ~= nil then
+				mobs_around = mobf_mob_around(name,secondary_name,pos,density,true)
+			end
+			
+			if pos.y ~= 0 and mobs_around == 0 then
+				dbg_mobf.spawning_lvl3("MOBF: no " .. name .. " within range of " .. density .. " around " ..printpos(centerpos))
+
+				if spawnfunc(name,pos,min_y,max_y,spawning_data) then
 					spawned = spawned +1
 					break
 				end
-			end --for -> 5
-		end --mob around
+			end -- mobs_around
+		end --for -> 5
 
 		divs = divs +1
 	end -- for z divs
@@ -647,6 +650,7 @@ function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,en
 			collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
 			visual          = "sprite",
 			textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+			mobf_spawner    = true,
 			
 			
 			on_step = function(self,dtime)
