@@ -35,7 +35,7 @@ mobf_env_plants = {
 	"default:grass_2",
 	"default:grass_3",
 	"default:grass_4",
-	"default:gradd_5"
+	"default:grass_5"
 }
 
 mobf_env_flowers = {
