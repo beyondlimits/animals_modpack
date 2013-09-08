@@ -2,6 +2,28 @@
 mob_npc_houses = {}
 building_spawner = {}
 
+building_spawner.spawnpositions = minetest.deserialize(mobf_get_world_setting("mobf_building_spawner_spawnpos"))
+
+if building_spawner.spawnpositions == nil then
+	building_spawner.spawnpositions = {}
+end
+
+function building_spawner.checkdistance(pos,distance)
+	
+	for i=1,#building_spawner.spawnpositions,1 do
+		if mobf_calc_distance(pos,building_spawner.spawnpositions[i]) < distance then
+			return false
+		end
+	end
+	
+	return true
+end
+
+function building_spawner.addspawnpoint(pos)
+	table.insert(building_spawner.spawnpositions,pos)
+	mobf_set_world_setting("mobf_building_spawner_spawnpos",minetest.serialize(building_spawner.spawnpositions))
+end
+
 blueprint_hut = {
 	size = { x= 5,z=4 },
 	walls = {
@@ -269,10 +291,10 @@ end
 --! @param spawning_data spawning configuration
 --! @param environment environment of mob
 -------------------------------------------------------------------------------
-function mob_npc_spawn_building(mob_name,mob_transform,spawning_data,environment)
-	minetest.log(LOGLEVEL_INFO,"MOBF:\tspawn_building spawner for mob "..mob_name)
+function mob_npc_spawn_building(spawning_data)
+	minetest.log(LOGLEVEL_INFO,"MOBF:\tspawn_building spawner for mob "..spawning_data.name)
 	
-	local spawnfunc = function(name,pos,min_y,max_y)
+	local spawnfunc = function(sp_data,pos)
 			
 			if math.random() < 0.25 then
 				local blueprint = mob_npc_houses[math.random(1,#mob_npc_houses)]
@@ -280,7 +302,12 @@ function mob_npc_spawn_building(mob_name,mob_transform,spawning_data,environment
 				pos.x = math.floor(pos.x)
 				pos.z = math.floor(pos.z)
 				
-				if building_spawner.builder(pos,blueprint,mob_name .."__default") then
+				if not building_spawner.checkdistance(pos,sp_data.density) then
+					return false
+				end
+				
+				if building_spawner.builder(pos,blueprint,sp_data.name .."__default") then
+					building_spawner.addspawnpoint(pos)
 					return true
 				end
 			end
@@ -295,8 +322,6 @@ function mob_npc_spawn_building(mob_name,mob_transform,spawning_data,environment
 					minp          = minp,
 					maxp          = maxp,
 					spawning_data = spawning_data,
-					mob_name      = mob_name,
-					mob_transform = mob_transform,
 					spawnfunc     = spawnfunc,
 					surfacefunc   = mobf_get_sunlight_surface,
 					maxtries      = 20,
@@ -309,8 +334,7 @@ function mob_npc_spawn_building(mob_name,mob_transform,spawning_data,environment
 	else
 		--add mob on map generation
 		minetest.register_on_generated(function(minp, maxp, seed)
-			spawning.divide_mapgen(minp,maxp,spawning_data.density,mob_name,
-				mob_transform,spawnfunc,mobf_get_sunlight_surface,20)
+			spawning.divide_mapgen(minp,maxp,spawning_data,spawnfunc,mobf_get_sunlight_surface,20)
 		end)
 	end
 end --end spawn algo
