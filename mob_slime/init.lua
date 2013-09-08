@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_slime mod loading ...")
-local version = "0.0.11"
+local version = "0.0.12"
 
 local selectionbox_slime_L = {-0.5, -0.4, -0.5,  0.5,0.4,0.5}
 local selectionbox_slime_M = {-0.3, -0.2, -0.3,  0.3,0.2,0.3}
@@ -202,6 +202,8 @@ local prototype_mob_slime_L = {
 					height = 4,
 					
 					min_depth = -100,
+					
+					respawndelay = 60,
 					},
 				}
 			},
