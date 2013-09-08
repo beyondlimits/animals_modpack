@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_cow mod loading ...")
-local version = "0.0.21"
+local version = "0.1.0"
 
 local cow_groups = {
 						not_in_creative_inventory=1
@@ -23,6 +23,25 @@ local cow_groups = {
 local selectionbox_cow = {-1.5, -1.5, -0.75, 1.5, 0.7, 0.75}
 local selectionbox_steer = {-1.5*1.1, -1.5*1.1, -0.75*1.1, 1.5*1.1, 0.7*1.1, 0.75*1.1}
 local selectionbox_baby_calf = {-0.8, -0.8, -0.5, 0.8, 0.8, 0.5}
+
+function cattle_drop()
+	local result = {}
+	if math.random() < 0.25 then
+		table.insert(result,"animalmaterials:meat_beef 6")
+	else
+		table.insert(result,"animalmaterials:meat_beef 5")
+	end
+	
+	if math.random() < 0.25 then
+		table.insert(result,"animalmaterials:coat_cattle 1")
+	end
+	
+	if math.random() < 0.1 then
+		table.insert(result,"animalmaterials:bone 1")
+	end
+	
+	return result
+end
 
 cow_prototype = {   
 		name="cow",
@@ -38,7 +57,7 @@ cow_prototype = {
 		generic = {
 					description="Cow",
 					base_health=40,
-					kill_result="animalmaterials:meat_beef 5",
+					kill_result=cattle_drop,
 					armor_groups= {
 						fleshy=60,
 					},
@@ -158,7 +177,7 @@ steer_prototype = {
         generic = {
                     description="Steer",
                     base_health=40,
-                    kill_result="animalmaterials:meat_beef 5",
+                    kill_result=cattle_drop,
                     armor_groups= {
                         fleshy=60,
                     },
