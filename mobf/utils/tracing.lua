@@ -153,6 +153,7 @@ end
 -------------------------------------------------------------------------------
 function mobf_warn_long_fct(starttime,fctname,facility)
 	local currenttime = mobf_get_time_ms()
+	mobf_assert_backtrace(starttime ~= nil)
 	local delta = currenttime - starttime
 	
 	if delta > 0 and minetest.world_setting_get("mobf_enable_statistics") then

@@ -16,31 +16,106 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
+local SHADOWS_SPAWNER_SURFACES = { "default:stone",
+							"default:gravel",
+							"default:dirt",
+							"default:sand" }
+local SHADOWS_SPAWNER_SUFFIX = "_shadows"
+
 -------------------------------------------------------------------------------
--- name: mobf_spawn_in_shadows(mob_name,mob_transform,spawning_data,environment)
+-- name: mobf_spawner_in_shadows_spawner_spawnfunc(spawning_data,pos,min_y,max_y)
+--
+--! @brief function to spawn a spawner entity
+--
+--! @param spawning_data spawning configuration
+--! @param pos position do spawn
+--! @param min_y minimum y value of generated chunk
+--! @param max_y maximum y value of generated chunk
+-------------------------------------------------------------------------------
+function mobf_spawner_in_shadows_spawner_spawnfunc(spawning_data,pos,min_y,max_y)
+	local starttime = mobf_get_time_ms()
+	pos.y = math.floor(math.random(min_y,max_y) + 0.5)
+	
+	local min_light_around = mobf_min_light_around(pos,2,0.5)
+	local air_around_list = minetest.find_nodes_in_area(
+							{ x=pos.x-2,y=pos.y-2,z=pos.z-2 },
+							{ x=pos.x+2,y=pos.y+2,z=pos.z+2},
+							 { "air","ignore" } )
+	local air_around = 0
+	
+	if air_around_list ~= nil then
+		air_around = #air_around_list
+	end
+	
+	
+	--if there's only sunlight around and we're not submerged
+	if min_light_around > 6 and
+		air_around > 60 then
+		mobf_warn_long_fct(starttime,"on_mapgen_shadows_spawner_spawnfunc","user_2")
+		return false
+	end
+	--mobf_print("MLA:" .. min_light_around .. " AA: " .. air_around .. " POS: " .. printpos(pos))
+	
+	spawning.spawn_and_check(spawning_data.name,
+								"_spawner" .. SHADOWS_SPAWNER_SUFFIX,
+								pos,
+								"shadows_spawner")
+	mobf_warn_long_fct(starttime,"on_mapgen_shadows_spawner_spawnfunc","user_2")
+	return true
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_spawner_in_shadows_spawnfunc(spawning_data,pos)
+--
+--! @brief function to spawn a mob entity
+--
+--! @param spawning_data spawning configuration
+--! @param pos position do spawn
+-------------------------------------------------------------------------------
+function mobf_spawner_in_shadows_spawnfunc(spawning_data,pos)
+	local node = minetest.get_node(pos)
+		
+	if not mobf_contains(SHADOWS_SPAWNER_SURFACES,node.name) then
+		dbg_mobf.spawning_lvl3(
+			"MOBF: node ain't of correct type: " .. node.name)
+		return false
+	end
+	
+	local pos_above = { x=pos.x,y=pos.y+1,z=pos.z }
+		
+	--check if its always in shadows
+	for i=0.0,1,0.1 do
+		if mobf_max_light_around(pos_above,1,i) > 6 then
+			return false
+		end
+	end
+	
+	spawning.spawn_and_check(spawning_data.name,"__default",pos_above,"shadows")
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_spawn_in_shadows(spawning_data)
 --
 --! @brief find a place with low light to spawn an mob
 --
---! @param mob_name name of mob
---! @param mob_transform secondary name of mob
 --! @param spawning_data spawning configuration
---! @param environment environment of mob
 -------------------------------------------------------------------------------
 
-function mobf_spawn_in_shadows(mob_name,mob_transform,spawning_data,environment) 
+function mobf_spawner_initialize_in_shadows_abm(spawning_data) 
 
 	minetest.log(LOGLEVEL_INFO,
-		"MOBF:\tregistering shadow spawn abm callback for mob "..mob_name)
+		"MOBF:\tregistering shadow spawn abm callback for mob "..
+		spawning_data.name)
 	
 	local media = nil
 	
-	if environment ~= nil and
-		environment.media ~= nil then
-		media = environment.media	
+	if spawning_data.environment ~= nil and
+		spawning_data.environment.media ~= nil then
+		media = spawning_data.environment.media
 	end
 
 	minetest.register_abm({
-			nodenames = { "default:stone" },
+			nodenames = SHADOWS_SPAWNER_SURFACES,
 			neighbors = media,
 			interval = 60,
 			chance = math.floor(1/spawning_data.rate),
@@ -48,7 +123,7 @@ function mobf_spawn_in_shadows(mob_name,mob_transform,spawning_data,environment)
 				local starttime = mobf_get_time_ms()
 				local pos_above = {
 					x = pos.x,
-					y = pos.y + spawning_data.height/2,
+					y = pos.y + 1,
 					z = pos.z
 				}
 
@@ -61,217 +136,49 @@ function mobf_spawn_in_shadows(mob_name,mob_transform,spawning_data,environment)
 				end
 
 				--check if there s enough space above to place mob
-				if mobf_air_above(pos,spawning_data.height) ~= true then
+				if spawning_data.height ~= nil and mobf_air_above(pos,spawning_data.height) ~= true then
 					dbg_mobf.spawning_lvl3("MOBF: height requirement not met")
 					mobf_warn_long_fct(starttime,"mobf_spawn_in_shadows")
 					return
 				end
-
-				local node_above = minetest.get_node(pos_above)
-
-				if mob_name == nil then
-					minetest.log(LOGLEVEL_ERROR,"MOBF: Bug!!! mob name not available")
-				else
-					dbg_mobf.spawning_lvl3("MOBF: trying to spawn " .. mob_name)
-					if mobf_mob_around(mob_name,
-										mob_transform,
-										pos,
-										spawning_data.density,
-										true) == 0 then
-
-						local maxlight = mobf_max_light_around(pos,3,0.5)
-						if  maxlight < 3 then
-
-							local newobject = 
-								minetest.add_entity(pos_above,mob_name .. "__default")
-
-							local newentity = mobf_find_entity(newobject)
-
-							if newentity == nil then
-								minetest.log(LOGLEVEL_ERROR,
-									"MOBF: unable to create mob " .. mob_name ..
-									" at pos " .. printpos(pos))
-							else
-								minetest.log(LOGLEVEL_INFO,"MOBF: Spawning "..
-									mob_name.." in shadows at position "..
-									printpos(pos) .. " maxlight was: " .. 
-									maxlight)
-							end
-						else
-						dbg_mobf.spawning_lvl3("MOBF: too much light next to "..
-							printpos(pos) .. " light: " .. maxlight )
-						end
-					else
-						dbg_mobf.spawning_lvl3(
-							"MOBF: too many mobs next to "..printpos(pos))
-					end
+				
+				--check if pos is ok
+				if not environment.evaluate_state(
+									spawning.pos_quality(spawning_data,pos_above),
+									LT_SAFE_POS) then
+					mobf_warn_long_fct(starttime,"mobf_spawn_in_shadows")
+					return
 				end
-			mobf_warn_long_fct(starttime,"mobf_spawn_in_shadows")
+				
+				--check population density
+				if mobf_mob_around(spawning_data.name,
+									spawning_data.name_secondary,
+									pos_above,spawning_data.density,true) > 0 then
+					mobf_warn_long_fct(starttime,"mobf_spawn_in_shadows")
+					return
+				end
+				
+				mobf_spawner_in_shadows_spawner_spawnfunc(spawning_data,pos)
+				mobf_warn_long_fct(starttime,"mobf_spawn_in_shadows")
 			end,
 		})
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_spawn_in_deep_large_caves(mob_name,mob_transform,spawning_data,environment)
+-- name: mobf_spawner_initialize_in_shadows_mapgen(spawning_data)
 --
---! @brief find a place in deep large caces to spawn
+--! @brief initialize in shadows spawner
 --
---! @param mob_name name of mob
---! @param mob_transform secondary name of mob
 --! @param spawning_data spawning configuration
---! @param environment environment of mob
 -------------------------------------------------------------------------------
-function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,environment)
+function mobf_spawner_initialize_in_shadows_mapgen(spawning_data)
 
-	spawning.register_spawner_entity(mob_name,mob_transform,spawning_data,environment,
-		function(self)
-			local pos = self.object:getpos()
-			
-			local newpos = pos
-			
-			local good = true
-			local reason = ""
-			
-			local max_tries = 25
-			
-			for try=1,max_tries,1 do
-				
-				if newpos == nil then
-					
-					newpos = {}
-					good = true
-					
-					local max_offset = 0.4*self.spawner_mob_spawndata.density
-					
-					dbg_mobf.spawning_lvl2("MOBF: trying to get new random value, max_offset:" ..max_offset)
-					
-					newpos.x = math.floor(pos.x + 
-								math.random(0,max_offset) +
-								0.5)
-					newpos.z = math.floor(pos.z + 
-								math.random(0,max_offset) +
-								0.5)
-					newpos.y = mobf_get_surface(newpos.x,newpos.z,pos.y-5, pos.y+5)
-				end
-				
-				if newpos.y == nil then
-					reason = reason .. ":no surface:" .. printpos(newpos) 
-					good = false
-					newpos = nil
-				else
-					dbg_mobf.spawning_lvl3("MOBF: " .. dump(self.spawner_mob_env))
-					
-					--check if own position is good
-					local pos_below = {x=newpos.x,y=newpos.y-1,z=newpos.z}
-					local node_below = minetest.get_node(pos_below)
-					
-					
-					if not mobf_contains({	"default:stone",
-											"default:gravel",
-											"default:dirt" },node_below.name) then
-						good = false
-						reson = reason .. ":wrong surface"
-					end
-					
-					--check if there s enough space above to place mob
-					if mobf_air_above(pos_below,self.spawner_mob_spawndata.height) ~= true then
-						good = false
-						reason = reason .. ":to low"
-					end
-					
-					for i=0.0,1,0.1 do
-						local light_val = minetest.get_node_light(pos,i)
-						if light_val == nil or light_val > 6 then
-							good = false
-							reason = reason .. ":to much light"
-						end
-					end
-					
-					--this is first check
-					if not good and try == 1 then
-						dbg_mobf.spawning_lvl2("MOBF: shadows: not spawning for " 
-						.. self.spawner_mob_name .. " somehow got to bad place: "..
-						reason)
-						--TODO try to move spawner to better place
-					else
-						--abort if we found a valid pos
-						if good and try ~= 1 then
-							try = max_tries +1
-						else
-							newpos = nil
-						end
-					end
-				end
-			end
-			
-			if good and mobf_mob_around(self.spawner_mob_name,
-								self.spawner_mob_transform,
-								-- this is intended we really want to know 
-								-- mobs around spawner not new pos
-								pos, 
-								self.spawner_mob_spawndata.density,true) == 0 then
-				if spawning.spawn_and_check(
-							self.spawner_mob_name,
-							"__default",
-							newpos,
-							"shadows_spawner_ent") then
-					self.spawner_last_result = "successfull"
-				else
-					self.spawner_last_result = "failed to spawn"
-				end
-			else
-				dbg_mobf.spawning_lvl2("MOBF: shadows: not spawning " .. 
-					self.spawner_mob_name .. 
-					" there's a mob around or pos not ok: " .. dump(good) .. " rsn: " .. dump(reason))
-				self.spawner_last_result = dump(reason)
-			end
-			
-			self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
-		end)
-		
-	local spawnfunc = function(name,pos,min_y,max_y,spawning_data)
-			
-				dbg_mobf.spawning_lvl3("MOBF: trying to create a spawner for " 
-					.. name .. " at " ..printpos(pos))
-				local surface = mobf_get_surface(pos.x,pos.z,min_y,max_y)
-				
-				if surface then
-					pos.y= surface -1
-					
-					local node = minetest.get_node(pos)
-					
-					if not mobf_contains({	"default:stone",
-											"default:gravel",
-											"default:dirt",
-											"default:sand" },node.name) then
-						dbg_mobf.spawning_lvl3(
-							"MOBF: node ain't of correct type: " .. node.name)
-						return false
-					end
-					
-					local pos_above = {x=pos.x,y=pos.y+1,z=pos.z}
-					local node_above = minetest.get_node(pos_above)
-					if not mobf_contains({"air"},node_above.name) then
-						dbg_mobf.spawning_lvl3(
-							"MOBF: node above ain't air but: " .. node_above.name)
-						return false
-					end
-					
-					--check if its always in shadows
-					for i=0.0,1,0.1 do
-						if minetest.get_node_light(pos_above,i) > 6 then
-							return false
-						end
-					end
-					
-					spawning.spawn_and_check(name,"_spawner",pos_above,"shadows_spawner")
-					return true
-				else
-					dbg_mobf.spawning_lvl3("MOBF: didn't find surface for " 
-						.. name .. " spawner at " ..printpos(pos))
-				end
-				return false
-			end
+	spawning.register_spawner_entity(
+				spawning_data,
+				mobf_spawner_in_shadows_spawnfunc,
+				nil,
+				SHADOWS_SPAWNER_SUFFIX
+				)
 
 	if minetest.world_setting_get("mobf_delayed_spawning") then
 		minetest.register_on_generated(function(minp, maxp, seed)
@@ -281,8 +188,7 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 					minp          = minp,
 					maxp          = maxp,
 					spawning_data = spawning_data,
-					mob_name      = mob_name,
-					spawnfunc     = spawnfunc,
+					spawnfunc     = mobf_spawner_in_shadows_spawner_spawnfunc,
 					maxtries      = 5,
 					func          = spawning.divide_mapgen_entity_jobfunc,
 					}
@@ -293,15 +199,17 @@ function mobf_spawn_in_shadows_entity(mob_name,mob_transform,spawning_data,envir
 		--add mob spawner on map generation
 		minetest.register_on_generated(function(minp, maxp, seed)
 			local starttime = mobf_get_time_ms()
-			spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,spawnfunc)
-			mobf_warn_long_fct(starttime,"on_mapgen " .. mob_name,"mapgen")
+			spawning.divide_mapgen_entity(minp,maxp,
+											spawning_data,
+											mobf_spawner_in_shadows_spawner_spawnfunc)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. spawning_data.name,"mapgen")
 		end) --register mapgen
 	end
 end
 
 --!@}
 
-spawning.register_spawn_algorithm("shadows", mobf_spawn_in_shadows)
+spawning.register_spawn_algorithm("shadows", mobf_spawner_initialize_in_shadows_abm)
 spawning.register_spawn_algorithm(	"shadows_spawner",
-									mobf_spawn_in_shadows_entity,
+									mobf_spawner_initialize_in_shadows_mapgen,
 									spawning.register_cleanup_spawner)

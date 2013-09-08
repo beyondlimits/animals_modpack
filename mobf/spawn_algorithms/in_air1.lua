@@ -16,20 +16,119 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
+local AIR_ABOVE_GRASS_SPAWNER_SUFFIX = "_air_above_grass"
+
+function mobf_random_air_y_pos(x,z,min_y,max_y)
+
+	local surface = mobf_get_surface(x,z,min_y,max_y)
+	
+	if surface == nil then
+		--try again with 10 less to avoid spawning below minimum height
+		surface = mobf_get_surface(x,z,min_y-10,max_y)
+		
+		if surface == nil then
+			local node_min = minetest.get_node({x=x,y=min_y,z=z})
+			
+			if node_min.name ~= "air" then
+				return nil
+			else
+				surface = min_y
+			end
+		end
+	end
+	
+	--spawn at least at height of 10
+	surface = surface +10
+	
+	if max_y <= surface then
+		return nil
+	end
+	
+	local retval = {
+		x=x,
+		y= math.floor(math.random(surface,MIN(max_y,surface)) + 0.5),
+		z=z
+		}
+		
+	return retval
+end
+
 -------------------------------------------------------------------------------
--- name: mobf_spawn_in_air1(mob_name,mob_transform,spawning_data,environment)
+-- name: mobf_spawner_air_above_grass_spawner_spawnfunc(spawning_data,pos,min_y,max_y)
+--
+--! @brief function to spawn a spawner entity
+--
+--! @param spawning_data spawning configuration
+--! @param pos position do spawn
+--! @param min_y minimum y value of generated chunk
+--! @param max_y maximum y value of generated chunk
+-------------------------------------------------------------------------------
+function mobf_spawner_air_above_grass_spawner_spawnfunc(spawning_data,pos,min_y,max_y)
+
+	pos = mobf_random_air_y_pos(pos.x,pos.z,min_y,max_y)
+	
+	if pos == nil then
+		return false
+	end
+	
+	mobf_assert_validpos(pos)
+	
+	local spawner = spawning.spawn_and_check(spawning_data.name,"_spawner",pos,"air_above_grass")
+	
+	if spawner == nil then
+		return false
+	else
+		spawner.spawner_miny = min_y
+		spawner.spawner_maxy = max_y
+		return true
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_spawner_air_above_grass_spawnfunc(spawning_data,pos)
+--
+--! @brief function to spawn a mob entity
+--
+--! @param spawning_data spawning configuration
+--! @param pos position do spawn
+-------------------------------------------------------------------------------
+function mobf_spawner_air_above_grass_spawnfunc(spawning_data,pos)
+	
+	local spawnpos = mobf_random_air_y_pos(pos.x,pos.z,pos.y,pos.y+20)
+	
+	--mobf_print("MOBF: SP: " .. printpos(pos) .. " NP: " .. printpos(spawnpos))
+	
+	if spawnpos == nil then
+		return false
+	end
+	
+	local node = minetest.get_node(spawnpos)
+	
+	if node.name ~= "air" then
+		mobf_print("MOBF: invalid pos: " .. printpos(spawnpos) .. " " .. node.name)
+		return false
+	end
+	
+	if not mobf_air_above(spawnpos,10) then
+		return false
+	end
+
+	spawning.spawn_and_check(spawning_data.name,"__default",spawnpos,"air_above_grass")
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_spawner_initialize_air_above_grass_abm(spawning_data)
 --
 --! @brief find a place in sky to spawn mob
 --
---! @param mob_name name of mob
---! @param mob_transform secondary name of mob
 --! @param spawning_data spawning configuration
---! @param environment environment of mob
 -------------------------------------------------------------------------------
 
-function mobf_spawn_in_air1(mob_name,mob_transform,spawning_data,environment) 
+function mobf_spawner_initialize_air_above_grass_abm(spawning_data) 
 
-	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering in air 1 spawn abm callback for mob "..mob_name)
+	minetest.log(LOGLEVEL_INFO,
+		"MOBF:\tregistering in air 1 spawn abm callback for mob "..
+		spawning_data.name)
 	
 	local media = nil
 	
@@ -41,128 +140,34 @@ function mobf_spawn_in_air1(mob_name,mob_transform,spawning_data,environment)
 	minetest.register_abm({
 			nodenames = { "default:dirt", "default:dirt_with_grass" },
 			neighbors = media,
-			interval = 60,
+			interval = 3600,
 			chance = math.floor(1/spawning_data.rate),
 			action = function(pos, node, active_object_count, active_object_count_wider)
 				local starttime = mobf_get_time_ms()
-				local pos_above = {
-					x = pos.x,
-					y = pos.y + 1,
-					z = pos.z
-				}
+
+				pos = mobf_random_air_y_pos(pos.x,pos.z,pos.y,pos.y+20)
 				
-				local node_above = minetest.get_node(pos_above)
-				
-				if node_above.name ~= "air" then
-					mobf_warn_long_fct(starttime,"mobf_spawn_in_air1")
-					return
-				end
+				--TODO check
 
-				
-				local pos_spawn = {
-					x = pos.x,
-					y = pos.y + 10 + math.floor(math.random(0,10)),
-					z = pos.z
-				}
-				
-				local node_spawn = minetest.get_node(pos_spawn)
-
-
-
-				if node_spawn.name ~= "air" then
-					mobf_warn_long_fct(starttime,"mobf_spawn_in_air1")
-					return
-				end
-				
-				if mob_name == nil then
-					minetest.log(LOGLEVEL_ERROR,"MOBF: Bug!!! mob name not available")
-				else
-					--print("Try to spawn mob: "..mob_name)				
-
-					if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
-
-						spawning.spawn_and_check(mob_name,"__default",pos_spawn,"in_air1")
-					end
-				end
-				mobf_warn_long_fct(starttime,"mobf_spawn_in_air1")
+				mobf_spawner_air_above_grass_spawnfunc(spawning_data,pos)
+				mobf_warn_long_fct(starttime,"mobf_spawn_air_above_grass")
 			end,
 		})
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_spawn_in_air1_spawner(mob_name,mob_transform,spawning_data,environment)
+-- name: mobf_spawner_initialize_air_above_grass_mapgen(spawning_data)
 --
 --! @brief a spawner based spawn spawn algorithm
 --
---! @param mob_name name of mob
---! @param mob_transform secondary name of mob
 --! @param spawning_data spawning configuration
---! @param environment environment of mob
 -------------------------------------------------------------------------------
-function mobf_spawn_in_air1_spawner(mob_name,mob_transform,spawning_data,environment)
+function mobf_spawner_initialize_air_above_grass_mapgen(spawning_data)
 	
-	spawning.register_spawner_entity(mob_name,mob_transform,spawning_data,environment,
-		function(self)
-			local pos = self.object:getpos()
-			local good = true
-			
-			dbg_mobf.spawning_lvl3("MOBF: " .. dump(self.spawner_mob_env))
-			
-			--check if own position is good
-			for x=pos.x-1,pos.x+1,1 do
-			for y=pos.y-1,pos.y+1,1 do
-			for z=pos.z-1,pos.z+1,1 do
-			
-				local node_to_check = minetest.get_node({x=x,y=y,z=z})
-				
-				if node_to_check == nil then
-					good = false
-				else
-					dbg_mobf.spawning_lvl3("MOBF: checking " .. node_to_check.name)
-					if not mobf_contains(self.spawner_mob_env.media,node_to_check.name) then
-						good = false
-					end
-				end
-			end
-			end
-			end
-			
-			if not good then
-				dbg_mobf.spawning_lvl2("MOBF: not spawning, spawner for " .. self.spawner_mob_name .. " somehow got to bad place")
-				--TODO try to move spawner to better place
-				
-				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
-				return
-			end
-			
-
-			if mobf_mob_around(self.spawner_mob_name,
-							   self.spawner_mob_transform,
-							   pos,
-							   self.spawner_mob_spawndata.density,true) == 0 then
-
-				spawning.spawn_and_check(self.spawner_mob_name,"__default",pos,"in_air1_spawner_ent")
-				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
-			else
-				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
-				dbg_mobf.spawning_lvl2("MOBF: not spawning " .. self.spawner_mob_name .. " there's a mob around")
-			end
-		end)
-		
-	local spawnfunc = function(name,pos,min_y,max_y)
-			dbg_mobf.spawning_lvl3("MOBF: trying to create a spawner for " .. name .. " at " ..printpos(pos))
-			local surface = mobf_get_surface(pos.x,pos.z,min_y,max_y)
-			
-			if surface then
-				pos.y=surface + 8 + math.random(0,5)
-				
-				if mobf_air_above(pos,10) then
-					spawning.spawn_and_check(name,"_spawner",pos,"in_air1_spawner")
-					return true
-				end
-			end
-			return false
-		end
+	spawning.register_spawner_entity(
+				spawning_data,
+				mobf_spawner_air_above_grass_spawnfunc,
+				mobf_random_air_y_pos)
 		
 	if minetest.world_setting_get("mobf_delayed_spawning") then
 		minetest.register_on_generated(function(minp, maxp, seed)
@@ -173,7 +178,7 @@ function mobf_spawn_in_air1_spawner(mob_name,mob_transform,spawning_data,environ
 					maxp          = maxp,
 					spawning_data = spawning_data,
 					mob_name      = mob_name,
-					spawnfunc     = spawnfunc,
+					spawnfunc     = mobf_spawner_air_above_grass_spawner_spawnfunc,
 					maxtries      = 5,
 					func          = spawning.divide_mapgen_entity_jobfunc,
 					}
@@ -184,8 +189,9 @@ function mobf_spawn_in_air1_spawner(mob_name,mob_transform,spawning_data,environ
 		--add mob spawner on map generation
 		minetest.register_on_generated(function(minp, maxp, seed)
 				local starttime = mobf_get_time_ms()
-				spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,spawnfunc)
-				mobf_warn_long_fct(starttime,"on_mapgen " .. mob_name,"mapgen")
+				spawning.divide_mapgen_entity(minp,maxp,spawning_data,
+											mobf_spawner_air_above_grass_spawner_spawnfunc)
+				mobf_warn_long_fct(starttime,"on_mapgen " .. spawning_data.name,"mapgen")
 			end) --register mapgen
 	end
 
@@ -193,5 +199,7 @@ end
 
 --!@}
 
-spawning.register_spawn_algorithm("in_air1", mobf_spawn_in_air1)
-spawning.register_spawn_algorithm("in_air1_spawner", mobf_spawn_in_air1_spawner,spawning.register_cleanup_spawner)
+spawning.register_spawn_algorithm("in_air1", mobf_spawner_initialize_air_above_grass_abm)
+spawning.register_spawn_algorithm("in_air1_spawner", 
+									mobf_spawner_initialize_air_above_grass_mapgen,
+									spawning.register_cleanup_spawner)

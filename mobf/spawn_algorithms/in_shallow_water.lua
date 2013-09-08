@@ -16,20 +16,207 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
+local SHALLOW_WATER_MAX_DEPTH = -10
+local SHALLOW_WATER_SPAWNER_SUFFIX = "_shallow_water"
+
 -------------------------------------------------------------------------------
--- name: mobf_spawn_in_shallow_water(mob_name,mob_transform,spawning_data,environment)
+-- name: mobf_spawner_get_water_pos(pos,max_depth,min_y,max_y)
+--
+--! @brief find a position at x/z within some y limitations
+--
+--! @param spawning_data spawning configuration
+--! @param pos position do spawn
+--! @param min_y minimum y value of generated chunk
+--! @param max_y maximum y value of generated chunk
+-------------------------------------------------------------------------------
+function mobf_spawner_get_water_pos(pos,max_depth,min_y,max_y)
+	--get information about current position
+	local upper_pos = {x=pos.x,y=max_y,z=pos.z}
+		
+	local ground_distance = mobf_ground_distance(upper_pos,
+							{ "default:water_flowing",
+								"default:water_source",
+								"air" },max_y - min_y)
+	local ground_level = max_y - ground_distance +1
+								
+	local ground_pos = {x=pos.x,y=ground_level,z=pos.z }
+	local water_depth = mobf_air_distance(ground_pos)
+	
+	local surfacenode = minetest.get_node(ground_pos)
+	
+	if surfacenode == nil then
+		dbg_mobf.spawning_lvl3("MOBF: invalid ground node")
+		return nil
+	end
+	
+	if surfacenode.name ~= "default:water_flowing" and
+		surfacenode.name ~= "default:water_source" then
+		--mobf_print("MOBF: WD:" .. water_depth .. " GD: " .. ground_distance)
+		--mobf_print("MOBF: MAXD:" .. max_depth .. " " .. min_y .. "<->" .. max_y)
+		dbg_mobf.spawning_lvl3("MOBF: " .. surfacenode.name .. " isn't open water: " .. printpos(ground_pos))
+		--if ground_pos.y > 0 then
+		--	for i=min_y,max_y,1 do
+		--		local node = minetest.get_node({x=pos.x,y=i,z=pos.z})
+		--		print("i=" .. i .. " : " .. node.name)
+		--	end
+		--end
+		return nil
+	end
+	
+	if water_depth == -1 or water_depth == 0 then
+		dbg_mobf.spawning_lvl3("MOBF: water not found! GP: " .. ground_level .. " WD: " .. water_depth)
+		
+		for i=min_y,max_y,1 do
+			local node = minetest.get_node({x=pos.x,y=i,z=pos.z})
+			print("i=" .. i .. " : " .. node.name)
+		end
+		
+		assert(false)
+		return nil
+	end
+	
+	local water_surface_pos = {x=pos.x,y=ground_level + water_depth,z=pos.z}
+	
+	--dbg_mobf.spawning_lvl2
+	dbg_mobf.spawning_lvl3("MOBF: mobf_spawner_get_water_pos GL: " .. 
+				ground_level .. 
+				" WDPT: " .. water_depth ..
+				" WSP: " .. printpos(water_surface_pos))
+	mobf_assert_backtrace(MAX(ground_level,SHALLOW_WATER_MAX_DEPTH) < water_surface_pos.y)
+	pos.y = math.floor(
+				math.random(
+					MAX(ground_level,SHALLOW_WATER_MAX_DEPTH),
+					water_surface_pos.y
+					)
+				 + 0.5)
+	return pos
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_spawner_in_shallow_water_spawner_spawnfunc(spawning_data,pos,min_y,max_y)
+--
+--! @brief function to spawn a spawner entity
+--
+--! @param spawning_data spawning configuration
+--! @param pos position do spawn
+--! @param min_y minimum y value of generated chunk
+--! @param max_y maximum y value of generated chunk
+-------------------------------------------------------------------------------
+function mobf_spawner_in_shallow_water_spawner_spawnfunc(spawning_data,pos,min_y,max_y)
+	
+	--check if we try to spawn in correct area
+	if max_y < SHALLOW_WATER_MAX_DEPTH then
+		dbg_mobf.spawning_lvl3("MOBF: shallow water spawner --> to deep: " .. max_y .. " < " .. SHALLOW_WATER_MAX_DEPTH)
+		return false
+	end
+	
+	local waternodes = minetest.find_nodes_in_area({x=pos.x,y=min_y,z=pos.z},
+									{x=pos.x,y=max_y,z=pos.z},
+									{ "default:water_flowing","default:water_source"} )
+	--check for water
+	if #waternodes == 0 then
+		--mobf_print("MOBF: no water at position " .. printpos(pos) .. 
+		--	" " .. min_y .. "<->" .. max_y .. " found")
+		return false
+	end	
+	
+	pos = mobf_spawner_get_water_pos(pos,SHALLOW_WATER_MAX_DEPTH,min_y,max_y)
+	
+	if pos == nil then
+		dbg_mobf.spawning_lvl3("MOBF: unable to find a suitable depth at position " .. printpos(pos))
+		return false
+	end
+	
+	--only place a spawner if there's enough water around
+	local found_nodes = minetest.find_nodes_in_area({x=pos.x-2,y=pos.y-2,z=pos.z-2},
+														{x=pos.x+2,y=pos.y+2,z=pos.z+2},
+														{ "default:water_flowing","default:water_source"} )
+	
+	--maximum number of water nodes is 64 if less than one third is water don't spawn here
+	if #found_nodes < 22 then
+		dbg_mobf.spawning_lvl3("MOBF: spawner " .. printpos(pos) .. " not enough water around: " ..  #found_nodes)
+		return false
+	end
+	
+	local spawner = spawning.spawn_and_check(
+								spawning_data.name,
+								"_spawner" .. SHALLOW_WATER_SPAWNER_SUFFIX,
+								pos,
+								"shallow_water")
+	
+	if spawner == nil then
+		return false
+	else
+		dbg_mobf.spawning_lvl3("MOBF: spawner spawned at " .. printpos(pos))
+		spawner.spawner_miny = min_y
+		spawner.spawner_maxy = max_y
+		return true
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_spawner_in_shallow_water_spawnfunc(spawning_data,pos)
+--
+--! @brief function to spawn a mob entity
+--
+--! @param spawning_data spawning configuration
+--! @param pos position do spawn
+-------------------------------------------------------------------------------
+function mobf_spawner_in_shallow_water_spawnfunc(spawning_data,pos)
+	local node = minetest.get_node(pos)
+	
+	if node.name == "air" then
+		pos = mobf_spawner_get_water_pos(pos,
+						SHALLOW_WATER_MAX_DEPTH,
+						pos.y-SHALLOW_WATER_MAX_DEPTH-1,
+						pos.y)
+	end
+	
+	--check if water is to deep
+	if mobf_air_distance(pos) < 10 then
+		return false
+	end
+	
+	--only place a spawner if there's enough water around
+	local found_nodes = minetest.find_nodes_in_area({x=pos.x-2,y=pos.y-2,z=pos.z-2},
+														{x=pos.x+2,y=pos.y+2,z=pos.z+2},
+														{ "default:water_flowing","default:water_source"} )
+	
+	--maximum number of water nodes is 64 if less than one third is water don't spawn here
+	if #found_nodes < 22 then
+		dbg_mobf.spawning_lvl2("MOBF: spawner " .. printpos(pos) .. " not enough water around: " ..  #found_nodes)
+		return false
+	end
+	
+	--make sure we're near green coast
+	if minetest.find_node_near(pos, 10, 
+		{"default:dirt","default:dirt_with_grass"}) == nil then
+		dbg_mobf.spawning_lvl2("MOBF: spawner " .. printpos(pos) .. " no coast around")
+		return false
+	end
+		
+	local pos_above = { x=pos.x,y=pos.y+1,z=pos.z }
+	
+	local spawner = spawning.spawn_and_check(spawning_data.name,"_default",pos_above,"shallow_water")
+	
+	if spawner == nil then
+		return false
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_spawn_initialize_in_shallow_water_abm(spawning_data)
 --
 --! @brief find a place in water to spawn mob
 --
---! @param mob_name name of mob
---! @param mob_transform secondary name of mob
 --! @param spawning_data spawning configuration
---! @param environment environment of mob
 -------------------------------------------------------------------------------
 
-function mobf_spawn_in_shallow_water(mob_name,mob_transform,spawning_data,environment) 
+function mobf_spawn_initialize_in_shallow_water_abm(spawning_data)
 
-	minetest.log(LOGLEVEL_INFO,"MOBF: \tregistering shallow water spawn abm callback for mob "..mob_name)
+	minetest.log(LOGLEVEL_INFO,
+		"MOBF: \tregistering shallow water spawn abm callback for mob "..
+		spawning_data.name)
 	
 	local media = nil
 	
@@ -58,139 +245,52 @@ function mobf_spawn_in_shallow_water(mob_name,mob_transform,spawning_data,enviro
 					return
 				end
 
-				--check if water is to deep
-				if mobf_air_distance(pos) < 10 then
+				--check if there s enough space above to place mob
+				if spawning_data.height ~= nil and mobf_air_above(pos,spawning_data.height) ~= true then
+					dbg_mobf.spawning_lvl3("MOBF: height requirement not met")
 					mobf_warn_long_fct(starttime,"mobf_spawn_in_shallow_water")
 					return
 				end
-
-				if mob_name == nil then
-					minetest.log(LOGLEVEL_ERROR,"MOBF: Bug!!! mob name not available")
-				else
-					--print("Try to spawn mob: "..mob_name)
 				
-					if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
-
-						if minetest.find_node_near(pos, 10, {"default:dirt",
-								"default:dirt_with_grass"}) ~= nil then
-
-							local newobject = minetest.add_entity(pos,mob_name .. "__default")
-
-							local newentity = mobf_find_entity(newobject)
-
-							if newentity == nil then
-								minetest.log(LOGLEVEL_ERROR,"MOBF: Bug!!! no "..mob_name.." has been created!")
-							end
-
-							minetest.log(LOGLEVEL_INFO,"MOBF: Spawning "..mob_name.." in shallow water "..printpos(pos))
-						--else
-							--print(printpos(pos).." not next to ground")
-						end			
-					end
+				--check if pos is ok
+				if not environment.evaluate_state(
+									spawning.pos_quality(spawning_data,pos_above),
+									LT_SAFE_POS) then
+					mobf_warn_long_fct(starttime,"mobf_spawn_in_shallow_water")
+					return
 				end
+				
+				--check population density
+				if mobf_mob_around(spawning_data.name,
+									spawning_data.name_secondary,
+									pos_above,spawning_data.density,true) > 0 then
+					mobf_warn_long_fct(starttime,"mobf_spawn_in_shallow_water")
+					return
+				end
+				
+				mobf_spawner_in_shallow_water_spawnfunc(spawning_data,pos)
 				mobf_warn_long_fct(starttime,"mobf_spawn_in_shallow_water")
 			end,
 		})
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_spawn_in_shallow_water_entity(mob_name,mob_transform,spawning_data,environment)
+-- name: mobf_spawn_initialize_in_shallow_water_mapgen(spawning_data)
 --
 --! @brief find a place in shallow water
 --
---! @param mob_name name of mob
---! @param mob_transform secondary name of mob
 --! @param spawning_data spawning configuration
---! @param environment environment of mob
 -------------------------------------------------------------------------------
-function mobf_spawn_in_shallow_water_entity(mob_name,mob_transform,spawning_data,environment)
-	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering in shallow water mapgen spawn mapgen callback for mob "..mob_name)
+function mobf_spawn_initialize_in_shallow_water_mapgen(spawning_data)
+	minetest.log(LOGLEVEL_INFO,
+		"MOBF:\tregistering in shallow water mapgen spawn mapgen callback for mob "..
+		spawning_data.name)
 	
-	spawning.register_spawner_entity(mob_name,mob_transform,spawning_data,environment,
-		function(self)
-			
-			local pos = self.object:getpos()
-			local good = true
-			
-			dbg_mobf.spawning_lvl3("MOBF: " .. dump(self.spawner_mob_env))
-			
-			--check if own position is good
-			local node_to_check = minetest.get_node(pos)
-			
-			if node_to_check ~= nil and
-				node_to_check.name ~= "default:water_flowing" and
-				node_to_check.name ~= "default:water_source" then
-				dbg_mobf.spawning_lvl2("MOBF: spawner " .. printpos(pos) .. " not in water but:" .. dump(node_to_check))
-				good = false
-			end
-			
-			local found_nodes = minetest.find_nodes_in_area({x=pos.x-1,y=pos.y-1,z=pos.z-1},
-																{x=pos.x+1,y=pos.y+1,z=pos.z+1},
-																{ "default:water_flowing","default:water_source"} )
-			if #found_nodes < 4 then
-				dbg_mobf.spawning_lvl2("MOBF: spawner " .. printpos(pos) .. " not enough water around: " ..  #found_nodes)
-				good = false
-			end
-			
-			--check if water is to deep
-			if mobf_air_distance(pos) > 10 then
-				dbg_mobf.spawning_lvl2("MOBF: spawner " .. printpos(pos) .. " air distance to far no dirt around")
-				good = false
-			end
-			
-			--make sure we're near green coast
-			if minetest.find_node_near(pos, 10, 
-				{"default:dirt","default:dirt_with_grass"}) == nil then
-				dbg_mobf.spawning_lvl2("MOBF: spawner " .. printpos(pos) .. " no dirt around")
-				good = false
-			end
-			
-			if not good then
-				dbg_mobf.spawning_lvl2("MOBF: not spawning, spawner for " .. self.spawner_mob_name .. " somehow got to bad place " .. printpos(pos))
-				--TODO try to move spawner to better place
-				
-				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
-				return
-			end
-			
-
-			if mobf_mob_around(self.spawner_mob_name,
-							   self.spawner_mob_transform,
-							   pos,
-							   self.spawner_mob_spawndata.density,true) == 0 then
-
-				spawning.spawn_and_check(self.spawner_mob_name,"__default",pos,"in_shallow_water_spawner_ent")
-				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
-			else
-				self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
-				dbg_mobf.spawning_lvl2("MOBF: not spawning " .. self.spawner_mob_name .. " there's a mob around")
-			end
-		end)
+	spawning.register_spawner_entity(spawning_data,
+		mobf_spawner_in_shallow_water_spawnfunc,
+		nil, --TODO
+		SHALLOW_WATER_SPAWNER_SUFFIX)
 		
-		
-	local spawnfunc = function(name,pos,min_y,max_y)
-				dbg_mobf.spawning_lvl3("MOBF: trying to create a spawner for " .. name .. " at " ..printpos(pos))
-				local surface = mobf_get_surface(pos.x,pos.z,min_y,max_y)
-				
-				if surface then
-					pos.y=surface - math.random(2,10)
-					
-					local node_to_check = minetest.get_node(pos)
-					
-					if node_to_check ~= nil and	
-						node_to_check.name == "default:water_source" or
-						node_to_check.name == "default:water_flowing" then
-						spawning.spawn_and_check(name,"_spawner",pos,"in_shallow_water_spawner")
-						return true
-					else
-						dbg_mobf.spawning_lvl3("MOBF:	pos to add spawner is not water but: " .. dump(node_to_check))
-					end
-				else
-					dbg_mobf.spawning_lvl3("MOBF:	unable to find surface")
-				end
-				return false
-			end
-			
 	if minetest.world_setting_get("mobf_delayed_spawning") then
 		minetest.register_on_generated(function(minp, maxp, seed)
 			local job = {
@@ -200,7 +300,7 @@ function mobf_spawn_in_shallow_water_entity(mob_name,mob_transform,spawning_data
 					maxp          = maxp,
 					spawning_data = spawning_data,
 					mob_name      = mob_name,
-					spawnfunc     = spawnfunc,
+					spawnfunc     = mobf_spawner_in_shallow_water_spawner_spawnfunc,
 					maxtries      = 15,
 					func          = spawning.divide_mapgen_entity_jobfunc,
 					}
@@ -211,12 +311,17 @@ function mobf_spawn_in_shallow_water_entity(mob_name,mob_transform,spawning_data
 		--add mob spawner on map generation
 		minetest.register_on_generated(function(minp, maxp, seed)
 			local starttime = mobf_get_time_ms()
-			spawning.divide_mapgen_entity(minp,maxp,spawning_data,mob_name,spawnfunc,15)
-			mobf_warn_long_fct(starttime,"on_mapgen " .. mob_name,"mapgen")
+			spawning.divide_mapgen_entity(minp,maxp,
+									spawning_data,
+									mobf_spawner_in_shallow_water_spawner_spawnfunc,
+									15)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. spawning_data.name,"mapgen")
 		end) --register mapgen
 	end
  end --end spawn algo
 --!@}
 
 spawning.register_spawn_algorithm("in_shallow_water", mobf_spawn_in_shallow_water)
-spawning.register_spawn_algorithm("in_shallow_water_spawner", mobf_spawn_in_shallow_water_entity,spawning.register_cleanup_spawner)
+spawning.register_spawn_algorithm("in_shallow_water_spawner", 
+									mobf_spawn_initialize_in_shallow_water_mapgen,
+									spawning.register_cleanup_spawner)

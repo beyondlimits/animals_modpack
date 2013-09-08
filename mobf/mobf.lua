@@ -308,14 +308,14 @@ function mobf.activate_handler(self,staticdata)
 	if cleaned_objectcount > 1 then
 		minetest.log(LOGLEVEL_WARNING,
 			"MOBF: trying to activate mob within something else! --> removing")
-		for i=1,#objectlist,1 do
-			local luaentity = objectlist[i]:get_luaentity()
-			if luaentity ~= nil then
-				print(i .. " " .. dump(luaentity))
-			else
-				print(i .. " " .. tostring(objectlist[i]))
-			end
-		end
+--		for i=1,#objectlist,1 do
+--			local luaentity = objectlist[i]:get_luaentity()
+--			if luaentity ~= nil then
+--				print(i .. " " .. dump(luaentity))
+--			else
+--				print(i .. " " .. tostring(objectlist[i]))
+--			end
+--		end
 		spawning.remove_uninitialized(self,staticdata)
 		return
 	end
@@ -323,7 +323,7 @@ function mobf.activate_handler(self,staticdata)
 	if environment.is_media_element(current_node.name,self.environment.media) == false then
 		minetest.log(LOGLEVEL_WARNING,"MOBF: trying to activate mob " 
 			.. self.data.name .. " at invalid position")
-		minetest.log(LOGLEVEL_WARNING,"	Activation at: " 
+		minetest.log(LOGLEVEL_WARNING,"	Activation at: " .. printpos(pos) .. " "
 			.. current_node.name .. " --> removing")
 		--TODO try to move 1 block up
 		spawning.remove_uninitialized(self,staticdata)
@@ -531,7 +531,7 @@ function mobf.register_entity(name, graphics, mob)
 				end
 			
 				if (self.dynamic_data.initialized == false) then
-					if entity_at_loaded_pos(self.object:getpos()) then
+					if entity_at_loaded_pos(self.object:getpos(),self.data.name) then
 						mobf.activate_handler(self,self.dynamic_data.last_static_data)
 						self.dynamic_data.last_static_data = nil
 					else
@@ -556,7 +556,7 @@ function mobf.register_entity(name, graphics, mob)
 				end
 				
 				--check lifetime
-				if spawning.lifecycle(self,now) == false then
+				if spawning.lifecycle_callback(self,now) == false then
 					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
 					return
 				end
@@ -622,7 +622,7 @@ function mobf.register_entity(name, graphics, mob)
 					local pos = self.object:getpos()
 					
 					if pos ~= nil and
-						entity_at_loaded_pos(pos) then
+						entity_at_loaded_pos(pos,self.data.name) then
 						mobf.activate_handler(self,staticdata)
 					else
 						minetest.log(LOGLEVEL_INFO,
@@ -859,8 +859,8 @@ function mobf.blacklisthandling(mob)
 			mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup(mob.modname.. ":" .. mob.name)
 			
 			if mob.spawning.algorithm_secondary ~= nil and
-				type(mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_cleanup) == "function" then
-					mobf_spawn_algorithms.register_spawn[mob.spawning.algorithm_secondary].register_cleanup(mob.modname.. ":" .. mob.name)
+				type(mobf_spawn_algorithms[mob.spawning.algorithm_secondary].initialize_cleanup) == "function" then
+					mobf_spawn_algorithms[mob.spawning.algorithm_secondary].initialize_cleanup(mob.modname.. ":" .. mob.name)
 			end
 		end
 	else

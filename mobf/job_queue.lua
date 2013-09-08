@@ -63,7 +63,7 @@ function mobf_job_queue.process(dtime)
 		action.callback(action.data)
 		jobs_processed = jobs_processed + 1
 	end
-	mobf_warn_long_fct(starttime,"on_mapgen_entity","delayed_processing")
+	mobf_warn_long_fct(starttime,"job_processing","delayed_processing")
 --	print("Queue processed " .. jobs_processed .. " of " .. jobs_before 
 --			.. " jobs in " .. string.format("%4.2f",(mobf_get_time_ms() - starttime)) .. "ms")
 end

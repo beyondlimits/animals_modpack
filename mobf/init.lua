@@ -285,7 +285,7 @@ function mobf_init_modules()
 	--workaround for shortcomings in spawn algorithm
 	mobf.register_on_step_callback({
 			name = "check_pop_dense",
-			handler = spawning.check_population_density,
+			handler = spawning.population_density_check,
 			init = spawning.init_dynamic_data,
 			configcheck = function(entity)
 					return true

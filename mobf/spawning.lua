@@ -121,7 +121,7 @@ function spawning.init_dynamic_data(entity,now)
 		spawnpoint         = entity.object:getpos(),
 		original_spawntime = now,
 		spawner            = nil,
-		density            = spawning.get_min_density(entity),
+		density            = spawning.population_density_get_min(entity),
 	}
 	
 	entity.removed = false
@@ -131,8 +131,8 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: check_population_density(mob)
--- @function [parent=#spawning] check_population_density
+-- name: population_density_check(mob)
+-- @function [parent=#spawning] population_density_check
 --
 --! @brief check and fix if there are too many mobs within a specific range
 --! @memberof spawning
@@ -140,7 +140,7 @@ end
 --! @param entity mob to check
 --! @param now current time
 -------------------------------------------------------------------------------
-function spawning.check_population_density(entity,now)
+function spawning.population_density_check(entity,now)
 	
 	if entity == nil or
 		entity.dynamic_data == nil or
@@ -289,15 +289,15 @@ function spawning.replace_entity(entity,name,preserve)
 end
 
 ------------------------------------------------------------------------------
--- name: lifecycle()
--- @function [parent=#spawning] lifecycle
+-- name: lifecycle_callback()
+-- @function [parent=#spawning] lifecycle_callback
 --
---! @brief check mob lifecycle
+--! @brief check mob lifecycle_callback
 --! @memberof spawning
 --
 --! @return true/false still alive dead
 -------------------------------------------------------------------------------
-function spawning.lifecycle(entity,now)
+function spawning.lifecycle_callback(entity,now)
 
 	if entity.dynamic_data.spawning.original_spawntime ~= nil then
 		if entity.data.spawning.lifetime ~= nil then
@@ -326,6 +326,8 @@ end
 --
 --! @brief print current spawn statistics
 --! @memberof spawning
+--! @param spawnfunc function to be called to initialize this algorithm
+--! @param cleanupfunc function to initialize a cleanup if spawner needs to be removed
 --
 --! @return true/false successfully added spawn algorithm
 -------------------------------------------------------------------------------
@@ -337,8 +339,8 @@ function spawning.register_spawn_algorithm(name, spawnfunc, cleanupfunc)
 	
 	local new_algorithm = {}
 	
-	new_algorithm.register_spawn	= spawnfunc
-	new_algorithm.register_cleanup 	= cleanupfunc 
+	new_algorithm.initialize_spawning   = spawnfunc
+	new_algorithm.initialize_cleanup    = cleanupfunc 
 		
 	mobf_spawn_algorithms[name] = new_algorithm
 
@@ -388,17 +390,17 @@ end
 
 
 ------------------------------------------------------------------------------
--- name: get_center(min,max,current_step,interval)
--- @function [parent=#spawning] get_center
+-- name: chunk_get_center(min,max,current_step,interval)
+-- @function [parent=#spawning] chunk_get_center
 --
 --! @brief calculate center and deltas
 --! @memberof spawning
 --
 --! @return center,delta
 -------------------------------------------------------------------------------
-function spawning.get_center(min,max,current_step,interval)
+function spawning.chunk_get_center(min,max,current_step,interval)
 
-	dbg_mobf.spawning_lvl3("MOBF: get_center params: " .. min .. " " .. max .. 
+	dbg_mobf.spawning_lvl3("MOBF: chunk_get_center params: " .. min .. " " .. max .. 
 		" " .. current_step .. " " .. interval )
 	local abs_min = min + interval * (current_step-1)
 	local abs_max = abs_min + interval
@@ -413,30 +415,27 @@ function spawning.get_center(min,max,current_step,interval)
 end
 
 ------------------------------------------------------------------------------
--- name: divide_mapgen_entity(minp,maxp,density,name,spawnfunc)
+-- name: divide_mapgen_entity(minp,maxp,spawning_data,spawnfunc,maxtries)
 -- @function [parent=#spawning] divide_mapgen_entity
 --
 --! @brief divide mapblock into 2d chunks and call spawnfunc with randomized parameters for each
 --! @memberof spawning
 --! @param minp minimum 3d point of map block
 --! @param maxp maximum 3d point of map block
---! @param spawndata spawndata
---! @param name name of entity to spawn
+--! @param spawning_data all information required for spawning
 --! @param spawnfunc function to use for spawning
 --! @param maxtries maximum number of tries to place a spawner
 --
 -------------------------------------------------------------------------------
-function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtries)
-	local density = spawndata.density
-	
-	dbg_mobf.spawning_lvl3("MOBF: divide_mapgen params: ")
-	dbg_mobf.spawning_lvl3("MOBF:	" .. dump(spawndata.density))
-	dbg_mobf.spawning_lvl3("MOBF:	" .. dump(name))
-	dbg_mobf.spawning_lvl3("MOBF:	" .. dump(spawnfunc))
+function spawning.divide_mapgen_entity(minp,maxp,spawning_data,spawnfunc,maxtries)
 	
 	if maxtries == nil then
 		maxtries = 2
 	end
+	
+	mobf_assert_backtrace(type(spawning_data) == "table")
+	mobf_assert_backtrace(type(maxtries) == "number")
+	mobf_assert_backtrace(type(spawnfunc) == "function")
 	
 	local divs = 0
 	local attempts = 0
@@ -451,8 +450,8 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 	local max_z = MAX(minp.z,maxp.z)
 	
 	
-	local xdivs = math.floor(((max_x - min_x) / spawndata.density) +1)
-	local zdivs = math.floor(((max_z - min_z) / spawndata.density) +1)
+	local xdivs = math.floor(((max_x - min_x) / spawning_data.density) +1)
+	local zdivs = math.floor(((max_z - min_z) / spawning_data.density) +1)
 	
 	dbg_mobf.spawning_lvl3("MOBF: X: " .. min_x .. "-->" .. max_x) 
 	dbg_mobf.spawning_lvl3("MOBF: Z: " .. min_z .. "-->" .. max_z)
@@ -462,8 +461,8 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 	for i = 1, xdivs,1 do
 	for j = 1, zdivs,1 do
 	
-		local x_center,x_delta = spawning.get_center(min_x,max_x,i,spawndata.density)
-		local z_center,z_delta = spawning.get_center(min_z,max_z,j,spawndata.density)
+		local x_center,x_delta = spawning.chunk_get_center(min_x,max_x,i,spawning_data.density)
+		local z_center,z_delta = spawning.chunk_get_center(min_z,max_z,j,spawning_data.density)
 		
 		local surface_center = mobf_get_surface(x_center,z_center,min_y,max_y)
 		
@@ -479,11 +478,11 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 			"(" .. x_center .. "," .. z_center .. ")"
 			.."  --> (".. x_delta .."," .. z_delta .. ")")
 		
-		--check if there is already a mob of same type within area
-		local mobs_around = mobf_spawner_around(name,centerpos,spawndata.density)
-		if mobs_around == 0 then
-			dbg_mobf.spawning_lvl3("no " .. name .. " within range of " .. 
-				spawndata.density .. " around " ..printpos(centerpos))
+		--check if there is already a mobspawner of same type within area
+		local spawner_around = mobf_spawner_around(spawning_data.name,centerpos,spawning_data.density)
+		if spawner_around == 0 then
+			dbg_mobf.spawning_lvl3("no " .. spawning_data.name .. " spawner within range of " .. 
+				spawning_data.density .. " around " ..printpos(centerpos))
 			
 			for i = 0, maxtries, 1 do
 				attempts = attempts +1
@@ -497,7 +496,7 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 				pos.x = math.floor(pos.x + 0.5)
 				pos.z = math.floor(pos.z + 0.5)
 				
-				if spawnfunc(name,pos,min_y,max_y,spawndata) then
+				if spawnfunc(spawning_data,pos,min_y,max_y) then
 					spawned = spawned +1
 					break
 				end
@@ -515,36 +514,25 @@ function spawning.divide_mapgen_entity(minp,maxp,spawndata,name,spawnfunc,maxtri
 end
 
 ------------------------------------------------------------------------------
--- name: divide_mapgen(minp,maxp,density,name,spawnfunc)
+-- name: divide_mapgen(minp,maxp,spawning_data,spawnfunc,surfacefunc,maxtries)
 -- @function [parent=#spawning] divide_mapgen
 --
 --! @brief divide mapblock into 2d chunks and call spawnfunc with randomized parameters for each
 --! @memberof spawning
 --! @param minp minimum 3d point of map block
 --! @param maxp maximum 3d point of map block
---! @param sp_data spawning data or density (auto detected)
---! @param name name of entity to spawn
---! @param secondary_name secondary name of entity
+--! @param spawning_data full set of spawning parameters
 --! @param spawnfunc function to use for spawning
---! @param surfacefunc use this function to detect surface
 --! @param maxtries maximum number of tries to place a entity
 --
 -------------------------------------------------------------------------------
-function spawning.divide_mapgen(minp,maxp,sp_data,name,secondary_name,spawnfunc,surfacefunc,maxtries)
+function spawning.divide_mapgen(minp,maxp,spawning_data,spawnfunc,surfacefunc,maxtries)
 	dbg_mobf.spawning_lvl3("MOBF: divide_mapgen params: ")
-	dbg_mobf.spawning_lvl3("MOBF:	" .. dump(density))
-	dbg_mobf.spawning_lvl3("MOBF:	" .. dump(name))
-	dbg_mobf.spawning_lvl3("MOBF:	" .. dump(spawnfunc))
+
+	mobf_assert_backtrace(type(spawning_data) == "table")
 	
 	if maxtries == nil then
 		maxtries = 2
-	end
-	
-	local density = sp_data
-	local spawning_data = nil
-	if type(sp_data) == "table" then
-		density = sp_data.density
-		spawning_data = sp_data
 	end
 	
 	local divs = 0
@@ -562,8 +550,8 @@ function spawning.divide_mapgen(minp,maxp,sp_data,name,secondary_name,spawnfunc,
 	local max_z = MAX(minp.z,maxp.z)
 	
 	
-	local xdivs = math.floor(((max_x - min_x) / density) +1)
-	local zdivs = math.floor(((max_z - min_z) / density) +1)
+	local xdivs = math.floor(((max_x - min_x) / spawning_data.density) +1)
+	local zdivs = math.floor(((max_z - min_z) / spawning_data.density) +1)
 	
 	dbg_mobf.spawning_lvl3("MOBF: X: " .. min_x .. "-->" .. max_x) 
 	dbg_mobf.spawning_lvl3("MOBF: Z: " .. min_z .. "-->" .. max_z)
@@ -573,8 +561,8 @@ function spawning.divide_mapgen(minp,maxp,sp_data,name,secondary_name,spawnfunc,
 	for i = 1, xdivs,1 do
 	for j = 1, zdivs,1 do
 		local starttime = mobf_get_time_ms()
-		local x_center,x_delta = spawning.get_center(min_x,max_x,i,density)
-		local z_center,z_delta = spawning.get_center(min_z,max_z,j,density)
+		local x_center,x_delta = spawning.chunk_get_center(min_x,max_x,i,spawning_data.density)
+		local z_center,z_delta = spawning.chunk_get_center(min_z,max_z,j,spawning_data.density)
 		
 		local surface_center = surfacefunc(x_center,z_center,min_y,max_y)
 		mobf_warn_long_fct(starttime,"surface_detection","user_2")
@@ -598,16 +586,58 @@ function spawning.divide_mapgen(minp,maxp,sp_data,name,secondary_name,spawnfunc,
 							z= z_center + z_try }
 							
 			pos.y = surfacefunc(pos.x,pos.z,min_y,max_y)
-			local mobs_around = -1
 			
-			if pos.y ~= nil then
-				mobs_around = mobf_mob_around(name,secondary_name,pos,density,true)
+			local continue = false
+			local mobs_around = -1
+			local pos_ok = true
+			
+			
+			if not continue and
+				pos.y == nil then
+				continue = true
 			end
 			
-			if pos.y ~= 0 and mobs_around == 0 then
-				dbg_mobf.spawning_lvl3("MOBF: no " .. name .. " within range of " .. density .. " around " ..printpos(centerpos))
+			if not continue then
+				mobs_around = mobf_mob_around(spawning_data.name,
+											  spawning_data.name_secondary,
+											  pos,
+											  spawning_data.density,true)
+				if mobs_around > 0 then
+					continue = true
+				end
+			end
+			
+			--check if there s enough space above to place mob
+			if not continue and
+				spawning_data.height ~= nil and 
+				mobf_air_above(pos,spawning_data.height) ~= true then
+				mobf_print("MOBF: not enough room to spawn: " .. spawning_data.height)
+				continue = true
+			end
+			
+			
+			
+			--check if position is ok
+			if not continue then
+				local pos_above = {
+							x=pos.x,
+							y=pos.y+1,
+							z=pos.z}
+				local state = spawning.pos_quality(spawning_data,pos_above)
+				if not environment.evaluate_state(state,LT_SAFE_POS) then
+					local node_at_pos = minetest.get_node(pos_above)
+					--mobf_print("MOBF: pos: " .. node_at_pos.name)
+					--mobf_print("MOBF: spawning data: " .. dump(spawning_data))
+					--mobf_print("MOBF: invalid pos to spawn: " .. state:tostring())
+					continue = true
+				end
+			end
+			
+					
 
-				if spawnfunc(name,pos,min_y,max_y,spawning_data) then
+			
+			if not continue then
+				if spawnfunc(spawning_data,pos) then
 					spawned = spawned +1
 					break
 				end
@@ -625,74 +655,207 @@ function spawning.divide_mapgen(minp,maxp,sp_data,name,secondary_name,spawnfunc,
 end
 
 ------------------------------------------------------------------------------
--- name: register_spawner_entity(mobname,secondary_mobname,spawndata,environment,spawnfunc)
+-- name: register_spawner_entity(spawning_data,spawnfunc,suffix)
 -- @function [parent=#spawning] register_spawner_entity
 --
 --! @brief register a spawner entity
 --! @memberof spawning
 --
---! @param mobname name of mob
---! @param secondary_mobname secondary name of mob
---! @param spawndata spawning information to use
---! @param environment what environment is good for mob
+--! @param spawning_data spawning information to use
 --! @param spawnfunc function to call for spawning
+--! @param surfacefunc if not nil use this function to find surface
 --! @param suffix to add
+--! @param maxttries maximum number of tries per step
 --
 --! @return
 -------------------------------------------------------------------------------
-function spawning.register_spawner_entity(mobname,secondary_mobname,spawndata,environment,spawnfunc,suffix)
+function spawning.register_spawner_entity(spawning_data,spawnfunc,surfacefunc,suffix,max_tries)
 	if suffix == nil then
 		suffix = ""
 	end
-	minetest.register_entity(mobname .. "_spawner" .. suffix,
+	
+	if max_tries == nil then
+		max_tries = 25
+	end
+	
+	mobf_assert_backtrace(type(spawning_data) == "table")
+	mobf_assert_backtrace(type(spawnfunc) == "function")
+	mobf_assert_backtrace(surfacefunc == nil or type(surfacefunc) == "function")
+	mobf_assert_backtrace(spawning_data.respawndelay ~= nil)
+	mobf_assert_backtrace(type(spawning_data.respawndelay) == "number")
+	
+	local spawner_texture = "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0"
+	local spawner_collisionbox = { 0.0,0.0,0.0,0.0,0.0,0.0}
+	local punchfct = nil
+	
+	if minetest.world_setting_get("mobf_show_spawners") then
+		spawner_texture = "spawner.png"
+		spawner_collisionbox = { -0.5,-0.5,-0.5,0.5,0.5,0.5 }
+		punchfct = function(self,puncher,time_from_last_punch, tool_capabilities, direction)
+				if puncher ~= nil and
+					puncher:is_player() then
+					
+					local playername = puncher:get_player_name()
+					
+					if playername ~= nil then
+						local pos = self.object:getpos()
+						local min_light_around = mobf_min_light_around(pos,5,0.5)
+						local air_around = minetest.find_nodes_in_area(
+							{ x=pos.x-2,y=pos.y-2,z=pos.z-2 },
+							{ x=pos.x+2,y=pos.y+2,z=pos.z+2},
+							 { "air" } )
+						mobf_print("MOBF: punched spawner: " .. self.name .. 
+							" spawning: " .. self.spawner_mob_name ..
+							" spawner suffix " .. self.spawner_suffix ..
+							" air_around: " .. #air_around ..
+							" min_light: " .. min_light_around)
+					end
+				end
+			end
+	end
+		
+	dbg_mobf.spawning_lvl2("MOBF: register spawner entity: \"" .. spawning_data.name .. "_spawner" .. suffix .. "\"")
+	minetest.register_entity(spawning_data.name .. "_spawner" .. suffix,
 		 {
 			physical        = false,
-			collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+			collisionbox    = spawner_collisionbox,
 			visual          = "sprite",
-			textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+			textures        = { spawner_texture },
 			mobf_spawner    = true,
-			
+			groups          = { "immortal" },
 			
 			on_step = function(self,dtime)
 				local starttime = mobf_get_time_ms()
 				self.spawner_time_passed = self.spawner_time_passed -dtime
+				
+				local surfacefunc = mobf_get_surface
+				
+				if self.spawner_surfacefunc ~= nil then
+					if self.spawner_miny ~= nil and
+						self.spawner_maxy ~= nil then
+						
+						surfacefunc = function(x,y,miny,maxy)
+								return self.spawner_surfacefunc(x,y,self.spawner_miny,self.spawner_maxy)
+							end
+					else
+						surfacefunc = self.spawner_surfacefunc
+					end
+				end
 
 				--self.spawner_time_passed has to be handled by spawnfunc!
 				if self.spawner_time_passed < 0 then
-					local starttime = mobf_get_time_ms()
+					local successfull = false
+					local spawnerpos = self.object:getpos()
 					
-					local mobcount = mobf_mob_around(self.spawner_mob_name,
-										self.spawner_mob_transform,
-										self.object:getpos(),
-										1.5,true)
+					--find random pos around
+					for try=1,max_tries,1 do
+						local newpos = {}
+						local continue = false
+						
+						--find a random new position
+						local max_offset = 0.4*self.spawner_mob_spawndata.density
 					
-					--check if mob is already at spawner pos
-					if mobcount == 0 then
-						spawnfunc(self)
-					else
-						dbg_mobf.spawning_lvl3("MOBF: not spawning " .. self.spawner_mob_name .. " due to mob being to near " .. mobcount)
+						dbg_mobf.spawning_lvl2(
+							"MOBF: trying to get new random value, max_offset:" ..
+							max_offset)
+					
+						newpos.x = math.floor(spawnerpos.x + 
+								math.random(0,max_offset) +
+								0.5)
+						newpos.z = math.floor(spawnerpos.z + 
+								math.random(0,max_offset) +
+								0.5)
+						newpos.y = mobf_get_surface(newpos.x,newpos.z,spawnerpos.y-10, spawnerpos.y+10)
+						
+						if newpos.y == nil then
+							continue = true
+						end
+						
+						--check if minimum height at random pos is given
+						if not continue then
+							--check if there s enough space above to place mob
+							if spawning_data.height ~= nil and mobf_air_above(newpos,self.spawner_mob_spawndata.height) ~= true then
+								continue = true
+							end
+						end
+						
+						--check if new position is suitable for mob
+						if not continue then
+							--check if pos is ok
+							if not environment.evaluate_state(
+												spawning.pos_quality(self.spawner_mob_spawndata,newpos),
+												LT_SAFE_POS) then
+								continue = true
+							end
+						end
+						
+						--don't spawn directly inside another mob
+						if not continue then
+							local mobcount = mobf_mob_around(
+												self.spawner_mob_spawndata.name,
+												self.spawner_mob_spawndata.name_secondary,
+												newpos,
+												1.5,true)
+							if mobcount > 0 then
+								continue = true
+							end
+						end
+						
+						--check population density
+						if not continue then
+							local mobcount = mobf_mob_around(
+												self.spawner_mob_spawndata.name,
+												self.spawner_mob_spawndata.name_secondary,
+												newpos,
+												self.spawner_mob_spawndata.density,true)
+							if mobcount > 0 then
+								continue = true
+							end
+						end
+						
+						--now try to spawn
+						if not continue then
+							local pos_below = {x=newpos.x,y=newpos.y-1,z=newpos.z }
+							if spawnfunc(self.spawner_mob_spawndata,pos_below,self) then
+								self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
+								successfull = true
+								break --break for loop
+							end
+						end
+					end
+					
+					--if we didn't find a pos try again a little bit faster
+					if not successfull then
+						self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay/2
 					end
 				end
-				mobf_warn_long_fct(starttime,"spawner_entity_onstep","spawn_onstep")
+				mobf_warn_long_fct(starttime,
+					"spawner_entity_onstep_" .. self.spawner_mob_name,"spawn_onstep")
 			end,
 			
 			on_activate = function(self,staticdata)
+				local pos = self.object:getpos()
+				dbg_mobf.spawning_lvl2("MOBF: spawner for mob: " .. 
+							self.spawner_mob_name .. " at " .. printpos(pos))
 				local starttime = mobf_get_time_ms()
 				if self.spawner_mob_transform == nil then
 					self.spawner_mob_transform = ""
 				end
+				self.object:set_armor_groups({immortal=100})
 				--TODO honor time since deactivation
 				self.spawner_time_passed     = 1
 				mobf_warn_long_fct(starttime,"spawner_entity_activate","spawn_onstep")
 			end,
 			
-			spawner_mob_name        = mobname,
-			spawner_mob_transform   = secondary_mobname,
+			on_punch = punchfct,
+			
+			spawner_mob_name        = spawning_data.name,
+			spawner_mob_transform   = spawning_data.name_secondary,
 			spawner_time_passed     = 1,
-			spawner_mob_env         = environment,
-			spawner_mob_spawndata   = spawndata,
+			spawner_mob_spawndata   = spawning_data,
+			spawner_surfacefunc     = surfacefunc,
+			spawner_suffix          = suffix,
 		})
-
 end
 
 ------------------------------------------------------------------------------
@@ -725,29 +888,38 @@ end
 --! @param secondary_name name of mob (when harvested)
 --! @param parameters spawning parameters
 --! @param envid identifyer for environment of mob
+--! @param collisionbox collisionbox of mob
 -------------------------------------------------------------------------------
-function spawning.setup_algorithm(primary_name,secondary_name,parameters,envid)
+function spawning.setup_algorithm(primary_name,secondary_name,parameters,envid,collisionbox)
 	
 	if type(parameters) == "table" then
 
 		if mobf_spawn_algorithms[parameters.algorithm] ~= nil and
-			type(mobf_spawn_algorithms[parameters.algorithm].register_spawn) == "function" then
+			type(mobf_spawn_algorithms[parameters.algorithm].initialize_spawning) == "function" then
 			dbg_mobf.spawning_lvl2("MOBF: algorithm: " .. parameters.algorithm)
 			dbg_mobf.spawning_lvl2("MOBF: " .. dump(primary_name) .. " " ..
 				dump(secondary_name) .. " " .. dump(parameters) .. " " ..
 				dump(envid))
-			mobf_spawn_algorithms[parameters.algorithm].register_spawn(
-								primary_name,
-								secondary_name,
-								parameters,
-								environment_list[envid])
+			
+			local spawning_data = minetest.deserialize(minetest.serialize(parameters))
+			
+			spawning_data.name = primary_name
+			spawning_data.name_secondary = secondary_name
+			spawning_data.environment = environment_list[envid]
+			spawning_data.collisionbox = collisionbox
+				
+			mobf_spawn_algorithms[parameters.algorithm].initialize_spawning(spawning_data)
+		else
+			dbg_mobf.spawning_lvl2("MOBF: setup algorithm: invalid algorithm identifier")
 		end
+	else
+		dbg_mobf.spawning_lvl2("MOBF: setup algorithm: no spawndata specified")
 	end
 end
 
 ------------------------------------------------------------------------------
--- name: get_min_density(entity)
--- @function [parent=#spawning] get_min_density
+-- name: population_density_get_min(entity)
+-- @function [parent=#spawning] population_density_get_min
 --
 --! @brief get minimum density for this mob
 --! @memberof spawning
@@ -756,7 +928,7 @@ end
 --
 --! @return minimum density over all spawners defined for this mob
 -------------------------------------------------------------------------------
-function spawning.get_min_density(entity)
+function spawning.population_density_get_min(entity)
 	if type(entity.data.spawning.primary_algorithms) == "table" then
 		local density = nil
 		for i=1 , #entity.data.spawning.primary_algorithms , 1 do
@@ -770,6 +942,39 @@ function spawning.get_min_density(entity)
 	else
 		return entity.data.spawning.density
 	end
+end
+
+------------------------------------------------------------------------------
+-- name: collisionbox_get_max(entity)
+-- @function [parent=#spawning] collisionbox_get_max
+--
+--! @brief get maximum extent of mob
+--! @memberof spawning
+--
+--! @param mob mob specification
+--
+--! @return a collisionbox covering all state collisionboxes
+-------------------------------------------------------------------------------
+function spawning.collisionbox_get_max(mob)
+
+	--use 1 block as minimum for spawning
+	local retval = {-0.5,-0.5,-0.5,0.5,0.5,0.5}
+
+	--check all states if there's some collisionbox that requires more room
+	for i=1,#mob.states,1 do
+		if mob.states[i] ~= nil and
+			mob.states[i].graphics_3d ~= nil and
+			type(mob.states[i].graphics_3d.collisionbox) == "table" then
+				retval[1] = MIN(retval[1],mob.states[i].graphics_3d.collisionbox[1])
+				retval[2] = MIN(retval[2],mob.states[i].graphics_3d.collisionbox[2])
+				retval[3] = MIN(retval[3],mob.states[i].graphics_3d.collisionbox[3])
+				retval[4] = MAX(retval[4],mob.states[i].graphics_3d.collisionbox[4])
+				retval[5] = MAX(retval[5],mob.states[i].graphics_3d.collisionbox[5])
+				retval[6] = MAX(retval[6],mob.states[i].graphics_3d.collisionbox[6])
+			end
+	end
+	
+	return retval
 end
 
 ------------------------------------------------------------------------------
@@ -801,7 +1006,8 @@ function spawning.register_mob(mob)
 								mob.modname..":"..mob.name,
 								secondary_name,
 								mob.spawning.primary_algorithms[i],
-								mob.generic.envid)
+								mob.generic.envid,
+								spawning.collisionbox_get_max(mob))
 					end
 				else
 					dbg_mobf.spawning_lvl2("MOBF: " .. mob.name 
@@ -822,29 +1028,7 @@ function spawning.register_mob(mob)
 			else
 				minetest.log(LOGLEVEL_WARNING,"MOBF: legacy spawning declaration"
 						.. " for mob: " .. mob.name
-						.. "!!! plz update to new way of defining spawn"
-						.. " algorithms")
-				if mobf_spawn_algorithms[mob.spawning.algorithm] ~= nil and
-					type(mobf_spawn_algorithms[mob.spawning.algorithm].register_spawn) == "function" then
-					mobf_spawn_algorithms[mob.spawning.algorithm].register_spawn(mob.modname..":"..mob.name,
-																		secondary_name,
-																		mob.spawning,
-																		environment_list[mob.generic.envid])
-				else
-					dbg_mobf.spawning_lvl2("MOBF: " .. mob.name 
-						.. " no primary spawn algorithm defined: " 
-						.. tostring(mob.spawning.algorithm))
-				end
-				
-				if minetest.world_setting_get("mobf_animal_spawning_secondary") then
-					if mob.spawning.algorithm_secondary ~= nil and 
-						type(mobf_spawn_algorithms[mob.spawning.algorithm_secondary].register_spawn) == "function" then
-						mobf_spawn_algorithms[mob.spawning.algorithm_secondary].register_spawn(mob.modname..":"..mob.name,
-																	secondary_name,
-																	mob.spawning,
-																	environment_list[mob.generic.envid])
-					end
-				end
+						.. "!!! not supported any longer!")
 			end
 		else
 			minetest.log(LOGLEVEL_ERROR,"MOBF: specified mob >" .. mob.name 
@@ -869,14 +1053,12 @@ function spawning.divide_mapgen_jobfunc(data)
 			data.minp,
 			data.maxp,
 			data.spawning_data,
-			data.mob_name,
-			data.mob_transform,
 			data.spawnfunc,
 			data.surfacefunc,
-			5
+			1
 			)
 	if data.func ~= nil then
-		data.maxtries = data.maxtries -5
+		data.maxtries = data.maxtries -1
 		data.spawned = data.spawned + spawned
 		local stopspawning = 3
 		if data.stopspawning ~= nil then
@@ -904,7 +1086,6 @@ function spawning.divide_mapgen_entity_jobfunc(data)
 			data.minp,
 			data.maxp,
 			data.spawning_data,
-			data.mob_name,
 			data.spawnfunc,
 			1
 			)
@@ -931,6 +1112,28 @@ function spawning.divide_mapgen_entity_jobfunc(data)
 	end
 end
 
+------------------------------------------------------------------------------
+-- name: pos_quality(spawning_data,pos)
+-- @function [parent=#spawning] pos_quality
+--
+--! @brief build a entity like datastructure to be passed to pos_quality check
+--! @memberof spawning
+--
+--! @param pos_quality state
+-------------------------------------------------------------------------------
+function spawning.pos_quality(spawning_data,pos)
+	local dummyentity = {}
+	
+	dummyentity.collisionbox = spawning_data.collisionbox
+	dummyentity.environment = spawning_data.environment
+	
+	--TODO find a way to pass this information!
+	dummyentity.data = {}
+	dummyentity.data.movement = {}
+	dummyentity.data.movement.canfly = false
+
+	return environment.pos_quality(pos,dummyentity)
+end
 --include spawn algorithms
 dofile (mobf_modpath .. "/spawn_algorithms/at_night.lua")
 dofile (mobf_modpath .. "/spawn_algorithms/forrest.lua")
