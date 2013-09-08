@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animalmaterials loading ...")
-local version = "0.0.20"
+local version = "0.1.0"
 
 
 animalmaterialsdata = {}
@@ -280,6 +280,36 @@ minetest.register_craftitem("animalmaterials:fur", {
 	description = "Fur",
 	image = "animalmaterials_fur.png",
 	stack_max=25
+})
+
+minetest.register_craftitem("animalmaterials:fur_deer", {
+	description = "Deer fur",
+	image = "animalmaterials_deer_fur.png",
+	stack_max=10
+})
+
+minetest.register_craftitem("animalmaterials:coat_cattle", {
+	description = "Cattle coat",
+	image = "animalmaterials_cattle_coat.png",
+	stack_max=10
+})
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- horns
+--
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+minetest.register_craftitem("animalmaterials:deer_horns", {
+	description = "Deer horns",
+	image = "animalmaterials_deer_horns.png",
+	stack_max=20
+})
+
+minetest.register_craftitem("animalmaterials:ivory", {
+	description = "Ivory",
+	image = "animalmaterials_ivory.png",
+	stack_max=20
 })
 
 -------------------------------------------------------------------------------
