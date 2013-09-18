@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: barn mod loading ...")
-local version = "0.0.10"
+local version = "0.0.11"
 
 local modpath = minetest.get_modpath("barn")
 
@@ -150,7 +150,7 @@ function breed(breedpairs,self,now)
 		
 		local result = breedpairs[math.random(3,4)]
 		
-		local breeded = minetest.add_entity(pos_to_breed ,result .. "__default")
+		local breeded = minetest.add_entity(pos_to_breed ,result)
 		
 		local breeded_lua = breeded:get_luaentity()
 		breeded_lua.dynamic_data.spawning.player_spawned = true
