@@ -44,6 +44,8 @@ mobf_rtd = {
 	timesource				= "os.clock() (10ms ONLY!)",
 	--!total spawned mobs
 	total_spawned			= 0,
+	--!detailed debug state
+	detailed_state			= false,
 }
 
 --!path of mod

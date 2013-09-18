@@ -104,7 +104,7 @@ function mobf_debug.spawn_mob(name,param)
 			return
 		end
 		
-		spawning.spawn_and_check(parameters[1],"__default",spawnpoint,"mobf_debug_spawner")
+		spawning.spawn_and_check(parameters[1],spawnpoint,"mobf_debug_spawner")
 	else
 		--todo find random pos
 
@@ -133,7 +133,7 @@ function mobf_debug.spawn_mob(name,param)
 			
 			if y ~= nil then
 				toadd.y = y +2
-				if spawning.spawn_and_check(parameters[1],"__default",toadd,"mobf_debug_spawner") then
+				if spawning.spawn_and_check(parameters[1],toadd,"mobf_debug_spawner") then
 					found = true
 				end
 			end
@@ -351,7 +351,7 @@ function mobf_debug.rightclick_callback(entity,player)
 	local lifetime = mobf_get_current_time() - entity.dynamic_data.spawning.original_spawntime
 	print("MOBF: " .. entity.data.name .. " " .. tostring(entity) .. " is alive for " .. lifetime .. " seconds")
 	print("MOBF: \tAbsolute spawntime:          " .. entity.dynamic_data.spawning.original_spawntime)
-	print("MOBF: \tCurrent state:               " .. entity.dynamic_data.state.current )
+	print("MOBF: \tCurrent state:               " .. entity.dynamic_data.state.current.name )
 	print("MOBF: \tCurrent movgen:              " .. entity.dynamic_data.current_movement_gen.name )
 	if entity.dynamic_data.current_movement_gen.name == "follow_mov_gen" or
 		entity.dynamic_data.current_movement_gen.name == "mgen_path" then
@@ -394,8 +394,7 @@ function mobf_debug.rightclick_callback(entity,player)
 				if not found and 
 					node_at.name ~= nil and
 					node_at.name ~= "ignore" then
-					spawning.spawn_and_check("mobf:path_marker_entity","",
-										v,"mark_path")
+					spawning.spawn_and_check("mobf:path_marker_entity",v,"mark_path")
 				end
 			end
 			print("MOBF: \t\tdistance to next point:      " .. p_mov_gen.distance_to_next_point(entity,entity.object:getpos()))
@@ -411,7 +410,9 @@ function mobf_debug.rightclick_callback(entity,player)
 	
 	print("MOBF: \tTime to state change:        " .. entity.dynamic_data.state.time_to_next_change .. " seconds")
 	print("MOBF: \tCurrent environmental state: " .. environment.pos_is_ok(entity.getbasepos(entity),entity))
+	if mobf_rtd.detailed_state then
 	print("MOBF: \tCurrent detailed state:      " .. detailed_state.tostring(detailed_state))
+	end
 	print("MOBF: \tCurrent accel:               " .. printpos(entity.object:getacceleration()))
 	print("MOBF: \tCurrent speed:               " .. printpos(entity.object:getvelocity()))
 	print("MOBF: \tSpawnpoint:                  " .. printpos(entity.dynamic_data.spawning.spawnpoint))
