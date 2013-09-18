@@ -273,6 +273,7 @@ function mob_state.change_state(entity,state)
 		if not state.HANDLER_precondition(entity,state) then
 			dbg_mobf.mob_state_lvl1("MOBF: " .. entity.data.name 
 				.. " custom precondition handler didn't meet ")
+			mobf_assert_backtrace("trying to enter state but invalid precondition" == nil)
 		end
 	end
 	
@@ -294,7 +295,7 @@ function mob_state.change_state(entity,state)
 		mobf_bug_warning(LOGLEVEL_WARNING,"MOBF BUG!!! mob_state no state dynamic data")
 	end
 
-	if entity.dynamic_data.state.current ~= state.name then
+	if entity.dynamic_data.state.current.name ~= state.name then
 		--call leave state handler for old state
 		if entity.dynamic_data.state.current.HANDLER_leave_state ~= nil and
 			type(entity.dynamic_data.state.current.HANDLER_leave_state) == "function" then
@@ -553,11 +554,13 @@ end
 function mob_state.BuiltinHungerLeave(mob)
 	
 	return function(entity,state)
+		--restore old stepheight
+		entity.object:set_properties({stepheight=entity.dynamic_data.hunger.old_stepheight})
 		entity.dynamic_data.hunger = nil
 		p_mov_gen.set_cycle_path(entity,nil)
 		p_mov_gen.set_path(entity,nil)
 		p_mov_gen.set_end_of_path_handler(entity,nil)
-
+		
 	end
 end
 
@@ -576,6 +579,11 @@ function mob_state.BuiltinHungerEnter(mob)
 	return function(entity)
 		mobf_assert_backtrace(entity.dynamic_data.state.current.name == "RSVD_hunger")
 		mobf_assert_backtrace(entity.dynamic_data.hunger ~= nil)
+		
+		--use stepheight 1 as we did look for a path by using this
+		entity.dynamic_data.hunger.old_stepheight = entity.stepheight
+		entity.object:set_properties({stepheight=1})
+		
 		p_mov_gen.set_path(entity,entity.dynamic_data.hunger.path)
 		p_mov_gen.set_cycle_path(entity,false)
 		p_mov_gen.set_cycle_path(entity,handler)
