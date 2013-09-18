@@ -179,7 +179,7 @@ function mobf_serialize_permanent_entity_data(entity)
 		local state = "default"
 		if entity.dynamic_data.state ~= nil and 
 			entity.dynamic_data.state.current ~= nil then
-			state = entity.dynamic_data.state.current
+			state = entity.dynamic_data.state.current.name
 		end
 		
 		if entity.dynamic_data.spawning.original_spawntime == nil then
