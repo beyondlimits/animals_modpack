@@ -48,22 +48,17 @@ function movement_generic.get_accel_to(new_pos,entity)
 							entity.data.movement.canfly)
 	mobf_assert_backtrace(yaccel ~= nil)
 
-	-- calc y speed for flying mobs
-	local x_diff = new_pos.x - old_pos.x
-	local z_diff = new_pos.z - old_pos.z
+	--calculate direction to target
+	local accel_direction = mobf_calc_yaw(new_pos.x-old_pos.x,new_pos.z-old_pos.z)
+	
+	--find a new speed
+	local absolute_accel = minaccel + (maxaccel - minaccel) * math.random()
+	
+	local new_accel_vector = mobf_calc_vector_components(accel_direction,absolute_accel)
+	
+	new_accel_vector.y = yaccel
 
-	local rand_x = (math.random() * (maxaccel - minaccel)) + minaccel
-	local rand_z = (math.random() * (maxaccel - minaccel)) + minaccel
-
-	if x_diff < 0 then
-		rand_x = rand_x * -1
-	end
-
-	if z_diff < 0 then
-		rand_z = rand_z * -1
-	end
-
-	return { x=rand_x,y=yaccel,z=rand_z }
+	return new_accel_vector
 end
 
 
