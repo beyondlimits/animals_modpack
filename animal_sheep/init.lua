@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.0.25"
+local version = "0.1.1"
 
 local sheep_groups = {
 						sheerable=1,
@@ -60,7 +60,7 @@ sheep_prototype = {
 					max_tool_usage=10,
 					tool_consumed=false,
 					result="wool:white 1", 
-					transforms_to="animal_sheep:sheep_naked__default",
+					transforms_to="animal_sheep:sheep_naked",
 					min_delay=-1,
 					},
 		catching = {
@@ -145,6 +145,7 @@ sheep_prototype = {
 					movgen = "none",
 					typical_state_time = 300,
 					chance = 0.10,
+					chance = 0,
 					animation = "sleep",
 				},
 				{ 
@@ -152,7 +153,7 @@ sheep_prototype = {
 					custom_preconhandler = nil,
 					movgen = "none",
 					typical_state_time = 20,
-					chance = 0.25,
+					chance = 0.05,
 					animation = "eating"
 				},
 				{ 
@@ -163,6 +164,18 @@ sheep_prototype = {
 					chance = 0.50,
 					animation = "walk"
 				},
+			},
+		hunger = {
+			target_nodes = { "default:junglegrass",
+							"default:sapling",
+							"default:grass_1",
+							"default:grass_2",
+							"default:grass_3",
+							"default:grass_4",
+							"default:grass_5"},
+			range = 10,
+			chance = 0.2,
+			typical_walk_time = 30,
 			}
 		}
 		
@@ -200,7 +213,7 @@ lamb_prototype = {
 					consumed=true,
 					},
 		auto_transform = {
-					result="animal_sheep:sheep__default",
+					result="animal_sheep:sheep",
 					delay=1800
 					},
 		spawning = {
@@ -275,7 +288,7 @@ lamb_prototype = {
 					custom_preconhandler = nil,
 					movgen = "none",
 					typical_state_time = 20,
-					chance = 0.25,
+					chance = 0.05,
 					animation = "eating"
 				},
 				{ 
@@ -286,6 +299,18 @@ lamb_prototype = {
 					chance = 0.50,
 					animation = "walk"
 				},
+			},
+		hunger = {
+			target_nodes = { "default:junglegrass",
+							"default:sapling",
+							"default:grass_1",
+							"default:grass_2",
+							"default:grass_3",
+							"default:grass_4",
+							"default:grass_5"},
+			range = 10,
+			chance = 0.2,
+			typical_walk_time = 30,
 			}
 		}
 	
@@ -322,7 +347,7 @@ sheep_naked_prototype = {
 					consumed=true,
 					},
 		auto_transform = {
-					result="animal_sheep:sheep__default",
+					result="animal_sheep:sheep",
 					delay=300
 					},
 		spawning = {
@@ -397,7 +422,7 @@ sheep_naked_prototype = {
 					custom_preconhandler = nil,
 					movgen = "none",
 					typical_state_time = 20,
-					chance = 0.25,
+					chance = 0.05,
 					animation = "eating"
 				},
 				{ 
@@ -408,6 +433,18 @@ sheep_naked_prototype = {
 					chance = 0.50,
 					animation = "walk"
 				},
+			},
+		hunger = {
+			target_nodes = { "default:junglegrass",
+							"default:sapling",
+							"default:grass_1",
+							"default:grass_2",
+							"default:grass_3",
+							"default:grass_4",
+							"default:grass_5"},
+			range = 10,
+			chance = 0.2,
+			typical_walk_time = 30,
 			}
 		}	
 
