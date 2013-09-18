@@ -41,7 +41,7 @@ function mobf_spawner_in_forrest_spawnfunc(spawning_data,pos)
 	
 	if tree_around then
 		local spawnpos = {x=pos.x,y=pos.y+1,z=pos.z}
-		spawning.spawn_and_check(spawning_data.name,"__default",spawnpos,"in_forrest_mapgen")
+		spawning.spawn_and_check(spawning_data.name,spawnpos,"in_forrest_mapgen")
 		return true
 	end
 	return false

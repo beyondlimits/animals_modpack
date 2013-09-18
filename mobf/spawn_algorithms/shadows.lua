@@ -56,8 +56,7 @@ function mobf_spawner_in_shadows_spawner_spawnfunc(spawning_data,pos,min_y,max_y
 	end
 	--mobf_print("MLA:" .. min_light_around .. " AA: " .. air_around .. " POS: " .. printpos(pos))
 	
-	spawning.spawn_and_check(spawning_data.name,
-								"_spawner" .. SHADOWS_SPAWNER_SUFFIX,
+	spawning.spawn_and_check(spawning_data.name .. "_spawner" .. SHADOWS_SPAWNER_SUFFIX,
 								pos,
 								"shadows_spawner")
 	mobf_warn_long_fct(starttime,"on_mapgen_shadows_spawner_spawnfunc","user_2")
@@ -90,7 +89,7 @@ function mobf_spawner_in_shadows_spawnfunc(spawning_data,pos)
 		end
 	end
 	
-	spawning.spawn_and_check(spawning_data.name,"__default",pos_above,"shadows")
+	spawning.spawn_and_check(spawning_data.name,pos_above,"shadows")
 end
 
 -------------------------------------------------------------------------------

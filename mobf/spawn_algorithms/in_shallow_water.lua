@@ -139,8 +139,7 @@ function mobf_spawner_in_shallow_water_spawner_spawnfunc(spawning_data,pos,min_y
 	end
 	
 	local spawner = spawning.spawn_and_check(
-								spawning_data.name,
-								"_spawner" .. SHALLOW_WATER_SPAWNER_SUFFIX,
+								spawning_data.name .. "_spawner" .. SHALLOW_WATER_SPAWNER_SUFFIX,
 								pos,
 								"shallow_water")
 	

@@ -26,7 +26,7 @@
 -------------------------------------------------------------------------------
 function mobf_spawner_willow_spawnfunc(spawning_data,pos)	
 	local spawnpos = {x=pos.x,y=pos.y+1,z=pos.z}
-	spawning.spawn_and_check(spawning_data.name,"__default",spawnpos,"on_willow_mapgen")
+	spawning.spawn_and_check(spawning_data.name,spawnpos,"on_willow_mapgen")
 	return true
 end
 

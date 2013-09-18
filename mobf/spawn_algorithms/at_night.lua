@@ -48,8 +48,7 @@ function mobf_spawner_at_night_spawner_spawnfunc(spawning_data,pos,min_y,max_y)
 	
 	mobf_assert_validpos(pos)
 	
-	spawning.spawn_and_check(spawning_data.name,
-								"_spawner" ..AT_NIGHT_SPAWNER_SUFFIX,
+	spawning.spawn_and_check(spawning_data.name .. "_spawner" ..AT_NIGHT_SPAWNER_SUFFIX,
 								pos,
 								"at_night_spawner")
 	return true
@@ -88,7 +87,7 @@ function mobf_spawner_at_night_spawnfunc(spawning_data,pos)
 		return false
 	end
 	
-	spawning.spawn_and_check(spawning_data.name,"__default",pos_above,"at_night")
+	spawning.spawn_and_check(spawning_data.name,pos_above,"at_night")
 end
 
 -------------------------------------------------------------------------------

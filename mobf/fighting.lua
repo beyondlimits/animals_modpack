@@ -355,11 +355,7 @@ function fighting.switch_to_combat_state(entity,now,target)
 	dbg_mobf.fighting_lvl2("MOBF: backing up state: " .. backup.current_state.name)
 	
 	--switch state
-	local newentity = mob_state.change_state(entity,combat_state)
-	
-	if newentity ~= nil then
-		entity = newentity
-	end
+	mob_state.change_state(entity,combat_state)
 	
 	--save old movement data to use on switching back
 	entity.dynamic_data.combat.movement_backup = backup
@@ -392,20 +388,15 @@ function fighting.restore_previous_state(entity,now)
 		
 		mobf_assert_backtrace(backup.current_state ~= "combat")
 		
-		local newentity = nil
 		if backup.current_state ~= nil then
 			dbg_mobf.fighting_lvl2("MOBF: restore state: " .. backup.current_state.name)
-			newentity = mob_state.change_state(entity,backup.current_state)
+			mob_state.change_state(entity,backup.current_state)
 		else
 			minetest.log(LOGLEVEL_WARNING,"MOBF: unable to restore previous state switching to default")
-			newentity = mob_state.change_state(entity,mob_state.get_state_by_name(entity,"default"))
+			mob_state.change_state(entity,mob_state.get_state_by_name(entity,"default"))
 		end
 		
 		backup.current_state = nil
-			
-		if newentity ~= nil then
-			entity = newentity
-		end
 		
 		--restore old movement data
 		entity.dynamic_data.movement = backup.movement
@@ -556,13 +547,7 @@ function fighting.combat(entity,now,dtime)
 		
 		if required_state ~= nil and
 			required_state.name ~= entity.dynamic_data.state.current then
-			local newentity = mob_state.change_state(entity,required_state)
-
-			--if we just changed entity abort this handler
-			if newentity ~= nil then
-				newentity.dynamic_data.current_movement_gen.set_target(newentity,target)
-				return false
-			end
+			mob_state.change_state(entity,required_state)
 			
 			--reset current attack target as movement target after state switch
 			entity.dynamic_data.current_movement_gen.set_target(entity,target)
@@ -1035,8 +1020,7 @@ function fighting.sun_damage_handler(entity,now)
 		mobf_assert_backtrace(entity.dynamic_data.combat ~= nil)
 
 		local pos = entity.object:getpos()
-		local current_state = mob_state.get_state_by_name(entity,
-											entity.dynamic_data.state.current)
+		local current_state = entity.dynamic_data.state.current
 		local current_light = minetest.get_node_light(pos)
 			
 		if current_light == nil then

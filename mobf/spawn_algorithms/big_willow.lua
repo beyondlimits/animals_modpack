@@ -51,7 +51,7 @@ function mobf_spawner_big_willow_spawnfunc(spawning_data,pos)
 	if pos_is_big_willow then
 		dbg_mobf.spawning_lvl3("willow is big enough " ..printpos(centerpos))
 		local spawnpos = {x=pos.x,y=pos.y+1,z=pos.z}
-		spawning.spawn_and_check(spawning_data.name,"__default",spawnpos,"on_big_willow_mapgen")
+		spawning.spawn_and_check(spawning_data.name,spawnpos,"on_big_willow_mapgen")
 		return true
 	end
 	

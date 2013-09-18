@@ -73,7 +73,7 @@ function mobf_spawner_air_above_grass_spawner_spawnfunc(spawning_data,pos,min_y,
 	
 	mobf_assert_validpos(pos)
 	
-	local spawner = spawning.spawn_and_check(spawning_data.name,"_spawner",pos,"air_above_grass")
+	local spawner = spawning.spawn_and_check(spawning_data.name .. "_spawner",pos,"air_above_grass")
 	
 	if spawner == nil then
 		return false
@@ -113,7 +113,7 @@ function mobf_spawner_air_above_grass_spawnfunc(spawning_data,pos)
 		return false
 	end
 
-	spawning.spawn_and_check(spawning_data.name,"__default",spawnpos,"air_above_grass")
+	spawning.spawn_and_check(spawning_data.name,spawnpos,"air_above_grass")
 end
 
 -------------------------------------------------------------------------------

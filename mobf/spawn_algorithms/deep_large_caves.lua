@@ -36,8 +36,7 @@ function mobf_spawner_deep_large_caves_spawner_spawnfunc(spawning_data,pos,min_y
 		return false
 	end
 	
-	spawning.spawn_and_check(spawning_data.name,
-								"_spawner" .. DEEP_LARGE_CAVE_SPAWNER_SUFFIX,
+	spawning.spawn_and_check(spawning_data.name .. "_spawner" .. DEEP_LARGE_CAVE_SPAWNER_SUFFIX,
 								pos,
 								"deep_large_caves_spawner")
 	return true
@@ -69,7 +68,7 @@ function mobf_spawner_deep_large_caves_spawnfunc(spawning_data,pos)
 		return false
 	end
 
-	spawning.spawn_and_check(spawning_data.name,"__default",pos_above,"deep_large_caves")
+	spawning.spawn_and_check(spawning_data.name,pos_above,"deep_large_caves")
 end
 
 -------------------------------------------------------------------------------

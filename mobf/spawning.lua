@@ -348,33 +348,35 @@ function spawning.register_spawn_algorithm(name, spawnfunc, cleanupfunc)
 end
 
 ------------------------------------------------------------------------------
--- name: spawn_and_check(name,suffix,pos)
+-- name: spawn_and_check(name,pos,text)
 -- @function [parent=#spawning] spawn_and_check
 --
 --! @brief spawn an entity and check for presence
 --! @memberof spawning
+--! @param name name of entity
+--! @param pos position to spawn mob at
+--! @param text message used for log messages
 --
 --! @return spawned mob entity
 -------------------------------------------------------------------------------
-function spawning.spawn_and_check(name,suffix,pos,text)
-	mobf_assert_backtrace(pos ~= nil)
-	mobf_assert_backtrace(pos.y ~= nil)
+function spawning.spawn_and_check(name,pos,text)
+	mobf_assert_validpos(pos)
 	mobf_assert_backtrace(name ~= nil)
-	mobf_assert_backtrace(suffix ~= nil)
-	local newobject = minetest.add_entity(pos,name .. suffix)
+	
+	local newobject = minetest.add_entity(pos,name)
 	
 	if newobject then
 		local newentity = mobf_find_entity(newobject)
 		
 		if newentity == nil then
-			dbg_mobf.spawning_lvl3("MOBF BUG!!! no " .. name.. suffix ..
+			dbg_mobf.spawning_lvl3("MOBF BUG!!! no " .. name ..
 				" entity has been created by " .. text .. "!")
-			mobf_bug_warning(LOGLEVEL_ERROR,"BUG!!! no " .. name.. suffix ..
+			mobf_bug_warning(LOGLEVEL_ERROR,"BUG!!! no " .. name ..
 				" entity has been created by " .. text .. "!")
 		else
-			dbg_mobf.spawning_lvl2("MOBF: spawning "..name.. suffix ..
+			dbg_mobf.spawning_lvl2("MOBF: spawning "..name ..
 				" entity by " .. text .. " at position ".. printpos(pos))
-			minetest.log(LOGLEVEL_INFO,"MOBF: spawning "..name.. suffix .. 
+			minetest.log(LOGLEVEL_INFO,"MOBF: spawning "..name .. 
 				" entity by " .. text .. " at position ".. printpos(pos))
 			return newentity
 		end

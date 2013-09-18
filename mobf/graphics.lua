@@ -275,6 +275,92 @@ end
 --! @brief get graphics information
 --! @memberof graphics
 --
+--! @param mob static data
+--! @param statename name of state
+--
+--! @return grahphic information
+-------------------------------------------------------------------------------
+function graphics.graphics_by_statename(mob,statename)
+
+	local dummyentity = { data = mob }
+
+	local default_state = mob_state.get_state_by_name(dummyentity,"default")
+	local selected_state = nil
+	
+	if statename == "default" then
+		selected_state = default_state
+	else
+		selected_state = mob_state.get_state_by_name(dummyentity,statename)
+	end
+	
+	if selected_state == nil then
+		selected_state = default_state
+	end
+	
+	if selected_state.graphics_3d == nil then
+		selected_state.graphics_3d = default_state.graphics_3d
+	end
+	
+	if selected_state.graphics == nil then
+		selected_state.graphics = default_state.graphics
+	end
+	
+		
+	local setgraphics = {}
+
+	if (selected_state.graphics_3d == nil) or
+		minetest.world_setting_get("mobf_disable_3d_mode") then
+		
+		if (selected_state.graphics == nil) then
+			--no idea if there is any legitimate reason for this
+			mobf_print("state: " .. dump(selected_state))
+			mobf_print("there ain't even 2d graphics available")
+			return nil
+		end
+		
+		local basename = modname .. name
+	
+		if statename ~= nil and
+			statename ~= "default" then
+			basename = basename .. "__" .. statename
+		end
+		
+		setgraphics.collisionbox    =  {-0.5,
+									-0.5 * selected_state.graphics.visible_height,
+									-0.5,
+									0.5,
+									0.5 * selected_state.graphics.visible_height,
+									0.5}
+		if selected_state.graphics.visual ~= nil then
+			selected_state.graphics.visual          = selected_state.graphics.visual
+		else
+			selected_state.graphics.visual          = "sprite"
+		end
+		setgraphics.textures        = { basename..".png^[makealpha:128,0,0^[makealpha:128,128,0" }
+		setgraphics.visual_size     = selected_state.graphics.sprite_scale
+		setgraphics.spritediv       = selected_state.graphics.sprite_div
+		setgraphics.mode 			= "2d"
+	else
+		if selected_state.graphics_3d.visual == "mesh" then
+			setgraphics.mesh = selected_state.graphics_3d.mesh
+		end
+		
+		setgraphics.collisionbox    = selected_state.graphics_3d.collisionbox
+		setgraphics.visual          = selected_state.graphics_3d.visual
+		setgraphics.visual_size     = selected_state.graphics_3d.visual_size
+		setgraphics.textures        = selected_state.graphics_3d.textures
+		setgraphics.mode 			= "3d"
+	end
+
+	return setgraphics
+end
+
+------------------------------------------------------------------------------
+-- name: prepare_graphic_info(graphics2d,graphics3d)
+--
+--! @brief get graphics information
+--! @memberof graphics
+--
 --! @param graphics2d
 --! @param graphics3d
 --! @param modname
@@ -285,8 +371,6 @@ end
 function graphics.prepare_info(graphics2d,graphics3d,modname,name,statename)
 
 	local setgraphics = {}
-	
-	
 
 	if (graphics3d == nil) or
 		minetest.world_setting_get("mobf_disable_3d_mode") then

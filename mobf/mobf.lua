@@ -378,38 +378,38 @@ function mobf.activate_handler(self,staticdata)
 			self.dynamic_data.state ~= nil then
 			minetest.log(LOGLEVEL_INFO,"MOBF: setting current state to: " 
 				.. preserved_data.state)
-			self.dynamic_data.state.current = preserved_data.state
+			self.dynamic_data.state.current =  
+				mob_state.get_state_by_name(self,preserved_data.state)
 		end
 	end
 	
 	self.dynamic_data.custom_persistent = preserved_data.custom_persistent
 	
-	local current_state = mob_state.get_state_by_name(self,
-												self.dynamic_data.state.current)
 	local default_state = mob_state.get_state_by_name(self,"default")
 	
 	if self.dynamic_data.state.current == nil or
-		(current_state.state_mode ~= "auto" and
-		current_state.state_mode ~= "user_def" and
-		current_state.state_mode ~= nil) then
-		current_state = default_state
-		self.dynamic_data.state.current = "default"
+		(self.dynamic_data.state.current.state_mode ~= "auto" and
+		self.dynamic_data.state.current.state_mode ~= "user_def" and
+		self.dynamic_data.state.current.state_mode ~= nil) or
+		(self.dynamic_data.state.current.HANDLER_precondition ~= nil and
+			(not self.dynamic_data.state.current.HANDLER_precondition(self,self.dynamic_data.state.current))) then
+		self.dynamic_data.state.current = default_state
 	end
 	
 	--user defined states are locked per definition
-	if current_state.state_mode == "user_def" then
+	if self.dynamic_data.state.current.state_mode == "user_def" then
 		mob_state.lock(self,true)
 	end
 	
 	dbg_mobf.mobf_core_lvl2("MOBF: " .. self.data.name .. " restoring state: " 
-								.. current_state.name)
+								.. self.dynamic_data.state.current.name)
 	
 	--initialize move gen
-	if current_state.movgen ~= nil then
+	if self.dynamic_data.state.current.movgen ~= nil then
 		dbg_mobf.mobf_core_lvl1(
-			"MOBF: setting movegen to: " .. current_state.movgen)
+			"MOBF: setting movegen to: " .. self.dynamic_data.state.current.movgen)
 		self.dynamic_data.current_movement_gen = 
-										getMovementGen(current_state.movgen)
+						getMovementGen(self.dynamic_data.state.current.movgen)
 	else
 		dbg_mobf.mobf_core_lvl1(
 			"MOBF: setting movegen to: " .. default_state.movgen)
@@ -417,20 +417,25 @@ function mobf.activate_handler(self,staticdata)
 										getMovementGen(default_state.movgen)
 	end
 	
-	if current_state.animation ~= nil then
+	if self.dynamic_data.state.current.animation ~= nil then
 		dbg_mobf.mobf_core_lvl1(
-			"MOBF: setting animation to: " .. current_state.animation)
-		graphics.set_animation(self,current_state.animation)
+			"MOBF: setting animation to: " .. self.dynamic_data.state.current.animation)
+		graphics.set_animation(self,self.dynamic_data.state.current.animation)
 	else
 		dbg_mobf.mobf_core_lvl1(
 			"MOBF: setting animation to: " .. dump(default_state.animation))
 		graphics.set_animation(self,default_state.animation)
 	end
-		
+	
 	mobf_assert_backtrace(self.dynamic_data.current_movement_gen ~= nil)
 
 	--initialize movegen entity,current time, permanent data
 	self.dynamic_data.current_movement_gen.init_dynamic_data(self,now,retval)
+
+	--call enter state fct
+	if self.dynamic_data.state.current.HANDLER_enter_state ~= nil then
+		self.dynamic_data.state.current.HANDLER_enter_state(self)
+	end
 	
 	--initialize armor groups
 	if self.data.generic.armor_groups ~= nil then
@@ -492,6 +497,7 @@ end
 -------------------------------------------------------------------------------
 function mobf.register_entity(name, graphics, mob)
 	dbg_mobf.mobf_core_lvl1("MOBF: registering new entity: " .. name)
+	mobf_print("MOBF: registering new entity: \"" .. name .. "\"")
 	minetest.register_entity(name,
 			 {
 				physical        = true,
@@ -628,7 +634,9 @@ function mobf.register_entity(name, graphics, mob)
 						minetest.log(LOGLEVEL_INFO,
 							"MOBF: animal activated at invalid position .. " ..
 							"delaying activation")
-						self.dynamic_data.last_static_data = staticdata
+						if self.dynamic_data.last_static_data == nil then
+							self.dynamic_data.last_static_data = staticdata
+						end
 					end
 					mobf_warn_long_fct(starttime,"onactivate_total","onactivate_total")
 				end,
@@ -800,8 +808,7 @@ function mobf.register_mob_item(name,modname,description)
 				local pos = pointed_thing.above
 				
 				local entity = 
-					spawning.spawn_and_check(modname..":"..name,"__default",
-												pos,"item_spawner")
+					spawning.spawn_and_check(modname..":"..name,pos,"item_spawner")
 
 				if entity ~= nil then
 					entity.dynamic_data.spawning.player_spawned = true
@@ -847,8 +854,6 @@ function mobf.blacklisthandling(mob)
 				self.object:remove()
 			end
 		
-		
-		
 		--cleanup spawners too
 		if minetest.registered_entities[mob.modname.. ":"..mob.name] == nil and
 			environment_list[mob.generic.envid] ~= nil and
@@ -873,20 +878,10 @@ function mobf.blacklisthandling(mob)
 	if minetest.registered_entities[mob.modname.. ":"..mob.name] == nil then
 	
 		--cleanup mob entities
-		minetest.register_entity(mob.modname.. ":"..mob.name .. "__default",
+		minetest.register_entity(mob.modname.. ":"..mob.name,
 			{
 				on_activate = on_activate_fct
 			})
-		
-		--TODO move to mob_state
-		if mob.states ~= nil then
-			for s = 1, #mob.states , 1 do
-				minetest.register_entity(":".. mob_state.get_entity_name(mob,mob.states[s]),
-				{
-					on_activate = on_activate_fct
-				})
-			end
-		end
 	end
 
 	

@@ -75,23 +75,6 @@ function mob_state.initialize(entity,now)
 	entity.dynamic_data.state = state
 end
 
-
--------------------------------------------------------------------------------
--- name: get_entity_name(mob,state)
---
---! @brief get entity name for a state
---! @memberof mob_state
---! @private
---
---! @param mob generic data
---! @param state selected state data
---!
---! @return name to use for entity
--------------------------------------------------------------------------------
-function mob_state.get_entity_name(mob,state)
-	return mob.modname .. ":"..mob.name .. "__" .. state.name
-end
-
 -------------------------------------------------------------------------------
 -- name: get_state_by_name(entity,name)
 --
@@ -150,19 +133,23 @@ end
 --! @param entity elemet to look for state data
 --! @param now current time
 --! @param dstep time passed since last call
+--
+--! @return
 -------------------------------------------------------------------------------
 function mob_state.callback(entity,now,dstep)
 
-	if entity.dynamic_data.state == nil then
-		minetest.log(LOGLEVEL_ERRROR,"MOBF BUG: " .. entity.data.name 
-			.. " mob state callback without mob dynamic data!")
-		mob_state.initialize(entity,now)
-		local default_state = mob_state.get_state_by_name(self,"default")
-		entity.dynamic_data.current_movement_gen = getMovementGen(default_state.movgen)
-		entity.dynamic_data.current_movement_gen.init_dynamic_data(entity,mobf_get_current_time())
-		entity = spawning.replace_entity(entity,entity.data.modname .. ":"..entity.data.name,true)
-		return true
-	end
+--TODO find out if this needs to be replaced
+--	if entity.dynamic_data.state == nil then
+--		minetest.log(LOGLEVEL_ERRROR,"MOBF BUG: " .. entity.data.name 
+--			.. " mob state callback without mob dynamic data!")
+--		mob_state.initialize(entity,now)
+--		local default_state = mob_state.get_state_by_name(self,"default")
+--		entity.dynamic_data.current_movement_gen = getMovementGen(default_state.movgen)
+--		entity.dynamic_data.current_movement_gen.init_dynamic_data(entity,mobf_get_current_time())
+--		entity = spawning.replace_entity(entity,entity.data.modname .. ":"..entity.data.name,true)
+--		return true
+--	end
+	
 	--abort state change if current state is locked
 	if entity.dynamic_data.state.locked or 
 		entity.dynamic_data.state.enabled == false then
@@ -188,8 +175,8 @@ function mob_state.callback(entity,now,dstep)
 		
 		--fill table with available states
 		for i=1, #entity.data.states, 1 do
-			if entity.data.states[i].custom_preconhandler == nil or
-				entity.data.states[i].custom_preconhandler(entity,entity.data.states[i]) and
+			if (entity.data.states[i].HANDLER_precondition == nil or
+				entity.data.states[i].HANDLER_precondition(entity,entity.data.states[i])) and
 				--ignore states that are not supposed to be switched to 
 				--by automatic state change handling e.g. fighting states or
 				--manual set states
@@ -214,18 +201,13 @@ function mob_state.callback(entity,now,dstep)
 			end
 			
 			if math.random() < current_chance then
-				if mob_state.change_state(entity,state_table[rand_state]) ~= nil then
-					return false
-				else
-					return true
-				end
+				mob_state.change_state(entity,state_table[rand_state])
+				return true
 			end
 		end
 		
 		--switch to default state (only reached if no change has been done
-		if mob_state.change_state(entity,mob_state.get_state_by_name(entity,"default")) ~= nil then
-			return false
-		end
+		mob_state.change_state(entity,mob_state.get_state_by_name(entity,"default"))
 	else
 		dbg_mobf.mob_state_lvl3("MOBF: " .. entity.data.name 
 			.. " is not ready for state change ")
@@ -233,56 +215,6 @@ function mob_state.callback(entity,now,dstep)
 	end
 	
 	return true
-end
-
--------------------------------------------------------------------------------
--- name: switch_entity(entity,state)
---
---! @brief helper function to swich an entity based on new state
---! @memberof mob_state
---! @private
---
---! @param entity to replace
---! @param state to take new entity
---!
---! @return the new entity or nil
--------------------------------------------------------------------------------
-function mob_state.switch_entity(entity,state)
-	--switch entity
-	local state_has_model = false
-	
-	if minetest.world_setting_get("mobf_disable_3d_mode") then
-		if state.graphics ~= nil then
-			state_has_model = true
-		end
-	else
-		if state.graphics_3d ~= nil then
-			state_has_model = true
-		end
-	end
-	
-	local newentity = nil
-	
-	if state_has_model then
-		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name 
-			.. " switching to state model ")
-		newentity = spawning.replace_entity(entity,
-							mob_state.get_entity_name(entity.data,state),true)
-	else
-		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name 
-			.. " switching to default model ")
-		newentity = spawning.replace_entity(entity,entity.data.modname 
-							.. ":"..entity.data.name .. "__default",true)
-	end	
-	
-	if newentity ~= nil then
-		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name 
-			.. " replaced entity=" .. tostring(entity) .. " by newentity=" 
-			.. tostring(newentity))
-		return newentity
-	else
-		return entity
-	end	
 end
 
 -------------------------------------------------------------------------------
@@ -296,6 +228,8 @@ end
 --! @param state to take new entity
 -------------------------------------------------------------------------------
 function mob_state.switch_movgen(entity,state)
+	mobf_assert_backtrace(entity ~= nil)
+	mobf_assert_backtrace(state ~= nil)
 	local mov_to_set = nil
 	
 	--determine new movement gen
@@ -326,26 +260,19 @@ end
 --
 --! @param entity to change state
 --! @param state to change to
---!
---! @return the new entity or nil
 -------------------------------------------------------------------------------
 function mob_state.change_state(entity,state)
 
 	dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name 
 		.. " state change called entity=" .. tostring(entity) .. " state:" 
 		.. dump(state))
-	--check if time precondition handler tells us to stop state change
-	--if not mob_state.precon_time(state) then
-	--	return
-	--end
 	
 	--check if custom precondition handler tells us to stop state change
 	if state ~= nil and
-		type(state.custom_preconhandler) == "function" then
-		if not state.custom_preconhandler(entity,state) then
+		type(state.HANDLER_precondition) == "function" then
+		if not state.HANDLER_precondition(entity,state) then
 			dbg_mobf.mob_state_lvl1("MOBF: " .. entity.data.name 
 				.. " custom precondition handler didn't meet ")
-			return nil
 		end
 	end
 	
@@ -365,34 +292,45 @@ function mob_state.change_state(entity,state)
 	
 	if entity.dynamic_data.state == nil then
 		mobf_bug_warning(LOGLEVEL_WARNING,"MOBF BUG!!! mob_state no state dynamic data")
-		return nil
 	end
 
 	if entity.dynamic_data.state.current ~= state.name then
+		--call leave state handler for old state
+		if entity.dynamic_data.state.current.HANDLER_leave_state ~= nil and
+			type(entity.dynamic_data.state.current.HANDLER_leave_state) == "function" then
+			entity.dynamic_data.state.current.HANDLER_leave_state(entity,state)
+		end
+		
 		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name 
 			.. " different states now really changeing to " .. state.name)
-		local switchedentity = mob_state.switch_entity(entity,state)
-		mob_state.switch_movgen(switchedentity,state)
+
+		mob_state.switch_model(entity,state)
+		mob_state.switch_movgen(entity,state)
 		
-		switchedentity.dynamic_data.state.time_to_next_change = mob_state.getTimeToNextState(state.typical_state_time)
-		switchedentity.dynamic_data.state.current = state.name
+		entity.dynamic_data.state.time_to_next_change =
+			mob_state.getTimeToNextState(state.typical_state_time)
+		entity.dynamic_data.state.current = state
 		
-		graphics.set_animation(switchedentity,state.animation)
-		dbg_mobf.mob_state_lvl2("MOBF:  time to next change = " 
-			.. switchedentity.dynamic_data.state.time_to_next_change)
+		graphics.set_animation(entity,state.animation)
 		
-		if switchedentity ~= entity then
-			return switchedentity
+		if state.HANDLER_enter_state ~= nil and
+			type(state.HANDLER_enter_state) == "function" then
+			state.HANDLER_enter_state(entity)
 		end
 	else
 		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name 
 			.. " switching to same state as before")
 		entity.dynamic_data.state.time_to_next_change = mob_state.getTimeToNextState(state.typical_state_time)
-		dbg_mobf.mob_state_lvl2("MOBF:  time to next change = " 
-			.. entity.dynamic_data.state.time_to_next_change)
+		
+		if state.HANDLER_enter_state ~= nil and
+			type(state.HANDLER_enter_state) == "function" then
+			state.HANDLER_enter_state(entity)
+		end
+
 	end
 	
-	return nil
+	dbg_mobf.mob_state_lvl2("MOBF:  time to next change = " 
+			.. entity.dynamic_data.state.time_to_next_change)
 end
 
 
@@ -462,88 +400,212 @@ end
 --! @param mob a mob declaration
 -------------------------------------------------------------------------------
 function mob_state.prepare_states(mob)
-	local custom_combat_state_defined = false
-	local default_state_defined = false
+	local builtin_state_overrides = {}
 
-	--add graphics for any mob state
+	--scan for states overriding mobf internal state definitions
 	if mob.states ~= nil then
 		for s = 1, #mob.states , 1 do
-			graphic_to_set = graphics.prepare_info(mob.states[s].graphics,
-										mob.states[s].graphics_3d,
-										mob.modname,"_"..mob.name, mob.states[s].name)
-	
-			if graphic_to_set ~= nil then
-				mobf.register_entity(":" .. mob_state.get_entity_name(mob,mob.states[s]), graphic_to_set, mob)
-			end
-			
 			if mob.states[s].name == "combat" then
-				custom_combat_state_defined = true
-			end
+				builtin_state_overrides["combat"] = true
+			end	
 			
-			if mob.states[s].name == "default" then
-				default_state_defined = true
-			end
+			--TODO patrol state
 			
-
+			--hunger state
+			if mob.states[s].name == "RSVD_hunger" then
+				builtin_state_overrides["RSVD_hunger"] = true
+			end
+				
 		end
 	else
 		mob.states = {}
 	end
 	
 	--add a default combat state if no custom state is defined
-	if mob.combat ~= nil then
-		if custom_combat_state_defined == false then
-				table.insert(mob.states,
-						{
-						name = "combat",
-						custom_preconhandler = nil,
-						movgen = "follow_mov_gen",
-						typical_state_time = -1,
-						chance = 0,
-						})
-		end
+	if mob.combat ~= nil and builtin_state_overrides["combat"] ~= true then
+		table.insert(mob.states,
+				{
+				name = "combat",
+				custom_preconhandler = nil,
+				movgen = "follow_mov_gen",
+				typical_state_time = -1,
+				chance = 0,
+				})
 	end
 	
-	
-	--legacy code to run old mobs
-	if not default_state_defined then
-		minetest.log(LOGLEVEL_WARNING,"MOBF: -----------------------------------------------------------------------------------------")
-		minetest.log(LOGLEVEL_WARNING,"MOBF: Automatic default state generation is legacy code subject to be removed in later version.")
-		minetest.log(LOGLEVEL_WARNING,"MOBF: -----------------------------------------------------------------------------------------")
-	
-		local default_state = {
-			name 				= "default",
-			movgen 				= mob.movement.default_gen,
-			graphics 			= mob.graphics,
-			graphics_3d 		= mob.graphics_3d,
-			chance				= 0,
-			typical_state_time 	= 30,
-			animation           = "walk",
-		}
+	if mob.hunger ~= nil and builtin_state_overrides["RSVD_hunger"] ~= true then
+		table.insert(mob.states,
+					{ 
+					name = "RSVD_hunger",
+					HANDLER_precondition = mob_state.BuiltinHungerPrecondition(mob),
+					HANDLER_leave_state  = mob_state.BuiltinHungerLeave(mob),
+					HANDLER_enter_state  = mob_state.BuiltinHungerEnter(mob),
+					movgen = "mgen_path",
+					typical_state_time = mob.hunger.typical_walk_time or 45,
+					chance             = mob.hunger.chance or 0.1,
+					animation          = mob.hunger.animation or "walk"
+				})
+	end
 		
-		graphic_to_set = graphics.prepare_info(default_state.graphics,
-										default_state.graphics_3d,
-										mob.modname,"_"..mob.name)
+end
+
+-------------------------------------------------------------------------------
+-- name: switch_model(entity,state)
+--
+--! @brief switch model used for a entity
+--! @memberof mob_state
+--! @public
+--
+--! @param entity to switch model
+--! @param state to change to
+-------------------------------------------------------------------------------
+function mob_state.switch_model(entity,state)
+	--TODO set object propertys to new model
+end
+
+-------------------------------------------------------------------------------
+-- name: BuiltinHungerPrecondition(mob)
+--
+--! @brief prepare builtin hunger precondition handler
+--! @memberof mob_state
+--! @public
+--
+--! @param mob definition of mob
+--! @return function to be called as precondition handler
+-------------------------------------------------------------------------------
+function mob_state.BuiltinHungerPrecondition(mob)
+
+	mobf_assert_backtrace(mob.hunger.target_nodes ~= nil)
+	mobf_assert_backtrace(mob.hunger.range ~= nil)
+
+	return function(entity,state)
+			mobf_assert_backtrace(state ~= nil)
+			mobf_assert_backtrace(state.name == "RSVD_hunger")
+			
+			local pos = entity.object:getpos()
+			mobf_print("MOBF: trying to find " .. 
+							dump(mob.hunger.target_nodes) ..
+							" around: " .. printpos(pos))
+			
+			local lower_pos = {x=pos.x-mob.hunger.range,
+								y=pos.y-mob.hunger.range,
+								z=pos.z-mob.hunger.range}
+			local upper_pos = {x=pos.x+mob.hunger.range,
+								y=pos.y+mob.hunger.range,
+								z=pos.z+mob.hunger.range}
+			
+			local targetnodes = minetest.find_nodes_in_area(lower_pos,
+											upper_pos,
+											 mob.hunger.target_nodes)
+											
+			if targetnodes ~= nil then
+				mobf_print("MOBF: Found " .. #targetnodes .. " targetnodes")
+				for i=1,5,1 do
+					if #targetnodes == 0 then
+						break
+					end
+					
+					local index = math.floor(math.random(1,#targetnodes) + 0.5)
+					
+					local targetpos = targetnodes[index]
+					table.remove(targetnodes,index)
+					
+					targetpos.y = targetpos.y +1
+					
+					--if mob is not in air try 1 above for pathfinding
+					local current_node = minetest.get_node(pos)
+					if current_node ~= nil and
+						current_node.name ~= "air" then
+						pos.y = pos.y+1
+					end
+					
+					local path = minetest.find_path(pos,targetpos,5,1,1,"A*_noprefetch")
+					
+					if path ~= nil then
+						entity.dynamic_data.hunger = {}
+						entity.dynamic_data.hunger.target = { x=targetpos.x,y=targetpos.y-1,z=targetpos.z}
+						entity.dynamic_data.hunger.path = path
+						mobf_print("MOBF: Found new target: " .. printpos(targetpos) .. " Path: " .. dump(path))
+						mobf_print("MOBF: saving hungerdata: " .. dump(entity.dynamic_data.hunger))
+						return true
+					else
+						mobf_print("MOBF: no path to: " .. printpos(targetpos))
+					end
+				end
+			else
+				mobf_print("MOBF: no targetnodes found!")
+			end
+			mobf_print("MOBF: precondition for hunger not met")
+			return false
+		end --end of handler
+end
+
+-------------------------------------------------------------------------------
+-- name: BuiltinHungerLeave(mob)
+--
+--! @brief prepare builtin hunger leave handler
+--! @memberof mob_state
+--! @public
+--
+--! @param mob definition of mob
+--! @return function to be called as leave handler
+-------------------------------------------------------------------------------
+function mob_state.BuiltinHungerLeave(mob)
 	
-		if graphic_to_set ~= nil then
-			mobf.register_entity(":" .. mob_state.get_entity_name(mob,default_state),
-									graphic_to_set, mob)
-		end
-		
-		--replace old mobs by new default state mobs
-		minetest.register_entity(":".. mob.modname .. ":"..mob.name,
-			 {
-			 	new_name = mob_state.get_entity_name(mob,default_state),
-			 	on_activate = function(self,staticdata)
-			 		minetest.log(LOGLEVEL_INFO, "MOBF replacing " .. self.name 
-			 			.. " by " .. self.new_name)
-			 		local pos = self.object:getpos()
-			 		self.object:remove()
-			 		
-			 		minetest.add_entity(pos,self.new_name)
-			 	end
-			 })
-		
-		table.insert(mob.states,default_state)
+	return function(entity,state)
+		entity.dynamic_data.hunger = nil
+		p_mov_gen.set_cycle_path(entity,nil)
+		p_mov_gen.set_path(entity,nil)
+		p_mov_gen.set_end_of_path_handler(entity,nil)
+
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: BuiltinHungerEnter(mob)
+--
+--! @brief prepare builtin hunger enter handler
+--! @memberof mob_state
+--! @public
+--
+--! @param mob definition of mob
+--! @return function to be called as enter handler
+-------------------------------------------------------------------------------
+function mob_state.BuiltinHungerEnter(mob)
+
+	return function(entity)
+		mobf_assert_backtrace(entity.dynamic_data.state.current.name == "RSVD_hunger")
+		mobf_assert_backtrace(entity.dynamic_data.hunger ~= nil)
+		p_mov_gen.set_path(entity,entity.dynamic_data.hunger.path)
+		p_mov_gen.set_cycle_path(entity,false)
+		p_mov_gen.set_cycle_path(entity,handler)
+		p_mov_gen.set_end_of_path_handler(entity,mob_state.BuiltinHungerTargetReached)
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: BuiltinHungerTargetReached(entity)
+--
+--! @brief handle target reached
+--! @memberof mob_state
+--! @public
+--
+--! @param entity that reached the target
+-------------------------------------------------------------------------------
+function mob_state.BuiltinHungerTargetReached(entity)
+	--consume original target
+	if (entity.dynamic_data.hunger.target ~= nil) then
+		mobf_print("MOBF: consuming targetnode: " .. 
+			printpos(entity.dynamic_data.hunger.target))
+		minetest.remove_node(entity.dynamic_data.hunger.target)
+	end
+	
+	local eating_state = mob_state.get_state_by_name(entity,"eating")
+	
+	if eating_state ~= nil then
+		mob_state.change_state(entity,eating_state)
+	else
+		local default_state = mob_state.get_state_by_name(entity,"default")
+		mob_state.change_state(entity,default_state)
 	end
 end

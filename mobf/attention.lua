@@ -43,8 +43,7 @@ function attention.aggression(entity,now)
 		return
 	end
 	
-	local current_state = 
-		mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
+	local current_state = entity.dynamic_data.state.current
 
 	--mob is specified as self attacking
 	if entity.data.combat.starts_attack and 
