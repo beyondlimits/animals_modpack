@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_slime mod loading ...")
-local version = "0.0.12"
+local version = "0.0.13"
 
 local selectionbox_slime_L = {-0.5, -0.4, -0.5,  0.5,0.4,0.5}
 local selectionbox_slime_M = {-0.3, -0.2, -0.3,  0.3,0.2,0.3}
@@ -72,10 +72,10 @@ function mob_slime_kill(entity,player)
 	end
 	
 	if mob_name ~= nil then
-		spawning.spawn_and_check(mob_name,"__default",
+		spawning.spawn_and_check(mob_name,
 							{x=pos.x+toadd.x1,y=pos.y,z=pos.z+toadd.z1},
 							"slime_kill_spawn")
-		spawning.spawn_and_check(mob_name,"__default",
+		spawning.spawn_and_check(mob_name,
 							{x=pos.x+toadd.x2,y=pos.y,z=pos.z+toadd.z2},
 							"slime_kill_spawn")
 	end

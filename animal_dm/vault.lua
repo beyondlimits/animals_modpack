@@ -90,7 +90,7 @@ vault.make_vault_part = function(p, part, seed)
             {name='air'},
             {name='default:cobble'},
         }
-        mob = "animal_dm:dm__default"
+        mob = "animal_dm:dm"
     elseif part == 'C' then
         top_y = 3
         ns = {

@@ -63,7 +63,7 @@ blueprint_hut = {
 		{"default:torch",{x=2,y=2,z=1},{x=2,y=2,z=1},5},
 	},
 	entities = {
-		{ {x=4,y=1,z=1.5},"mob_npc:npc_trader__default",-math.pi }
+		{ {x=4,y=1,z=1.5},"mob_npc:npc_trader",-math.pi }
 	}
 }
 
@@ -125,7 +125,7 @@ blueprint_normalhouse = {
 		{"default:lava_source",{x=1,y=0,z=8},{x=1,y=0,z=8}},
 	},
 	entities = {
-			{ {x=3,y=1,z=5},"mob_npc:npc_trader__default",-1.14 }
+			{ {x=3,y=1,z=5},"mob_npc:npc_trader",-1.14 }
 		}
 }
 
@@ -306,7 +306,7 @@ function mob_npc_spawn_building(spawning_data)
 					return false
 				end
 				
-				if building_spawner.builder(pos,blueprint,sp_data.name .."__default") then
+				if building_spawner.builder(pos,blueprint,sp_data.name) then
 					building_spawner.addspawnpoint(pos)
 					return true
 				end

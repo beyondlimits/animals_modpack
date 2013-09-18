@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_chicken mod loading ...")
-local version = "0.0.19"
+local version = "0.0.20"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
@@ -283,7 +283,7 @@ chick_m_prototype = {
 				consumed=true,
 				},
 		auto_transform = {
-				result="animal_chicken:rooster__default",
+				result="animal_chicken:rooster",
 				delay=600,
 				},
 		spawning = {
@@ -371,7 +371,7 @@ chick_f_prototype = {
 				consumed=true,
 				},
 		auto_transform = {
-				result="animal_chicken:chicken__default",
+				result="animal_chicken:chicken",
 				delay=600,
 				},
 		spawning = {
@@ -424,7 +424,6 @@ chick_f_prototype = {
 				},
 			},
 		}
-
 
 --register with animals mod
 minetest.log("action","\tadding animal "..chicken_prototype.name)

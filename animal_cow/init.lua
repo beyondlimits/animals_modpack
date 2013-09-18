@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_cow mod loading ...")
-local version = "0.1.0"
+local version = "0.1.1"
 
 local cow_groups = {
 						not_in_creative_inventory=1
@@ -312,7 +312,7 @@ baby_calf_f_prototype = {
 			consumed=true,
 			},
 		auto_transform = {
-			result="animal_cow:cow__default",
+			result="animal_cow:cow",
 			delay=7200,
 			},
 		spawning = {
@@ -409,7 +409,7 @@ baby_calf_m_prototype = {
 				consumed=true,
 				},
 		auto_transform = {
-				result="animal_cow:steer__default",
+				result="animal_cow:steer",
 				delay=7200,
 				},
 		spawning = {
