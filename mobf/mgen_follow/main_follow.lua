@@ -254,7 +254,7 @@ function mgen_follow.callback(entity,now)
 			--TODO other ways to handle this?
 			--return						 
 		end
-		dbg_mobf.fmovement_lvl3("MOBF:   line of sight")
+		--dbg_mobf.fmovement_lvl3("MOBF:   line of sight")
 		
 		local max_distance = entity.dynamic_data.movement.max_distance
 		
@@ -325,15 +325,6 @@ function mgen_follow.callback(entity,now)
 				entity.object:setvelocity({x=0,y=0,z=0})
 				entity.object:setacceleration({x=0,y=yaccel,z=0})
 				entity.dynamic_data.movement.last_next_to_target = now
-				
-				
-				local dir = mobf_get_direction(basepos,targetpos)
-				--update mob orientation
-				if entity.mode == "3d" then
-					entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
-				else
-					entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
-				end
 			end
 		end
 	
