@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_deer mod loading ... ")
 
-local version = "0.1.0"
+local version = "0.1.1"
 
 local deer_groups = {
 						not_in_creative_inventory=1
@@ -313,11 +313,10 @@ deer_f_prototype = {
 minetest.register_entity(":animal_deer:deer__default",
 	{
 		on_activate = function(self,staticdata)
-			minetest.add_entity(self.object:getpos(),"animal_deer:deer_m__default")
+			minetest.add_entity(self.object:getpos(),"animal_deer:deer_m")
 			self.object:remove()
 		end
 	})
-
 
 --register with animals mod
 minetest.log("action","\tadding mob "..deer_m_prototype.name)
