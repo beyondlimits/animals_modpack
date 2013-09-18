@@ -87,6 +87,32 @@ function mobf_add_mob(mob)
 	minetest.log(LOGLEVEL_INFO,"MOBF: adding: " .. mob.name)
 	mob_state.prepare_states(mob)
 
+	mobf.register_entity(":" .. mob.modname .. ":"..mob.name,
+							graphics.graphics_by_statename(mob,"default"), mob)
+	
+	--add compatibility entity to replace old __default entities by new ones
+	minetest.log(LOGLEVEL_INFO,"MOBF: registering compatibility entity: >" .. 
+					":" .. mob.modname .. ":"..mob.name .. "__default" .. "<")
+	minetest.register_entity(":" .. mob.modname .. ":"..mob.name .. "__default",
+			{
+			replacement_name = mob.modname .. ":"..mob.name,
+			on_activate = function(self,staticdata)
+			
+					local pos = self.object:getpos()
+					
+					if pos ~= nil then
+						local newobject = minetest.add_entity(pos,self.replacement_name)
+						local spawned_entity = mobf_find_entity(newobject)
+						
+						if spawned_entity ~= nil then
+						spawned_entity.dynamic_data.initialized = false
+						spawned_entity.dynamic_data.last_static_data = staticdata
+						end
+					end
+					self.object:remove()
+				end,
+			})
+	
 	mobf.register_mob_item(mob.name,mob.modname,mob.generic.description)
 	
 	--check if a movement pattern was specified
