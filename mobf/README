@@ -18,6 +18,15 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes pre 2.3.x
+-replace entity based state models by just switching model of same entity
+-add hunger support
+-fix house spawner (trader) to not spawn too often
+-add female deer
+-add some more animal raw materials
+-fix bug target movement gen using bogus direction calculation
+-make sheep feed from grass nodes
+
 Changes 2.2
 -Fix doxygen documentation
 -Improve spawn algorithms to avoid spawning within existing mobs
