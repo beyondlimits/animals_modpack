@@ -327,7 +327,7 @@ function fighting.switch_to_combat_state(entity,now,target)
 	--set attack target
 	entity.dynamic_data.combat.target = target
 	
-	local current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
+	local current_state = entity.dynamic_data.state.current
 	
 	mobf_assert_backtrace(current_state.state_mode ~= "combat")
 	
@@ -351,7 +351,7 @@ function fighting.switch_to_combat_state(entity,now,target)
 	entity.dynamic_data.movement = {}
 	entity.dynamic_data.p_movement = {}
 	
-	backup.current_state = mob_state.get_state_by_name(entity,entity.dynamic_data.state.current)
+	backup.current_state = entity.dynamic_data.state.current
 	dbg_mobf.fighting_lvl2("MOBF: backing up state: " .. backup.current_state.name)
 	
 	--switch state
