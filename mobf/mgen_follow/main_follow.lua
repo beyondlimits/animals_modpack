@@ -177,9 +177,9 @@ function mgen_follow.callback(entity,now)
 	
 	--check environment
 	local basepos  = entity.getbasepos(entity)
-	local state = environment.pos_is_ok(basepos,entity)
+	local pos_quality = environment.pos_quality(basepos,entity)
 	
-	if state == "ok" then
+	if environment.evaluate_state(pos_quality, LT_GOOD_POS) then
 		local toset = {
 			x= basepos.x,
 			y= basepos.y - 0.5 - entity.collisionbox[2],
@@ -188,12 +188,12 @@ function mgen_follow.callback(entity,now)
 		entity.dynamic_data.movement.last_pos_in_env = toset
 	end
 	
-	if not environment.possible_pos(entity,basepos) or 
-		state == "in_water" or 
-		state == "above_water" or
-		state == "in_air" or
-		state == "drop_above_water" then
-		dbg_mobf.fmovement_lvl1("MOBF: followed to wrong place " .. state)
+	if pos_quality.media_quality == MQ_IN_AIR or                  -- wrong media
+		pos_quality.media_quality == MQ_IN_WATER or               -- wrong media
+		pos_quality.geometry_quality == GQ_NONE or               -- no ground contact (TODO this was drop above water before)
+		pos_quality.surface_quality_min == SQ_WATER then         -- above water
+
+		dbg_mobf.fmovement_lvl1("MOBF: followed to wrong place " .. pos_quality.tostring(pos_quality))
 		if entity.dynamic_data.movement.last_pos_in_env ~= nil then
 			entity.object:moveto(entity.dynamic_data.movement.last_pos_in_env)
 			basepos  = entity.getbasepos(entity)
