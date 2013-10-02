@@ -228,10 +228,10 @@ function MOBF_FIREBALL_ENTITY.on_step(self, dtime)
 
 	if hit then
 		--damage objects within inner blast radius
-		mobf_do_area_damage(pos,self.owner,self.damage_range/4,self.damage_outer)
+		mobf_do_area_damage(pos,self.owner,self.damage_outer,self.damage_range/4)
 
 		--damage all objects within blast radius
-		mobf_do_area_damage(pos,self.owner,self.damage_range/2,self.damage_damage_inner)
+		mobf_do_area_damage(pos,self.owner,self.damage_inner,self.damage_range/2)
 		
 		MOBF_FIREBALL_ENTITY.surfacefire(pos,self.damage_range)
 
@@ -268,6 +268,10 @@ MOBF_PLASMABALL_ENTITY = {
 
 	damage = {
 			fleshy=4,
+			},
+			
+	damage_pass = {
+			fleshy=2,
 			},
 
 	owner = 0,
@@ -318,7 +322,7 @@ function MOBF_PLASMABALL_ENTITY.on_step(self, dtime)
 	end
 
 	--damage all objects not hit but at least passed
-	mobf_do_area_damage(pos,self.owner,2,1)	
+	mobf_do_area_damage(pos,self.owner,self.damage_pass,2)
 
 	if hit then
 		--damage objects within inner blast radius

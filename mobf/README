@@ -27,6 +27,10 @@ Changes pre 2.3.x
 -fix bug target movement gen using bogus direction calculation
 -make sheep feed from grass nodes
 
+Changes 2.2.1
+-Fix typo in plant environment definition
+-Fix crash in plasma- and fireball damage handling
+
 Changes 2.2
 -Fix doxygen documentation
 -Improve spawn algorithms to avoid spawning within existing mobs
