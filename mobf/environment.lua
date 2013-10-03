@@ -160,12 +160,20 @@ function environment.get_suitable_pos_same_level(pos_raw,maxsearcharea,entity,ac
 	if accept_possible then
 		return environment.get_pos_same_level(pos_raw,maxsearcharea,entity,
 				function(quality)
-					return environment.evaluate_state(quality,LT_SAFE_POSSIBLE_EDGE_POS)
+					if entity.data.movement.canfly then
+						return environment.evaluate_state(quality,LT_GOOD_FLY_POS)
+					else
+						return environment.evaluate_state(quality,LT_SAFE_POSSIBLE_EDGE_POS)
+					end
 				end)
 	else
 		return environment.get_pos_same_level(pos_raw,maxsearcharea,entity,
 				function(quality)
-					return environment.evaluate_state(quality,LT_SAFE_EDGE_POS)
+					if entity.data.movement.canfly then
+						return environment.evaluate_state(quality,LT_GOOD_FLY_POS)
+					else
+						return environment.evaluate_state(quality,LT_SAFE_EDGE_POS)
+					end
 				end)
 	end
 end
@@ -622,6 +630,7 @@ function environment.pos_quality(pos,entity)
 						retval = retval .."\n\tcenter_geometry_quality: (" .. state.center_geometry_quality .. ") "
 						if state.center_geometry_quality == 100 then retval = retval .. "contact" end
 						if state.center_geometry_quality ==  30 then retval = retval .. "no contact" end
+						if state.center_geometry_quality ==   0 then retval = retval .. "not evaluated" end
 					
 						retval = retval .."\n\tsurface_quality_min: (" .. state.surface_quality_min ..") "
 						if state.surface_quality_min == 100 then retval = retval .. "ok" end
@@ -1101,4 +1110,5 @@ dofile (mobf_modpath .. "/environments/on_ground_1.lua")
 dofile (mobf_modpath .. "/environments/on_ground_2.lua")
 dofile (mobf_modpath .. "/environments/open_waters.lua")
 dofile (mobf_modpath .. "/environments/shallow_waters.lua")
+dofile (mobf_modpath .. "/environments/deep_water.lua")
 dofile (mobf_modpath .. "/environments/simple_air.lua")
