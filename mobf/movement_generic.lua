@@ -32,10 +32,11 @@ movement_generic = {}
 --! @return { x,y,z } random speed directed to new_pos
 -------------------------------------------------------------------------------
 --
-function movement_generic.get_accel_to(new_pos,entity)
+function movement_generic.get_accel_to(new_pos,entity,ymovement)
 
 	if new_pos == nil or entity == nil then
-		minetest.log(LOGLEVEL_CRITICAL,"MOBF: movement_generic.get_accel_to : Invalid parameters")
+		minetest.log(LOGLEVEL_CRITICAL,
+			"MOBF: movement_generic.get_accel_to : Invalid parameters")
 	end
 	
 	local old_pos  = entity.object:getpos()
@@ -48,16 +49,39 @@ function movement_generic.get_accel_to(new_pos,entity)
 							entity.data.movement.canfly)
 	mobf_assert_backtrace(yaccel ~= nil)
 
-	--calculate direction to target
-	local accel_direction = mobf_calc_yaw(new_pos.x-old_pos.x,new_pos.z-old_pos.z)
+	--calculate plane direction to target
+	local xz_direction = 
+		mobf_calc_yaw(new_pos.x-old_pos.x,new_pos.z-old_pos.z)
 	
 	--find a new speed
 	local absolute_accel = minaccel + (maxaccel - minaccel) * math.random()
 	
-	local new_accel_vector = mobf_calc_vector_components(accel_direction,absolute_accel)
+	local new_accel_vector = nil
 	
-	new_accel_vector.y = yaccel
-
+	--flying mob calculate accel towards target
+	if entity.data.movement.canfly and
+		yaccel == 0 then
+		local xz_direction,xy_direction = mobf_calc_direction(old_pos,new_pos)
+		
+		new_accel_vector = 
+			mobf_calc_vector_components_3d(xz_direction,
+											xy_direction,
+											absolute_accel)
+		
+		if (new_pos.y > old_pos.y) then
+			mobf_assert_backtrace(new_accel_vector.y >= 0)
+		end
+		
+		if (new_pos.y < old_pos.y) then
+			mobf_assert_backtrace(new_accel_vector.y <= 0)
+		end
+		
+	else
+		new_accel_vector = 
+			mobf_calc_vector_components(xz_direction,absolute_accel)
+		new_accel_vector.y = yaccel
+	end
+	
 	return new_accel_vector
 end
 
