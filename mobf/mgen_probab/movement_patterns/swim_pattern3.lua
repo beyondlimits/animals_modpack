@@ -5,8 +5,8 @@
 -- copyright notice. 
 -- And of course you are NOT allow to pretend you have written it.
 --
---! @file swim_pattern2.lua
---! @brief movementpattern for medium swimming mobs 
+--! @file swim_pattern1.lua
+--! @brief movementpattern for slow swimming mobs 
 --! @copyright Sapier
 --! @author Sapier
 --! @date 2012-08-10
@@ -17,17 +17,19 @@
 -------------------------------------------------------------------------------
 
 --! @struct swim_pattern1_prototype
---! @brief movement pattern for mobs swimming medium speeds
-local swim_pattern2_prototype = 	{
-		name                            ="swim_pattern2",
-		jump_up							=0,
+--! @brief movement pattern for mobs swimming slow
+local swim_pattern3_prototype = 	{
+		name                            ="swim_pattern3",
+		jump_up                         =0,
 	
-		random_jump_chance              =0.4,
+		random_jump_chance              =0.2,
 		random_jump_initial_speed       =0,
-		random_jump_delay               =15,
-		random_acceleration_change      =0.7,
+		random_jump_delay               =10,
+		random_acceleration_change      =0.5,
+		
+		min_height_above_ground     = 3
 	}
 	
 --!@}
 	
-table.insert(mov_patterns_defined,swim_pattern2_prototype)
+table.insert(mov_patterns_defined,swim_pattern3_prototype)
