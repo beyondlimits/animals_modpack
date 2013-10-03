@@ -42,13 +42,41 @@ end
 --
 --! @brief calculate 2d distance between to points
 --
---! @param pos1 first position
---! @param pos2 second position
+--! @param pos1 target position
+--! @param pos2 start position
 --! @return scalar value, distance
 -------------------------------------------------------------------------------
 function mobf_calc_distance_2d(pos1,pos2)
 	return math.sqrt( math.pow(pos1.x-pos2.x,2) + 
 				math.pow(pos1.z-pos2.z,2))
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_calc_direction(pos1,pos2)
+--
+--! @brief calculate direction angles from pos2 to pos1
+--
+--! @param start starting position
+--! @param destination end position
+--! @return anglexz,anglexy
+-------------------------------------------------------------------------------
+function mobf_calc_direction(start,destination)
+	mobf_assert_backtrace(start ~= nil)
+	mobf_assert_backtrace(destination ~= nil)
+	
+	local xdelta = destination.x - start.x
+	local ydelta = destination.y - start.y
+	local zdelta = destination.z - start.z
+	
+	local distance = math.sqrt(
+							math.pow(xdelta,2) +
+							math.pow(ydelta,2) +
+							math.pow(zdelta,2)
+							)
+							
+	local anglexz = math.atan2(zdelta,xdelta)
+	local anglexy = math.acos(ydelta/distance)
+	return anglexz,anglexy
 end
 
 -------------------------------------------------------------------------------
@@ -82,6 +110,27 @@ function mobf_calc_vector_components(dir_radians,absolute_speed)
 	
 	retval.x = absolute_speed * math.cos(dir_radians)
 	retval.z = absolute_speed * math.sin(dir_radians)
+
+	return retval
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_calc_vector_components_3d(xzplane_radians,xy_plane_radians,absolute_speed)
+--
+--! @brief calculate calculate x and z components of a directed speed
+--
+--! @param dir_radians direction of movement radians
+--! @param absolute_speed speed in direction
+--
+--! @return {x,z}
+-------------------------------------------------------------------------------
+function mobf_calc_vector_components_3d(xz_plane_radians,xy_plane_radians,absolute_speed)
+	
+	local retval = {x=0,z=0,y=0}
+	
+	retval.x= absolute_speed * math.sin(xy_plane_radians) * math.cos(xz_plane_radians)
+	retval.z= absolute_speed * math.sin(xy_plane_radians) * math.sin(xz_plane_radians)
+	retval.y= absolute_speed * math.cos(xy_plane_radians)
 
 	return retval
 end
