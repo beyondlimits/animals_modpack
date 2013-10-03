@@ -52,6 +52,16 @@ LT_GOOD_POS = {
 	min_center_surface=nil
 }
 
+LT_GOOD_FLY_POS = {
+	old_state=nil,
+	min_media=MQ_IN_MEDIA,
+	min_geom=nil,
+	min_geom_center=nil,
+	min_min_surface=Q_UNKNOWN,
+	min_max_surface=Q_UNKNOWN,
+	min_center_surface=nil
+}
+
 --! @brief a position where mob is in media, has surface contact and is at least on a possible surface
 LT_SAFE_POS = {
 	old_state=nil,
