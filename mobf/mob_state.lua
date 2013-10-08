@@ -602,7 +602,9 @@ end
 -------------------------------------------------------------------------------
 function mob_state.BuiltinHungerTargetReached(entity)
 	--consume original target
-	if (entity.dynamic_data.hunger.target ~= nil) then
+	if (entity.dynamic_data.hunger.target ~= nil) and
+		(entity.data.hunger.keep_food == nil or 
+		entity.data.hunger.keep_food == false) then
 		mobf_print("MOBF: consuming targetnode: " .. 
 			printpos(entity.dynamic_data.hunger.target))
 		minetest.remove_node(entity.dynamic_data.hunger.target)
