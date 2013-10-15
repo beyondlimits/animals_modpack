@@ -476,7 +476,9 @@ end
 -------------------------------------------------------------------------------
 function mob_state.BuiltinHungerPrecondition(mob)
 
-	mobf_assert_backtrace(mob.hunger.target_nodes ~= nil)
+	mobf_assert_backtrace(
+		(mob.hunger.target_nodes ~= nil) or
+		(mob.hunger.target_entities ~= nil))
 	mobf_assert_backtrace(mob.hunger.range ~= nil)
 
 	return function(entity,state)
@@ -485,7 +487,8 @@ function mob_state.BuiltinHungerPrecondition(mob)
 			
 			local pos = entity.object:getpos()
 			mobf_print("MOBF: trying to find " .. 
-							dump(mob.hunger.target_nodes) ..
+							dump(mob.hunger.target_nodes) .. " or " ..
+							dump(mob.hunger.target_entities) ..
 							" around: " .. printpos(pos))
 			
 			local lower_pos = {x=pos.x-mob.hunger.range,
@@ -494,43 +497,86 @@ function mob_state.BuiltinHungerPrecondition(mob)
 			local upper_pos = {x=pos.x+mob.hunger.range,
 								y=pos.y+mob.hunger.range,
 								z=pos.z+mob.hunger.range}
+								
+			local target_nodes = nil
+			local target_entities = nil
 			
-			local targetnodes = minetest.find_nodes_in_area(lower_pos,
+			if mob.hunger.target_nodes ~= nil then
+				target_nodes = minetest.find_nodes_in_area(lower_pos,
 											upper_pos,
 											 mob.hunger.target_nodes)
-											
-			if targetnodes ~= nil then
-				mobf_print("MOBF: Found " .. #targetnodes .. " targetnodes")
+			end
+				
+			if mob.hunger.target_entities ~= nil then
+				local objectlist = minetest.get_objects_inside_radius(pos,mob.hunger.range)
+				mobf_print("MOBF: found: " .. #objectlist .. " objects around")
+				if objectlist ~= nil and #objectlist > 0 then
+					target_entities = {}
+					for i=1,#objectlist,1 do
+						local luaentity = objectlist[i]:get_luaentity()
+						if luaentity ~= nil and 
+							mobf_contains(mob.hunger.target_entities,luaentity.name) then
+							table.insert(target_entities,objectlist[i])
+						end
+					end
+				end
+			end
+			
+			local targets = {}
+			
+			if target_nodes ~= nil then
+				for i=1,#target_nodes,1 do
+					table.insert(targets,target_nodes[i])
+				end
+			end
+			
+			if target_entities ~= nil then
+				for i=1,#target_entities,1 do
+					table.insert(targets,target_entities[i])
+				end
+			end
+			
+			if targets ~= nil then
+				mobf_print("MOBF: Found " .. #targets .. " targets")
 				for i=1,5,1 do
-					if #targetnodes == 0 then
+					if #targets == 0 then
 						break
 					end
 					
-					local index = math.floor(math.random(1,#targetnodes) + 0.5)
+					local index = math.floor(math.random(1,#targets) + 0.5)
 					
-					local targetpos = targetnodes[index]
-					table.remove(targetnodes,index)
+					local target = targets[index]
+					table.remove(targets,index)
 					
-					targetpos.y = targetpos.y +1
-					
-					--if mob is not in air try 1 above for pathfinding
-					local current_node = minetest.get_node(pos)
-					if current_node ~= nil and
-						current_node.name ~= "air" then
-						pos.y = pos.y+1
-					end
-					
-					local path = minetest.find_path(pos,targetpos,5,1,1,"A*_noprefetch")
-					
-					if path ~= nil then
+					--target is a entity
+					if type(target) == "userdata" then
 						entity.dynamic_data.hunger = {}
-						entity.dynamic_data.hunger.target = { x=targetpos.x,y=targetpos.y-1,z=targetpos.z}
-						entity.dynamic_data.hunger.path = path
-						mobf_print("MOBF: Found new target: " .. printpos(targetpos) .. " Path: " .. dump(path))
+						entity.dynamic_data.hunger.target = target
 						mobf_print("MOBF: saving hungerdata: " .. dump(entity.dynamic_data.hunger))
 						return true
 					else
-						mobf_print("MOBF: no path to: " .. printpos(targetpos))
+						local targetpos = target
+						targetpos.y = targetpos.y +1
+						
+						--if mob is not in air try 1 above for pathfinding
+						local current_node = minetest.get_node(pos)
+						if current_node ~= nil and
+							current_node.name ~= "air" then
+							pos.y = pos.y+1
+						end
+						
+						local path = minetest.find_path(pos,targetpos,5,1,1,"A*_noprefetch")
+						
+						if path ~= nil then
+							entity.dynamic_data.hunger = {}
+							entity.dynamic_data.hunger.target = { x=targetpos.x,y=targetpos.y-1,z=targetpos.z}
+							entity.dynamic_data.hunger.path = path
+							mobf_print("MOBF: Found new target: " .. printpos(targetpos) .. " Path: " .. dump(path))
+							mobf_print("MOBF: saving hungerdata: " .. dump(entity.dynamic_data.hunger))
+							return true
+						else
+							mobf_print("MOBF: no path to: " .. printpos(targetpos))
+						end
 					end
 				end
 			else
@@ -582,12 +628,21 @@ function mob_state.BuiltinHungerEnter(mob)
 		
 		--use stepheight 1 as we did look for a path by using this
 		entity.dynamic_data.hunger.old_stepheight = entity.stepheight
-		entity.object:set_properties({stepheight=1})
 		
-		p_mov_gen.set_path(entity,entity.dynamic_data.hunger.path)
+		if (type(entity.dynamic_data.hunger.target) == "userdata") then
+			if not p_mov_gen.set_target(entity,entity.dynamic_data.hunger.target) then
+				mobf_print("MOBF: EnterHungerState, failed to set target")
+			else
+				mobf_print("MOBF: target successfully set")
+			end
+		else
+			entity.object:set_properties({stepheight=1})		
+			p_mov_gen.set_path(entity,entity.dynamic_data.hunger.path)
+		end
+		--p_mov_gen.set_cycle_path(entity,handler)
 		p_mov_gen.set_cycle_path(entity,false)
-		p_mov_gen.set_cycle_path(entity,handler)
 		p_mov_gen.set_end_of_path_handler(entity,mob_state.BuiltinHungerTargetReached)
+		
 	end
 end
 
@@ -601,13 +656,24 @@ end
 --! @param entity that reached the target
 -------------------------------------------------------------------------------
 function mob_state.BuiltinHungerTargetReached(entity)
+	mobf_print("MOBF: reached hunger target")
 	--consume original target
 	if (entity.dynamic_data.hunger.target ~= nil) and
 		(entity.data.hunger.keep_food == nil or 
 		entity.data.hunger.keep_food == false) then
-		mobf_print("MOBF: consuming targetnode: " .. 
-			printpos(entity.dynamic_data.hunger.target))
-		minetest.remove_node(entity.dynamic_data.hunger.target)
+		if type(entity.dynamic_data.hunger.target) ~= "userdata" then
+			mobf_print("MOBF: consuming targetnode: " .. 
+				printpos(entity.dynamic_data.hunger.target))
+			minetest.remove_node(entity.dynamic_data.hunger.target)
+		else
+			local targetentity = entity.dynamic_data.hunger.target:get_luaentity()
+			
+			if targetentity ~= nil and 
+				type(targetentity.mobf_hunger_interface) == "function" then
+				targetentity.mobf_hunger_interface(entity,"HUNGER_CONSUME")
+				mobf_print("MOBF: consuming targetentity")
+			end
+		end
 	end
 	
 	local eating_state = mob_state.get_state_by_name(entity,"eating")

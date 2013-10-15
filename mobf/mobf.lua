@@ -307,7 +307,8 @@ function mobf.activate_handler(self,staticdata)
 	
 	if cleaned_objectcount > 1 then
 		minetest.log(LOGLEVEL_WARNING,
-			"MOBF: trying to activate mob within something else! --> removing")
+			"MOBF: trying to activate mob \"" ..self.data.name .. 
+			"\" within something else! --> removing")
 --		for i=1,#objectlist,1 do
 --			local luaentity = objectlist[i]:get_luaentity()
 --			if luaentity ~= nil then
