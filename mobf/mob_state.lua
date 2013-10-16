@@ -486,10 +486,10 @@ function mob_state.BuiltinHungerPrecondition(mob)
 			mobf_assert_backtrace(state.name == "RSVD_hunger")
 			
 			local pos = entity.object:getpos()
-			mobf_print("MOBF: trying to find " .. 
-							dump(mob.hunger.target_nodes) .. " or " ..
-							dump(mob.hunger.target_entities) ..
-							" around: " .. printpos(pos))
+			--mobf_print("MOBF: trying to find " .. 
+			--				dump(mob.hunger.target_nodes) .. " or " ..
+			--				dump(mob.hunger.target_entities) ..
+			--				" around: " .. printpos(pos))
 			
 			local lower_pos = {x=pos.x-mob.hunger.range,
 								y=pos.y-mob.hunger.range,
@@ -509,7 +509,7 @@ function mob_state.BuiltinHungerPrecondition(mob)
 				
 			if mob.hunger.target_entities ~= nil then
 				local objectlist = minetest.get_objects_inside_radius(pos,mob.hunger.range)
-				mobf_print("MOBF: found: " .. #objectlist .. " objects around")
+				--mobf_print("MOBF: found: " .. #objectlist .. " objects around")
 				if objectlist ~= nil and #objectlist > 0 then
 					target_entities = {}
 					for i=1,#objectlist,1 do
@@ -537,7 +537,7 @@ function mob_state.BuiltinHungerPrecondition(mob)
 			end
 			
 			if targets ~= nil then
-				mobf_print("MOBF: Found " .. #targets .. " targets")
+				dbg_mobf.mob_state_lvl3("MOBF: Hunger found " .. #targets .. " targets")
 				for i=1,5,1 do
 					if #targets == 0 then
 						break
@@ -552,7 +552,7 @@ function mob_state.BuiltinHungerPrecondition(mob)
 					if type(target) == "userdata" then
 						entity.dynamic_data.hunger = {}
 						entity.dynamic_data.hunger.target = target
-						mobf_print("MOBF: saving hungerdata: " .. dump(entity.dynamic_data.hunger))
+						--mobf_print("MOBF: saving hungerdata: " .. dump(entity.dynamic_data.hunger))
 						return true
 					else
 						local targetpos = target
@@ -571,18 +571,15 @@ function mob_state.BuiltinHungerPrecondition(mob)
 							entity.dynamic_data.hunger = {}
 							entity.dynamic_data.hunger.target = { x=targetpos.x,y=targetpos.y-1,z=targetpos.z}
 							entity.dynamic_data.hunger.path = path
-							mobf_print("MOBF: Found new target: " .. printpos(targetpos) .. " Path: " .. dump(path))
-							mobf_print("MOBF: saving hungerdata: " .. dump(entity.dynamic_data.hunger))
+							--mobf_print("MOBF: Found new target: " .. printpos(targetpos) .. " Path: " .. dump(path))
+							--mobf_print("MOBF: saving hungerdata: " .. dump(entity.dynamic_data.hunger))
 							return true
 						else
-							mobf_print("MOBF: no path to: " .. printpos(targetpos))
+							dbg_mobf.mob_state_lvl2("MOBF: hunger no path to: " .. printpos(targetpos))
 						end
 					end
 				end
-			else
-				mobf_print("MOBF: no targetnodes found!")
 			end
-			mobf_print("MOBF: precondition for hunger not met")
 			return false
 		end --end of handler
 end
@@ -631,9 +628,7 @@ function mob_state.BuiltinHungerEnter(mob)
 		
 		if (type(entity.dynamic_data.hunger.target) == "userdata") then
 			if not p_mov_gen.set_target(entity,entity.dynamic_data.hunger.target) then
-				mobf_print("MOBF: EnterHungerState, failed to set target")
-			else
-				mobf_print("MOBF: target successfully set")
+				dbg_mobf.mob_state_lvl1("MOBF: EnterHungerState, failed to set target")
 			end
 		else
 			entity.object:set_properties({stepheight=1})		
@@ -656,13 +651,12 @@ end
 --! @param entity that reached the target
 -------------------------------------------------------------------------------
 function mob_state.BuiltinHungerTargetReached(entity)
-	mobf_print("MOBF: reached hunger target")
 	--consume original target
 	if (entity.dynamic_data.hunger.target ~= nil) and
 		(entity.data.hunger.keep_food == nil or 
 		entity.data.hunger.keep_food == false) then
 		if type(entity.dynamic_data.hunger.target) ~= "userdata" then
-			mobf_print("MOBF: consuming targetnode: " .. 
+			dbg_mobf.mob_state_lvl2("MOBF: consuming targetnode: " .. 
 				printpos(entity.dynamic_data.hunger.target))
 			minetest.remove_node(entity.dynamic_data.hunger.target)
 		else
@@ -671,7 +665,7 @@ function mob_state.BuiltinHungerTargetReached(entity)
 			if targetentity ~= nil and 
 				type(targetentity.mobf_hunger_interface) == "function" then
 				targetentity.mobf_hunger_interface(entity,"HUNGER_CONSUME")
-				mobf_print("MOBF: consuming targetentity")
+				dbg_mobf.mob_state_lvl2("MOBF: consuming targetentity")
 			end
 		end
 	end
