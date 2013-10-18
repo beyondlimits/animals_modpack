@@ -125,14 +125,11 @@ function mobf_spawner_initialize_on_big_willow_abm(spawning_data)
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_spawn_on_big_willow_mapgen(mob_name,mob_transform,spawning_data,environment)
+-- name: mobf_spawn_on_big_willow_mapgen(spawning_data)
 --
 --! @brief find a place on big willow to spawn a mob on map generation
 --
---! @param mob_name name of mob
---! @param mob_transform secondary name of mob
---! @param spawning_data spawning configuration
---! @param environment environment of mob
+--! @param spawning_data all information required for spawning
 -------------------------------------------------------------------------------
 function mobf_spawner_initialize_big_willow_mapgen(spawning_data)
 	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering willow mapgen spawn mapgen callback for mob "..spawning_data.name)

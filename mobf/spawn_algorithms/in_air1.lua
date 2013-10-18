@@ -177,7 +177,6 @@ function mobf_spawner_initialize_air_above_grass_mapgen(spawning_data)
 					minp          = minp,
 					maxp          = maxp,
 					spawning_data = spawning_data,
-					mob_name      = mob_name,
 					spawnfunc     = mobf_spawner_air_above_grass_spawner_spawnfunc,
 					maxtries      = 5,
 					func          = spawning.divide_mapgen_entity_jobfunc,

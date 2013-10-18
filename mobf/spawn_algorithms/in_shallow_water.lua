@@ -298,7 +298,6 @@ function mobf_spawn_initialize_in_shallow_water_mapgen(spawning_data)
 					minp          = minp,
 					maxp          = maxp,
 					spawning_data = spawning_data,
-					mob_name      = mob_name,
 					spawnfunc     = mobf_spawner_in_shallow_water_spawner_spawnfunc,
 					maxtries      = 15,
 					func          = spawning.divide_mapgen_entity_jobfunc,

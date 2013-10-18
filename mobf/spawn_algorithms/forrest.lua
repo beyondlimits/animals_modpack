@@ -56,7 +56,7 @@ end
 -------------------------------------------------------------------------------
 function mobf_spawner_initialize_in_forrest_abm(spawning_data) 
 	minetest.log(LOGLEVEL_WARNING,"MOBF: using deprecated abm based spawn algorithm \"spawn_in_forrest\" most likely causing lag in server!\t Use spawn_in_forrest_mapgen instead!")
-	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering forrest spawn abm callback for mob "..mob_name)
+	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering forrest spawn abm callback for mob ".. spawning_data.name)
 	
 	local media = nil
 	
