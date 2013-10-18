@@ -66,8 +66,8 @@ function mobf_path.init()
 				local pos = pointed_thing.above
 				
 				local entity = 
-					spawning.spawn_and_check("mobf:path_marker_entity","",
-												pos,"path_marker_click")
+					spawning.spawn_and_check("mobf:path_marker_entity",
+											pos,"path_marker_click")
 
 				if entity ~= nil then
 					mobf_path.handle_path_marker_place(placer,pos)
@@ -303,19 +303,6 @@ function mobf_path.button_handler(player, formname, fields)
 			local data = mobf_path.parse_button_name(k)
 			
 			if data ~= nil then
-				if data.buttonid == "next_page" then
-					data.pagenum = data.pagenum + 1
-					data.pathname = nil
-					data.ownername = nil
-				end
-				
-				if data.buttonid == "prev_page" and
-					data.pagenum > 1 then
-					data.pagenum = data.pagenum - 1
-					data.pathname = nil
-					data.ownername = nil
-				end
-				
 				if data.buttonid == "lock_path" then
 					mobf_rtd.path_data.users[data.ownername].paths[data.pathname].locked = true
 					mobf_path.save()
@@ -362,7 +349,14 @@ function mobf_path.button_handler(player, formname, fields)
 					data.ownername = nil
 				end
 				
-				dbg_mobf.path_lvl3("MOBF: Got button click with id: " .. 
+				if data.buttonid == "tl_paths" then
+					local event = explode_textlist_event(v)
+					--TODO honor event type
+					data.selected_path = event.index
+				end
+				
+				--dbg_mobf.path_lvl3
+				mobf_print("MOBF: Got button click with id: " .. 
 									data.buttonid)
 				mobf_path.show_manage_menu(playername,data)
 			end
@@ -416,93 +410,76 @@ function mobf_path.get_pathlist(playername,isadmin)
 	return retval
 end
 -------------------------------------------------------------------------------
--- name: point_labels(playername,pathname)
+-- name: point_textlist(playername,pathname)
 --
 --! @brief create a gui point gui element
 --! @ingroup mobf_path
 --
---! @param playername name of player to create path for
---! @param pathname name of path to prepare point gui list
+--! @param data data required for this menu
 --
 --! @return string containing gui point list description
 -------------------------------------------------------------------------------
-function mobf_path.point_labels(playername,pathname)
+function mobf_path.point_textlist(data)
 	local retval = ""
-	local current_y = 2.15
-	local current_x = 6
+	local first = true
 	
-	--TODO don't need to path playername here!
-	for i,v in ipairs(mobf_rtd.path_data.users[playername].paths[pathname].points) do
-	
-		if i == 21 then 
-			current_y = 2.15
-			current_x = 9
-		end
-			
-		if i <= 40 then
-			retval = retval .. 
-				"label[" .. current_x .. "," .. current_y .. ";".. 
-					mobf_fixed_size_string(i .. ": ",5) .. printpos(v) .. "]"
-		else
-			--TODO add error maximum point count exceeded
-		end
+	retval = "textlist[6,2.15;6.25,7;" .. 
+		mobf_path.make_button_name("tl_path_points",data) ..";"
 		
-		current_y = current_y + 0.35
+	--TODO don't need playername to path here!
+	for i,v in ipairs(mobf_rtd.path_data.users[data.ownername].paths[data.pathname].points) do
+	
+		if not first then
+			retval = retval .. ","
+		else
+			first = false
+		end
+		retval = retval .. minetest.formspec_escape(
+				mobf_fixed_size_string(i .. ": ",5) .. printpos(v))
 	end
+	
+	retval = retval .. ";]"
 
 	return retval
 end
 
 -------------------------------------------------------------------------------
--- name: path_buttons(paths,startindex, playername, data, isadmin)
+-- name: path_textlist(paths, playername, data, isadmin)
 --
 --! @brief get buttons for paths
 --! @ingroup mobf_path
 --
 --! @param paths paths to add
---! @param startindex index in paths to start
 --! @param playername name of player
 --! @param data information to add to button
 --! @param isadmin create admin list
 --
---! @return number of paths added,text
+--! @return text
 -------------------------------------------------------------------------------
-function mobf_path.path_buttons(paths,startindex, playername,data,isadmin)
-	dbg_mobf.path_lvl3("MOBF: path_buttons start index: " .. startindex .. 
-									" table contains " .. #paths .. " entries")
-	local current_index = 1
+function mobf_path.path_textlist(paths, playername,data,isadmin)
 	local retval = ""
-	local ystart = 1.75
+	local first = true
 	
 	--preserve current data values
 	local oldpathname  = data.pathname
 	local oldownername = data.ownername
 	
-	for i,value in ipairs(paths) do
+	retval = "textlist[0,1.5;5.25,8.5;" .. 
+			mobf_path.make_button_name("tl_paths",data) ..";"
 	
-		if current_index >= startindex and
-			current_index <= startindex + 10 then
-			
-			dbg_mobf.path_lvl3("MOBF: Creating button for: " .. dump(value))
-			
-			data.pathname = value.pathname
-			data.ownername = value.ownername
-			
-			retval = retval ..
-				"button[0," .. ystart .. ";3,0.5;" .. 
-					mobf_path.make_button_name("pathbtn",data) .. ";" .. 
-					value.pathname .. "]"
-				
-			if isadmin ~= nil then
-				retval = retval ..
-					"label[3," .. (ystart-0.125) .. ";" .. value.ownername .. "]"
-			end
-			
-			ystart = ystart +0.75
-		end	
-		current_index = current_index +1
+	for i,value in ipairs(paths) do
+		if not first then
+			retval = retval .. ","
+		else
+			first = false
+		end
+		retval = retval .. 
+			minetest.formspec_escape(paths[i].pathname .. 
+										" (" .. paths[i].ownername .. ")")
 	end
 	
+	retval = retval ..";]"
+		
 	--restore data values
 	data.pathname  = oldpathname
 	data.ownername = oldownername
@@ -525,35 +502,29 @@ function mobf_path.show_manage_menu(playername,data)
 	
 	if data == nil then
 		data = {}
-		data.pagenum = 1
 	end
 
 	--check privs	
 	local isadmin = minetest.check_player_privs(playername, {mobfw_admin=true}) 
 						or minetest.is_singleplayer()
 	
-	local pathbuttons = ""
+	local pathtextlixt = ""
 	local all_paths = mobf_path.get_pathlist(playername,isadmin)
 	
-	local pathbuttons = 
-		mobf_path.path_buttons(all_paths,
-								(((data.pagenum -1) * 10) +1),playername,
-								data, isadmin)
+	mobf_print("data: " .. dump(data))
+	if data.selected_path ~= nil then
+		data.pathname = all_paths[data.selected_path].pathname
+		data.ownername = all_paths[data.selected_path].ownername
+	end
+	
+	mobf_print("data2: " .. dump(data))
+	
+	local pathtextlist = 
+		mobf_path.path_textlist(all_paths,playername, data, isadmin)
 	
 	local formspec = "size[13,10]"
 	
-	if data.pagenum > 1 then
-		formspec = formspec ..
-			"button[10.75,0;1,0.5;" .. 
-				mobf_path.make_button_name("prev_page",data) .. "; <- ]"
-	end
-	if data.pagenum < #all_paths / 10 then
-		formspec = formspec ..
-			"button[12,0;1,0.5;" .. 
-				mobf_path.make_button_name("next_page",data) .. "; -> ]"
-	end
 	formspec = formspec .. 
-			"label[12.75,9.75;" .. data.pagenum .. "]" ..
 			"label[0,-0.125;Mobf path management]" ..
 			"label[0,1;Pathname]"
 
@@ -564,9 +535,7 @@ function mobf_path.show_manage_menu(playername,data)
 	
 	formspec = formspec ..
 			"label[6,1.5;Points]" ..
-			"label[0,1.25;-----------------------------------]" ..
-			"label[6,1.75;-------------------------------------------]" ..
-			pathbuttons
+			pathtextlist
 			
 	if data.pathname ~= nil then
 		formspec = formspec ..
@@ -591,7 +560,7 @@ function mobf_path.show_manage_menu(playername,data)
 					mobf_path.make_button_name("unused",data) .. ";unused]"
 				
 			formspec = formspec .. 
-				mobf_path.point_labels(data.ownername,data.pathname)
+				mobf_path.point_textlist(data)
 	end
 	
 	--show formspec
@@ -611,8 +580,6 @@ end
 -------------------------------------------------------------------------------
 function mobf_path.make_button_name(buttonid,data)
 	local retval = buttonid .. ":"
-	
-	retval = retval .. data.pagenum  .. ":"
 	
 	if data.pathname ~= nil then
 		retval = retval .. data.pathname .. ":"
@@ -646,9 +613,8 @@ function mobf_path.parse_button_name(datastring)
 	local parts = string.split(datastring,":")
 	
 	data.buttonid  = parts[1]
-	data.pagenum   = tonumber(parts[2])
-	data.pathname  = parts[3]
-	data.ownername = parts[4]
+	data.pathname  = parts[2]
+	data.ownername = parts[3]
 	if data.pathname == "" then
 		data.pathname = nil
 		data.ownername = nil

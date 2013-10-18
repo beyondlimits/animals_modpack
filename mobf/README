@@ -28,6 +28,7 @@ Changes pre 2.3.x
 -make sheep feed from grass nodes
 -add support for feeding from entities
 -add fish blue white feed from bobber(fishing mod) support
+-replace old style pathmanager by textlist based one
 
 Changes 2.2.1
 -Fix typo in plant environment definition
