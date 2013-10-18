@@ -26,6 +26,8 @@ Changes pre 2.3.x
 -add some more animal raw materials
 -fix bug target movement gen using bogus direction calculation
 -make sheep feed from grass nodes
+-add support for feeding from entities
+-add fish blue white feed from bobber(fishing mod) support
 
 Changes 2.2.1
 -Fix typo in plant environment definition
