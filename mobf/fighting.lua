@@ -666,7 +666,8 @@ function fighting.get_target(entity)
 						
 						if mobf_rtd.factions_available then
 							same_origin_protection = not attention.is_enemy(entity,v)
-						else
+						elseif target_entity.dynamic_data ~= nil and
+							target_entity.dynamic_data.spawning ~= nil then
 							same_origin_protection = 
 								target_entity.dynamic_data.spawning.spawner ==
 										entity.dynamic_data.spawning.spawner
