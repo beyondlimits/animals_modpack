@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_cow mod loading ...")
-local version = "0.1.1"
+local version = "0.1.2"
 
 local cow_groups = {
 						not_in_creative_inventory=1
@@ -117,6 +117,13 @@ cow_prototype = {
 				movgen = "probab_mov_gen",
 				typical_state_time = 180,
 				chance = 0.50,
+				animation = "walk",
+				},
+				{ 
+				name = "flee",
+				movgen = "flee_mov_gen",
+				typical_state_time = 30,
+				chance = 0,
 				animation = "walk",
 				},
 				{
@@ -231,6 +238,13 @@ steer_prototype = {
 				movgen = "probab_mov_gen",
 				typical_state_time = 180,
 				chance = 0.50,
+				animation = "walk",
+				},
+				{ 
+				name = "flee",
+				movgen = "flee_mov_gen",
+				typical_state_time = 30,
+				chance = 0,
 				animation = "walk",
 				},
 				{
@@ -354,6 +368,13 @@ baby_calf_f_prototype = {
 				animation = "walk",
 				},
 				{
+				name = "flee",
+				movgen = "flee_mov_gen",
+				typical_state_time = 30,
+				chance = 0,
+				animation = "walk",
+				},
+				{
 				name = "default",
 				movgen = "none",
 				typical_state_time = 45,
@@ -448,6 +469,13 @@ baby_calf_m_prototype = {
 				movgen = "probab_mov_gen",
 				typical_state_time = 180,
 				chance = 0.50,
+				animation = "walk",
+				},
+				{
+				name = "flee",
+				movgen = "flee_mov_gen",
+				typical_state_time = 30,
+				chance = 0,
 				animation = "walk",
 				},
 				{
