@@ -75,10 +75,6 @@ function mobf_spawner_get_water_pos(pos,max_depth,min_y,max_y)
 				ground_level .. 
 				" WDPT: " .. water_depth ..
 				" WSP: " .. printpos(water_surface_pos))
-	for i=min_y,max_y,1 do
-		local node = minetest.get_node({x=pos.x,y=i,z=pos.z})
-		print("i=" .. i .. " : " .. node.name)
-	end
 	mobf_assert_backtrace(MAX(ground_level,SHALLOW_WATER_MAX_DEPTH) < water_surface_pos.y)
 	pos.y = math.floor(
 				math.random(
