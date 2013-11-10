@@ -29,6 +29,10 @@ Changes pre 2.3.x
 -add support for feeding from entities
 -add fish blue white feed from bobber(fishing mod) support
 -replace old style pathmanager by textlist based one
+-fix fish spawning
+
+Changes 2.2.2
+-Fix crash without factions mod
 
 Changes 2.2.1
 -Fix typo in plant environment definition

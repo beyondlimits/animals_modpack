@@ -498,7 +498,10 @@ function spawning.divide_mapgen_entity(minp,maxp,spawning_data,spawnfunc,maxtrie
 				pos.x = math.floor(pos.x + 0.5)
 				pos.z = math.floor(pos.z + 0.5)
 				
-				if spawnfunc(spawning_data,pos,min_y,max_y) then
+				spawning_data.minp = min_y
+				spawning_data.maxp = max_y
+				
+				if spawnfunc(spawning_data,pos,nil) then
 					spawned = spawned +1
 					break
 				end
@@ -706,11 +709,16 @@ function spawning.register_spawner_entity(spawning_data,spawnfunc,surfacefunc,su
 							{ x=pos.x-2,y=pos.y-2,z=pos.z-2 },
 							{ x=pos.x+2,y=pos.y+2,z=pos.z+2},
 							 { "air" } )
+						local ycheck = "false"
+						if self.spawner_mob_spawndata.relaxed_y_check then
+							ycheck = "true"
+						end
 						mobf_print("MOBF: punched spawner: " .. self.name .. 
 							" spawning: " .. self.spawner_mob_name ..
 							" spawner suffix " .. self.spawner_suffix ..
 							" air_around: " .. #air_around ..
-							" min_light: " .. min_light_around)
+							" min_light: " .. min_light_around ..
+							" ignore y check: " .. ycheck)
 					end
 				end
 			end
@@ -730,19 +738,23 @@ function spawning.register_spawner_entity(spawning_data,spawnfunc,surfacefunc,su
 				local starttime = mobf_get_time_ms()
 				self.spawner_time_passed = self.spawner_time_passed -dtime
 				
-				local surfacefunc = mobf_get_surface
-				
-				if self.spawner_surfacefunc ~= nil then
-					if self.spawner_miny ~= nil and
-						self.spawner_maxy ~= nil then
-						
-						surfacefunc = function(x,y,miny,maxy)
-								return self.spawner_surfacefunc(x,y,self.spawner_miny,self.spawner_maxy)
-							end
+				if self.surfacefunc == nil then
+					if self.spawner_surfacefunc ~= nil then
+						if self.spawner_miny ~= nil and
+							self.spawner_maxy ~= nil then
+							
+							self.surfacefunc = function(x,y,miny,maxy)
+									return self.spawner_surfacefunc(x,y,self.spawner_miny,self.spawner_maxy)
+								end
+						else
+							self.surfacefunc = self.spawner_surfacefunc
+						end
 					else
-						surfacefunc = self.spawner_surfacefunc
+						self.surfacefunc = mobf_get_surface
 					end
 				end
+				
+				local surfacefunc = self.surfacefunc
 
 				--self.spawner_time_passed has to be handled by spawnfunc!
 				if self.spawner_time_passed < 0 then
@@ -757,61 +769,63 @@ function spawning.register_spawner_entity(spawning_data,spawnfunc,surfacefunc,su
 						--find a random new position
 						local max_offset = 0.4*self.spawner_mob_spawndata.density
 					
-						dbg_mobf.spawning_lvl2(
-							"MOBF: trying to get new random value, max_offset:" ..
-							max_offset)
-					
 						newpos.x = math.floor(spawnerpos.x + 
 								math.random(0,max_offset) +
 								0.5)
 						newpos.z = math.floor(spawnerpos.z + 
 								math.random(0,max_offset) +
 								0.5)
+								
+						dbg_mobf.spawning_lvl2(
+							"MOBF: trying to get new random value, max_offset:" ..
+							max_offset .. " checking pos: " .. printpos(newpos) .. " spawnerpos.y=" .. spawnerpos.y)
+								
 						newpos.y = mobf_get_surface(newpos.x,newpos.z,spawnerpos.y-10, spawnerpos.y+10)
 						
+						--NOT required for flying mobs
+						if spawning_data.relaxed_y_check and newpos.y == nil then
+							newpos.y = spawnerpos.y
+						end
+						
 						if newpos.y == nil then
+							dbg_mobf.spawning_lvl2("MOBF: didn't find surface")
 							continue = true
 						end
 						
-						--check if minimum height at random pos is given
-						if not continue then
-							--check if there s enough space above to place mob
-							if spawning_data.height ~= nil and mobf_air_above(newpos,self.spawner_mob_spawndata.height) ~= true then
-								continue = true
+						if not spawning_data.relaxed_y_check then
+
+							--check if minimum height at random pos is given
+							if not continue then
+								--check if there s enough space above to place mob
+								if spawning_data.height ~= nil and 
+								mobf_air_above(newpos,
+									self.spawner_mob_spawndata.height) ~= true then
+									dbg_mobf.spawning_lvl2("MOBF: not enough air above")
+									continue = true
+								end
 							end
-						end
 						
-						--check if new position is suitable for mob
-						if not continue then
-							--check if pos is ok
-							if not environment.evaluate_state(
-												spawning.pos_quality(self.spawner_mob_spawndata,newpos),
-												LT_SAFE_POS) then
-								continue = true
+							--check if new position is suitable for mob
+							if not continue then
+								--check if pos is ok
+								if not environment.evaluate_state(
+													spawning.pos_quality(self.spawner_mob_spawndata,newpos),
+													LT_SAFE_POS) then
+									dbg_mobf.spawning_lvl2("MOBF: not a safe pos")
+									continue = true
+								end
 							end
-						end
 						
-						--don't spawn directly inside another mob
-						if not continue then
-							local mobcount = mobf_mob_around(
-												self.spawner_mob_spawndata.name,
-												self.spawner_mob_spawndata.name_secondary,
-												newpos,
-												1.5,true)
-							if mobcount > 0 then
-								continue = true
+							--don't spawn directly inside another mob
+							if not continue then
+								continue = spawning.position_in_use(newpos,
+														self.spawner_mob_spawndata)
 							end
-						end
 						
-						--check population density
-						if not continue then
-							local mobcount = mobf_mob_around(
-												self.spawner_mob_spawndata.name,
-												self.spawner_mob_spawndata.name_secondary,
-												newpos,
-												self.spawner_mob_spawndata.density,true)
-							if mobcount > 0 then
-								continue = true
+							--check population density
+							if not continue then
+								continue = population_density_limit(newpos,
+														self.spawner_mob_spawndata)
 							end
 						end
 						
@@ -820,8 +834,11 @@ function spawning.register_spawner_entity(spawning_data,spawnfunc,surfacefunc,su
 							local pos_below = {x=newpos.x,y=newpos.y-1,z=newpos.z }
 							if spawnfunc(self.spawner_mob_spawndata,pos_below,self) then
 								self.spawner_time_passed = self.spawner_mob_spawndata.respawndelay
+								dbg_mobf.spawning_lvl2("MOBF: succesfully spawned")
 								successfull = true
 								break --break for loop
+							else
+								dbg_mobf.spawning_lvl2("MOBF: failed to spawn")
 							end
 						end
 					end
@@ -1136,6 +1153,61 @@ function spawning.pos_quality(spawning_data,pos)
 
 	return environment.pos_quality(pos,dummyentity)
 end
+
+------------------------------------------------------------------------------
+-- name: position_in_use(pos,spawndata)
+-- @function [parent=#spawning] position_in_use
+--
+--! @brief check if there already is a mob at a specific position
+--! @memberof spawning
+--
+--! @param pos position to check
+--! @param spawndata data for this mob
+--
+--! @return true == mob present false == no mob
+-------------------------------------------------------------------------------
+function spawning.position_in_use(pos,spawndata)
+	local mobcount = mobf_mob_around(
+						spawndata.name,
+						spawndata.name_secondary,
+						pos,
+						1.5,true)
+	if mobcount > 0 then
+		dbg_mobf.spawning_lvl2("MOBF: mob at same pos")
+		return true
+	end
+	
+	return false
+end
+
+------------------------------------------------------------------------------
+-- name: population_density_limit(pos,spawndata)
+-- @function [parent=#spawning] position_in_use
+--
+--! @brief check if population density limit is reached
+--! @memberof spawning
+--
+--! @param pos position to check
+--! @param spawndata data for this mob
+--
+--! @return true == mob present false == no mob
+-------------------------------------------------------------------------------
+function spawning.population_density_limit(pos,spawndata)
+	mobf_assert_backtrace(spawndata ~= nil)
+	mobf_assert_validpos(pos)
+	local mobcount = mobf_mob_around(
+						spawndata.name,
+						spawndata.name_secondary,
+						pos,
+						spawndata.density,true)
+	if mobcount > 0 then
+		dbg_mobf.spawning_lvl2("MOBF: not spawning within pop density")
+		return true
+	end
+	
+	return false
+end
+
 --include spawn algorithms
 dofile (mobf_modpath .. "/spawn_algorithms/at_night.lua")
 dofile (mobf_modpath .. "/spawn_algorithms/forrest.lua")
