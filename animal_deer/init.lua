@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_deer mod loading ... ")
 
-local version = "0.1.1"
+local version = "0.1.2"
 
 local deer_groups = {
 						not_in_creative_inventory=1
@@ -184,6 +184,13 @@ deer_m_prototype = {
 				chance = 0.50,
 				animation = "walk"
 			},
+			{ 
+			name = "flee",
+			movgen = "flee_mov_gen",
+			typical_state_time = 20,
+			chance = 0,
+			animation = "walk",
+			},
 		}
 	}
 		
@@ -305,6 +312,13 @@ deer_f_prototype = {
 				typical_state_time = 180,
 				chance = 0.50,
 				animation = "walk"
+			},
+			{ 
+			name = "flee",
+			movgen = "flee_mov_gen",
+			typical_state_time = 20,
+			chance = 0,
+			animation = "walk",
 			},
 		}
 	}

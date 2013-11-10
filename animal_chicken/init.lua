@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_chicken mod loading ...")
-local version = "0.0.20"
+local version = "0.0.21"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
@@ -145,6 +145,13 @@ chicken_prototype = {
 				animation = "walk",
 				typical_state_time = 180,
 				},
+				{ 
+				name = "flee",
+				movgen = "flee_mov_gen",
+				typical_state_time = 5,
+				chance = 0,
+				animation = "walk",
+				},
 			},
 		}
 		
@@ -246,6 +253,13 @@ rooster_prototype = {
 				animation = "walk",
 				typical_state_time = 180,
 				},
+				{ 
+				name = "flee",
+				movgen = "flee_mov_gen",
+				typical_state_time = 5,
+				chance = 0,
+				animation = "walk",
+				},
 			},
 		}
 
@@ -334,6 +348,13 @@ chick_m_prototype = {
 				animation = "walk",
 				typical_state_time = 180,
 				},
+				{ 
+				name = "flee",
+				movgen = "flee_mov_gen",
+				typical_state_time = 5,
+				chance = 0,
+				animation = "walk",
+				},
 			},
 		}
 
@@ -421,6 +442,13 @@ chick_f_prototype = {
 				chance = 0.50,
 				animation = "walk",
 				typical_state_time = 180,
+				},
+				{ 
+				name = "flee",
+				movgen = "flee_mov_gen",
+				typical_state_time = 5,
+				chance = 0,
+				animation = "walk",
 				},
 			},
 		}

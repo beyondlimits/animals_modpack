@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_ostrich mod loading ...")
-local version = "0.0.8"
+local version = "0.0.9"
 
 local ostrich_groups = {
 						not_in_creative_inventory=1
@@ -133,6 +133,13 @@ ostrich_f_prototype = {
 				animation = "walk",
 				typical_state_time = 180,
 				},
+				{ 
+				name = "flee",
+				movgen = "flee_mov_gen",
+				typical_state_time = 20,
+				chance = 0,
+				animation = "walk",
+				},
 			},
 		}
 		
@@ -220,6 +227,13 @@ ostrich_m_prototype = {
 					chance = 0.25,
 					animation = "walk",
 					typical_state_time = 180,
+				},
+				{ 
+				name = "flee",
+				movgen = "flee_mov_gen",
+				typical_state_time = 20,
+				chance = 0,
+				animation = "walk",
 				},
 				
 				{ 

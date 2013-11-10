@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.1.1"
+local version = "0.1.2"
 
 local sheep_groups = {
 						sheerable=1,
@@ -164,6 +164,13 @@ sheep_prototype = {
 					chance = 0.50,
 					animation = "walk"
 				},
+				{ 
+				name = "flee",
+				movgen = "flee_mov_gen",
+				typical_state_time = 10,
+				chance = 0,
+				animation = "walk",
+				},
 			},
 		hunger = {
 			target_nodes = { "default:junglegrass",
@@ -299,6 +306,13 @@ lamb_prototype = {
 					chance = 0.50,
 					animation = "walk"
 				},
+				{ 
+				name = "flee",
+				movgen = "flee_mov_gen",
+				typical_state_time = 15,
+				chance = 0,
+				animation = "walk",
+				},
 			},
 		hunger = {
 			target_nodes = { "default:junglegrass",
@@ -432,6 +446,13 @@ sheep_naked_prototype = {
 					typical_state_time = 180,
 					chance = 0.50,
 					animation = "walk"
+				},
+				{ 
+				name = "flee",
+				movgen = "flee_mov_gen",
+				typical_state_time = 10,
+				chance = 0,
+				animation = "walk",
 				},
 			},
 		hunger = {
