@@ -23,12 +23,13 @@ movement_generic = {}
 --!@}
 
 -------------------------------------------------------------------------------
--- name: get_accel_to(new_pos,entity) 
+-- name: get_accel_to(new_pos,entity,ymovement) 
 --
 --! @brief calculate a random speed directed to new_pos
 --
 --! @param new_pos position to go to
 --! @param entity mob to move
+--! @param ymovement current movement in y direction
 --! @return { x,y,z } random speed directed to new_pos
 -------------------------------------------------------------------------------
 --
