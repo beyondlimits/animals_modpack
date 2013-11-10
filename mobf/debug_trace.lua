@@ -54,6 +54,10 @@ dbg_mobf = {
 	fmovement_lvl2			= function () end,
 	fmovement_lvl3			= function () end,
 	
+	flmovement_lvl1			= function () end,
+	flmovement_lvl2			= function () end,
+	flmovement_lvl3			= function () end,
+	
 	path_mov_lvl1			= function () end,
 	path_mov_lvl2			= function () end,
 	path_mov_lvl3			= function () end,

@@ -225,33 +225,45 @@ function fighting.hit(entity,attacker)
 		end
 	else
 		--make non agressive animals run away
+		fighting.run_away(entity,dir,attacker)
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: run_away(entity,dir_to_enemy,enemy)
+--
+--! @brief make a mob run away
+--! @memberof fighting
+--! @private
+--
+--! @param entity mob to run away
+--! @param dir_to_enemy direction towards enemy
+--! @param enemy the enemy to avoid
+-------------------------------------------------------------------------------
+function fighting.run_away(entity,dir_to_enemy,enemy)
+	local flee_state = mob_state.get_state_by_name(entity,"flee")
+	
+	if flee_state == nil then
+		local new_state = mob_state.get_state_by_name(entity,"walking")
+		local dir_rad     = mobf_calc_yaw(dir_to_enemy.x,dir_to_enemy.z)
+		local fleevelocity     = mobf_calc_vector_components(dir_rad,
+										entity.data.movement.max_accel*2)
 		
-		local flee_state = mob_state.get_state_by_name(entity,"flee")
+		local current_accel    = entity.object:getacceleration()
+		local current_velocity = entity.object:getvelocity()
 		
-		--if there's no dedicated flee state try walking
-		if flee_state == nil then
-			flee_state = mob_state.get_state_by_name(entity,"walking")
-		end
+		mob_state.change_state(entity,new_state)
 		
-		if flee_state ~= nil then
-			local dir_rad     = mobf_calc_yaw(dir.x,dir.z)
-			local fleevelocity     = mobf_calc_vector_components(dir_rad,
-											entity.data.movement.max_accel*2)
-			
-			local current_accel    = entity.object:getacceleration()
-			local current_velocity = entity.object:getvelocity()
-			
-			mob_state.change_state(entity,flee_state)
-			
-			entity.object:setvelocity({x=0,y=current_velocity.y,z=0})
-			entity.object:setacceleration({
-											x=fleevelocity.x,
-											y=current_accel.y,
-											z=fleevelocity.z}
-										)
-		else
-			dbg_mobf.fighting_lvl2("MOBF: unable to run away no matching state (flee/walking) defined ")
-		end
+		entity.object:setvelocity({x=0,y=current_velocity.y,z=0})
+		entity.object:setacceleration({
+										x=fleevelocity.x,
+										y=current_accel.y,
+										z=fleevelocity.z}
+									)
+	else
+		mob_state.change_state(entity,flee_state)
+		entity.dynamic_data.current_movement_gen.set_target(entity,enemy)
+		dbg_mobf.fighting_lvl2("MOBF: unable to run away no matching state (flee/walking) defined ")
 	end
 end
 
@@ -265,7 +277,7 @@ end
 --! @param entity mob to find state for
 --! @param distance distance to target
 --
---! @return state tu use
+--! @return state to use
 -------------------------------------------------------------------------------
 function fighting.identify_combat_state(entity,distance)
 
