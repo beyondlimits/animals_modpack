@@ -282,7 +282,7 @@ function mob_state.change_state(entity,state)
 		dbg_mobf.mob_state_lvl2("MOBF: " .. entity.data.name 
 			.. " invalid state switch, switching to default instead of: " 
 			.. dump(state))
-		state = mob_state.get_state_by_name("default")
+		state = mob_state.get_state_by_name(entity,"default")
 	end
 	
 	local entityname = entity.data.name
