@@ -824,7 +824,7 @@ function spawning.register_spawner_entity(spawning_data,spawnfunc,surfacefunc,su
 						
 							--check population density
 							if not continue then
-								continue = population_density_limit(newpos,
+								continue = spawning.population_density_limit(newpos,
 														self.spawner_mob_spawndata)
 							end
 						end

@@ -23,16 +23,20 @@ local SHADOWS_SPAWNER_SURFACES = { "default:stone",
 local SHADOWS_SPAWNER_SUFFIX = "_shadows"
 
 -------------------------------------------------------------------------------
--- name: mobf_spawner_in_shadows_spawner_spawnfunc(spawning_data,pos,min_y,max_y)
+-- name: mobf_spawner_in_shadows_spawner_spawnfunc(spawning_data,pos)
 --
 --! @brief function to spawn a spawner entity
 --
 --! @param spawning_data spawning configuration
 --! @param pos position do spawn
---! @param min_y minimum y value of generated chunk
---! @param max_y maximum y value of generated chunk
 -------------------------------------------------------------------------------
-function mobf_spawner_in_shadows_spawner_spawnfunc(spawning_data,pos,min_y,max_y)
+function mobf_spawner_in_shadows_spawner_spawnfunc(spawning_data,pos)
+	mobf_assert_backtrace(type(spawning_data.minp) == "number")
+	mobf_assert_backtrace(type(spawning_data.maxp) == "number")
+	
+	local min_y = spawning_data.minp
+	local max_y = spawning_data.maxp
+
 	local starttime = mobf_get_time_ms()
 	pos.y = math.floor(math.random(min_y,max_y) + 0.5)
 	

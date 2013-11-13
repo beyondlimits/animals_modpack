@@ -63,7 +63,13 @@ end
 --! @param min_y minimum y value of generated chunk
 --! @param max_y maximum y value of generated chunk
 -------------------------------------------------------------------------------
-function mobf_spawner_air_above_grass_spawner_spawnfunc(spawning_data,pos,min_y,max_y)
+function mobf_spawner_air_above_grass_spawner_spawnfunc(spawning_data,pos)
+
+	mobf_assert_backtrace(type(spawning_data.minp) == "number")
+	mobf_assert_backtrace(type(spawning_data.maxp) == "number")
+	
+	local min_y = spawning_data.minp
+	local max_y = spawning_data.maxp
 
 	pos = mobf_random_air_y_pos(pos.x,pos.z,min_y,max_y)
 	

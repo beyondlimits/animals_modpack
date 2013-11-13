@@ -27,10 +27,14 @@ local AT_NIGHT_SPAWNER_SUFFIX = "_at_night"
 --
 --! @param spawning_data spawning configuration
 --! @param pos position do spawn
---! @param min_y minimum y value of generated chunk
---! @param max_y maximum y value of generated chunk
 -------------------------------------------------------------------------------
-function mobf_spawner_at_night_spawner_spawnfunc(spawning_data,pos,min_y,max_y)
+function mobf_spawner_at_night_spawner_spawnfunc(spawning_data,pos)
+
+	mobf_assert_backtrace(type(spawning_data.minp) == "number")
+	mobf_assert_backtrace(type(spawning_data.maxp) == "number")
+	
+	local min_y = spawning_data.minp
+	local max_y = spawning_data.maxp
 
 	--check if there's a surface around the selected pos
 	pos.y = mobf_get_surface(pos.x,pos.z,min_y,max_y)
