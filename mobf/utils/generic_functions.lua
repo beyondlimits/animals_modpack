@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allowed to pretend you have written it.
 --
 --! @file generic_functions.lua
@@ -45,13 +45,13 @@ function mobf_contains(cur_table,element)
     if cur_table == nil then
         return false
     end
-    
+
     for i,v in ipairs(cur_table) do
         if v == element then
             return true
         end
     end
-    
+
     return false
 end
 
@@ -86,7 +86,7 @@ end
 function MAX(a,b)
 	mobf_assert_backtrace(type(a) == "number")
 	mobf_assert_backtrace(type(b) == "number")
-	if a > b then 
+	if a > b then
 		return a
 	else
 		return b
@@ -172,7 +172,7 @@ end
 --! @param pos center of area to search
 --! @param distance radius of area
 --! @param daytime time of day to check
---! @return highest detected light level 
+--! @return highest detected light level
 -------------------------------------------------------------------------------
 function mobf_max_light_around(pos,distance,daytime)
 	mobf_assert_validpos(pos)
@@ -184,7 +184,7 @@ function mobf_max_light_around(pos,distance,daytime)
 		local current_pos = {x=x_run,y=y_run,z=z_run }
 		local node = minetest.get_node(current_pos)
 
-		if node.name == "air" then 
+		if node.name == "air" then
 			local current_light = minetest.get_node_light(current_pos,daytime)
 
 			if current_light > max_light then
@@ -206,7 +206,7 @@ end
 --! @param pos center of area to search
 --! @param distance radius of area
 --! @param daytime time of day to check
---! @return highest detected light level 
+--! @return highest detected light level
 -------------------------------------------------------------------------------
 function mobf_min_light_around(pos,distance,daytime)
 	mobf_assert_validpos(pos)
@@ -218,7 +218,7 @@ function mobf_min_light_around(pos,distance,daytime)
 		local current_pos = {x=x_run,y=y_run,z=z_run }
 		local node = minetest.get_node(current_pos)
 
-		if node.name == "air" then 
+		if node.name == "air" then
 			local current_light = minetest.get_node_light(current_pos,daytime)
 
 			if current_light < min_light then
@@ -247,24 +247,24 @@ end
 function mobf_mob_around(mob_name,mob_transform,pos,range,ignore_playerspawned)
 	local count = 0
 	local objectcount = 0
-	
+
 	mobf_assert_backtrace(range ~= nil)
 	mobf_assert_backtrace(pos ~= nil)
 
 	local objectlist = minetest.get_objects_inside_radius(pos,range)
-	
+
 	if mob_transform == nil then
 		mob_transform = ""
 	end
 
-	for index,value in pairs(objectlist) do 
+	for index,value in pairs(objectlist) do
 
 		local entity = mobf_find_entity(value)
 
 		dbg_mobf.generic_lvl1("MOBF: entity at "..printpos(pos)..
 							" looking for: "..mob_name ..
 							" or " .. mob_transform )
-		
+
 		--any mob is required to have a name so we may use this to decide
 		--if an entity is an mob or not
 		if 	entity ~= nil and
@@ -273,11 +273,11 @@ function mobf_mob_around(mob_name,mob_transform,pos,range,ignore_playerspawned)
 			entity.dynamic_data.spawning ~= nil then
 
 			if entity.removed == false then
-	
+
 				if entity.data.modname..":"..entity.data.name == mob_name or
 					entity.data.modname..":"..entity.data.name == mob_transform then
 					if (ignore_playerspawned and entity.dynamic_data.spawning.player_spawned) or
-						ignore_playerspawned ~= false then	
+						ignore_playerspawned ~= false then
 						dbg_mobf.generic_lvl1("MOBF: Found "..mob_name.. " or "
 							..mob_transform .. " within specified range of "..range)
 						count = count + 1
@@ -291,7 +291,7 @@ function mobf_mob_around(mob_name,mob_transform,pos,range,ignore_playerspawned)
 		objectcount = objectcount +1
 	end
 
-	dbg_mobf.generic_lvl2("MOBF: found " .. objectcount .. " within range " 
+	dbg_mobf.generic_lvl2("MOBF: found " .. objectcount .. " within range "
 		.. count .. " of them are relevant mobs ")
 
 	return count
@@ -316,32 +316,32 @@ function mobf_spawner_around(mob_name,pos,range)
 	local objectcount = 0
 
 	local objectlist = minetest.get_objects_inside_radius(pos,range)
-	
-	for index,value in pairs(objectlist) do 
+
+	for index,value in pairs(objectlist) do
 
 		local entity = value:get_luaentity()
-	
+
 		dbg_mobf.generic_lvl3("MOBF: entity at: "..dump(value:getpos())..
 							" looking for: "..mob_name .. " " ..
 							dump(value) .. " " ..
 							dump(entity))
-		
+
 		--any mob is required to have a name so we may use this to decide
 		--if an entity is an mob or not
 		if 	entity ~= nil and
 			entity.spawner_mob_name ~= nil then
-			
+
 			if entity.spawner_mob_name == mob_name then
-				dbg_mobf.generic_lvl2("MOBF: Found "..mob_name 
+				dbg_mobf.generic_lvl2("MOBF: Found "..mob_name
 					.. " within specified range of "..range)
 				count = count + 1
 			end
 		end
-		
+
 		objectcount = objectcount +1
 	end
 
-	dbg_mobf.generic_lvl2("MOBF: found " .. objectcount .. " within range " 
+	dbg_mobf.generic_lvl2("MOBF: found " .. objectcount .. " within range "
 		.. count .. " of them are relevant spawners ")
 
 	return count
@@ -372,7 +372,7 @@ end
 function mobf_pos_is_zero(pos)
 
 	if pos.x ~= 0 then return false end
-	if pos.y ~= 0 then return false end	
+	if pos.y ~= 0 then return false end
 	if pos.z ~= 0 then return false end
 
 	return true
@@ -426,11 +426,11 @@ function mobf_ground_distance(pos_raw,media,max_check_height)
 	local node_to_check = minetest.get_node(pos)
 
 	local count = 0
-	
+
 	if max_check_height == nil then
 		max_check_height = 32
 	end
-	
+
 	while node_to_check ~= nil and mobf_contains(media,node_to_check.name) and
 			count < max_check_height do
 		count = count +1
@@ -454,13 +454,13 @@ function mobf_surface_distance(pos)
 	local node_to_check = minetest.get_node(pos)
 
 	local count = 0
-	
-	while node_to_check ~= nil and 
+
+	while node_to_check ~= nil and
 			node_to_check.name == "air" and
 			count < 32 do
-		
+
 		count = count +1
-		
+
 		pos = {x=pos.x,y=pos.y-1,z=pos.z};
 		node_to_check = minetest.get_node(pos)
 	end
@@ -482,12 +482,12 @@ function mobf_air_distance(pos)
 	local node_to_check = minetest.get_node(pos)
 
 	local count = 0
-	
+
 	while node_to_check ~= nil and (
 			node_to_check.name == "default:water_source" or
 			node_to_check.name == "default:water_flowing") do
-		
-		count = count +1		
+
+		count = count +1
 		pos = {x=pos.x,y=pos.y+1,z=pos.z};
 		node_to_check = minetest.get_node(pos)
 	end
@@ -510,14 +510,14 @@ end
 function mobf_above_water(pos)
 
 	local node_to_check = minetest.get_node(pos)
-	
-	while node_to_check ~= nil and 
+
+	while node_to_check ~= nil and
 			node_to_check.name == "air" do
-			
+
 			pos = {x=pos.x,y=pos.y-1,z=pos.z};
 			node_to_check = minetest.get_node(pos)
 	end
-	
+
 	if node_to_check.name == "default:water_source" or
 		node_to_check.name == "default:water_flowing" then
 		return true
@@ -541,7 +541,7 @@ function mobf_get_sunlight_surface(x,z, min_y, max_y)
     for runy = min_y, max_y,1 do
         local pos = { x=x,y=runy, z=z }
         local node_to_check = minetest.get_node(pos)
-        
+
         if node_to_check.name == "default:dirt_with_grass" then
             return pos.y
         end
@@ -567,7 +567,7 @@ function mobf_get_surface(x,z, min_y, max_y)
 	mobf_assert_backtrace(max_y ~= nil)
 	mobf_assert_backtrace(x ~= nil)
 	mobf_assert_backtrace(z ~= nil)
-	
+
 	if type(minetest.get_surface) == "function" then
 		local basepos = {x=x,y=min_y,z=z}
 		local offset = max_y-min_y
@@ -610,8 +610,8 @@ function entity_at_loaded_pos(pos,mobname)
 
 	if current_node ~= nil then
 		if current_node.name == "ignore" then
-			minetest.log(LOGLEVEL_WARNING,"MOBF: " ..mobname .. " spawned at unloaded pos! : " 
-			.. dump(pos)) 
+			minetest.log(LOGLEVEL_WARNING,"MOBF: " ..mobname .. " spawned at unloaded pos! : "
+			.. dump(pos))
 			return false
 		else
 			return true
@@ -631,7 +631,7 @@ end
 function mobf_random_direction()
 
 	local retval = {}
-	
+
 	retval.x=math.random(-1,1)
 	retval.y=math.random(-1,1)
 	retval.z=math.random(-1,1)
@@ -644,7 +644,7 @@ end
 --
 --! @brief check if two positions are equal
 --
---! @param pos1 
+--! @param pos1
 --! @param pos2
 --
 --! @return true/false
@@ -654,7 +654,7 @@ function mobf_pos_is_same(pos1,pos2)
 		pos2 == nil then
 		return false
 	end
-	
+
 	if pos1.x ~= pos2.x or
 		pos1.y ~= pos2.y or
 		pos1.z ~= pos2.z or
@@ -666,7 +666,7 @@ function mobf_pos_is_same(pos1,pos2)
 		pos2.z == nil then
 		return false
 	end
-	
+
 	return true
 end
 
@@ -685,23 +685,23 @@ function mobf_is_pos(value)
 		type(value) ~= "table" then
 		return false
 	end
-	
+
 	if value.x == nil or
 		tonumber(value.x) == nil then
 		return false
 	end
-	
+
 	if value.y == nil or
 		tonumber(value.y) == nil then
 		return false
 	end
-	
+
 	if value.z == nil or
 		tonumber(value.z) == nil then
 		return false
 	end
-	
-	
+
+
 	return true
 end
 
