@@ -616,11 +616,11 @@ function spawning.divide_mapgen(minp,maxp,spawning_data,spawnfunc,surfacefunc,ma
 			if not continue and
 				spawning_data.height ~= nil and
 				mobf_air_above(pos,spawning_data.height) ~= true then
-				mobf_print("MOBF: not enough room to spawn: " .. spawning_data.height)
+				dbg_mobf.spawning_lvl3("MOBF: not enough room to spawn: " .. spawning_data.height)
 				local mypos = pos
 				for i=1,spawning_data.height,1 do
 					local nodeatpos = minetest.get_node(mypos)
-					mobf_print("\t" .. printpos(mypos) .. ": " .. nodeatpos.name)
+					dbg_mobf.spawning_lvl3("\t" .. printpos(mypos) .. ": " .. nodeatpos.name)
 					mypos.y = mypos.y +1
 				end
 				continue = true
@@ -1214,6 +1214,92 @@ function spawning.population_density_limit(pos,spawndata)
 	return false
 end
 
+-------------------------------------------------------------------------------
+-- name: spawner_get_water_pos(pos,max_depth,min_y,max_y)
+--
+--! @brief find a position at x/z within some y limitations
+--
+--! @param pos position do spawn
+--! @param min_depth min-y depth to spawn
+--! @param max_depth max-y depth to spawn
+--! @param min_y minimum y value of generated chunk
+--! @param max_y maximum y value of generated chunk
+-------------------------------------------------------------------------------
+function spawning.spawner_get_water_pos(pos,min_depth,max_depth,min_y,max_y)
+	--get information about current position
+	local upper_pos = {x=pos.x,y=max_y,z=pos.z}
+
+	mobf_assert_backtrace(type(min_depth) == "number")
+	mobf_assert_backtrace(type(max_depth) == "number")
+
+	local ground_distance = mobf_ground_distance(upper_pos,
+							{ "default:water_flowing",
+								"default:water_source",
+								"air" },max_y - min_y)
+	local ground_level = max_y - ground_distance +1
+
+	local ground_pos = {x=pos.x,y=ground_level,z=pos.z }
+	local water_depth = mobf_air_distance(ground_pos)
+
+	local surfacenode = minetest.get_node(ground_pos)
+
+	if surfacenode == nil then
+		dbg_mobf.spawning_lvl3("MOBF: invalid ground node")
+		return nil
+	end
+
+	if surfacenode.name ~= "default:water_flowing" and
+		surfacenode.name ~= "default:water_source" then
+		--mobf_print("MOBF: WD:" .. water_depth .. " GD: " .. ground_distance)
+		--mobf_print("MOBF: MAXD:" .. max_depth .. " " .. min_y .. "<->" .. max_y)
+		dbg_mobf.spawning_lvl3("MOBF: " .. surfacenode.name .. " isn't open water: " .. printpos(ground_pos))
+		--if ground_pos.y > 0 then
+		--	for i=min_y,max_y,1 do
+		--		local node = minetest.get_node({x=pos.x,y=i,z=pos.z})
+		--		print("i=" .. i .. " : " .. node.name)
+		--	end
+		--end
+		return nil
+	end
+
+	if water_depth <= 0 then
+		dbg_mobf.spawning_lvl3("MOBF: water not found! GP: " .. ground_level .. " WD: " .. water_depth)
+		--TODO spawn in caves?
+		return nil
+	end
+
+	local water_surface_pos = {x=pos.x,y=ground_level + water_depth,z=pos.z}
+
+	--dbg_mobf.spawning_lvl2
+	dbg_mobf.spawning_lvl3("MOBF: mobf_spawner_get_water_pos GL: " ..
+				ground_level ..
+				" WDPT: " .. water_depth ..
+				" WSP: " .. printpos(water_surface_pos))
+	if MAX(ground_level,max_depth) > water_surface_pos.y then
+		mobf_print("MOBF: WD:" .. water_depth .. " GD: " .. ground_distance)
+		mobf_print("MOBF: MAXD:" .. max_depth .. " " .. min_y .. "<->" .. max_y)
+		mobf_print("MOBF: mobf_spawner_get_water_pos GL: " ..
+				ground_level ..
+				" WDPT: " .. water_depth ..
+				" WSP: " .. printpos(water_surface_pos))
+		mobf_assert_backtrace(MAX(ground_level,max_depth) < water_surface_pos.y)
+		return nil
+	end
+
+	--check if there is any chance to find a suitable pos
+	if MAX(ground_level,max_depth) >= MIN(water_surface_pos.y,min_depth) then
+		return nil
+	end
+
+	pos.y = math.floor(
+				math.random(
+					MAX(ground_level,max_depth),
+					MIN(water_surface_pos.y,min_depth)
+					)
+				 + 0.5)
+	return pos
+end
+
 --include spawn algorithms
 dofile (mobf_modpath .. "/spawn_algorithms/at_night.lua")
 dofile (mobf_modpath .. "/spawn_algorithms/forrest.lua")
@@ -1224,3 +1310,4 @@ dofile (mobf_modpath .. "/spawn_algorithms/big_willow.lua")
 dofile (mobf_modpath .. "/spawn_algorithms/in_air1.lua")
 dofile (mobf_modpath .. "/spawn_algorithms/none.lua")
 dofile (mobf_modpath .. "/spawn_algorithms/deep_large_caves.lua")
+dofile (mobf_modpath .. "/spawn_algorithms/deep_water.lua")
