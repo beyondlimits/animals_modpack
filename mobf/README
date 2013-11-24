@@ -30,6 +30,10 @@ Changes pre 2.3.x
 -add fish blue white feed from bobber(fishing mod) support
 -replace old style pathmanager by textlist based one
 -fix fish spawning
+-add shark
+-enable delayed spawning by default
+-make mobs really run away
+-lots of spawning related cleanups
 
 Changes 2.2.2
 -Fix crash without factions mod
