@@ -277,13 +277,13 @@ function mobf.activate_handler(self,staticdata)
 	local pos = self.object:getpos()
 
 	if pos == nil then
-		minetest.log(LOGLEVEL_ERROR,"MOBF: mob at nil pos!")
+		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: mob at nil pos!")
 	end
 
 	local current_node = minetest.get_node(pos)
 
 	if current_node == nil then
-		minetest.log(LOGLEVEL_ERROR,
+		mobf_bug_warning(LOGLEVEL_ERROR,
 			"MOBF: trying to activate mob in nil node! removing")
 
 		spawning.remove_uninitialized(self,staticdata)
@@ -314,7 +314,7 @@ function mobf.activate_handler(self,staticdata)
 			spawner = self.dynamic_data.spawning.spawner
 		end
 
-		minetest.log(LOGLEVEL_WARNING,
+		mobf_bug_warning(LOGLEVEL_WARNING,
 			"MOBF: trying to activate mob \"" ..self.data.name ..
 			" at " .. printpos(pos) ..
 			"\" within something else!" ..
@@ -325,12 +325,12 @@ function mobf.activate_handler(self,staticdata)
 			if luaentity ~= nil then
 				if luaentity.data ~= nil and
 					luaentity.data.name ~= nil then
-					print(i .. " " .. luaentity.data.name .. printpos(objectlist[i]:getpos()))
+					dbg_mobf.mobf_core_helper_lvl3(i .. " " .. luaentity.data.name .. printpos(objectlist[i]:getpos()))
 				else
-					print(i .. " " .. dump(luaentity))
+					dbg_mobf.mobf_core_helper_lvl3(i .. " " .. dump(luaentity))
 				end
 			else
-				print(i .. " " .. tostring(objectlist[i]) .. printpos(objectlist[i]:getpos()))
+				dbg_mobf.mobf_core_helper_lvl3(i .. " " .. tostring(objectlist[i]) .. printpos(objectlist[i]:getpos()))
 			end
 		end
 		spawning.remove_uninitialized(self,staticdata)

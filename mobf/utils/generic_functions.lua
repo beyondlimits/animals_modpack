@@ -348,7 +348,7 @@ function mobf_spawner_around(mob_name,pos,range)
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_line_of_sightX(pos1,pos2)
+-- name: mobf_line_of_sight(pos1,pos2)
 --
 --! @brief is there a line of sight between two specified positions
 --
