@@ -42,10 +42,13 @@ function mobf_init_world_specific_settings()
 			mobf_world_settings_data = {}
 		else
 			local data_raw = file:read("*a")
+			file:close()
 
 			data_raw=data_raw:gsub("\n","")
-			mobf_world_settings_data = minetest.deserialize(data_raw)
-			file:close()
+
+			if data_raw ~= nil then
+				mobf_world_settings_data = minetest.deserialize(data_raw)
+			end
 		end
 
 		--set world settings function
@@ -121,6 +124,57 @@ function mobf_init_world_specific_settings()
 			return mobf_world_settings_data[name]
 		end
 	end
+
+
+	--initialize defaults
+	if minetest.world_setting_get("vombie_3d_burn_animation_enabled") == nil then
+		minetest.world_setting_set("vombie_3d_burn_animation_enabled",false)
+	end
+
+	if minetest.world_setting_get("mobf_log_removed_entities") == nil then
+		minetest.world_setting_set("mobf_log_removed_entities",false)
+	end
+
+	if minetest.world_setting_get("mobf_disable_animal_spawning") == nil then
+		minetest.world_setting_set("mobf_disable_animal_spawning",false)
+	end
+
+	if minetest.world_setting_get("mobf_disable_3d_mode") == nil then
+		minetest.world_setting_set("mobf_disable_3d_mode",false)
+	end
+
+	if minetest.world_setting_get("mobf_disable_pathfinding") == nil then
+		minetest.world_setting_set("mobf_disable_pathfinding",false)
+	end
+
+	if minetest.world_setting_get("mobf_delayed_spawning") == nil then
+		minetest.world_setting_set("mobf_delayed_spawning",true)
+	end
+
+	if minetest.world_setting_get("mobf_log_bug_warnings") == nil then
+		minetest.world_setting_set("mobf_log_bug_warnings",false)
+	end
+
+	if minetest.world_setting_get("mobf_show_spawners") == nil then
+		minetest.world_setting_set("mobf_show_spawners",false)
+	end
+
+	if minetest.world_setting_get("mobf_lifebar") == nil then
+		minetest.world_setting_set("mobf_lifebar",true)
+	end
+
+	if minetest.world_setting_get("mobf_enable_statistics") == nil then
+		minetest.world_setting_set("mobf_enable_statistics",false)
+	end
+
+	if minetest.world_setting_get("mobf_animal_spawning_secondary") == nil then
+		minetest.world_setting_set("mobf_animal_spawning_secondary",false)
+	end
+
+	if minetest.world_setting_get("mobf_grief_protection") == nil then
+		minetest.world_setting_set("mobf_grief_protection",false)
+	end
+
 end
 
 -------------------------------------------------------------------------------
