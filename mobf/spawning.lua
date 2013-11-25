@@ -1232,6 +1232,16 @@ function spawning.spawner_get_water_pos(pos,min_depth,max_depth,min_y,max_y)
 	mobf_assert_backtrace(type(min_depth) == "number")
 	mobf_assert_backtrace(type(max_depth) == "number")
 
+	if max_depth > max_y then
+		dbg_mobf.spawning_lvl3("MOBF: get_water_pos to deep")
+		return nil
+	end
+
+	if min_depth < min_y then
+		dbg_mobf.spawning_lvl3("MOBF: get_water_pos to high")
+		return nil
+	end
+
 	local ground_distance = mobf_ground_distance(upper_pos,
 							{ "default:water_flowing",
 								"default:water_source",
@@ -1242,6 +1252,8 @@ function spawning.spawner_get_water_pos(pos,min_depth,max_depth,min_y,max_y)
 	local water_depth = mobf_air_distance(ground_pos)
 
 	local surfacenode = minetest.get_node(ground_pos)
+
+
 
 	if surfacenode == nil then
 		dbg_mobf.spawning_lvl3("MOBF: invalid ground node")
