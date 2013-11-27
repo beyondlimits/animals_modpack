@@ -200,7 +200,7 @@ function mobf_spawn_initialize_deep_water_abm(spawning_data)
 				--never try to spawn an mob at pos (0,0,0) it's initial entity spawnpos and
 				--used to find bugs in initial spawnpoint setting code
 				if mobf_pos_is_zero(pos) then
-					mobf_warn_long_fct(starttime,"mobf_spawn_deep_water")
+					mobf_warn_long_fct(starttime,"mobf_spawn_deep_water_abm_r1")
 					return
 				end
 
@@ -208,7 +208,7 @@ function mobf_spawn_initialize_deep_water_abm(spawning_data)
 				if not environment.evaluate_state(
 									spawning.pos_quality(spawning_data,pos_above),
 									LT_SAFE_POS) then
-					mobf_warn_long_fct(starttime,"mobf_spawn_deep_water")
+					mobf_warn_long_fct(starttime,"mobf_spawn_deep_water_abm_r2")
 					return
 				end
 
@@ -216,12 +216,12 @@ function mobf_spawn_initialize_deep_water_abm(spawning_data)
 				if mobf_mob_around(spawning_data.name,
 									spawning_data.name_secondary,
 									pos_above,spawning_data.density,true) > 0 then
-					mobf_warn_long_fct(starttime,"mobf_spawn_deep_water")
+					mobf_warn_long_fct(starttime,"mobf_spawn_deep_water_abm_r3")
 					return
 				end
 
 				mobf_spawner_deep_water_spawnfunc(spawning_data,pos)
-				mobf_warn_long_fct(starttime,"mobf_spawn_deep_water")
+				mobf_warn_long_fct(starttime,"mobf_spawn_deep_water_abm_done")
 			end,
 		})
 end
@@ -248,6 +248,7 @@ function mobf_spawn_initialize_deep_water_mapgen(spawning_data)
 
 	if minetest.world_setting_get("mobf_delayed_spawning") then
 		minetest.register_on_generated(function(minp, maxp, seed)
+			local starttime = mobf_get_time_ms()
 			local job = {
 				callback = spawning.divide_mapgen_entity_jobfunc,
 				data = {
@@ -260,6 +261,7 @@ function mobf_spawn_initialize_deep_water_mapgen(spawning_data)
 					}
 				}
 			mobf_job_queue.add_job(job)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. spawning_data.name .. "_job_queued","mapgen")
 		end)
 	else
 		--add mob spawner on map generation

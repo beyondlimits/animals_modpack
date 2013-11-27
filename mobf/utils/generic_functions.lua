@@ -592,7 +592,6 @@ end
 --! @return y value of surface (first air node) or nil
 -------------------------------------------------------------------------------
 function mobf_get_surface(x,z, min_y, max_y)
-	local starttime = mobf_get_time_ms()
 	mobf_assert_backtrace(min_y ~= nil)
 	mobf_assert_backtrace(max_y ~= nil)
 	mobf_assert_backtrace(x ~= nil)
@@ -602,7 +601,6 @@ function mobf_get_surface(x,z, min_y, max_y)
 		local basepos = {x=x,y=min_y,z=z}
 		local offset = max_y-min_y
 		local retval = minetest.get_surface(basepos,offset)
-		mobf_warn_long_fct(starttime,"on_mapgen_entity_spawnfunc","user_3")
 		return retval
 	end
 
@@ -613,12 +611,10 @@ function mobf_get_surface(x,z, min_y, max_y)
 		if node_to_check.name == "air" and
 			last_node.name ~= "air" and
 			last_node.mame ~= "ignore" then
-			mobf_warn_long_fct(starttime,"on_mapgen_entity_spawnfunc","user_3")
 			return pos.y
 		end
 		last_node = node_to_check
 	end
-	mobf_warn_long_fct(starttime,"on_mapgen_entity_spawnfunc","user_3")
 	return nil
 end
 

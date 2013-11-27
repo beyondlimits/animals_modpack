@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file deep_large_caves.lua
@@ -29,17 +29,17 @@ function mobf_spawner_deep_large_caves_spawner_spawnfunc(spawning_data,pos)
 
 	mobf_assert_backtrace(type(spawning_data.minp) == "number")
 	mobf_assert_backtrace(type(spawning_data.maxp) == "number")
-	
+
 	local min_y = spawning_data.minp
 	local max_y = spawning_data.maxp
 
 	pos.y = math.floor(math.random(min_y,max_y) + 0.5)
-	
+
 	if pos.y > spawning_data.min_depth then
 		dbg_mobf.spawning_lvl3("MOBF: min depth requirement not met")
 		return false
 	end
-	
+
 	spawning.spawn_and_check(spawning_data.name .. "_spawner" .. DEEP_LARGE_CAVE_SPAWNER_SUFFIX,
 								pos,
 								"deep_large_caves_spawner")
@@ -57,16 +57,16 @@ end
 function mobf_spawner_deep_large_caves_spawnfunc(spawning_data,pos)
 	mobf_assert_validpos(pos)
 	mobf_assert_backtrace(type(spawning_data) == "table")
-	
+
 	local node = minetest.get_node(pos)
 	local pos_above = { x=pos.x,y=pos.y+1,z=pos.z }
-	
+
 	if not mobf_contains(DEEP_LARGE_CAVE_SURFACES,node.name) then
 		dbg_mobf.spawning_lvl3(
 			"MOBF: node ain't of correct type: " .. node.name)
 		return false
 	end
-	
+
 	if pos.y > spawning_data.min_depth then
 		dbg_mobf.spawning_lvl3("MOBF: min depth requirement not met")
 		return false
@@ -83,13 +83,13 @@ end
 --! @param spawning_data spawning configuration
 -------------------------------------------------------------------------------
 
-function mobf_spawner_initialize_deep_large_caves_abm(spawning_data) 
+function mobf_spawner_initialize_deep_large_caves_abm(spawning_data)
 
 	minetest.log(LOGLEVEL_INFO,
 		"MOBF:\tregistering shadow spawn abm callback for mob "..spawning_data.name)
-	
+
 	local media = nil
-	
+
 	if spawning_data.environment ~= nil and
 		spawning_data.environment.media ~= nil then
 		media = spawning_data.environment.media
@@ -112,27 +112,27 @@ function mobf_spawner_initialize_deep_large_caves_abm(spawning_data)
 				--used to find bugs in initial spawnpoint setting code
 				if mobf_pos_is_zero(pos) then
 					dbg_mobf.spawning_lvl1("MOBF: not spawning due to 0 pos")
-					mobf_warn_long_fct(starttime,"mobf_spawn_in_deep_large_caves")
+					mobf_warn_long_fct(starttime,"mobf_spawn_in_deep_large_caves_abm_r1")
 					return
 				end
 
 				--check if there s enough space above to place mob
 				if spawning_data.height ~= nil and mobf_air_above(pos,spawning_data.height) ~= true then
 					dbg_mobf.spawning_lvl3("MOBF: height requirement not met")
-					mobf_warn_long_fct(starttime,"mobf_spawn_in_deep_large_caves")
+					mobf_warn_long_fct(starttime,"mobf_spawn_in_deep_large_caves_abm_r2")
 					return
 				end
-				
+
 				--check if pos is ok
 				if not environment.evaluate_state(
 									spawning.pos_quality(spawning_data,pos_above),
 									LT_SAFE_POS) then
-					mobf_warn_long_fct(starttime,"mobf_spawn_in_deep_large_caves")
+					mobf_warn_long_fct(starttime,"mobf_spawn_in_deep_large_caves_abm_r3")
 					return
 				end
-				
+
 				mobf_spawner_deep_large_caves_spawnfunc(spawning_data,pos)
-				mobf_warn_long_fct(starttime,"mobf_spawn_in_deep_large_caves")
+				mobf_warn_long_fct(starttime,"mobf_spawn_in_deep_large_caves_abm_done")
 			end,
 		})
 end
@@ -150,11 +150,12 @@ function mobf_spawner_initialize_deep_large_caves_mapgen(spawning_data)
 		mobf_spawner_deep_large_caves_spawnfunc,
 		nil,
 		DEEP_LARGE_CAVE_SPAWNER_SUFFIX)
-		
+
 	if minetest.world_setting_get("mobf_delayed_spawning") then
 		minetest.register_on_generated(function(minp, maxp, seed)
+			local starttime = mobf_get_time_ms()
 			local job = {
-						
+
 						callback = spawning.divide_mapgen_entity_jobfunc,
 						data = {
 							minp          = minp,
@@ -167,6 +168,7 @@ function mobf_spawner_initialize_deep_large_caves_mapgen(spawning_data)
 							}
 						}
 			mobf_job_queue.add_job(job)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. spawning_data.name .. "_job_queued","mapgen")
 		end)
 	else
 		--add mob spawner on map generation
@@ -182,6 +184,6 @@ end
 --!@}
 
 spawning.register_spawn_algorithm("deep large caves", mobf_spawner_initialize_deep_large_caves_abm)
-spawning.register_spawn_algorithm("deep_large_caves_spawner", 
+spawning.register_spawn_algorithm("deep_large_caves_spawner",
 									mobf_spawner_initialize_deep_large_caves_mapgen,
 									spawning.register_cleanup_spawner)

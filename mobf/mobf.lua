@@ -350,6 +350,7 @@ function mobf.activate_handler(self,staticdata)
 	--do initialization of dynamic modules
 	local now = mobf_get_current_time()
 
+
 	spawning.init_dynamic_data(self,now)
 
 	mobf.init_on_step_callbacks(self,now)
@@ -515,6 +516,8 @@ end
 function mobf.register_entity(name, graphics, mob)
 	dbg_mobf.mobf_core_lvl1("MOBF: registering new entity: " .. name)
 	mobf_print("MOBF: registering new entity: \"" .. name .. "\"")
+
+	mobf_assert_backtrace(environment_list[mob.generic.envid] ~= nil)
 	minetest.register_entity(name,
 			 {
 				physical        = true,
@@ -542,14 +545,14 @@ function mobf.register_entity(name, graphics, mob)
 				if self.removed ~= false then
 					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: on_step: "
 						.. self.data.name .. " on_step for removed entity????")
-					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
+					mobf_warn_long_fct(starttime,"on_step_total_removed","on_step_total")
 					return
 				end
 
 				if self.dynamic_data == nil then
 					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: on_step: "
 						.. "no dynamic data available!")
-					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
+					mobf_warn_long_fct(starttime,"on_step_total_no_dyn","on_step_total")
 					return
 				end
 
@@ -558,14 +561,14 @@ function mobf.register_entity(name, graphics, mob)
 						mobf.activate_handler(self,self.dynamic_data.last_static_data)
 						self.dynamic_data.last_static_data = nil
 					else
-						mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
+						mobf_warn_long_fct(starttime,"on_step_total_no_init","on_step_total")
 						return
 					end
 				end
 
 				--do special ride callback
 				if mobf_ride.on_step_callback(self) then
-					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
+					mobf_warn_long_fct(starttime,"on_step_total_ride_cb","on_step_total")
 					return
 				end
 
@@ -574,22 +577,21 @@ function mobf.register_entity(name, graphics, mob)
 				local now = mobf_get_current_time()
 
 				if self.current_dtime < 0.25 then
-					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
+					mobf_warn_long_fct(starttime,"on_step_total_pre_update","on_step_total")
 					return
 				end
 
 				--check lifetime
 				if spawning.lifecycle_callback(self,now) == false then
-					mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
+					mobf_warn_long_fct(starttime,"on_step_total_lifecycle","on_step_total")
 					return
 				end
 
-				mobf_warn_long_fct(starttime,"on_step lifecycle","lifecycle")
-
+				local movestart = mobf_get_time_ms()
 				--movement generator
 				self.dynamic_data.current_movement_gen.callback(self,now)
 
-				mobf_warn_long_fct(starttime,"on_step movement","movement")
+				mobf_warn_long_fct(movestart,"on_step_movement","movement")
 
 				if #self.on_step_hooks > 32 then
 					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: "
@@ -601,17 +603,17 @@ function mobf.register_entity(name, graphics, mob)
 
 				--dynamic modules
 				for i = 1, #self.on_step_hooks, 1 do
+					local cb_starttime = mobf_get_time_ms()
 					--check return value if on_step hook tells us to stop any other processing
 					if self.on_step_hooks[i](self,now,self.current_dtime) == false then
 						dbg_mobf.mobf_core_lvl1("MOBF: on_step: " .. self.data.name
 							.. " aborting callback processing entity=" .. tostring(self))
 						break
 					end
-					mobf_warn_long_fct(starttime,"callback nr " .. i,"callback_os_"
-						.. self.data.name .. "_" .. i)
+					mobf_warn_long_fct(cb_starttime,"callback_os_" .. self.data.name .. "_" .. i,"callback nr " .. i)
 				end
 
-				mobf_warn_long_fct(starttime,"on_step_total","on_step_total")
+				mobf_warn_long_fct(starttime,"on_step_" .. self.data.name .. "_total","on_step_total")
 				self.current_dtime = 0
 				end,
 
@@ -655,7 +657,7 @@ function mobf.register_entity(name, graphics, mob)
 							self.dynamic_data.last_static_data = staticdata
 						end
 					end
-					mobf_warn_long_fct(starttime,"onactivate_total","onactivate_total")
+					mobf_warn_long_fct(starttime,"onactivate_total_" .. self.data.name,"onactivate_total")
 				end,
 
 			getbasepos       = mobf.get_basepos,

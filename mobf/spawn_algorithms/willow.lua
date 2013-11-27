@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file willow.lua
@@ -24,7 +24,7 @@
 --! @param spawning_data spawning configuration
 --! @param pos position to spawn at
 -------------------------------------------------------------------------------
-function mobf_spawner_willow_spawnfunc(spawning_data,pos)	
+function mobf_spawner_willow_spawnfunc(spawning_data,pos)
 	local spawnpos = {x=pos.x,y=pos.y+1,z=pos.z}
 	spawning.spawn_and_check(spawning_data.name,spawnpos,"on_willow_mapgen")
 	return true
@@ -37,15 +37,15 @@ end
 --
 --! @param spawning_data spawning configuration
 -------------------------------------------------------------------------------
-function mobf_spawner_initialize_on_willow_abm(spawning_data) 
+function mobf_spawner_initialize_on_willow_abm(spawning_data)
 	minetest.log(LOGLEVEL_WARNING,"MOBF: using deprecated abm based spawn algorithm \"spawn_on_willow\" most likely causing lag in server!\t Use spawn_on_willow_mapgen instead!")
 	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering willow spawn abm callback for mob "..spawning_data.name)
-	
+
 	local media = nil
-	
+
 	if environment ~= nil and
 		environment.media ~= nil then
-		media = environment.media	
+		media = environment.media
 	end
 
 	minetest.register_abm({
@@ -64,14 +64,14 @@ function mobf_spawner_initialize_on_willow_abm(spawning_data)
 				--never try to spawn an mob at pos (0,0,0) it's initial entity spawnpos and
 				--used to find bugs in initial spawnpoint setting code
 				if mobf_pos_is_zero(pos) then
-					mobf_warn_long_fct(starttime,"mobf_spawn_on_willow")
+					mobf_warn_long_fct(starttime,"mobf_spawn_on_willow_abm_r1")
 					return
 				end
-				
+
 				--check if there s enough space above to place mob
 				if spawning_data.height ~= nil and mobf_air_above(pos,spawning_data.height) ~= true then
 					dbg_mobf.spawning_lvl3("MOBF: height requirement not met")
-					mobf_warn_long_fct(starttime,"mobf_spawn_on_willow")
+					mobf_warn_long_fct(starttime,"mobf_spawn_on_willow_abm_r2")
 					return
 				end
 
@@ -79,20 +79,20 @@ function mobf_spawner_initialize_on_willow_abm(spawning_data)
 				if not environment.evaluate_state(
 									spawning.pos_quality(spawning_data,pos_above),
 									LT_SAFE_POS) then
-					mobf_warn_long_fct(starttime,"mobf_spawn_on_willow")
+					mobf_warn_long_fct(starttime,"mobf_spawn_on_willow_abm_r3")
 					return
 				end
-				
+
 				--check population density
 				if mobf_mob_around(spawning_data.name,
 									spawning_data.name_secondary,
 									pos_above,spawning_data.density,true) > 0 then
-					mobf_warn_long_fct(starttime,"mobf_spawn_on_willow")
+					mobf_warn_long_fct(starttime,"mobf_spawn_on_willow_abm_r4")
 					return
 				end
 
 				mobf_spawner_willow_spawnfunc(spawning_data,pos)
-				mobf_warn_long_fct(starttime,"mobf_spawn_on_willow")
+				mobf_warn_long_fct(starttime,"mobf_spawn_on_willow_abm_done")
 			end,
 		})
 end

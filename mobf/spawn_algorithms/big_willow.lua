@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file willow.lua
@@ -38,7 +38,7 @@ function mobf_spawner_big_willow_spawnfunc(spawning_data,pos)
 			pos_is_big_willow = false
 			break
 		end
-	
+
 		--check if there s enough space above to place mob
 		if not mobf_air_above({x=x,y=pos.y,z=z},spawning_data.height) then
 			pos_is_big_willow = false
@@ -46,7 +46,7 @@ function mobf_spawner_big_willow_spawnfunc(spawning_data,pos)
 		end
 	end
 	end
-	
+
 	--evaluate checks
 	if pos_is_big_willow then
 		dbg_mobf.spawning_lvl3("willow is big enough " ..printpos(centerpos))
@@ -54,7 +54,7 @@ function mobf_spawner_big_willow_spawnfunc(spawning_data,pos)
 		spawning.spawn_and_check(spawning_data.name,spawnpos,"on_big_willow_mapgen")
 		return true
 	end
-	
+
 	return false
 end
 
@@ -66,15 +66,15 @@ end
 --
 --! @param spawning_data spawning configuration
 -------------------------------------------------------------------------------
-function mobf_spawner_initialize_on_big_willow_abm(spawning_data) 
+function mobf_spawner_initialize_on_big_willow_abm(spawning_data)
 	minetest.log(LOGLEVEL_WARNING,"MOBF: using deprecated abm based spawn algorithm \"spawn_on_willow\" most likely causing lag in server!\t Use spawn_on_willow_mapgen instead!")
 	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering willow spawn abm callback for mob ".. spawning_data.name)
-	
+
 	local media = nil
-	
+
 	if spawning_data.environment ~= nil and
 		spawning_data.environment.media ~= nil then
-		media = spawning_data.environment.media	
+		media = spawning_data.environment.media
 	end
 
 	minetest.register_abm({
@@ -93,33 +93,33 @@ function mobf_spawner_initialize_on_big_willow_abm(spawning_data)
 				--never try to spawn an mob at pos (0,0,0) it's initial entity spawnpos and
 				--used to find bugs in initial spawnpoint setting code
 				if mobf_pos_is_zero(pos_above) then
-					mobf_warn_long_fct(starttime,"mobf_spawn_on_big_willow")
+					mobf_warn_long_fct(starttime,"mobf_spawn_on_big_willow_abm_r1")
 					return
 				end
 
 				--check if there s enough space above to place mob
 				if spawning_data.height ~= nil and mobf_air_above(pos_above,spawning_data.height) ~= true then
-					mobf_warn_long_fct(starttime,"mobf_spawn_on_big_willow")
+					mobf_warn_long_fct(starttime,"mobf_spawn_on_big_willow_abm_r2")
 					return
 				end
-				
+
 				--check if pos is ok
 				if not environment.evaluate_state(
 									spawning.pos_quality(spawning_data,pos_above),
 									LT_SAFE_POS) then
-					mobf_warn_long_fct(starttime,"mobf_spawn_on_big_willow")
+					mobf_warn_long_fct(starttime,"mobf_spawn_on_big_willow_abm_r3")
 					return
 				end
-				
+
 				if mobf_mob_around(spawning_data.name,
 									spawning_data.name_secondary,
 									pos_above,spawning_data.density,true) > 0 then
-					mobf_warn_long_fct(starttime,"mobf_spawn_on_big_willow")
+					mobf_warn_long_fct(starttime,"mobf_spawn_on_big_willow_abm_r4")
 					return
 				end
 
 				mobf_spawner_big_willow_spawnfunc(spawning_data,pos)
-				mobf_warn_long_fct(starttime,"mobf_spawn_on_big_willow")
+				mobf_warn_long_fct(starttime,"mobf_spawn_on_big_willow_abm_done")
 			end,
 		})
 end
@@ -133,9 +133,10 @@ end
 -------------------------------------------------------------------------------
 function mobf_spawner_initialize_big_willow_mapgen(spawning_data)
 	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering willow mapgen spawn mapgen callback for mob "..spawning_data.name)
-	
+
 	if minetest.world_setting_get("mobf_delayed_spawning") then
 		minetest.register_on_generated(function(minp, maxp, seed)
+			local starttime = mobf_get_time_ms()
 			local job = {
 				callback = spawning.divide_mapgen_jobfunc,
 				data = {
@@ -150,6 +151,7 @@ function mobf_spawner_initialize_big_willow_mapgen(spawning_data)
 					}
 				}
 			mobf_job_queue.add_job(job)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. spawning_data.name .. "_job_queued","mapgen")
 		end)
 	else
 		--add mob on map generation
