@@ -565,12 +565,11 @@ function spawning.divide_mapgen(minp,maxp,spawning_data,spawnfunc,surfacefunc,ma
 
 	for i = 1, xdivs,1 do
 	for j = 1, zdivs,1 do
-		local starttime = mobf_get_time_ms()
+
 		local x_center,x_delta = spawning.chunk_get_center(min_x,max_x,i,spawning_data.density)
 		local z_center,z_delta = spawning.chunk_get_center(min_z,max_z,j,spawning_data.density)
 
 		local surface_center = surfacefunc(x_center,z_center,min_y,max_y)
-		mobf_warn_long_fct(starttime,"surface_detection","user_2")
 
 		local centerpos = {x=x_center,y=surface_center,z=z_center}
 
@@ -1294,7 +1293,8 @@ function spawning.spawner_get_water_pos(pos,min_depth,max_depth,min_y,max_y)
 				ground_level ..
 				" WDPT: " .. water_depth ..
 				" WSP: " .. printpos(water_surface_pos))
-		mobf_assert_backtrace(MAX(ground_level,max_depth) < water_surface_pos.y)
+		--this can happen if there are air bubbles within water
+		--mobf_assert_backtrace(MAX(ground_level,max_depth) < water_surface_pos.y)
 		return nil
 	end
 
