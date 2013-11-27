@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --
@@ -39,29 +39,29 @@ environment_list = {}
 --! @return {x,y,z} position found or nil
 -------------------------------------------------------------------------------
 function environment.get_pos_same_level(pos_raw,maxsearcharea,entity,checkfunc)
-	dbg_mobf.environment_lvl2("MOBF: --> get_pos_same_level " 
+	dbg_mobf.environment_lvl2("MOBF: --> get_pos_same_level "
 		.. printpos(pos_raw))
 	local pos = mobf_round_pos(pos_raw)
-	
+
 	dbg_mobf.environment_lvl3("MOBF: Starting pos is "..printpos(pos)
 	.." max search area is "..maxsearcharea)
 		local e1 = "|"
 	local e2 = "|"
 	local e3 = "|"
 	local e4 = "|"
-	
+
 	local possible_targets = {}
 
 	--search next position on solid ground
 	for search=1, maxsearcharea,1 do
-	
+
 		--find along edge 1
 		for current=-search,search,1 do
-			local pos_tocheck = { x= pos.x + current,y=pos.y,z=pos.z -search}		
+			local pos_tocheck = { x= pos.x + current,y=pos.y,z=pos.z -search}
 			local pos_quality = environment.pos_quality(pos_tocheck,entity)
 
 			local pos_state = checkfunc(pos_quality)
-			dbg_mobf.environment_lvl3("MOBF: state of "..printpos(pos_tocheck).." is " 
+			dbg_mobf.environment_lvl3("MOBF: state of "..printpos(pos_tocheck).." is "
 				.. dump(pos_state))
 
 			if pos_state then
@@ -69,16 +69,16 @@ function environment.get_pos_same_level(pos_raw,maxsearcharea,entity,checkfunc)
 				table.insert(possible_targets, pos_tocheck)
 			else
 				e1 = e1.."-|"
-			end			
+			end
 		end
 
 		--find along edge 2
 		for current=-(search-1),(search-1),1 do
-			local pos_tocheck = { x= pos.x + search,y=pos.y,z=pos.z + current}		
+			local pos_tocheck = { x= pos.x + search,y=pos.y,z=pos.z + current}
 			local pos_quality = environment.pos_quality(pos_tocheck,entity)
 
 			local pos_state = checkfunc(pos_quality)
-			dbg_mobf.environment_lvl3("MOBF: state of "..printpos(pos_tocheck).." is " 
+			dbg_mobf.environment_lvl3("MOBF: state of "..printpos(pos_tocheck).." is "
 				.. dump(pos_state))
 
 			if pos_state then
@@ -86,17 +86,17 @@ function environment.get_pos_same_level(pos_raw,maxsearcharea,entity,checkfunc)
 				table.insert(possible_targets, pos_tocheck)
 			else
 				e2 = e2.. "-|"
-			end			
+			end
 		end
 
 		--find along edge 3
 
 		for current=search,-search,-1 do
-			local pos_tocheck = { x= pos.x + current,y=pos.y,z=pos.z + search}		
+			local pos_tocheck = { x= pos.x + current,y=pos.y,z=pos.z + search}
 			local pos_quality = environment.pos_quality(pos_tocheck,entity)
 
 			local pos_state = checkfunc(pos_quality)
-			dbg_mobf.environment_lvl3("MOBF: state of "..printpos(pos_tocheck).." is " 
+			dbg_mobf.environment_lvl3("MOBF: state of "..printpos(pos_tocheck).." is "
 				.. dump(pos_state))
 
 			if pos_state then
@@ -104,16 +104,16 @@ function environment.get_pos_same_level(pos_raw,maxsearcharea,entity,checkfunc)
 				table.insert(possible_targets, pos_tocheck)
 			else
 				e3 = e3.."-|"
-			end			
+			end
 		end
 
 		--find along edge 4
 		for current=(search-1),-(search-1),-1 do
-			local pos_tocheck = { x= pos.x -search,y=pos.y,z=pos.z + current}		
+			local pos_tocheck = { x= pos.x -search,y=pos.y,z=pos.z + current}
 			local pos_quality = environment.pos_quality(pos_tocheck,entity)
 
 			local pos_state = checkfunc(pos_quality)
-			dbg_mobf.environment_lvl3("MOBF: state of "..printpos(pos_tocheck).." is " 
+			dbg_mobf.environment_lvl3("MOBF: state of "..printpos(pos_tocheck).." is "
 				.. dump(pos_state))
 
 			if pos_state then
@@ -121,7 +121,7 @@ function environment.get_pos_same_level(pos_raw,maxsearcharea,entity,checkfunc)
 				table.insert(possible_targets, pos_tocheck)
 			else
 				e4 = e4.."-|"
-			end			
+			end
 		end
 	end
 
@@ -134,8 +134,8 @@ function environment.get_pos_same_level(pos_raw,maxsearcharea,entity,checkfunc)
 
 	if #possible_targets > 0 then
 		local i = math.random(1, #possible_targets)
-		dbg_mobf.environment_lvl1("Found " .. #possible_targets 
-			.. " possible positions, selected: " 
+		dbg_mobf.environment_lvl1("Found " .. #possible_targets
+			.. " possible positions, selected: "
 			.. i .. ": " .. printpos(possible_targets[i]))
 		return possible_targets[i]
 	end
@@ -195,19 +195,19 @@ function environment.is_media_element( nodename, media )
 		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! no environment specified!")
 		return false
 	end
-	
+
 	for i,v in ipairs(media) do
 		if v == nodename then
 			return true
 		end
 	end
-	
+
 	dbg_mobf.environment_lvl2("MOBF: " .. nodename .. " is not within environment list:")
-	
+
 	for i,v in ipairs(media) do
 		dbg_mobf.environment_lvl3("MOBF: \t" .. v)
 	end
-	
+
 	return false
 end
 
@@ -222,7 +222,7 @@ end
 --! @return { minpos,maxpos }
 ------------------------------------------------------------------------------
 function environment.get_absolute_min_max_pos(env,pos)
-	
+
 	local node = minetest.get_node(pos)
 
 	--if is not within environment it should be return current position
@@ -230,24 +230,24 @@ function environment.get_absolute_min_max_pos(env,pos)
 	if environment.is_media_element(node.name,env.media) == false then
 		return pos.y,pos.y
 	end
-	
+
 	local min_y = env.min_height_above_ground
 	local max_y = env.max_height_above_ground
-	
-	
+
+
 	--a fully generic check isn't possible here so we need to use media
 	--specific ways ... it's ugly but works
 	if node.name == "air" then
 		min_y = min_y + ( pos.y - mobf_surface_distance(pos))
 		max_y = max_y + ( pos.y - mobf_surface_distance(pos))
 	end
-	
+
 	if node.name == "default:water" or
 		node.name == "defailt:water_flowing" then
 		-- water mobs do use min/max directly
 	end
-	
-	if node.name == "default:lava" or 
+
+	if node.name == "default:lava" or
 		node.name == "default:lava_flowing" then
 		--TODO e.g. lava fish
 		--not implemented by now
@@ -268,7 +268,7 @@ end
 -------------------------------------------------------------------------------
 function environment.is_jumpable_surface(name)
 
-	
+
 	if 	name == "default:dirt" or
 		name == "default:dirt_with_grass" or
 		name == "default:stone" or
@@ -293,35 +293,35 @@ end
 --! @return true on valid surface false if not
 -------------------------------------------------------------------------------
 function environment.checksurface(pos,surface)
-	
+
 	--if no surfaces are specified any surface is treated as ok
 	if surface == nil then
 		return "ok"
 	end
-	
+
 	local pos_below = {x=pos.x,y=pos.y-1,z=pos.z}
-	
+
 	local node_below = minetest.get_node(pos_below)
-	
-	
+
+
 	if node_below == nil then
 		return "ok"
 	end
-	
+
 	for i,v in ipairs(surface.good) do
 		if node_below.name == v then
 			return "ok"
 		end
 	end
-	
-	if surface.possible ~= nil then	
+
+	if surface.possible ~= nil then
 		for i,v in ipairs(surface.possible) do
 			if node_below.name == v then
 				return "possible_surface"
 			end
 		end
 	end
-	
+
 	return "wrong_surface",node_below.name
 
 end
@@ -338,18 +338,18 @@ end
 function environment.get_min_max_ground_dist(entity)
 	local min_ground_distance   = 0
 	local max_ground_distance   = 0
-	
+
 	if entity.environment.max_height_above_ground ~= nil then
 		max_ground_distance = entity.environment.max_height_above_ground
-	end 
-	
+	end
+
 	if entity.environment.min_height_above_ground ~= nil then
 		min_ground_distance = entity.environment.min_height_above_ground
 	end
 
 	if entity.data.movement.canfly == nil or
 		entity.data.movement.canfly == false then
-		max_ground_distance = 1	
+		max_ground_distance = 1
 	end
 
 	return min_ground_distance,max_ground_distance
@@ -373,11 +373,11 @@ function environment.evaluate_pos_media(pos,media)
 		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking position with invalid node")
 		return 0,nil
 	end
-	
+
 	if not environment.is_media_element(node_to_check.name,media) then
 		return 10,node_to_check
 	end
-	
+
 	return 100,node_to_check
 end
 
@@ -395,7 +395,7 @@ end
 function environment.same_state(state1,state2)
 	environment.is_state(state1)
 	environment.is_state(state2)
-	
+
 	if state1.valid == false or
 		state2.valid == false then
 		return false
@@ -404,19 +404,19 @@ function environment.same_state(state1,state2)
 	if state1.media_quality ~= state2.media_quality then
 		return false
 	end
-	
+
 	if state1.geometry_quality ~= state2.geometry_quality then
 		return false
 	end
-	
+
 	if state1.surface_quality_min ~= state2.surface_quality_min then
 		return false
 	end
-	
+
 	if state1.surface_quality_max ~= state2.surface_quality_max then
 		return false
 	end
-	
+
 	if state1.level_quality ~= state2.level_quality then
 		return false
 	end
@@ -441,15 +441,15 @@ function environment.compare_state(state1,state2)
 
 	local right_worse = false
 	local right_better = false
-	
+
 	if state1.valid == false and state2.valid == true then
 		return 1
 	end
-	
+
 	if state1.valid == true and state2.valid == false then
 		return -1
 	end
-	
+
 	if	state1.media_quality < state2.media_quality or
 		state1.geometry_quality < state2.geometry_quality or
 		state1.surface_quality_min < state2.surface_quality_min or
@@ -458,8 +458,8 @@ function environment.compare_state(state1,state2)
 		then
 		right_better = true
 	end
-	
-	if	state1.media_quality > state2.media_quality or 
+
+	if	state1.media_quality > state2.media_quality or
 		state1.geometry_quality > state2.geometry_quality or
 		state1.surface_quality_min > state2.surface_quality_min or
 		state1.surface_quality_max > state2.surface_quality_max or
@@ -470,11 +470,11 @@ function environment.compare_state(state1,state2)
 	if right_better and not left_better then
 		return 1
 	end
-	
+
 	if left_better and not right_better then
 		return -1
 	end
-	
+
 	return 0
 end
 
@@ -498,7 +498,7 @@ function environment.is_state(state)
 	mobf_assert_backtrace(state.surface_quality_center ~= nil)
 end
 -------------------------------------------------------------------------------
--- name: evaluate_state(state,old_state, min_media, 
+-- name: evaluate_state(state,old_state, min_media,
 --                     min_geom,min_geom_center,min_min_surface,min_max_surface)
 --
 --! @brief evaluate a position
@@ -521,32 +521,32 @@ function environment.evaluate_state(state,limits)
 
 	mobf_assert_backtrace(type(limits) == "table")
 	environment.is_state(state)
-	
+
 	if state.valid == false then return false end
-	
-	if limits.min_media ~= nil and state.media_quality < limits.min_media 
+
+	if limits.min_media ~= nil and state.media_quality < limits.min_media
 		then return false end
-		
-	if limits.min_geom_center ~= nil and state.center_geometry_quality < limits.min_geom_center 
+
+	if limits.min_geom_center ~= nil and state.center_geometry_quality < limits.min_geom_center
 		then return false end
-	
+
 	if limits.old_state ~= nil then
 		if environment.compare_state(state,limits.old_state) == -1 then
 			return true
 		end
 	end
-	
+
 	local retval = true
-	
-	if limits.min_geom ~= nil and state.geometry_quality < limits.min_geom 
+
+	if limits.min_geom ~= nil and state.geometry_quality < limits.min_geom
 		then retval = false end
-	if limits.min_min_surface ~= nil and state.surface_quality_min < limits.min_min_surface 
+	if limits.min_min_surface ~= nil and state.surface_quality_min < limits.min_min_surface
 		then retval = false end
-	if limits.min_max_surface ~= nil and state.surface_quality_max < limits.min_max_surface 
+	if limits.min_max_surface ~= nil and state.surface_quality_max < limits.min_max_surface
 		then retval = false end
-	if limits.min_center_surface ~= nil and state.surface_quality_center < limits.min_center_surface 
+	if limits.min_center_surface ~= nil and state.surface_quality_center < limits.min_center_surface
 		then retval = false end
-	
+
 	return retval
 end
 
@@ -598,7 +598,7 @@ end
 function environment.pos_quality(pos,entity)
 	mobf_assert_backtrace(pos ~= nil)
 	mobf_assert_backtrace(entity ~= nil)
-	
+
 	local retval = {
 					media_quality           =  100,
 					geometry_quality        =    0,
@@ -608,10 +608,10 @@ function environment.pos_quality(pos,entity)
 					surface_quality_center  =    0,
 					level_quality           =  100,
 					valid                   = true,
-					
+
 					tostring = function(state)
 						environment.is_state(state)
-						
+
 						local retval = "\nState: ".. dump(state.valid) .. "\n"
 						retval = retval .."\tmedia_quality: (" .. state.media_quality ..") "
 						if state.media_quality == 100 then retval = retval .. "in media" end
@@ -620,66 +620,73 @@ function environment.pos_quality(pos,entity)
 						if state.media_quality ==  10 then retval = retval .. "in air" end
 						if state.media_quality ==   5 then retval = retval .. "solid" end
 						if state.media_quality ==   0 then retval = retval .. "not evaluated" end
-						
+
 						retval = retval .."\n\tgeometry_quality: (" .. state.geometry_quality .. ") "
 						if state.geometry_quality == 100 then retval = retval .. "full contact" end
 						if state.geometry_quality ==  60 then retval = retval .. "partial contact" end
 						if state.geometry_quality ==  30 then retval = retval .. "no contact" end
 						if state.geometry_quality ==   0 then retval = retval .. "not evaluated" end
-					
+
 						retval = retval .."\n\tcenter_geometry_quality: (" .. state.center_geometry_quality .. ") "
 						if state.center_geometry_quality == 100 then retval = retval .. "contact" end
 						if state.center_geometry_quality ==  30 then retval = retval .. "no contact" end
 						if state.center_geometry_quality ==   0 then retval = retval .. "not evaluated" end
-					
+
 						retval = retval .."\n\tsurface_quality_min: (" .. state.surface_quality_min ..") "
 						if state.surface_quality_min == 100 then retval = retval .. "ok" end
 						if state.surface_quality_min ==  60 then retval = retval .. "possible" end
 						if state.surface_quality_min ==  30 then retval = retval .. "wrong" end
 						if state.surface_quality_min ==  10 then retval = retval .. "above water" end
 						if state.surface_quality_min ==   0 then retval = retval .. "not evaluated" end
-						
+
 						retval = retval .."\n\tsurface_quality_max: (" .. state.surface_quality_max .. ") "
 						if state.surface_quality_max == 100 then retval = retval .. "ok" end
 						if state.surface_quality_max ==  60 then retval = retval .. "possible" end
 						if state.surface_quality_max ==  30 then retval = retval .. "wrong" end
 						if state.surface_quality_max ==  10 then retval = retval .. "above water" end
 						if state.surface_quality_max ==   0 then retval = retval .. "not evaluated" end
-					
+
 						retval = retval .."\n\tsurface_quality_center: (" .. state.surface_quality_center .. ") "
 						if state.surface_quality_center == 100 then retval = retval .. "ok" end
 						if state.surface_quality_center ==  60 then retval = retval .. "possible" end
 						if state.surface_quality_center ==  30 then retval = retval .. "wrong" end
 						if state.surface_quality_center ==  10 then retval = retval .. "above water" end
 						if state.surface_quality_center ==   0 then retval = retval .. "not evaluated" end
-						
+
 						retval = retval .."\n\tlevel_quality: (" .. state.level_quality .. ") "
 						if state.level_quality == 100 then retval = retval .. "ok" end
 						if state.level_quality ==  60 then retval = retval .. "above limit" end
 						if state.level_quality ==  30 then retval = retval .. "below limit" end
 						if state.level_quality ==   0 then retval = retval .. "not evaluated" end
 						retval = retval .. "\n"
-						
+
 						return retval
+					end,
+					shortstring = function(state)
+						return dump(state.valid) .. ":" ..
+							state.media_quality .. ";" ..
+							state.geometry_quality .. "," .. state.center_geometry_quality .. ";" ..
+							state.surface_quality_min .. "," .. state.surface_quality_max .. "," .. state.surface_quality_center .. ";" ..
+							state.level_quality
 					end
 				}
 
-	
-	
+
+
 	local cornerpositions = {}
 	local lastpos = nil -- performance improvement to skip checking same pos multiple times
-	
+
 	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[4] -0.01,y=pos.y,z=pos.z + entity.collisionbox[6] -0.01})
 	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[4] -0.01,y=pos.y,z=pos.z + entity.collisionbox[3] +0.01})
 	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[1] +0.01,y=pos.y,z=pos.z + entity.collisionbox[6] -0.01})
 	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[1] +0.01,y=pos.y,z=pos.z + entity.collisionbox[3] +0.01})
-	
+
 	local min_ground_distance,max_ground_distance = environment.get_min_max_ground_dist(entity)
 
 	--check if mob at pos will be in correct environment
 	for i=1,#cornerpositions,1 do
 		if not mobf_pos_is_same(lastpos,cornerpositions[i]) then
-			local med_quality,node_to_check = 
+			local med_quality,node_to_check =
 				environment.evaluate_pos_media(cornerpositions[i],
 												entity.environment.media)
 			--if current result is worse than old one
@@ -687,17 +694,17 @@ function environment.pos_quality(pos,entity)
 				if med_quality == 0 then
 					retval.valid = false
 				end
-				
-				if node_to_check.name == "default:water_source" or 
+
+				if node_to_check.name == "default:water_source" or
 					node_to_check.name == "default:water_flowing" then
 					retval.media_quality = 20
 				end
-				
+
 				if node_to_check.name == "air" then
 					retval.media_quality = 10
 					break
 				end
-				
+
 				if med_quality < retval.media_quality then
 					retval.media_quality = 5
 				end
@@ -705,22 +712,22 @@ function environment.pos_quality(pos,entity)
 		end
 		lastpos = cornerpositions[i]
 	end
-	
+
 	--check height level for flying mobs
 	if entity.data.movement.canfly == true then
 		lastpos = nil
 		for i=1,#cornerpositions,1 do
 			if not mobf_pos_is_same(lastpos,cornerpositions[i]) then
 				local miny,maxy = environment.get_absolute_min_max_pos(entity.environment,cornerpositions[i])
-				
-				dbg_mobf.environment_lvl2("MOBF: \tflying mob detected, min: " 
+
+				dbg_mobf.environment_lvl2("MOBF: \tflying mob detected, min: "
 					.. miny .. " max: " .. maxy .. " current: " .. pos.y)
-					
-				
+
+
 				if cornerpositions[i].y < miny then
 					retval.level_quality = 30
 				end
-				
+
 				if cornerpositions[i].y > maxy then
 					retval.level_quality = 60
 				end
@@ -729,24 +736,24 @@ function environment.pos_quality(pos,entity)
 					break
 				end
 			end
-			
+
 		lastpos = cornerpositions[i]
 		end
 	else
-	
+
 		--check geometry and surface quality
 		lastpos = nil
 		local have_contact    = false
 		local have_no_contact = false
-		
+
 		table.insert(cornerpositions,pos)
-		
+
 		for i=1,#cornerpositions,1 do
 			if not mobf_pos_is_same(lastpos,cornerpositions[i]) then
-			
+
 				local ground_distance = mobf_ground_distance(cornerpositions[i], entity.environment.media)
-				
-				
+
+
 				--first check if on surface or not
 				if ground_distance <= max_ground_distance then
 					local is_center = false
@@ -755,45 +762,45 @@ function environment.pos_quality(pos,entity)
 						is_center = true
 					end
 					have_contact = true
-					
-					local current_surface,belowname = 
+
+					local current_surface,belowname =
 						environment.checksurface(cornerpositions[i],entity.environment.surfaces)
-				
+
 					if current_surface == "ok" then
 						if retval.surface_quality_max < 100 then
 							retval.surface_quality_max = 100
 						end
-						
+
 						if is_center then
 							retval.surface_quality_center = 100
 						end
 					end
-					
+
 					if current_surface == "possible_surface" then
 						if retval.surface_quality_max < 60 then
 							retval.surface_quality_max = 60
 						end
-						
+
 						if retval.surface_quality_min > 60 then
 							retval.surface_quality_min = 60
 						end
-						
+
 						if is_center then
 							retval.surface_quality_center = 60
 						end
 					end
-					
+
 					if current_surface == "wrong_surface" then
-						if	belowname == "default:water_source" or 
+						if	belowname == "default:water_source" or
 							belowname == "default:water_flowing" then
 							if retval.surface_quality_max < 10 then
 								retval.surface_quality_max = 10
 							end
-							
+
 							if retval.surface_quality_min > 10 then
 								retval.surface_quality_min = 10
 							end
-							
+
 							if is_center then
 								retval.surface_quality_center = 10
 							end
@@ -801,11 +808,11 @@ function environment.pos_quality(pos,entity)
 							if retval.surface_quality_max < 30 then
 								retval.surface_quality_max = 30
 							end
-							
+
 							if retval.surface_quality_min > 30 then
 								retval.surface_quality_min = 30
 							end
-							
+
 							if is_center then
 								retval.surface_quality_center = 30
 							end
@@ -818,23 +825,23 @@ function environment.pos_quality(pos,entity)
 					have_no_contact = true
 				end
 			end
-			
+
 			lastpos = cornerpositions[i]
 		end
-		
+
 		if have_contact and not have_no_contact then
 			retval.geometry_quality = 100
 		end
-		
+
 		if have_contact and have_no_contact then
 			retval.geometry_quality = 60
 		end
-		
+
 		if not have_contact and have_no_contact then
 			retval.geometry_quality = 30
 		end
 	end
-	
+
 	return retval
 end
 
@@ -849,7 +856,7 @@ end
 --! @param entity mob to check
 --! @param dont_do_jumpcheck
 --! @return suitability of position for mob values:
---!           -ok                    -@>position is ok                         
+--!           -ok                    -@>position is ok
 --!           -collision             -@>position is within a node
 --!           -collision_jumpable    -@>position is within a node that can be jumped onto
 --!           -drop                  -@>position is a drop
@@ -865,38 +872,38 @@ end
 function environment.pos_is_ok(pos,entity,dont_do_jumpcheck)
 
 	local min_ground_distance,max_ground_distance = environment.get_min_max_ground_dist(entity)
-	
+
 	local cornerpositions = {}
-	
+
 	table.insert(cornerpositions,pos)
 	--read positions at corners
 	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[4] -0.01,y=pos.y,z=pos.z + entity.collisionbox[6] -0.01})
 	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[4] -0.01,y=pos.y,z=pos.z + entity.collisionbox[3] +0.01})
 	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[1] +0.01,y=pos.y,z=pos.z + entity.collisionbox[6] -0.01})
 	table.insert(cornerpositions,{x=pos.x + entity.collisionbox[1] +0.01,y=pos.y,z=pos.z + entity.collisionbox[3] +0.01})
-	
+
 	local lastpos = nil
-	
+
 	local retval = "temp_ok"
-	
+
 	--check if mob at pos will be in correct environment
 	for i=1,#cornerpositions,1 do
 		if not mobf_pos_is_same(lastpos,cornerpositions[i]) then
 			local node_to_check = minetest.get_node(cornerpositions[i])
-			
+
 			if node_to_check == nil then
 				mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!!! checking position with invalid node")
 				retval = "invalid"
 				break
 			end
-			
+
 			if not environment.is_media_element(node_to_check.name,entity.environment.media) == true then
-				dbg_mobf.environment_lvl3("MOBF: " .. i .. ": " .. 
-					printpos(cornerpositions[i]) .. " -- " .. printpos(pos) .. 
+				dbg_mobf.environment_lvl3("MOBF: " .. i .. ": " ..
+					printpos(cornerpositions[i]) .. " -- " .. printpos(pos) ..
 					" not within environment")
-				
+
 				if mobf_pos_is_same(pos,cornerpositions[i]) then
-					if node_to_check.name == "default:water_source" or 
+					if node_to_check.name == "default:water_source" or
 						node_to_check.name == "default:water_flowing" then
 						retval = "in_water"
 						break
@@ -906,7 +913,7 @@ function environment.pos_is_ok(pos,entity,dont_do_jumpcheck)
 						retval = "in_air"
 						break
 					end
-					
+
 					--TODO maybe replace by "invalid medium"
 				else
 					retval = "collision"
@@ -915,18 +922,18 @@ function environment.pos_is_ok(pos,entity,dont_do_jumpcheck)
 		end
 		lastpos = cornerpositions[i]
 	end
-	
+
 	--
 	if retval == "temp_ok" then
 		dbg_mobf.environment_lvl3("MOBF: \tin environment")
 		local ground_distance = mobf_ground_distance(pos,entity.environment.media)
-		
+
 		--following return codes are only usefull for non flying
 		if entity.data.movement.canfly == nil or
 			entity.data.movement.canfly == false then
 
 			if mobf_above_water(pos) then
-				
+
 				if ground_distance > max_ground_distance then
 					dbg_mobf.environment_lvl2("MOBF: \tdropping above water")
 					retval = "drop_above_water"
@@ -945,7 +952,7 @@ function environment.pos_is_ok(pos,entity,dont_do_jumpcheck)
 			end
 		else
 			local miny,maxy = environment.get_absolute_min_max_pos(entity.environment,pos)
-			dbg_mobf.environment_lvl2("MOBF: \tflying mob detected, min: " 
+			dbg_mobf.environment_lvl2("MOBF: \tflying mob detected, min: "
 				.. miny .. " max: " .. maxy .. " current: " .. pos.y)
 			if pos.y < miny then
 				retval = "below_limit"
@@ -956,7 +963,7 @@ function environment.pos_is_ok(pos,entity,dont_do_jumpcheck)
 			end end
 		end
 	end
-	
+
 	if retval == "collision" and not dont_do_jumpcheck then
 		dbg_mobf.environment_lvl2("MOBF: check if pos is jumpable")
 		local upper_pos_state = environment.pos_is_ok({x=pos.x,
@@ -969,7 +976,7 @@ function environment.pos_is_ok(pos,entity,dont_do_jumpcheck)
 			dbg_mobf.environment_lvl2("MOBF: upper pos state was: " .. upper_pos_state)
 		end
 	end
-	
+
 	return retval
 end
 
@@ -992,29 +999,29 @@ function environment.get_default_gravity(pos,media,canfly)
 
 	local node = minetest.get_node(pos)
 
-	--if an mob can't fly or isn't within it's medium default acceleration 
+	--if an mob can't fly or isn't within it's medium default acceleration
 	-- for it's current medium is applied
 	if  canfly == nil or
 		canfly == false or
 		environment.is_media_element(node.name,media) == false
 		then
-		if (node.name == "air") then			
+		if (node.name == "air") then
 			return -9.81
 		end
-		
+
 		if node.name == "default:water_source" or
 			node.name == "default:water_flowing" then
 			return -2.5
 		end
-		
+
 		if node.name == "default:lava" then
 			return 0.1
 		end
-		
+
 		--mob is at invalid position thus returning default air acceleration
 		return -9.81
 	end
-		
+
 	return 0
 end
 
@@ -1032,30 +1039,30 @@ end
 function environment.fix_base_pos(entity, center_to_bottom)
 
 	if center_to_bottom > 0.5 then
-		
+
 		local pos = entity.object:getpos()
-	
+
 		local node_pos = minetest.get_node(pos)
-		
+
 		local pos_to_check = {x=pos.x,y=pos.y-center_to_bottom+0.1,z=pos.z}
 		local node_pos_check = minetest.get_node(pos_to_check)
-		
+
 		if node_pos ~= nil and
 			node_pos_check ~= nil then
-			dbg_mobf.environment_lvl3("MOBF: fixing y position / base position required? " 
+			dbg_mobf.environment_lvl3("MOBF: fixing y position / base position required? "
 				.. node_pos.name .. " " .. node_pos_check.name)
 			if node_pos.name ~= node_pos_check.name then
 				distance_to_ground = mobf_surface_distance(pos)
-				
+
 				pos.y = pos.y + (center_to_bottom - distance_to_ground +0.5)
-				dbg_mobf.environment_lvl2("MOBF: fixing y position of " .. entity.data.name 
+				dbg_mobf.environment_lvl2("MOBF: fixing y position of " .. entity.data.name
 					.. " got distance " .. center_to_bottom .. " moving to " ..printpos(pos))
 				entity.object:moveto(pos)
 				entity.dynamic_data.spawning.spawnpoint = pos
 			end
 		end
 	end
-	
+
 	return entity.getbasepos(entity)
 end
 
@@ -1074,9 +1081,9 @@ function environment.register(name, environment)
 	if environment_list[name] ~= nil then
 		return false
 	end
-	
-	environment_list[name] = environment	
-	return true	 
+
+	environment_list[name] = environment
+	return true
 end
 
 -------------------------------------------------------------------------------
@@ -1097,7 +1104,7 @@ function environment.possible_pos(entity,pos)
 		state == "invalid" then
 		return false
 	end
-	
+
 	return true
 end
 

@@ -196,17 +196,17 @@ function movement_gen.callback(entity)
 		--									movement_state.current_velocity,
 		--									movement_state.current_acceleration)
 
-		local pos_predicted_state = environment.pos_is_ok(pos_predicted,entity)
-		dbg_mobf.pmovement_lvl3("MOBF: Pos predicted state ".. entity.data.name
-			.. ": " .. pos_predicted_state)
+		local pos_predicted_quality = environment.pos_quality(pos_predicted,entity)
+
+		dbg_mobf.pmovement_lvl3("MOBF: Pos pred quality: ".. entity.data.name
+			.. ": " .. pos_predicted_quality:shortstring())
 
 		-- Y-Movement
 		if movement_state.changed == false then
 			height_level_control.precheck_movement(entity,movement_state,
-											pos_predicted,pos_predicted_state)
+											pos_predicted,pos_predicted_quality)
 		end
 
-		local pos_predicted_quality = environment.pos_quality(pos_predicted,entity)
 		-- X/Z-Movement
 		if movement_state.changed == false then
 			direction_control.precheck_movement(entity,movement_state,
