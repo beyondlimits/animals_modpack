@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file geometry.lua
@@ -31,8 +31,8 @@
 function mobf_calc_distance(pos1,pos2)
 	mobf_assert_backtrace(pos1 ~= nil)
 	mobf_assert_backtrace(pos2 ~= nil)
-	
-	return math.sqrt( 	math.pow(pos1.x-pos2.x,2) + 
+
+	return math.sqrt( 	math.pow(pos1.x-pos2.x,2) +
 				math.pow(pos1.y-pos2.y,2) +
 				math.pow(pos1.z-pos2.z,2))
 end
@@ -47,7 +47,7 @@ end
 --! @return scalar value, distance
 -------------------------------------------------------------------------------
 function mobf_calc_distance_2d(pos1,pos2)
-	return math.sqrt( math.pow(pos1.x-pos2.x,2) + 
+	return math.sqrt( math.pow(pos1.x-pos2.x,2) +
 				math.pow(pos1.z-pos2.z,2))
 end
 
@@ -63,17 +63,17 @@ end
 function mobf_calc_direction(start,destination)
 	mobf_assert_backtrace(start ~= nil)
 	mobf_assert_backtrace(destination ~= nil)
-	
+
 	local xdelta = destination.x - start.x
 	local ydelta = destination.y - start.y
 	local zdelta = destination.z - start.z
-	
+
 	local distance = math.sqrt(
 							math.pow(xdelta,2) +
 							math.pow(ydelta,2) +
 							math.pow(zdelta,2)
 							)
-							
+
 	local anglexz = math.atan2(zdelta,xdelta)
 	local anglexy = math.acos(ydelta/distance)
 	return anglexz,anglexy
@@ -107,7 +107,7 @@ end
 function mobf_calc_vector_components(dir_radians,absolute_speed)
 
 	local retval = {x=0,z=0}
-	
+
 	retval.x = absolute_speed * math.cos(dir_radians)
 	retval.z = absolute_speed * math.sin(dir_radians)
 
@@ -125,9 +125,9 @@ end
 --! @return {x,z}
 -------------------------------------------------------------------------------
 function mobf_calc_vector_components_3d(xz_plane_radians,xy_plane_radians,absolute_speed)
-	
+
 	local retval = {x=0,z=0,y=0}
-	
+
 	retval.x= absolute_speed * math.sin(xy_plane_radians) * math.cos(xz_plane_radians)
 	retval.z= absolute_speed * math.sin(xy_plane_radians) * math.sin(xz_plane_radians)
 	retval.y= absolute_speed * math.cos(xy_plane_radians)
@@ -202,15 +202,15 @@ end
 -------------------------------------------------------------------------------
 function mobf_calc_yaw(x,z)
 	local direction = math.atan2(z,x)
-				
+
 	while direction < 0 do
 		direction = direction + (2* math.pi)
 	end
-	
+
 	while direction > (2*math.pi) do
 		direction = direction - (2* math.pi)
 	end
-				
+
 	return direction
 end
 
@@ -229,8 +229,8 @@ function mobf_balistic_start_speed(heightdiff,time,acceleration)
 	mobf_assert_backtrace(heightdiff ~= nil)
 	mobf_assert_backtrace(time ~= nil)
 	mobf_assert_backtrace(acceleration ~= nil)
-	
-	return (heightdiff - (acceleration/2) * (time*time)) / time	
+
+	return (heightdiff - (acceleration/2) * (time*time)) / time
 end
 
 -------------------------------------------------------------------------------
@@ -248,35 +248,35 @@ function mobf_calc_travel_time(distance,velocity,acceleration)
 	mobf_assert_backtrace(distance ~= nil)
 	mobf_assert_backtrace(velocity ~= nil)
 	mobf_assert_backtrace(acceleration ~= nil)
-	
+
 	if acceleration == 0 then
 		--print("no accel shortcut time calculation")
 		return distance/velocity
 	end
-	
+
 	local a = acceleration/2
 	local b = velocity
 	local c = -distance
-	
+
 	--print("a=" .. a .. " b=" .. b .. " c=" .. c)
-	
+
 	local det = b*b - 4*a*c
-	
+
 	--print("det=" .. det)
-	
+
 	if det < 0 then
 		return nil
 	end
-	
+
 	local ret1 = (-b + math.sqrt(det))/(2*a)
 	local ret2 = (-b - math.sqrt(det))/(2*a)
-	
+
 	--print("x1=" .. ret1 .. " x2=" .. ret2)
-	
+
 	if ret1 > 0 then
 		return ret1
 	end
-	
+
 	return ret2
 end
 
@@ -298,13 +298,58 @@ function mobf_same_quadrant(x1,z1,x2,z2)
 		x1 < 0 and x2 >0 then
 			return false
 	end
-	
+
 	if z1 > 0 and z2 < 0 or
 		z1 < 0 and z2 >0 then
 			return false
 	end
-	
+
 	return true
 
+end
+
+
+-------------------------------------------------------------------------------
+-- name: mobf_gauss(center)
+--
+--! @brief calc random value based uppon gauss distribution around a value
+--
+--! @param center center value for distribution
+--! @param max_deviation maximum deviation from center
+--
+--! @return gauss randomized value
+-------------------------------------------------------------------------------
+function mobf_gauss(center,max_deviation)
+
+	local u1 = 2 * math.random() -1
+	local u2 = 2 * math.random() -1
+
+	local q = u1*u1 + u2*u2
+
+	local maxtries = 0
+
+	while (q == 0 or q >= 1) and maxtries < 10 do
+		u1 = math.random()
+		u2 = math.random() * -1
+		q = u1*u1 + u2*u2
+
+		maxtries = maxtries +1
+	end
+
+	--abort random generation
+	if maxtries >= 10 then
+		return center
+	end
+
+	local p = math.sqrt( (-2*math.log(q))/q )
+
+	--calculate normalized value of max deviation
+	if math.random() < 0.5 then
+		retval = center + ( u1*p * (center*max_deviation))
+	else
+		retval = center + ( u2*p * (center*max_deviation))
+	end
+
+	return retval
 end
 --!@}
