@@ -1,4 +1,4 @@
-local version = "0.0.25"
+local version = "0.0.26"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -6,7 +6,7 @@ local vombie_groups = {
 						not_in_creative_inventory=1
 					}
 
-local selectionbox_vombie = {-0.3, -1.2, -0.3, 0.3, 1, 0.3}
+local selectionbox_vombie = {-0.3, -1.0, -0.3, 0.3, 0.7, 0.3}
 
 local modpath = minetest.get_modpath("animal_vombie")
 
@@ -19,25 +19,25 @@ function vombie_drop()
 	else
 		table.insert(result,"animalmaterials:bone 1")
 	end
-	
+
 	table.insert(result,"animalmaterials:meat_undead 1")
-	
+
 	return result
 end
 
 function vombie_on_step_handler(entity,now,dtime)
 	local pos = entity.getbasepos(entity)
 	local current_light = minetest.get_node_light(pos)
-	
-	--print("vombie on step: current_light:" .. current_light .. " max light: " 
+
+	--print("vombie on step: current_light:" .. current_light .. " max light: "
 	--	.. LIGHT_MAX .. " 3dmode:" .. dump(minetest.world_setting_get("disable_animals_3d_mode")))
 
 	if current_light ~= nil and
 		current_light > LIGHT_MAX and
 		minetest.world_setting_get("mobf_disable_3d_mode") ~= true and
 		minetest.world_setting_get("vombie_3d_burn_animation_enabled") == true then
-		
-		
+
+
 		local xdelta = (math.random()-0.5)
 		local zdelta = (math.random()-0.5)
 		--print("receiving sun damage: " .. xdelta .. " " .. zdelta)
@@ -64,7 +64,7 @@ function vombie_on_step_handler(entity,now,dtime)
 				end
 			end
 		end
-		
+
 		entity.last_time = current_time
 	end
 end
@@ -72,9 +72,9 @@ end
 function vombie_on_activate_handler(entity)
 
 	local pos = entity.object:getpos()
-	
+
 	local current_light = minetest.get_node_light(pos)
-	
+
 	if current_light == nil then
 		minetest.log(LOGLEVEL_ERROR,
 			"ANIMALS:Vombie Bug!!! didn't get a light value for ".. printpos(pos))
@@ -90,14 +90,14 @@ end
 vombie_prototype = {
 		name="vombie",
 		modname="animal_vombie",
-		
+
 		factions = {
 			member = {
 				"monsters",
 				"undead"
 				}
 			},
-	
+
 		generic = {
 					description="Vombie",
 					base_health=8,
@@ -113,11 +113,11 @@ vombie_prototype = {
 				},
 		movement =  {
 					min_accel=0.3,
-					max_accel=1.5,
-					max_speed=2,
+					max_accel=0.75,
+					max_speed=1,
 					pattern="stop_and_go",
 					canfly=false,
-					follow_speedup=10,
+					follow_speedup=20,
 					},
 		combat = {
 					angryness=1,
@@ -125,13 +125,13 @@ vombie_prototype = {
 					sun_sensitive=true,
 					melee = {
 						maxdamage=2,
-						range=2, 
+						range=2,
 						speed=1,
 						},
 					distance 		= nil,
 					self_destruct 	= nil,
 					},
-		
+
 		spawning = {
 					primary_algorithms = {
 							{
@@ -206,7 +206,7 @@ vombie_prototype = {
 					chance = 0.5,
 					animation = "walk",
 				},
-				{ 
+				{
 					name = "combat",
 					typical_state_time = 9999,
 					chance = 0.0,
@@ -215,8 +215,8 @@ vombie_prototype = {
 				},
 			}
 		}
-		
-		
+
+
 --compatibility code
 minetest.register_entity("animal_vombie:vombie_spawner",
  {
@@ -225,7 +225,7 @@ minetest.register_entity("animal_vombie:vombie_spawner",
 	visual          = "sprite",
 	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
 	on_activate = function(self,staticdata)
-	
+
 		local pos = self.object:getpos();
 		minetest.add_entity(pos,"animal_vombie:vombie_spawner_at_night")
 		self.object:remove()
