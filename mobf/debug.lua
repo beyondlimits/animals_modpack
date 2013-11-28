@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file debug.lua
@@ -67,82 +67,82 @@ end
 ------------------------------------------------------------------------------
 function mobf_debug.spawn_mob(name,param)
 	print("name: " .. name .. " param: " .. dump(param))
-	
+
 	local parameters = param:split(" ")
-	
+
 	if #parameters ~= 1 and
 		#parameters ~= 2 then
 		mobf_debug.print_usage(name,"spawnmob")
 		return
 	end
-	
+
 	if mobf_is_known_mob(parameters[1]) ~= true then
-		mobf_debug.print_usage(name,"ukn_mob", ">"..parameters[1].."<") 
+		mobf_debug.print_usage(name,"ukn_mob", ">"..parameters[1].."<")
 		return true
 	end
-	
+
 	if #parameters == 2 then
 		local pos_strings = parameters[2]:split(",")
-		
+
 		if #pos_strings ~= 3 then
 			mobf_debug.print_usage(name,"spawmob")
 			return
 		end
-	
-		
-	
+
+
+
 		local spawnpoint = {
 							x=tonumber(pos_strings[1]),
 							y=tonumber(pos_strings[2]),
 							z=tonumber(pos_strings[3])
 							}
-	
+
 		if spawnpoint.x == nil or
 			spawnpoint.y == nil or
 			spawnpoint.z == nil then
-			mobf_debug.print_usage(name,"spawnmob")	
+			mobf_debug.print_usage(name,"spawnmob")
 			return
 		end
-		
+
 		spawning.spawn_and_check(parameters[1],spawnpoint,"mobf_debug_spawner")
 	else
 		--todo find random pos
 
 		local player = minetest.get_player_by_name(name)
-		
+
 		if player == nil then
-		
+
 			return
 		end
-		
+
 		local pos = player:getpos()
-		
+
 		if pos == nil then
 			return
 		end
-		
+
 		local found = false
 		local maxtries = 10
-		
+
 		while (found == false) and (maxtries > 0) do
 			toadd = {}
 			toadd.x = pos.x + (math.random(20) -10)
 			toadd.z = pos.z + (math.random(20) -10)
-			
+
 			local y = mobf_get_surface(toadd.x,toadd.z,pos.y-10,pos.y+10)
-			
+
 			if y ~= nil then
 				toadd.y = y +2
 				if spawning.spawn_and_check(parameters[1],toadd,"mobf_debug_spawner") then
 					found = true
 				end
 			end
-			
+
 			maxtries = maxtries -1
 		end
 	end
 
-	
+
 end
 
 -------------------------------------------------------------------------------
@@ -154,11 +154,11 @@ end
 --! @param param parameters received
 ------------------------------------------------------------------------------
 function mobf_debug.list_active_mobs(name,param)
-	
+
 	local count = 1
-	for index,value in pairs(minetest.luaentities) do 
+	for index,value in pairs(minetest.luaentities) do
 		if value.data ~= nil and value.data.name ~= nil then
-			local tosend = count .. ": " .. value.data.name .. " at " 
+			local tosend = count .. ": " .. value.data.name .. " at "
 				.. printpos(value.object:getpos())
 			print(tosend)
 			minetest.chat_send_player(name,tosend)
@@ -176,16 +176,16 @@ end
 --! @param param parameters received
 ------------------------------------------------------------------------------
 function mobf_debug.list_spawners(name,param)
-	
-	for index,value in pairs(minetest.luaentities) do 
+
+	for index,value in pairs(minetest.luaentities) do
 		if value ~= nil and value.spawner_mob_name ~= nil then
-			local resultline = "SPW: " 
+			local resultline = "SPW: "
 				.. mobf_fixed_size_string(value.spawner_mob_name,24) .. " "
 				.. mobf_fixed_size_string(printpos(value.object:getpos()),16)
-				.. "  STATE: " 
+				.. "  STATE: "
 				.. mobf_fixed_size_string(dump(value.spawner_last_result),32)
 				.. " TIME: " .. value.spawner_time_passed
-			
+
 			print(resultline)
 		end
 	end
@@ -200,14 +200,14 @@ end
 --! @param param parameters received
 ------------------------------------------------------------------------------
 function mobf_debug.mob_count(name,param)
-	
+
 	local count = 1
-	for index,value in pairs(minetest.luaentities) do 
+	for index,value in pairs(minetest.luaentities) do
 		if value.data ~= nil and value.data.name ~= nil then
 			count = count +1
 		end
 	end
-	
+
 	minetest.chat_send_player(name,"Active mobs: " .. count)
 end
 
@@ -221,12 +221,12 @@ end
 ------------------------------------------------------------------------------
 function mobf_debug.add_tools(name,param)
 	local player = minetest.get_player_by_name(name)
-	
+
 	if player ~= nil then
 		player:get_inventory():add_item("main", "animalmaterials:lasso 20")
 		player:get_inventory():add_item("main", "animalmaterials:net 20")
 		player:get_inventory():add_item("main", "animalmaterials:scissors 1")
-		player:get_inventory():add_item("main", "vessels:drinking_glass 10")	
+		player:get_inventory():add_item("main", "vessels:drinking_glass 10")
 	end
 
 end
@@ -263,7 +263,7 @@ function mobf_debug.init()
 			privs		= {mobfw_admin=true},
 			func		= mobf_debug.spawn_mob
 		})
-		
+
 	minetest.register_chatcommand("listactivemobs",
 		{
 			params		= "",
@@ -271,7 +271,7 @@ function mobf_debug.init()
 			privs		= {mobfw_admin=true},
 			func		= mobf_debug.list_active_mobs
 		})
-		
+
 	minetest.register_chatcommand("listdefinedmobs",
 		{
 			params		= "",
@@ -279,7 +279,7 @@ function mobf_debug.init()
 			privs		= {mobfw_admin=true},
 			func		= mobf_debug.list_defined_mobs
 		})
-		
+
 	minetest.register_chatcommand("mob_add_tools",
 		{
 			params		= "",
@@ -287,7 +287,7 @@ function mobf_debug.init()
 			privs		= {mobfw_admin=true},
 			func		= mobf_debug.add_tools
 		})
-		
+
 	minetest.register_chatcommand("mobf_version",
 		{
 			params		= "",
@@ -295,9 +295,9 @@ function mobf_debug.init()
 			privs		= {},
 			func		= function(name,param)
 								minetest.chat_send_player(name,"MOBF version: " .. mobf_version)
-							end 
+							end
 		})
-		
+
 	minetest.register_chatcommand("listspawners",
 		{
 			params		= "",
@@ -305,7 +305,7 @@ function mobf_debug.init()
 			privs		= {mobfw_admin=true},
 			func		= mobf_debug.list_spawners
 		})
-		
+
 	minetest.register_chatcommand("mobf_count",
 		{
 			params		= "",
@@ -325,7 +325,7 @@ function mobf_debug.init()
 					luatrace.tron(nil)
 					end
 			})
-			
+
 		minetest.register_chatcommand("traceoff",
 			{
 				params		= "",
@@ -348,6 +348,7 @@ end
 --! @param player player doing rightclick
 ------------------------------------------------------------------------------
 function mobf_debug.rightclick_callback(entity,player)
+	local basepos  = entity.getbasepos(entity)
 	local lifetime = mobf_get_current_time() - entity.dynamic_data.spawning.original_spawntime
 	print("MOBF: " .. entity.data.name .. " " .. tostring(entity) .. " is alive for " .. lifetime .. " seconds")
 	print("MOBF: \tAbsolute spawntime:          " .. entity.dynamic_data.spawning.original_spawntime)
@@ -355,10 +356,9 @@ function mobf_debug.rightclick_callback(entity,player)
 	print("MOBF: \tCurrent movgen:              " .. entity.dynamic_data.current_movement_gen.name )
 	if entity.dynamic_data.current_movement_gen.name == "follow_mov_gen" or
 		entity.dynamic_data.current_movement_gen.name == "mgen_path" then
-			local basepos  = entity.getbasepos(entity)
-			
+
 			local targetpos = entity.dynamic_data.spawning.spawnpoint
-			if entity.dynamic_data.movement.target ~= nil then 
+			if entity.dynamic_data.movement.target ~= nil then
 				if not mobf_is_pos(entity.dynamic_data.movement.target) then
 					targetpos = entity.dynamic_data.movement.target:getpos()
 				else
@@ -382,16 +382,16 @@ function mobf_debug.rightclick_callback(entity,player)
 				local found = false;
 				for i=1,#objects,1 do
 					local luaentity = objects[i]:get_luaentity()
-					if luaentity ~= nil and 
+					if luaentity ~= nil and
 						luaentity.name == "mobf:path_marker_entity" then
 						found = true
 						break
 					end
 				end
-				
+
 				local node_at = minetest.get_node(v)
-				
-				if not found and 
+
+				if not found and
 					node_at.name ~= nil and
 					node_at.name ~= "ignore" then
 					spawning.spawn_and_check("mobf:path_marker_entity",v,"mark_path")
@@ -400,45 +400,53 @@ function mobf_debug.rightclick_callback(entity,player)
 			print("MOBF: \t\tdistance to next point:      " .. p_mov_gen.distance_to_next_point(entity,entity.object:getpos()))
 		end
 	end
-	
+
 	local predicted_pos = movement_generic.predict_next_block(
-			entity.getbasepos(entity),
+			basepos,
 			entity.object:getvelocity(),
 			entity.object:getacceleration())
+	if not ( entity.data.movement.canfly == true) then
+		predicted_pos.y = basepos.y
+	end
 	local pos_state  = environment.pos_is_ok(predicted_pos,entity)
-	local detailed_state = environment.pos_quality(entity.getbasepos(entity),entity)
-	
+	local pos_quality = environment.pos_quality(basepos,entity)
+	local predicted_quality = environment.pos_quality(predicted_pos,entity)
+
 	print("MOBF: \tTime to state change:        " .. entity.dynamic_data.state.time_to_next_change .. " seconds")
 	print("MOBF: \tCurrent environmental state: " .. environment.pos_is_ok(entity.getbasepos(entity),entity))
 	if mobf_rtd.detailed_state then
-	print("MOBF: \tCurrent detailed state:      " .. detailed_state.tostring(detailed_state))
+	print("MOBF: \tCurrent detailed state:      " .. pos_quality:shortstring())
 	end
+	print("MOBF: \tCan fly:                     " .. dump(entity.data.movement.canfly))
 	print("MOBF: \tCurrent accel:               " .. printpos(entity.object:getacceleration()))
 	print("MOBF: \tCurrent speed:               " .. printpos(entity.object:getvelocity()))
 	print("MOBF: \tSpawnpoint:                  " .. printpos(entity.dynamic_data.spawning.spawnpoint))
 	print("MOBF: \tSpawner:                     " .. dump(entity.dynamic_data.spawning.spawner))
-	print("MOBF: \tCurrent pos:                 " .. printpos(entity.object:getpos()))
+	print("MOBF: \tCurrent pos:                 " .. printpos(basepos))
 	print("MOBF: \tPredicted pos:               " .. printpos(predicted_pos))
 	print("MOBF: \tPredicted state:             " .. pos_state)
+	if mobf_rtd.detailed_state then
+	print("MOBF: \tPredicted detail:            " .. predicted_quality:shortstring())
+	end
 	if entity.dynamic_data.combat ~= nil then
 		print("MOBF: \tCurrent combat target:       " .. fighting.get_target_name(entity.dynamic_data.combat.target))
 	end
 	if entity.dynamic_data.attention ~= nil then
-		print("MOBF: \t Current attention table:")	
+		print("MOBF: \t Current attention table:")
 		for k,v in pairs(entity.dynamic_data.attention.watched_objects) do
 			print("MOBF: \t\t " .. k .. ": " .. v.value)
 		end
-	
+
 		if entity.dynamic_data.attention.most_relevant_target ~= nil then
 			local attention_name = tostring(entity.dynamic_data.attention.most_relevant_target)
-			
+
 			if (entity.dynamic_data.attention.most_relevant_target:is_player()) then
 				attention_name = entity.dynamic_data.attention.most_relevant_target:get_player_name()
 			end
 			print("MOBF: \tTop attention object:       " .. attention_name)
 		end
 	end
-	
+
 	if entity.dynamic_data.graphics.last_fps ~= nil then
 		print("MOBF: Animating with: " .. entity.dynamic_data.graphics.last_fps .. " fps")
 	end
