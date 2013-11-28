@@ -42,9 +42,10 @@ function mob_preserve.init()
 	mob_preserve.current_preserve_list =
 			minetest.deserialize(preserved_mobs_raw)
 
-		if mob_preserve.current_preserve_list == nil then
-			mob_preserve.current_preserve_list = {}
-		end
+	end
+
+	if mob_preserve.current_preserve_list == nil then
+		mob_preserve.current_preserve_list = {}
 	end
 
 	minetest.register_chatcommand("mobf_restore_mobs",
