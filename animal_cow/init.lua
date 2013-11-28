@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -14,14 +14,14 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_cow mod loading ...")
-local version = "0.1.2"
+local version = "0.1.3"
 
 local cow_groups = {
 						not_in_creative_inventory=1
 					}
 
-local selectionbox_cow = {-1.5, -1.5, -0.75, 1.5, 0.7, 0.75}
-local selectionbox_steer = {-1.5*1.1, -1.5*1.1, -0.75*1.1, 1.5*1.1, 0.7*1.1, 0.75*1.1}
+local selectionbox_cow = {-1.5, -1.5, -0.75, 0.8, 0.7, 0.75}
+local selectionbox_steer = {-1.5*1.1, -1.5*1.1, -0.75*1.1, 0.8*1.1, 0.7*1.1, 0.75*1.1}
 local selectionbox_baby_calf = {-0.8, -0.8, -0.5, 0.8, 0.8, 0.5}
 
 function cattle_drop()
@@ -31,29 +31,29 @@ function cattle_drop()
 	else
 		table.insert(result,"animalmaterials:meat_beef 5")
 	end
-	
+
 	if math.random() < 0.25 then
 		table.insert(result,"animalmaterials:coat_cattle 1")
 	end
-	
+
 	if math.random() < 0.1 then
 		table.insert(result,"animalmaterials:bone 1")
 	end
-	
+
 	return result
 end
 
-cow_prototype = {   
+cow_prototype = {
 		name="cow",
 		modname="animal_cow",
-		
+
 		factions = {
 			member = {
 				"animals",
 				"grassland_animals"
 				}
 			},
-	
+
 		generic = {
 					description="Cow",
 					base_health=40,
@@ -63,7 +63,7 @@ cow_prototype = {
 					},
 					groups = cow_groups,
 					envid = "meadow"
-				},				
+				},
 		movement =  {
 					default_gen="none",
 					min_accel=0.05,
@@ -72,11 +72,11 @@ cow_prototype = {
 					min_speed=0.025,
 					pattern="stop_and_go",
 					canfly=false,
-					},		
-		harvest = {	
+					},
+		harvest = {
 					tool="vessels:drinking_glass",
 					tool_consumed=true,
-					result="animalmaterials:milk", 
+					result="animalmaterials:milk",
 					transforms_to="",
 					min_delay=60,
 				  	},
@@ -112,14 +112,14 @@ cow_prototype = {
 								},
 					},
 		states = {
-				{ 
+				{
 				name = "walking",
 				movgen = "probab_mov_gen",
 				typical_state_time = 180,
 				chance = 0.50,
 				animation = "walk",
 				},
-				{ 
+				{
 				name = "flee",
 				movgen = "flee_mov_gen",
 				typical_state_time = 30,
@@ -169,18 +169,18 @@ cow_prototype = {
 					},
 			}
 		}
-		
-steer_prototype = {   
+
+steer_prototype = {
         name="steer",
         modname="animal_cow",
-        
+
         factions = {
             member = {
                 "animals",
                 "grassland_animals"
                 }
             },
-    
+
         generic = {
                     description="Steer",
                     base_health=40,
@@ -190,7 +190,7 @@ steer_prototype = {
                     },
                     groups = cow_groups,
                     envid = "meadow"
-                },              
+                },
         movement =  {
                     default_gen="probab_mov_gen",
                     min_accel=0.05,
@@ -199,7 +199,7 @@ steer_prototype = {
                     min_speed=0.025,
                     pattern="stop_and_go",
                     canfly=false,
-                    },      
+                    },
         harvest = nil,
         catching = {
                     tool="animalmaterials:lasso",
@@ -233,14 +233,14 @@ steer_prototype = {
 						},
 					},
 		states = {
-				{ 
+				{
 				name = "walking",
 				movgen = "probab_mov_gen",
 				typical_state_time = 180,
 				chance = 0.50,
 				animation = "walk",
 				},
-				{ 
+				{
 				name = "flee",
 				movgen = "flee_mov_gen",
 				typical_state_time = 30,
@@ -294,7 +294,7 @@ steer_prototype = {
 baby_calf_f_prototype = {
 		name="baby_calf_f",
 		modname="animal_cow",
-		
+
 		factions = {
 			member = {
 				"animals",
@@ -360,7 +360,7 @@ baby_calf_f_prototype = {
 					},
 			},
 		states = {
-				{ 
+				{
 				name = "walking",
 				movgen = "probab_mov_gen",
 				typical_state_time = 180,
@@ -396,10 +396,10 @@ baby_calf_f_prototype = {
 			},
 		}
 
-baby_calf_m_prototype = {   
+baby_calf_m_prototype = {
 		name="baby_calf_m",
 		modname="animal_cow",
-		
+
 		factions = {
 			member = {
 				"animals",
@@ -464,7 +464,7 @@ baby_calf_m_prototype = {
 					},
 			},
 		states = {
-				{ 
+				{
 				name = "walking",
 				movgen = "probab_mov_gen",
 				typical_state_time = 180,
