@@ -126,7 +126,7 @@ function movement_gen.callback(entity)
 	--                                                                       --
 	---------------------------------------------------------------------------
 	---------------------------------------------------------------------------
-	dbg_mobf.pmovement_lvl2("MOBF: position check for mob ".. entity.data.name ..
+	dbg_mobf.pmovement_lvl3("MOBF: position check for mob ".. entity.data.name ..
 		" "..printpos(movement_state.basepos))
 	movement_state.default_y_accel =
 			environment.get_default_gravity(movement_state.basepos,
@@ -160,7 +160,7 @@ function movement_gen.callback(entity)
 	--                                                                       --
 	---------------------------------------------------------------------------
 	---------------------------------------------------------------------------
-	dbg_mobf.pmovement_lvl2("MOBF: movement hard limits check for mob "..
+	dbg_mobf.pmovement_lvl3("MOBF: movement hard limits check for mob "..
 		entity.data.name .. " "..printpos(movement_state.basepos))
 
 	movement_gen.fix_runaway(entity,movement_state)
@@ -180,7 +180,7 @@ function movement_gen.callback(entity)
 	--                                                                       --
 	---------------------------------------------------------------------------
 	---------------------------------------------------------------------------
-	dbg_mobf.pmovement_lvl2("MOBF: movement check for mob ".. entity.data.name
+	dbg_mobf.pmovement_lvl3("MOBF: movement check for mob ".. entity.data.name
 		.. " "..printpos(movement_state.basepos))
 
 	--skip if movement already got changed
@@ -191,6 +191,11 @@ function movement_gen.callback(entity)
 											movement_state.current_velocity,
 											movement_state.current_acceleration)
 
+		--if this isn't a flying mob ignore y prediction as it's not honoring
+		--collisions
+		if not entity.data.movement.canfly then
+			pos_predicted.y = movement_state.basepos.y
+		end
 		--local pos_predicted =
 		--	movement_generic.predict_enter_next_block(entity, movement_state.basepos,
 		--									movement_state.current_velocity,
@@ -224,7 +229,7 @@ function movement_gen.callback(entity)
 	--                                                                       --
 	---------------------------------------------------------------------------
 	---------------------------------------------------------------------------
-	dbg_mobf.pmovement_lvl2("MOBF: randomized movement for mob "..
+	dbg_mobf.pmovement_lvl3("MOBF: randomized movement for mob "..
 					entity.data.name .. " "..printpos(movement_state.basepos))
 
 	--do randomized changes if not fighting
@@ -337,9 +342,12 @@ end
 --! @param movement_state current state of movement
 -------------------------------------------------------------------------------
 function movement_gen.fix_runaway(entity,movement_state)
+
+
 	--avoid mobs racing away
-	local xzspeed = math.sqrt(math.pow(movement_state.current_velocity.x,2)+
-							  math.pow(movement_state.current_velocity.z,2))
+	local xzspeed = mobf_calc_scalar_speed(movement_state.current_velocity.x,
+											movement_state.current_velocity.z)
+
 	dbg_mobf.pmovement_lvl3("MOBF: checkrunaway x=" ..
 							movement_state.current_velocity.x ..
 							" z=" ..movement_state.current_velocity.z ..
@@ -350,38 +358,23 @@ function movement_gen.fix_runaway(entity,movement_state)
 		dbg_mobf.pmovement_lvl3("MOBF: too fast! vxz=" .. xzspeed)
 		dbg_mobf.pmovement_lvl3("MOBF: current acceleration:" ..
 								printpos(movement_state.current_acceleration))
-		local newaccel = {x=0,y=movement_state.current_acceleration.y,z=0}
 
-		--calculate sign of acceleration
-		if movement_state.current_velocity.x > 0 and
-		    movement_state.current_acceleration.x >= 0 then
-				newaccel.x = entity.data.movement.max_accel * -1
-		else
-				newaccel.x = entity.data.movement.max_accel
-		end
+		local direction = mobf_calc_yaw(movement_state.current_velocity.x,
+										movement_state.current_velocity.z)
 
-		if movement_state.current_velocity.z > 0 and
-		    movement_state.current_acceleration.z >= 0 then
-				newaccel.z = entity.data.movement.max_accel * -1
-		else
-				newaccel.z = entity.data.movement.max_accel
-		end
+		--reduce speed to 90% of current speed
+		local new_speed = mobf_calc_vector_components(direction,xzspeed*0.9)
+		new_speed.y = movement_state.current_velocity.y
+		entity.object:setvelocity(new_speed)
 
-		--calculate relative partition of acceleration based on velocity
-		if movement_state.current_velocity.x > 0 and
-			movement_state.current_velocity.z > 0 then
-			newaccel.x = newaccel.x * movement_state.current_velocity.x /
-						(movement_state.current_velocity.x+
-							movement_state.current_velocity.z)
-			newaccel.z = newaccel.z * movement_state.current_velocity.z /
-						(movement_state.current_velocity.x+
-							movement_state.current_velocity.z)
-		end
+		movement_state.current_velocity = new_speed
 
-		dbg_mobf.pmovement_lvl3("MOBF: fixed acceleration:" .. printpos(newaccel))
-		--set acceleration based on min acceleration
-		movement_state.accel_to_set = newaccel
+		--don't accelerate any longer
+		movement_state.accel_to_set = {x=0,z=0}
 		movement_state.changed = true
+
+		dbg_mobf.pmovement_lvl2("MOBF: fix runaway new acceleration:" ..
+									printpos(movement_state.accel_to_set))
 	end
 end
 
@@ -396,8 +389,8 @@ end
 --! @param movement_state current state of movement
 -------------------------------------------------------------------------------
 function movement_gen.fix_to_slow(entity,movement_state)
-	local xzspeed = math.sqrt(math.pow(movement_state.current_velocity.x,2) +
-								math.pow(movement_state.current_velocity.z,2) )
+	local xzspeed = mobf_calc_scalar_speed(movement_state.current_velocity.x,
+											movement_state.current_velocity.z)
 
 	dbg_mobf.pmovement_lvl3("MOBF: checktoslow x=" ..
 							movement_state.current_velocity.x ..
@@ -409,7 +402,8 @@ function movement_gen.fix_to_slow(entity,movement_state)
 	--but it's a quick solution to fix most of the problems
 	if (entity.data.movement.min_speed ~= nil and
 		xzspeed < entity.data.movement.min_speed) or
-		xzspeed == nil then
+		xzspeed == nil or
+		xzspeed == 0 then
 
 		dbg_mobf.pmovement_lvl2("MOBF: too slow! vxz=" .. xzspeed)
 		--use normal speed change handling
@@ -525,7 +519,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 			else
 				mobf_bug_warning(LOGLEVEL_WARNING,"MOBF: BUG !!! didn't find a way"
 							.." out of water, for mob at: " ..
-							printpos(movement_state.basepos) .. " drowning " ..
+							printpos(movement_state.basepos) .. " drowning, last pos in env:" ..
 							dump(entity.dynamic_data.movement.last_pos_in_env))
 				abort_processing = true
 				spawning.remove(entity, "mgen probab watercheck")
