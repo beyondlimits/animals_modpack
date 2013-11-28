@@ -294,30 +294,40 @@ end
 -------------------------------------------------------------------------------
 function environment.checksurface(pos,surface)
 
-	--if no surfaces are specified any surface is treated as ok
-	if surface == nil then
-		return "ok"
-	end
-
 	local pos_below = {x=pos.x,y=pos.y-1,z=pos.z}
-
 	local node_below = minetest.get_node(pos_below)
 
-
+	--if we couldn't even get the node count as wrong
 	if node_below == nil then
-		return "ok"
+		return "wrong_surface"
+	end
+
+	--if no surfaces are specified any surface is treated as ok
+	if surface == nil then
+		if minetest.registered_nodes[node_below.name] ~= nil then
+			if minetest.registered_nodes[node_below.name].walkable then
+				return "ok",node_below.name
+			else
+				return "wrong_surface",node_below.name
+			end
+		else
+			dbg_mobf.environment_lvl1("ENV surface check: " .. node_below.name..
+				" isn't even a registred node??")
+			--not a registred nodename??? count as wrong surface
+			return "wrong_surface",node_below.name
+		end
 	end
 
 	for i,v in ipairs(surface.good) do
 		if node_below.name == v then
-			return "ok"
+			return "ok",node_below.name
 		end
 	end
 
 	if surface.possible ~= nil then
 		for i,v in ipairs(surface.possible) do
 			if node_below.name == v then
-				return "possible_surface"
+				return "possible_surface",node_below.name
 			end
 		end
 	end
@@ -666,7 +676,7 @@ function environment.pos_quality(pos,entity)
 						return dump(state.valid) .. ":" ..
 							state.media_quality .. ";" ..
 							state.geometry_quality .. "," .. state.center_geometry_quality .. ";" ..
-							state.surface_quality_min .. "," .. state.surface_quality_max .. "," .. state.surface_quality_center .. ";" ..
+							state.surface_quality_min .. "," .. state.surface_quality_center .. "," ..state.surface_quality_max .. ";" ..
 							state.level_quality
 					end
 				}
