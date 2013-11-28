@@ -269,6 +269,7 @@ function direction_control.precheck_movement(entity,movement_state,pos_predicted
 				if mob_is_safe then
 					entity.object:setvelocity({x=0,y=0,z=0})
 					movement_state.accel_to_set = {x=0,y=nil,z=0}
+					dbg_mobf.pmovement_lvl2("MOBF: no suitable pos found stopping at safe pos")
 					movement_state.changed = true
 				end
 			end
@@ -452,9 +453,11 @@ end
 --! @return movement_state is modified!
 -------------------------------------------------------------------------------
 function direction_control.random_movement_handler(entity,movement_state)
-	dbg_mobf.pmovement_lvl2("MOBF: random movement handler called")
+	dbg_mobf.pmovement_lvl3("MOBF: random movement handler called")
+	local rand_value = math.random()
+	local max_value = entity.dynamic_data.movement.mpattern.random_acceleration_change * PER_SECOND_CORRECTION_FACTOR
 	if movement_state.changed == false and
-		(math.random() < (entity.dynamic_data.movement.mpattern.random_acceleration_change * PER_SECOND_CORRECTION_FACTOR) or
+		(rand_value < max_value or
 		movement_state.force_change) then
 
 		movement_state.accel_to_set = direction_control.changeaccel(movement_state.basepos,
@@ -464,6 +467,11 @@ function direction_control.random_movement_handler(entity,movement_state)
 			movement_state.accel_to_set.y = movement_state.current_acceleration.y
 			movement_state.changed = true
 		end
-		dbg_mobf.pmovement_lvl1("MOBF: randomly changing speed from "..printpos(movement_state.current_acceleration).." to "..printpos(movement_state.accel_to_set))
+		dbg_mobf.pmovement_lvl1("MOBF: randomly changing speed from "..
+			printpos(movement_state.current_acceleration).." to "..
+			printpos(movement_state.accel_to_set))
+	else
+		dbg_mobf.pmovement_lvl3("MOBF:" .. entity.data.name ..
+			" not changing speed random: " .. rand_value .." >= " .. max_value)
 	end
 end
