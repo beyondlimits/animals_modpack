@@ -6,7 +6,7 @@ Mob Framework Mod (former animals mod) provides a framework for creating mobs
 
 Contact sapier a t gmx net
 -------------------------------------------------------------------------------
-Big thanks to rinoux for providing graphics and all others for their 
+Big thanks to rinoux for providing graphics and all others for their
 suggestions too!
 -------------------------------------------------------------------------------
 
@@ -18,7 +18,12 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
-Changes pre 2.3.x
+Changes 2.2.91
+-fix dm vault spawning
+-fix stop & go movement to avoid permanent direction changes
+-fix lifebar not beeing removed correctly
+
+Changes 2.2.90
 -replace entity based state models by just switching model of same entity
 -add hunger support
 -fix house spawner (trader) to not spawn too often
@@ -119,13 +124,13 @@ Changes 2.0.80
 -add support for mutliple spawn algorithms (make vombies spawn underground)
 -add support for flee state for non agressive mobs
 -NEW MOB oerkki
--add attention support 
-	(player or other mobs now will draw attention to agressive mobs once some 
+-add attention support
+	(player or other mobs now will draw attention to agressive mobs once some
 	 threshold is exceeded a mob may look at you or even start an attack)
 -make all new gui's available from mobf_settings "Tools" page
 
 Changes 2.0.5
--fix bug in mobf_settings using settings_save instead of mobf_setting_save 
+-fix bug in mobf_settings using settings_save instead of mobf_setting_save
 
 Changes 2.0.4
 -fixed bug trader selling without pay if price1 or price 2 not set
@@ -159,7 +164,7 @@ Changes 1.9.15
 Changes 1.9.14
 -add vombie 3d mesh
 -fix crash when trying to access empty movgen
--fix old default movgen definition was still used instead of default state 
+-fix old default movgen definition was still used instead of default state
  movgen in state change handling
 -fixed deer model flying when lying
 -fix crash in changestate
@@ -340,7 +345,7 @@ Changes 1.4.0
 -fixed bug wrong parameter set to true on remove due to pop dens check
 -fixed bug mobs running around like crazy after on_step frequency increase
 -added spawn in deep caves spawn algorithm
--added special movement gen none only applying y acceleration but stopping mob 
+-added special movement gen none only applying y acceleration but stopping mob
  otherwise
 
 Changes 1.3.5
@@ -450,7 +455,7 @@ Changes 0.9.11:
 Changes 0.9.9:
 -MAJOR code reorganization
 -fixed creeper
--added collision boxes with correct height 
+-added collision boxes with correct height
 (width ain't possible as sprites are rotated automaticaly)
 -added some missing item graphics
 -fixed a lot of small bugs probably not even discovered
