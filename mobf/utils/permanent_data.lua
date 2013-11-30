@@ -176,8 +176,14 @@ end
 --! @return string containing entitys permanent data
 -------------------------------------------------------------------------------
 function mobf_serialize_permanent_entity_data(entity)
-	if entity.removed == false and
-		entity.dynamic_data ~= nil and
+	if entity.dynamic_data ~= nil and
+			entity.dynamic_data.last_static_data ~= nil then
+			mobf_print("MOBF: mob " .. entity.data.name .. "(" .. tostring(entity)
+				.. ") wasn't even completely activated by now: ")
+			return entity.dynamic_data.last_static_data
+	end
+
+	if entity.dynamic_data ~= nil and
 		entity.dynamic_data.spawning ~= nil then
 
 		local state = "default"
@@ -230,8 +236,8 @@ function mobf_serialize_permanent_entity_data(entity)
 		return serialized
 	else
 		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: >" .. dump(entity.data.name) ..
-		"< removed=" ..dump(entity.removed) .. " entity=" .. tostring(entity) ..
-		" No spawning information available on saving mob or mob already deleted")
+			"< removed=" ..dump(entity.removed) .. " entity=" .. tostring(entity) ..
+			" No spawning information available on saving mob")
 	end
 
 	return ""
