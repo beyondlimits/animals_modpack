@@ -307,7 +307,8 @@ function mobf.activate_handler(self,staticdata)
 	for i=1,#objectlist,1 do
 		local luaentity = objectlist[i]:get_luaentity()
 		if luaentity ~= nil then
-			if not luaentity.mobf_spawner then
+			if not luaentity.mobf_spawner and
+				luaentity.name ~= "mobf:lifebar" then
 				cleaned_objectcount = cleaned_objectcount + 1
 			end
 		else
@@ -325,7 +326,8 @@ function mobf.activate_handler(self,staticdata)
 
 		mobf_bug_warning(LOGLEVEL_WARNING,
 			"MOBF: trying to activate mob \"" ..self.data.name ..
-			" at " .. printpos(pos) ..
+			" at " .. printpos(pos) .. " (" .. tostring(self)
+			.. ")"..
 			"\" within something else!" ..
 			" originaly spawned by: " .. spawner ..
 			" --> removing")
@@ -334,12 +336,19 @@ function mobf.activate_handler(self,staticdata)
 			if luaentity ~= nil then
 				if luaentity.data ~= nil and
 					luaentity.data.name ~= nil then
-					dbg_mobf.mobf_core_helper_lvl3(i .. " " .. luaentity.data.name .. printpos(objectlist[i]:getpos()))
+					dbg_mobf.mobf_core_helper_lvl3(
+						i .. " LE: " .. luaentity.name .. " (" .. tostring(luaentity) .. ") " ..
+						luaentity.data.name .. " " ..
+						printpos(objectlist[i]:getpos()))
 				else
-					dbg_mobf.mobf_core_helper_lvl3(i .. " " .. dump(luaentity))
+					dbg_mobf.mobf_core_helper_lvl3(
+						i .. " LE: " .. luaentity.name .. " (" .. tostring(luaentity) .. ") " ..
+						dump(luaentity))
 				end
 			else
-				dbg_mobf.mobf_core_helper_lvl3(i .. " " .. tostring(objectlist[i]) .. printpos(objectlist[i]:getpos()))
+				dbg_mobf.mobf_core_helper_lvl3(
+					i .. " " .. tostring(objectlist[i]) ..
+					printpos(objectlist[i]:getpos()))
 			end
 		end
 		spawning.remove_uninitialized(self,staticdata)
@@ -491,6 +500,22 @@ function mobf.activate_handler(self,staticdata)
 	end
 
 	self.dynamic_data.initialized = true
+
+	if self.dynamic_data.delayed_placement ~= nil then
+		entity.dynamic_data.spawning.player_spawned =
+			self.dynamic_data.delayed_placement.player_spawned
+
+		entity.dynamic_data.spawning.spawner =
+			self.dynamic_data.delayed_placement.spawner
+
+		if self.dynamic_data.delayed_placement.callback ~= nil then
+			self.dynamic_data.delayed_placement.callback(self,
+					self.dynamic_data.delayed_placement.placer,
+					self.dynamic_data.delayed_placement.pointed_thing)
+		end
+
+		self.dynamic_data.delayed_placement = nil
+	end
 	mobf_step_quota.consume(starttime)
 end
 
@@ -568,13 +593,13 @@ function mobf.register_entity(name, graphics, mob)
 					return
 				end
 
-				if (self.dynamic_data.initialized == false) then
+				if (self.dynamic_data.initialized ~= true) then
 					if entity_at_loaded_pos(self.object:getpos(),self.data.name) then
 						mobf.activate_handler(self,self.dynamic_data.last_static_data)
 
 						--if quota is exceeded activation is delayed don't continue
 						--until initialization is done
-						if self.dynamic_data.initialized == false then
+						if self.dynamic_data.initialized ~= true then
 							return
 						end
 						self.dynamic_data.last_static_data = nil
@@ -671,10 +696,11 @@ function mobf.register_entity(name, graphics, mob)
 					if pos ~= nil and
 						entity_at_loaded_pos(pos,self.data.name) then
 						mobf.activate_handler(self,staticdata)
-					else
+					end
+
+					if self.dynamic_data.initialized ~= nil then
 						minetest.log(LOGLEVEL_INFO,
-							"MOBF: animal activated at invalid position .. " ..
-							"delaying activation")
+							"MOBF: delaying activation")
 						if self.dynamic_data.last_static_data == nil then
 							self.dynamic_data.last_static_data = staticdata
 						end
@@ -732,7 +758,7 @@ end
 function mobf.rightclick_handler(entity,clicker)
 	local starttime = mobf_get_time_ms()
 
-	if self.dynamic_data.initialized == false then
+	if entity.dynamic_data.initialized == false then
 		return
 	end
 
@@ -856,18 +882,29 @@ function mobf.register_mob_item(name,modname,description)
 					spawning.spawn_and_check(modname..":"..name,pos,"item_spawner")
 
 				if entity ~= nil then
-					entity.dynamic_data.spawning.player_spawned = true
 
-					if placer:is_player(placer) then
-						minetest.log(LOGLEVEL_INFO,"MOBF: mob placed by "
-							.. placer:get_player_name(placer))
-						entity.dynamic_data.spawning.spawner =
-							placer:get_player_name(placer)
-					end
+					if entity.dynamic_data.spawning ~= nil then
+						entity.dynamic_data.spawning.player_spawned = true
 
-					if entity.data.generic.custom_on_place_handler ~= nil then
-						entity.data.generic.custom_on_place_handler(entity,
-														placer, pointed_thing)
+						if placer:is_player(placer) then
+							minetest.log(LOGLEVEL_INFO,"MOBF: mob placed by "
+								.. placer:get_player_name(placer))
+							entity.dynamic_data.spawning.spawner =
+								placer:get_player_name(placer)
+						end
+
+						if entity.data.generic.custom_on_place_handler ~= nil then
+							entity.data.generic.custom_on_place_handler(entity,
+															placer, pointed_thing)
+						end
+					else
+						entity.dynamic_data.delayed_placement =  {
+							player_spawned = true,
+							spawner = placer:get_player_name(placer),
+							placer = placer,
+							pointed_thing = pointed_thing,
+							calback = entity.data.generic.custom_on_place_handler
+							}
 					end
 
 					item:take_item()
