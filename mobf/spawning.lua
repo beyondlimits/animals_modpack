@@ -165,8 +165,11 @@ function spawning.population_density_check(entity,now)
 
 	--don't do population check while fighting
 	if entity.dynamic_data.combat ~= nil and
+		entity.dynamic_data.combat.target ~= nil and
 		entity.dynamic_data.combat.target ~= "" then
-		dbg_mobf.spawning_lvl1("MOBF: fighting right now skipping pop dense check")
+		dbg_mobf.spawning_lvl1(
+			"MOBF: fighting right now skipping pop dense check: " ..
+			dump(entity.dynamic_data.combat.target))
 		return true
 	end
 
