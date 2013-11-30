@@ -178,8 +178,8 @@ end
 function mobf_serialize_permanent_entity_data(entity)
 	if entity.dynamic_data ~= nil and
 			entity.dynamic_data.last_static_data ~= nil then
-			mobf_print("MOBF: mob " .. entity.data.name .. "(" .. tostring(entity)
-				.. ") wasn't even completely activated by now: ")
+			--mobf_print("MOBF: mob " .. entity.data.name .. "(" .. tostring(entity)
+			--	.. ") wasn't even completely activated by now: ")
 			return entity.dynamic_data.last_static_data
 	end
 
