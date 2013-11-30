@@ -272,7 +272,12 @@ end
 --! @param staticdata data to use for initialization
 -------------------------------------------------------------------------------
 function mobf.activate_handler(self,staticdata)
+	local starttime = mobf_get_time_ms()
 
+	if mobf_step_quota.is_exceeded() then
+		mobf_print("MOBF: step quota exceeded")
+		return
+	end
 	--do some initial checks
 	local pos = self.object:getpos()
 
@@ -287,6 +292,7 @@ function mobf.activate_handler(self,staticdata)
 			"MOBF: trying to activate mob in nil node! removing")
 
 		spawning.remove_uninitialized(self,staticdata)
+		mobf_step_quota.consume(starttime)
 		return
 	end
 
@@ -334,6 +340,7 @@ function mobf.activate_handler(self,staticdata)
 			end
 		end
 		spawning.remove_uninitialized(self,staticdata)
+		mobf_step_quota.consume(starttime)
 		return
 	end
 
@@ -344,6 +351,7 @@ function mobf.activate_handler(self,staticdata)
 			.. current_node.name .. " --> removing")
 		--TODO try to move 1 block up
 		spawning.remove_uninitialized(self,staticdata)
+		mobf_step_quota.consume(starttime)
 		return
 	end
 
@@ -367,6 +375,7 @@ function mobf.activate_handler(self,staticdata)
 		self.object:set_hp(dyndata_delayed.health)
 		self.object:setyaw(dyndata_delayed.entity_orientation)
 		dyndata_delayed = nil
+		mobf_step_quota.consume(starttime)
 		return
 	end
 
@@ -481,6 +490,7 @@ function mobf.activate_handler(self,staticdata)
 	end
 
 	self.dynamic_data.initialized = true
+	mobf_step_quota.consume(starttime)
 end
 
 
@@ -559,6 +569,12 @@ function mobf.register_entity(name, graphics, mob)
 				if (self.dynamic_data.initialized == false) then
 					if entity_at_loaded_pos(self.object:getpos(),self.data.name) then
 						mobf.activate_handler(self,self.dynamic_data.last_static_data)
+
+						--if quota is exceeded activation is delayed don't continue
+						--until initialization is done
+						if self.dynamic_data.initialized == false then
+							return
+						end
 						self.dynamic_data.last_static_data = nil
 					else
 						mobf_warn_long_fct(starttime,"on_step_total_no_init","on_step_total")

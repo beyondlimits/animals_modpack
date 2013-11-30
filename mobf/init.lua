@@ -96,6 +96,7 @@ dofile (mobf_modpath .. "/inventory.lua")
 dofile (mobf_modpath .. "/mob_preserve.lua")
 dofile (mobf_modpath .. "/path.lua")
 dofile (mobf_modpath .. "/factions.lua")
+dofile (mobf_modpath .. "/step_quota.lua")
 
 --include spawning support
 dofile (mobf_modpath .. "/spawning.lua")
@@ -147,9 +148,6 @@ end
 function mobf_init_framework()
 
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing mob framework")
-
-
-
 
 	mobf_init_basic_tools()
 
@@ -203,6 +201,9 @@ function mobf_init_framework()
 
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Register rightclick button handler..")
 	minetest.register_on_player_receive_fields(mobf.rightclick_button_handler)
+
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing step time quota .. ")
+	mobf_step_quota.initialize()
 
 	-- register privilege to change mobf settings
 	minetest.register_privilege("mobfw_admin",
