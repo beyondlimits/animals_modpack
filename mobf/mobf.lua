@@ -275,7 +275,8 @@ function mobf.activate_handler(self,staticdata)
 	local starttime = mobf_get_time_ms()
 
 	if mobf_step_quota.is_exceeded() then
-		mobf_print("MOBF: step quota exceeded")
+		--mobf_print("MOBF: step quota exceeded for mob: "..
+		--			self.data.name .." (" .. tostring(self) .. ")")
 		return
 	end
 	--do some initial checks
@@ -374,7 +375,8 @@ function mobf.activate_handler(self,staticdata)
 		self.dynamic_data = dyndata_delayed.data
 		self.object:set_hp(dyndata_delayed.health)
 		self.object:setyaw(dyndata_delayed.entity_orientation)
-		dyndata_delayed = nil
+		self.dyndata_delayed = nil
+		self.dynamic_data.initialized = true
 		mobf_step_quota.consume(starttime)
 		return
 	end
@@ -552,10 +554,11 @@ function mobf.register_entity(name, graphics, mob)
 			on_step = function(self, dtime)
 				local starttime = mobf_get_time_ms()
 
-				if self.removed ~= false then
+				if self.removed == true then
 					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: on_step: "
 						.. self.data.name .. " on_step for removed entity????")
 					mobf_warn_long_fct(starttime,"on_step_total_removed","on_step_total")
+					self.object:remove()
 					return
 				end
 
@@ -637,6 +640,10 @@ function mobf.register_entity(name, graphics, mob)
 			on_punch = function(self, hitter, time_from_last_punch, tool_capabilities, dir)
 				local starttime = mobf_get_time_ms()
 				local now = mobf_get_current_time()
+
+				if self.dynamic_data.initialized == false then
+					return
+				end
 
 				for i = 1, #self.on_punch_hooks, 1 do
 					if self.on_punch_hooks[i](self,hitter,now,
@@ -725,6 +732,10 @@ end
 -------------------------------------------------------------------------------
 function mobf.rightclick_handler(entity,clicker)
 	local starttime = mobf_get_time_ms()
+
+	if self.dynamic_data.initialized == false then
+		return
+	end
 
 	if #entity.on_rightclick_hooks > 1 then
 
