@@ -297,6 +297,9 @@ function mobf.activate_handler(self,staticdata)
 		return
 	end
 
+	--restore saved data
+	local preserved_data = mobf_deserialize_permanent_entity_data(staticdata)
+
 	local objectlist = minetest.get_objects_inside_radius(pos,0.25)
 
 	local cleaned_objectcount = 0
@@ -315,10 +318,9 @@ function mobf.activate_handler(self,staticdata)
 	if cleaned_objectcount > 1 then
 		local spawner = "unknown"
 
-		if self.dynamic_data ~= nil and
-			self.dynamic_data.spawning ~= nil and
-			self.dynamic_data.spawning.spawner ~= nil then
-			spawner = self.dynamic_data.spawning.spawner
+		if preserved_data ~= nil and
+			preserved_data.spawner ~= nil then
+			spawner = preserved_data.spawner
 		end
 
 		mobf_bug_warning(LOGLEVEL_WARNING,
@@ -380,9 +382,6 @@ function mobf.activate_handler(self,staticdata)
 		mobf_step_quota.consume(starttime)
 		return
 	end
-
-	--restore saved data
-	local preserved_data = mobf_deserialize_permanent_entity_data(staticdata)
 
 	if self.dynamic_data.spawning ~= nil then
 		if mobf_pos_is_zero(preserved_data.spawnpoint) ~= true then
@@ -556,9 +555,9 @@ function mobf.register_entity(name, graphics, mob)
 
 				if self.removed == true then
 					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: on_step: "
-						.. self.data.name .. " on_step for removed entity????")
+						.. self.data.name .. " on_step for removed entity???? ("
+						.. tostring(self) .. ")")
 					mobf_warn_long_fct(starttime,"on_step_total_removed","on_step_total")
-					self.object:remove()
 					return
 				end
 
