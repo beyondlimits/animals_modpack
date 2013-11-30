@@ -148,27 +148,27 @@ function spawning.population_density_check(entity,now)
 		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!! " .. entity.data.name ..
 			" pop dense check called for entity with missing spawn data entity=" ..
 			tostring(entity))
-		return
+		return false
 	end
 
 
 	-- don't check if mob is player spawned
 	if entity.dynamic_data.spawning.player_spawned == true then
 		dbg_mobf.spawning_lvl1("MOBF: mob is player spawned skipping pop dense check")
-		return
+		return true
 	end
 
 
 	--don't do population check while fighting
 	if entity.dynamic_data.combat ~= nil and
 		entity.dynamic_data.combat.target ~= "" then
-		return
+		return true
 	end
 
 
 	--only check every 15 seconds
 	if entity.dynamic_data.spawning.ts_dense_check + 15 > now then
-		return
+		return true
 	end
 
 	entity.dynamic_data.spawning.ts_dense_check = now
@@ -177,7 +177,7 @@ function spawning.population_density_check(entity,now)
 
 	--mob either not initialized completely or a bug
 	if mobf_pos_is_zero(entitypos) then
-		return
+		return true
 	end
 
 	local secondary_name = ""
@@ -198,8 +198,10 @@ function spawning.population_density_check(entity,now)
 			entity.data.name.." at one place dying: " ..
 			tostring(entity.dynamic_data.spawning.player_spawned))
 		spawning.remove(entity, "population density check")
+		return false
 	else
 		dbg_mobf.spawning_lvl3("Density ok only "..mob_count.." mobs around")
+		return true
 	end
 end
 
