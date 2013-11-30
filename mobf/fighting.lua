@@ -265,7 +265,6 @@ function fighting.run_away(entity,dir_to_enemy,enemy)
 	else
 		mob_state.change_state(entity,flee_state)
 		entity.dynamic_data.current_movement_gen.set_target(entity,enemy)
-		dbg_mobf.fighting_lvl2("MOBF: unable to run away no matching state (flee/walking) defined ")
 	end
 end
 
