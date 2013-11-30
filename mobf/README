@@ -18,6 +18,11 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.2.92
+-add activation quota
+-add missing shark icon
+-disabled pathfinding by default (will improve performance on slow machines)
+
 Changes 2.2.91
 -fix dm vault spawning
 -fix stop & go movement to avoid permanent direction changes

@@ -144,7 +144,7 @@ function mobf_init_world_specific_settings()
 	end
 
 	if minetest.world_setting_get("mobf_disable_pathfinding") == nil then
-		minetest.world_setting_set("mobf_disable_pathfinding",false)
+		minetest.world_setting_set("mobf_disable_pathfinding",true)
 	end
 
 	if minetest.world_setting_get("mobf_delayed_spawning") == nil then
