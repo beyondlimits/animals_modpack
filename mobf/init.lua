@@ -110,7 +110,7 @@ dofile (mobf_modpath .. "/mgen_pathbased/main.lua")
 dofile (mobf_modpath .. "/mgen_flee/main_flee.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "2.2.94"
+mobf_version = "2.2.95"
 
 --! @brief define tools used for more than one mob
 function mobf_init_basic_tools()

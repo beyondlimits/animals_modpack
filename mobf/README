@@ -18,6 +18,10 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.2.95
+-fix bug causing population density check not working for vombie
+-add support for deer fleeing
+
 Changes 2.2.94
 -fix additional bugs due to delayed activation
 -fix lifebar causing mobs to despawn
