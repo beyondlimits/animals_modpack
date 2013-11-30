@@ -609,6 +609,7 @@ function mobf.register_entity(name, graphics, mob)
 					end
 				end
 
+
 				--do special ride callback
 				if mobf_ride.on_step_callback(self) then
 					mobf_warn_long_fct(starttime,"on_step_total_ride_cb","on_step_total")
@@ -617,16 +618,24 @@ function mobf.register_entity(name, graphics, mob)
 
 				self.current_dtime = self.current_dtime + dtime
 
+				if mobf_step_quota.is_exceeded() then
+					return
+				end
+
+				local quotatime = mobf_get_time_ms()
+
 				local now = mobf_get_current_time()
 
 				if self.current_dtime < 0.25 then
 					mobf_warn_long_fct(starttime,"on_step_total_pre_update","on_step_total")
+					mobf_step_quota.consume(quotatime)
 					return
 				end
 
 				--check lifetime
 				if spawning.lifecycle_callback(self,now) == false then
 					mobf_warn_long_fct(starttime,"on_step_total_lifecycle","on_step_total")
+					mobf_step_quota.consume(quotatime)
 					return
 				end
 
@@ -658,6 +667,7 @@ function mobf.register_entity(name, graphics, mob)
 
 				mobf_warn_long_fct(starttime,"on_step_" .. self.data.name .. "_total","on_step_total")
 				self.current_dtime = 0
+				mobf_step_quota.consume(quotatime)
 				end,
 
 		--player <-> mob interaction
