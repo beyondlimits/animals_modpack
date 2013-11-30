@@ -18,6 +18,11 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.2.94
+-fix additional bugs due to delayed activation
+-fix lifebar causing mobs to despawn
+-fix lamb collision box
+
 Changes 2.2.93
 -fix bugs shown by activation quota
 
