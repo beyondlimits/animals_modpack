@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_deer mod loading ... ")
 
-local version = "0.1.2"
+local version = "0.1.3"
 
 local deer_groups = {
 						not_in_creative_inventory=1
@@ -30,19 +30,19 @@ function deer_m_drop()
 	else
 		table.insert(result,"animalmaterials:meat_venison 2")
 	end
-	
+
 	if math.random() < 0.25 then
 		table.insert(result,"animalmaterials:deer_horns 1")
 	end
-	
+
 	if math.random() < 0.25 then
 		table.insert(result,"animalmaterials:fur_deer 1")
 	end
-	
+
 	if math.random() < 0.1 then
 		table.insert(result,"animalmaterials:bone 1")
 	end
-	
+
 	return result
 end
 
@@ -53,22 +53,28 @@ function deer_f_drop()
 	else
 		table.insert(result,"animalmaterials:meat_venison 2")
 	end
-	
+
 	if math.random() < 0.25 then
 		table.insert(result,"animalmaterials:fur_deer 1")
 	end
-	
+
 	if math.random() < 0.1 then
 		table.insert(result,"animalmaterials:bone 1")
 	end
-	
+
 	return result
+end
+
+function deer_watch_callback(entity,target)
+	local flee_state = mob_state.get_state_by_name(entity,"flee")
+	mob_state.change_state(entity,flee_state)
+	entity.dynamic_data.current_movement_gen.set_target(entity,target)
 end
 
 deer_m_prototype = {
 	name="deer_m",
 	modname = "animal_deer",
-	
+
 	factions = {
 		member = {
 			"animals",
@@ -86,7 +92,7 @@ deer_m_prototype = {
 				groups = deer_groups,
 				envid="meadow",
 			},
-	movement =  { 
+	movement =  {
 				default_gen="probab_mov_gen",
 				min_accel=0.2,
 				max_accel=0.4,
@@ -94,13 +100,26 @@ deer_m_prototype = {
 				min_speed=0.02,
 				pattern="stop_and_go",
 				canfly=false,
-				},		
+				},
 	catching = {
 				tool="animalmaterials:lasso",
 				consumed=true,
 				},
 	random_drop    = nil,
 	auto_transform = nil,
+	attention = {
+			hear_distance = 10,
+			hear_distance_value = 20,
+			view_angle = math.pi/2,
+			own_view_value = 0.2,
+			remote_view = false,
+			remote_view_value = 0,
+			attention_distance_value = 0.2,
+			watch_threshold = 10,
+			attention_distance = 15,
+			attention_max = 25,
+			watch_callback = deer_watch_callback
+	},
 	spawning = {
 				primary_algorithms = {
 					{
@@ -159,7 +178,7 @@ deer_m_prototype = {
 					visual_size= {x=1,y=1,z=1},
 					},
 			},
-			{ 
+			{
 				name = "sleeping",
 				--TODO replace by check for night
 				custom_preconhandler = nil,
@@ -168,7 +187,7 @@ deer_m_prototype = {
 				chance = 0.10,
 				animation = "sleep",
 			},
-			{ 
+			{
 				name = "eating",
 				custom_preconhandler = nil,
 				movgen = "none",
@@ -184,7 +203,7 @@ deer_m_prototype = {
 				chance = 0.50,
 				animation = "walk"
 			},
-			{ 
+			{
 			name = "flee",
 			movgen = "flee_mov_gen",
 			typical_state_time = 20,
@@ -193,11 +212,11 @@ deer_m_prototype = {
 			},
 		}
 	}
-		
+
 deer_f_prototype = {
 	name="deer_f",
 	modname = "animal_deer",
-	
+
 	factions = {
 		member = {
 			"animals",
@@ -215,7 +234,7 @@ deer_f_prototype = {
 				groups = deer_groups,
 				envid="meadow",
 			},
-	movement =  { 
+	movement =  {
 				default_gen="probab_mov_gen",
 				min_accel=0.2,
 				max_accel=0.4,
@@ -223,13 +242,26 @@ deer_f_prototype = {
 				min_speed=0.02,
 				pattern="stop_and_go",
 				canfly=false,
-				},		
+				},
 	catching = {
 				tool="animalmaterials:lasso",
 				consumed=true,
 				},
 	random_drop    = nil,
 	auto_transform = nil,
+	attention = {
+			hear_distance = 10,
+			hear_distance_value = 20,
+			view_angle = math.pi/2,
+			own_view_value = 0.2,
+			remote_view = false,
+			remote_view_value = 0,
+			attention_distance_value = 0.2,
+			watch_threshold = 10,
+			attention_distance = 15,
+			attention_max = 25,
+			watch_callback = deer_watch_callback
+	},
 	spawning = {
 				primary_algorithms = {
 					{
@@ -288,7 +320,7 @@ deer_f_prototype = {
 					visual_size= {x=0.9,y=0.9,z=0.9},
 					},
 			},
-			{ 
+			{
 				name = "sleeping",
 				--TODO replace by check for night
 				custom_preconhandler = nil,
@@ -297,7 +329,7 @@ deer_f_prototype = {
 				chance = 0.10,
 				animation = "sleep",
 			},
-			{ 
+			{
 				name = "eating",
 				custom_preconhandler = nil,
 				movgen = "none",
@@ -313,7 +345,7 @@ deer_f_prototype = {
 				chance = 0.50,
 				animation = "walk"
 			},
-			{ 
+			{
 			name = "flee",
 			movgen = "flee_mov_gen",
 			typical_state_time = 20,
@@ -322,7 +354,7 @@ deer_f_prototype = {
 			},
 		}
 	}
-		
+
 --compatibility code
 minetest.register_entity(":animal_deer:deer__default",
 	{
