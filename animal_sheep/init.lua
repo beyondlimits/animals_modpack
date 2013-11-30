@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.1.2"
+local version = "0.1.3"
 
 local sheep_groups = {
 						sheerable=1,
@@ -29,14 +29,14 @@ local selectionbox_lamb = {-0.65*0.6, -0.8*0.6, -0.65*0.6, 0.65*0.6, 0.45*0.6, 0
 sheep_prototype = {
 		name="sheep",
 		modname="animal_sheep",
-	
+
 		factions = {
 			member = {
 				"animals",
 				"grassland_animals"
 				}
 			},
-			
+
 		generic = {
 					description="Sheep",
 					base_health=10,
@@ -55,11 +55,11 @@ sheep_prototype = {
 					pattern="stop_and_go",
 					canfly=false,
 					},
-		harvest = {	
+		harvest = {
 					tool="animalmaterials:scissors",
 					max_tool_usage=10,
 					tool_consumed=false,
-					result="wool:white 1", 
+					result="wool:white 1",
 					transforms_to="animal_sheep:sheep_naked",
 					min_delay=-1,
 					},
@@ -125,7 +125,7 @@ sheep_prototype = {
 					typical_state_time = 30,
 					chance = 0,
 					animation = "stand",
-					graphics = { 
+					graphics = {
 						sprite_scale={x=4,y=4},
 						sprite_div = {x=6,y=1},
 						visible_height = 1.5,
@@ -138,7 +138,7 @@ sheep_prototype = {
 						visual_size= {x=1,y=1,z=1},
 						},
 				},
-				{ 
+				{
 					name = "sleeping",
 					--TODO replace by check for night
 					custom_preconhandler = nil,
@@ -148,7 +148,7 @@ sheep_prototype = {
 					chance = 0,
 					animation = "sleep",
 				},
-				{ 
+				{
 					name = "eating",
 					custom_preconhandler = nil,
 					movgen = "none",
@@ -156,7 +156,7 @@ sheep_prototype = {
 					chance = 0.05,
 					animation = "eating"
 				},
-				{ 
+				{
 					name = "walking",
 					custom_preconhandler = nil,
 					movgen = "probab_mov_gen",
@@ -164,7 +164,7 @@ sheep_prototype = {
 					chance = 0.50,
 					animation = "walk"
 				},
-				{ 
+				{
 				name = "flee",
 				movgen = "flee_mov_gen",
 				typical_state_time = 10,
@@ -185,18 +185,18 @@ sheep_prototype = {
 			typical_walk_time = 30,
 			}
 		}
-		
+
 lamb_prototype = {
 		name="lamb",
 		modname="animal_sheep",
-		
+
 		factions = {
 			member = {
 				"animals",
 				"grassland_animals"
 				}
 			},
-	
+
 		generic = {
 					description="Lamp",
 					base_health=3,
@@ -268,7 +268,7 @@ lamb_prototype = {
 					typical_state_time = 30,
 					chance = 0,
 					animation = "stand",
-					graphics = { 
+					graphics = {
 						sprite_scale={x=4,y=4},
 						sprite_div = {x=6,y=1},
 						visible_height = 1.5,
@@ -277,11 +277,11 @@ lamb_prototype = {
 						visual = "mesh",
 						mesh = "animal_sheep_sheep.b3d",
 						textures = {"animal_sheep_mesh.png"},
-						collisionbox = selectionbox_sheep,
+						collisionbox = selectionbox_lamb,
 						visual_size= {x=0.5,y=0.5,z=0.5},
 						},
 				},
-				{ 
+				{
 					name = "sleeping",
 					--TODO replace by check for night
 					custom_preconhandler = nil,
@@ -290,7 +290,7 @@ lamb_prototype = {
 					chance = 0.10,
 					animation = "sleep",
 				},
-				{ 
+				{
 					name = "eating",
 					custom_preconhandler = nil,
 					movgen = "none",
@@ -298,7 +298,7 @@ lamb_prototype = {
 					chance = 0.05,
 					animation = "eating"
 				},
-				{ 
+				{
 					name = "walking",
 					custom_preconhandler = nil,
 					movgen = "probab_mov_gen",
@@ -306,7 +306,7 @@ lamb_prototype = {
 					chance = 0.50,
 					animation = "walk"
 				},
-				{ 
+				{
 				name = "flee",
 				movgen = "flee_mov_gen",
 				typical_state_time = 15,
@@ -327,18 +327,18 @@ lamb_prototype = {
 			typical_walk_time = 30,
 			}
 		}
-	
+
 sheep_naked_prototype = {
 		name="sheep_naked",
 		modname="animal_sheep",
-		
+
 		factions = {
 			member = {
 				"animals",
 				"grassland_animals"
 				}
 			},
-	
+
 		generic = {
 					description="Naked sheep",
 					base_health=10,
@@ -355,7 +355,7 @@ sheep_naked_prototype = {
 					max_speed=0.5,
 					min_speed=0.1,
 					pattern="stop_and_go"
-					},		
+					},
 		catching = {
 					tool="animalmaterials:lasso",
 					consumed=true,
@@ -409,7 +409,7 @@ sheep_naked_prototype = {
 					typical_state_time = 30,
 					chance = 0,
 					animation = "stand",
-					graphics = { 
+					graphics = {
 						sprite_scale={x=4,y=4},
 						sprite_div = {x=6,y=1},
 						visible_height = 1.5,
@@ -422,7 +422,7 @@ sheep_naked_prototype = {
 						visual_size= {x=1,y=1,z=1},
 						},
 				},
-				{ 
+				{
 					name = "sleeping",
 					--TODO replace by check for night
 					custom_preconhandler = nil,
@@ -431,7 +431,7 @@ sheep_naked_prototype = {
 					chance = 0.10,
 					animation = "sleep",
 				},
-				{ 
+				{
 					name = "eating",
 					custom_preconhandler = nil,
 					movgen = "none",
@@ -439,7 +439,7 @@ sheep_naked_prototype = {
 					chance = 0.05,
 					animation = "eating"
 				},
-				{ 
+				{
 					name = "walking",
 					custom_preconhandler = nil,
 					movgen = "probab_mov_gen",
@@ -447,7 +447,7 @@ sheep_naked_prototype = {
 					chance = 0.50,
 					animation = "walk"
 				},
-				{ 
+				{
 				name = "flee",
 				movgen = "flee_mov_gen",
 				typical_state_time = 10,
@@ -467,7 +467,7 @@ sheep_naked_prototype = {
 			chance = 0.2,
 			typical_walk_time = 30,
 			}
-		}	
+		}
 
 
 minetest.register_craft({
