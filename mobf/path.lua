@@ -17,7 +17,7 @@ mobf_assert_backtrace(mobf_path == nil)
 mobf_path = {}
 
 -------------------------------------------------------------------------------
--- name: init()
+-- @function [parent=#mobf_path] init()
 --
 --! @brief initialize path subsystem
 --! @ingroup mobf_path
@@ -91,7 +91,7 @@ function mobf_path.init()
 end
 
 -------------------------------------------------------------------------------
--- name: save()
+-- @function [parent=#mobf_path] save()
 --
 --! @brief save all path data
 --! @ingroup mobf_path
@@ -101,7 +101,7 @@ function mobf_path.save()
 end
 
 -------------------------------------------------------------------------------
--- name: load()
+-- @function [parent=#mobf_path] load()
 --
 --! @brief save all path data
 --! @ingroup mobf_path
@@ -115,7 +115,7 @@ function mobf_path.load()
 end
 
 -------------------------------------------------------------------------------
--- name: handle_path_marker_place(placer,pos)
+-- @function [parent=#mobf_path] handle_path_marker_place(placer,pos)
 --
 --! @brief initialize path subsystem
 --! @ingroup mobf_path
@@ -137,7 +137,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: get_editable_path_names(playername)
+-- @function [parent=#mobf_path] get_editable_path_names(playername)
 --
 --! @brief get list of pathnames for a player
 --! @ingroup mobf_path
@@ -172,7 +172,7 @@ function mobf_path.get_editable_path_names(playername)
 end
 
 -------------------------------------------------------------------------------
--- name: add_point(playername,pathname,point)
+-- @function [parent=#mobf_path] add_point(playername,pathname,point)
 --
 --! @brief add a point to a path
 --! @ingroup mobf_path
@@ -201,7 +201,7 @@ function mobf_path.add_point(playername,pathname,point)
 end
 
 -------------------------------------------------------------------------------
--- name: show_add_point_menu(pathnames)
+-- @function [parent=#mobf_path] show_add_point_menu(pathnames)
 --
 --! @brief show a menu containing all paths a point may be added to
 --! @ingroup mobf_path
@@ -240,7 +240,7 @@ function mobf_path.show_add_point_menu(playername,pathnames,point)
 end
 
 -------------------------------------------------------------------------------
--- name: button_handler(player, formname, fields)
+-- @function [parent=#mobf_path] button_handler(player, formname, fields)
 --
 --! @brief handle button click in mobf_path menu
 --! @ingroup mobf_path
@@ -373,7 +373,7 @@ function mobf_path.button_handler(player, formname, fields)
 end
 
 -------------------------------------------------------------------------------
--- name: get_pathlist(playername,isadmin)
+-- @function [parent=#mobf_path] get_pathlist(playername,isadmin)
 --
 --! @brief get a list of paths for a specific player
 --! @ingroup mobf_path
@@ -414,7 +414,7 @@ function mobf_path.get_pathlist(playername,isadmin)
 	return retval
 end
 -------------------------------------------------------------------------------
--- name: point_textlist(playername,pathname)
+-- @function [parent=#mobf_path] point_textlist(playername,pathname)
 --
 --! @brief create a gui point gui element
 --! @ingroup mobf_path
@@ -448,7 +448,7 @@ function mobf_path.point_textlist(data)
 end
 
 -------------------------------------------------------------------------------
--- name: path_textlist(paths, playername, data, isadmin)
+-- @function [parent=#mobf_path] path_textlist(paths, playername, data, isadmin)
 --
 --! @brief get buttons for paths
 --! @ingroup mobf_path
@@ -572,7 +572,7 @@ function mobf_path.show_manage_menu(playername,data)
 end
 
 -------------------------------------------------------------------------------
--- name: make_button_name(buttonid,data)
+-- @function [parent=#mobf_path] make_button_name(buttonid,data)
 --
 --! @brief create a button name
 --! @ingroup mobf_path
@@ -601,7 +601,7 @@ function mobf_path.make_button_name(buttonid,data)
 end
 
 -------------------------------------------------------------------------------
--- name: parse_button_name(datastring)
+-- @function [parent=#mobf_path] parse_button_name(datastring)
 --
 --! @brief get data from button name
 --! @ingroup mobf_path
@@ -628,7 +628,7 @@ function mobf_path.parse_button_name(datastring)
 end
 
 -------------------------------------------------------------------------------
--- name: mob_rightclick_callback(entity,player)
+-- @function [parent=#mobf_path] mob_rightclick_callback(entity,player)
 --
 --! @brief do rightclick action
 --! @ingroup mobf_path
@@ -668,7 +668,7 @@ function mobf_path.mob_rightclick_callback(entity,player)
 end
 
 -------------------------------------------------------------------------------
--- name: config_check(entity)
+-- @function [parent=#mobf_path] config_check(entity)
 --
 --! @brief check if mob is configured as trader
 --! @ingroup mobf_path
@@ -685,7 +685,7 @@ function mobf_path.config_check(entity)
 end
 
 -------------------------------------------------------------------------------
--- name: buttontext(entity)
+-- @function [parent=#mobf_path] buttontext(entity)
 --
 --! @brief return text for rightclick button
 --! @ingroup mobf_path
@@ -702,7 +702,7 @@ function mobf_path.buttontext(entity)
 end
 
 -------------------------------------------------------------------------------
--- name: switch_patrol(entity,points)
+-- @function [parent=#mobf_path] switch_patrol(entity,points)
 --
 --! @brief check if mob is configured as trader
 --! @ingroup mobf_path
@@ -748,7 +748,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: getpoints(owner,name)
+-- @function [parent=#mobf_path] getpoints(owner,name)
 --
 --! @brief get a path by owner and name
 --! @ingroup mobf_path

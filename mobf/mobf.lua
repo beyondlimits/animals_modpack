@@ -31,7 +31,7 @@ mobf.on_rightclick_callbacks = {}
 
 
 ------------------------------------------------------------------------------
--- name: register_on_step_callback(callback)
+-- @function [parent=#mobf] register_on_step_callback(callback)
 --
 --! @brief make a new on_step callback known to mobf
 --! @memberof mobf
@@ -56,7 +56,7 @@ end
 
 
 ------------------------------------------------------------------------------
--- name: init_on_step_callbacks(entity,now)
+-- @function [parent=#mobf] init_on_step_callbacks(entity,now)
 --
 --! @brief initalize callbacks to be used on step
 --! @memberof mobf
@@ -101,7 +101,7 @@ function mobf.init_on_step_callbacks(entity,now)
 end
 
 ------------------------------------------------------------------------------
--- name: register_on_rightclick_callback(callback)
+-- @function [parent=#mobf] register_on_rightclick_callback(callback)
 --
 --! @brief make a new on_rightclick callback known to mobf
 --! @memberof mobf
@@ -126,7 +126,7 @@ end
 
 
 ------------------------------------------------------------------------------
--- name: register_on_punch_callback(callback)
+-- @function [parent=#mobf] register_on_punch_callback(callback)
 --
 --! @brief make a new on_punch callback known to mobf
 --! @memberof mobf
@@ -150,7 +150,7 @@ end
 
 
 ------------------------------------------------------------------------------
--- name: init_on_punch_callbacks(entity,now)
+-- @function [parent=#mobf] init_on_punch_callbacks(entity,now)
 --
 --! @brief initalize callbacks to be used on punch
 --! @memberof mobf
@@ -190,7 +190,7 @@ function mobf.init_on_punch_callbacks(entity,now)
 end
 
 ------------------------------------------------------------------------------
--- name: init_on_rightclick_callbacks(entity,now)
+-- @function [parent=#mobf] init_on_rightclick_callbacks(entity,now)
 --
 --! @brief initalize callbacks to be used on punch
 --! @memberof mobf
@@ -230,7 +230,7 @@ function mobf.init_on_rightclick_callbacks(entity,now)
 end
 
 ------------------------------------------------------------------------------
--- name: get_basepos(entity)
+-- @function [parent=#mobf] get_basepos(entity)
 --
 --! @brief get basepos for an entity
 --! @memberof mobf
@@ -262,7 +262,7 @@ function mobf.get_basepos(entity)
 end
 
 ------------------------------------------------------------------------------
--- name: mobf_activate_handler(self,staticdata)
+-- @function [parent=#mobf] mobf_activate_handler(self,staticdata)
 --
 --! @brief hanlder called for basic mob initialization
 --! @memberof mobf
@@ -521,7 +521,7 @@ end
 
 
 ------------------------------------------------------------------------------
--- name: init_factions(entityn)
+-- @function [parent=#mobf] init_factions(entityn)
 --
 --! @brief register mob to factions nod
 --! @memberof mobf
@@ -539,7 +539,7 @@ function mobf.init_factions(entity)
 end
 
 ------------------------------------------------------------------------------
--- name: register_entity(entityname,graphics)
+-- @function [parent=#mobf] register_entity(entityname,graphics)
 --
 --! @brief register an entity
 --! @memberof mobf
@@ -754,7 +754,7 @@ function mobf.register_entity(name, graphics, mob)
 end
 
 -------------------------------------------------------------------------------
--- name: rightclick_handler(entity,clicker)
+-- @function [parent=#mobf] rightclick_handler(entity,clicker)
 --
 --! @brief handle rightclick of mob
 --! @memberof mobf
@@ -825,7 +825,7 @@ function mobf.rightclick_handler(entity,clicker)
 end
 
 -------------------------------------------------------------------------------
--- name: rightclick_button_handler(player,formname,fields)
+-- @function [parent=#mobf] rightclick_button_handler(player,formname,fields)
 --
 --! @brief handle button clicks as result of rightclick of mob
 --! @memberof mobf
@@ -870,7 +870,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: register_mob_item(mob)
+-- @function [parent=#mobf] register_mob_item(mob)
 --
 --! @brief add mob item for catchable mobs
 --! @memberof mobf
@@ -926,7 +926,7 @@ function mobf.register_mob_item(name,modname,description)
 end
 
 -------------------------------------------------------------------------------
--- name: blacklist_handling(mob)
+-- @function [parent=#mobf] blacklist_handling(mob)
 --
 --! @brief add mob item for catchable mobs
 --! @memberof mobf

@@ -22,7 +22,7 @@ mobf_step_quota = {}
 
 
 ------------------------------------------------------------------------------
--- name: is_exceeded()
+-- @function [parent=#mobf_step_quota] is_exceeded
 --
 --! @brief check if quota is exceeded
 --! @memberof mobf_step_quota
@@ -35,7 +35,7 @@ function mobf_step_quota.is_exceeded()
 end
 
 ------------------------------------------------------------------------------
--- name: remaining()
+-- @function [parent=#mobf_step_quota] remaining()
 --
 --! @brief get remaining time this quota
 --! @memberof mobf_step_quota
@@ -52,7 +52,7 @@ function mobf_step_quota.remaining()
 end
 
 ------------------------------------------------------------------------------
--- name: initialize()
+-- @function [parent=#mobf_step_quota] initialize()
 --
 --! @brief initialize quota handling
 --! @memberof mobf_step_quota
@@ -66,7 +66,7 @@ function mobf_step_quota.initialize()
 end
 
 ------------------------------------------------------------------------------
--- name: reload()
+-- @function [parent=#mobf_step_quota] reload()
 --
 --! @brief reload current quota
 --! @memberof mobf_step_quota
@@ -78,7 +78,7 @@ function mobf_step_quota.reload()
 end
 
 ------------------------------------------------------------------------------
--- name: cosume()
+-- @function [parent=#mobf_step_quota] cosume(starttime)
 --
 --! @brief reduce remaining quota by time passed
 --! @memberof mobf_step_quota

@@ -21,7 +21,7 @@ mobf_assert_backtrace(mobf_job_queue == nil)
 mobf_job_queue = {}
 
 -------------------------------------------------------------------------------
--- name: add_job(job)
+-- @function [parent=#mobf_job_queue] add_job(job)
 --
 --! @brief queue a job to asynchronous job handling
 --! @memberof mobf_job_queue
@@ -34,7 +34,7 @@ function mobf_job_queue.add_job(job)
 end
 
 -------------------------------------------------------------------------------
--- name: process(dtime)
+-- @function [parent=#mobf_job_queue] process(dtime)
 --
 --! @brief job processing handler
 --! @memberof mobf_job_queue
@@ -69,7 +69,7 @@ function mobf_job_queue.process(dtime)
 end
 
 -------------------------------------------------------------------------------
--- name: cleanup()
+-- @function [parent=#mobf_job_queue] cleanup()
 --
 --! @brief handle all jobs queued
 --! @memberof mobf_job_queue
@@ -93,7 +93,7 @@ function mobf_job_queue.cleanup()
 end
 
 -------------------------------------------------------------------------------
--- name: initialize()
+-- @function [parent=#mobf_job_queue] initialize()
 --
 --! @brief initialize job queue
 --! @memberof mobf_job_queue

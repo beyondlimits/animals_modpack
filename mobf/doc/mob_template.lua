@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file mob_template.lua
@@ -16,15 +16,15 @@
 
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
--- WARNING this code might be not correct lua in order to get doxygen 
+-- WARNING this code might be not correct lua in order to get doxygen
 --         compatibility!
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 --! @brief Template for creating mobs
---! 
---! This template trys to describe all available configuration options 
+--!
+--! This template trys to describe all available configuration options
 --! in mob framework.
 --! @ingroup framework_mob
 local mob_template = {
@@ -33,87 +33,87 @@ local mob_template = {
 	name = "some name",
 	--! @brief [MANDATORY] name of mod defining the mob
 	modname = "name of mod",
-	
+
 	--! @brief [MANDATORY] generic parameters for mob
 	generic = {
-		--! @brief [MANDATORY] description to show on mouse over in inventory	
+		--! @brief [MANDATORY] description to show on mouse over in inventory
 		description="Some mob",
-		
+
 		--! @brief [MANDATORY] maximum health
 		base_health=0,
-		
+
 		--! @brief [MANDATORY] environment of mob to be
 		envid="some environment id",
-		
+
 		--! @brief [OPTIONAL] item description OR function all returning a item description of whats the result of a kill
 		kill_result = nil,
-		
+
 		--! @brief [OPTIONAL] armor groups of mob
 		armor_groups = nil,
-		
+
 		--! @brief [OPTIONAL] custom on_hit(entity,player) callback return true to skip normal fight callback
 		on_hit_callback = nil,
-		
+
 		--! @brief [OPTIONAL] custom on_kill(entity,player) callback return true to skip normal on kill handling
 		on_kill_callback = nil,
-		
+
 		--! @brief [OPTIONAL] custom on_place(entity, placer, pointed_thing) callback called after normal on place handling is done
 		custom_on_place_handler = nil,
-		
+
 		--! @brief [OPTIONAL] custom on_activate(entity) callback called after normal on_activate handling is done
 		custom_on_activate_handler = nil,
-		
+
 		--! @brief [OPTIONAL] custom on_step(entity) callback called after normal on_step handling is done
 		custom_on_step_handler = nil,
-		
+
 		},
-			
-	--! @brief [MANDATORY] configuration of movement generator				
+
+	--! @brief [MANDATORY] configuration of movement generator
 	movement =  {
 		--! @brief [MANDATORY] is this a flying mob
 		canfly=false,
-		
+
 		--! @brief [MANDATORY] minumum acceleration of mob
 		min_accel=0,
-		
+
 		--! @brief [MANDATORY] maximum acceleration of mob
 		max_accel=0,
-		
+
 		--! @brief [MANDATORY] maximum absolute speed of mob
 		max_speed=0,
-		
+
 		--! @brief [OPTIONAL] minimum speed a mob shall move (if moving at all)
 		min_speed=0,
-		
+
 		--! @brief [MOV_GEN_DEPENDENT | MANDATORY] pattern based movement gen -> pattern to use for movement
 		pattern="some pattern id",
-		
+
 		--! @brief [MOV_GEN_DEPENDENT | OPTIONAL] follow movement gen -> does this mob guard it's spawnpoint
 		guardspawnpoint = false,
-		
+
 		--! @brief [MOV_GEN_DEPENDENT | OPTIONAL] follow movement gen -> time until this mob teleports to its target
 		teleportdelay = 60,
 
 		},
-		
+
 	--! @brief [OPTIONAL] if mob is harvestable configure it here
 	harvest = {
 		--! @brief [OPTIONAL] tool required for harvesting
 		tool=nil,
-		
+
 		--! @brief [OPTIONAL] is tool consuled by harvesting
 		tool_consumed=false,
-		
+
 		--! @brief [MANDATORY] result of harvest
-		result="", 
-		
+		result="",
+
 		--! @brief [OPTIONAL] mob transforms to this mob on harvest
 		transforms_to="",
-		
+
 		--! @brief [MANDATORY] minimum time between two harvests (in case of transform set this to -1)
 		min_delay=-1,
 		},
-		
+
 	--! @brief [OPTIONAL] configuration how to catch the mob
 	catching = {
 		--! @brief [MANDATORY] tool required to wear to catch the mob
@@ -121,26 +121,26 @@ local mob_template = {
 		--! @brief [MANDATORY] is tool consumed by catching
 		consumed = true,
 		},
-		
+
 	--! @brief [OPTIONAL] does this mob do random drops
 	random_drop    = {
-	
+
 		--! @brief [MANDATORY] item to be dropped
 		result="some_material",
-		
+
 		--! @brief [MANDATORY] minimum delay between two drops
 		min_delay=60,
-		
+
 		--! @brief [MANDATORY] chance per second to drop after min_delay has passed
 		chance=0.2
-		},		
-	
+		},
+
 	--! @brief [OPTIONAL] if this mob s intended to transform by its own configure it here
 	auto_transform = {
-	
+
 		--! @brief [MANDATORY] mob to transform to
 		result="some_mob",
-		
+
 		--! @brief [MANDATORY] time to transformation
 		delay=1800
 		},
@@ -149,20 +149,20 @@ local mob_template = {
 	combat = {
 		--! @brief [MANDATORY] does mob start an attack on its own?
 		starts_attack=true,
-		
+
 		--! @brief [MANDATORY] chance mob will attack (if starting attack on its own or beeing attacked)
 		angryness=0.95,
-		
+
 		--! @brief [OPTIONAL] is mob sensitive to sun?
 		sun_sensitive=true,
-		
+
 		--! @brief [OPTIONAL] attacks hostile mobs
 		attack_hostile_mobs=false,
-		
+
 		--! @brief [UNUSED] attacks hostile mobs
 		--attack_friendly_mobs=false,
-		
-		--! @brief [OPTIONAL] configuration of meele attack				
+
+		--! @brief [OPTIONAL] configuration of meele attack
 		melee = {
 			--! @brief [MANDATORY] maximum damage mob does per hit
 			maxdamage=4,
@@ -182,7 +182,7 @@ local mob_template = {
 			--! @brief [MANDATORY] minimum time between two attacks
 			speed=2,
 			},
-			
+
 		--! @brief [OPTIONAL] configuration for self destructing mob
 		self_destruct = {
 			--! [MANDATORY] maximum damage to be done on self destruct
@@ -195,7 +195,7 @@ local mob_template = {
 			delay=5,
 			},
 		},
-	--! @brief [MANDATORY] spawning configuration for mob	
+	--! @brief [MANDATORY] spawning configuration for mob
 	spawning = {
 		--! @brief [MANDATORY] rate this mob is spawned
 		rate=0.01,
@@ -203,11 +203,11 @@ local mob_template = {
 		density=1000,
 		--! @brief [MANDATORY] identifyer of spawn algorithm
 		algorithm="some algorithm id",
-		
+
 		--! @brief [ALGORITHM DEPENDENT] shadows minimum number of air blocks above pos
 		height = 1,
 		},
-	
+
 	--! @brief [OPTIONAL] sounds to be played by mob
 	sound = {
 		--! @brief [OPTIONAL] random sound to be played
@@ -269,7 +269,7 @@ local mob_template = {
 			max_hear_distance = 100,
 			},
 		},
-		
+
 	--! @brief [OPTIONAL] parameters for rideable mobs
 	ride = {
 		--! @brief [OPTIONAL] speed when walking
@@ -279,13 +279,13 @@ local mob_template = {
 		--! @brief [OPTIONAL] inital jumpspeed
 		jumpspeed  = 58,
 		--! @brief [OPTIONAL] offset to center player is put to
-		attacheoffset = { x=0,y=2,z=0},					
+		attacheoffset = { x=0,y=2,z=0},
 		--! @brief [OPTIONAL] texture modifier when player is attached
 		texturemod = "^mob_ostrich_ostrich_saddle_mesh.png",
 		--! @brief [OPTIONAL] animation to show when riding
 		walk_anim = "walk",
 	},
-	
+
 	--! @brief [OPTIONAL] description of animations
 	animation = {
 		--! @brief [OPTIONAL] one or many animation descriptions
@@ -296,7 +296,7 @@ local mob_template = {
 			end_frame   = 2,
 			},
 		},
-	
+
 	--! @brief [OPTIONAL] configuration for a trader mob
 	trader_inventory = {
 				--! @brief [MANDATORY] goodlist to be sold
@@ -309,40 +309,43 @@ local mob_template = {
 				--! @brief [MANDATORY] list of names randomly choosen for trader
 				random_names = { "Name1","Name2","Name3"},
 			},
-	
+
 	--! @brief [OPTIONAL] configuration for attention handling
 	attention = {
 				--! @brief [OPTIONAL] hear distance value
 				hear_distance = 3,
 				--! @brief [UPPER_VALUE_DEPENDENT | MANDATORY] value to add if within hear distance
 				hear_distance_value = 0.5,
-				
+
 				--! @brief [OPTIONAL] view angle to consider
 				view_angle = nil,
 				--! @brief [UPPER_VALUE_DEPENDENT | MANDATORY] value to add if someone is within view angke
 				own_view_value = 0,
-				
+
 				--! @brief [OPTIONAL] is remove view angle relevant?
 				remote_view = false,
 				--! @brief [UPPER_VALUE_DEPENDENT | MANDATORY] value to add if remote target looks at mob
 				remote_view_value = 0,
-				
+
 				--! @brief [OPTIONAL] value to add if within attention distance
 				attention_distance_value = 0.2,
-				
+
 				--! @brief [OPTIONAL] threshold to issue watch callback
 				watch_threshold = 2,
-				
+
 				--! @brief [OPTIONAL] threshold to issue attack callback
 				attack_threshold = nil,
-				
+
 				--! @brief [MANDATORY] maximum distance to consider objects for attantion
 				attention_distance = 7.5,
-				
+
 				--! @brief [MANDATORY] maximum amount of attention any object can draw
 				attention_max = 10,
+
+				--! @brief [OPTIONAL] watch_callback(entity,target) a callback to be called once attention threshold is reached
+				watch_callback = nil
 		},
-		
+
 	--! @brief [OPTIONAL] factions configuration
 	factions = {
 			--! @brief [OPTIONAL] define factions to be member in
@@ -353,7 +356,7 @@ local mob_template = {
 				"faction_4"
 				},
 			},
-	--! @brief [OPTIONAL] used to specify different movement/model states, 
+	--! @brief [OPTIONAL] used to specify different movement/model states,
 	--! you may specify as many states as you like
 	states = {
 			{
@@ -386,7 +389,7 @@ local mob_template = {
 					sprite_div = {x=0,y=0},
 					--! @brief [MANDATORY] height of sprite
 					visible_height = 3.2,
-					
+
 					},
 				--! @brief [MANDATORY] a animation to be played while this state is active
 				animation = "walk",

@@ -329,11 +329,13 @@ function spawning.lifecycle_callback(entity,now)
 end
 
 ------------------------------------------------------------------------------
--- name: register_spawn_algorithm()
+-- name: register_spawn_algorithm(name, spawnfunc, cleanupfunc)
 -- @function [parent=#spawning] register_spawn_algorithm
 --
 --! @brief print current spawn statistics
 --! @memberof spawning
+--
+--! @param name name of spawn algorithm
 --! @param spawnfunc function to be called to initialize this algorithm
 --! @param cleanupfunc function to initialize a cleanup if spawner needs to be removed
 --
@@ -532,10 +534,12 @@ end
 --
 --! @brief divide mapblock into 2d chunks and call spawnfunc with randomized parameters for each
 --! @memberof spawning
+--
 --! @param minp minimum 3d point of map block
 --! @param maxp maximum 3d point of map block
 --! @param spawning_data full set of spawning parameters
 --! @param spawnfunc function to use for spawning
+--! @param surfacefunc funtion to determine surface level
 --! @param maxtries maximum number of tries to place a entity
 --
 -------------------------------------------------------------------------------
@@ -683,9 +687,8 @@ end
 --! @param spawnfunc function to call for spawning
 --! @param surfacefunc if not nil use this function to find surface
 --! @param suffix to add
---! @param maxttries maximum number of tries per step
+--! @param max_tries maximum number of tries per step
 --
---! @return
 -------------------------------------------------------------------------------
 function spawning.register_spawner_entity(spawning_data,spawnfunc,surfacefunc,suffix,max_tries)
 	if suffix == nil then
@@ -1151,7 +1154,10 @@ end
 --! @brief build a entity like datastructure to be passed to pos_quality check
 --! @memberof spawning
 --
---! @param pos_quality state
+--! @param spawning_data to check quality for
+--! @param pos position to check quality at
+--
+--! @return a possition quality element
 -------------------------------------------------------------------------------
 function spawning.pos_quality(spawning_data,pos)
 	local dummyentity = {}

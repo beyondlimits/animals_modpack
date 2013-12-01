@@ -26,6 +26,7 @@ local SHALLOW_WATER_SPAWNER_SUFFIX = "_shallow_water"
 --
 --! @param spawning_data spawning configuration
 --! @param pos position do spawn
+--! @param self entity calling this fct
 -------------------------------------------------------------------------------
 function mobf_spawner_in_shallow_water_spawner_spawnfunc(spawning_data,pos,self)
 

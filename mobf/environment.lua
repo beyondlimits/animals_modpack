@@ -27,7 +27,7 @@ mobf_assert_backtrace(environment_list == nil)
 environment_list = {}
 
 -------------------------------------------------------------------------------
--- name: get_pos_same_level(pos_raw,maxsearcharea,entity,checkfunc)
+-- @function [parent=#environment] get_pos_same_level(pos_raw,maxsearcharea,entity,checkfunc)
 --
 --! @brief find a position suitable around a specific position
 --! @ingroup environment
@@ -144,7 +144,7 @@ function environment.get_pos_same_level(pos_raw,maxsearcharea,entity,checkfunc)
 end
 
 -------------------------------------------------------------------------------
--- name: get_suitable_pos_same_level(pos_raw,maxsearcharea,entity)
+-- @function [parent=#environment] get_suitable_pos_same_level(pos_raw,maxsearcharea,entity)
 --
 --! @brief find a position suitable around a specific position
 --! @ingroup environment
@@ -179,7 +179,7 @@ function environment.get_suitable_pos_same_level(pos_raw,maxsearcharea,entity,ac
 end
 
 -------------------------------------------------------------------------------
--- name: is_media_element(nodename,environment)
+-- @function [parent=#environment] is_media_element(nodename,environment)
 --
 --! @brief check if nodename is in environment
 --! @ingroup environment
@@ -212,7 +212,7 @@ function environment.is_media_element( nodename, media )
 end
 
 -------------------------------------------------------------------------------
--- name: get_absolute_min_max_pos(env, pos)
+-- @function [parent=#environment] get_absolute_min_max_pos(env, pos)
 --
 --! @brief check if nodename is in environment
 --! @ingroup environment
@@ -258,7 +258,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: is_jumpable_surface(name)
+-- @function [parent=#environment] is_jumpable_surface(name)
 --
 --! @brief check if name is a surface an mob may jump onto
 --! @ingroup environment
@@ -283,7 +283,7 @@ function environment.is_jumpable_surface(name)
 end
 
 -------------------------------------------------------------------------------
--- name: checksurfacek(pos,surfaces)
+-- @function [parent=#environment] checksurfacek(pos,surfaces)
 --
 --! @brief check if a position is suitable for an mob
 --! @ingroup environment
@@ -337,7 +337,7 @@ function environment.checksurface(pos,surface)
 end
 
 -------------------------------------------------------------------------------
--- name: get_min_max_ground_dist(entity)
+-- @function [parent=#environment] get_min_max_ground_dist(entity)
 --
 --! @brief calculate absolute minimum and maximum height for a mob
 --! @ingroup environment
@@ -366,7 +366,7 @@ function environment.get_min_max_ground_dist(entity)
 end
 
 -------------------------------------------------------------------------------
--- name: evaluate_pos_media(pos,media)
+-- @function [parent=#environment] evaluate_pos_media(pos,media)
 --
 --! @brief check position media quality
 --! @ingroup environment
@@ -392,7 +392,7 @@ function environment.evaluate_pos_media(pos,media)
 end
 
 -------------------------------------------------------------------------------
--- name: same_state(state1,state2)
+-- @function [parent=#environment] same_state(state1,state2)
 --
 --! @brief compare two states
 --! @ingroup environment
@@ -435,7 +435,7 @@ function environment.same_state(state1,state2)
 end
 
 -------------------------------------------------------------------------------
--- name: compare_state(state1,state2)
+-- @function [parent=#environment] compare_state(state1,state2)
 --
 --! @brief compare state1 and state2
 --! @ingroup environment
@@ -449,8 +449,8 @@ function environment.compare_state(state1,state2)
 	environment.is_state(state1)
 	environment.is_state(state2)
 
-	local right_worse = false
 	local right_better = false
+	local left_better = false
 
 	if state1.valid == false and state2.valid == true then
 		return 1
@@ -489,7 +489,7 @@ function environment.compare_state(state1,state2)
 end
 
 -------------------------------------------------------------------------------
--- name: is_state(state)
+-- @function [parent=#environment] is_state(state)
 --
 --
 --! @brief assert if state is something else than a state
@@ -508,7 +508,7 @@ function environment.is_state(state)
 	mobf_assert_backtrace(state.surface_quality_center ~= nil)
 end
 -------------------------------------------------------------------------------
--- name: evaluate_state(state,old_state, min_media,
+-- @function [parent=#environment] evaluate_state(state,old_state, min_media,
 --                     min_geom,min_geom_center,min_min_surface,min_max_surface)
 --
 --! @brief evaluate a position
@@ -561,7 +561,7 @@ function environment.evaluate_state(state,limits)
 end
 
 -------------------------------------------------------------------------------
--- name: pos_quality(pos,entity)
+-- @function [parent=#environment] pos_quality(pos,entity)
 --
 --! @brief check position quality
 --! @ingroup environment
@@ -857,7 +857,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: pos_is_ok(pos,entity) DEPRECATED
+-- @function [parent=#environment] pos_is_ok(pos,entity) DEPRECATED
 --
 --! @brief check if a position is suitable for an mob
 --! @ingroup environment
@@ -991,7 +991,7 @@ function environment.pos_is_ok(pos,entity,dont_do_jumpcheck)
 end
 
 -------------------------------------------------------------------------------
--- name: get_default_gravity(pos,environment,canfly)
+-- @function [parent=#environment] get_default_gravity(pos,environment,canfly)
 --
 --! @brief get default acceleration depending on mobs medium and pos
 --! @ingroup environment
@@ -1037,7 +1037,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: fix_base_pos(entity, middle_to_bottom)
+-- @function [parent=#environment] fix_base_pos(entity, middle_to_bottom)
 --
 --! @brief fix the mobs y position according to model or sprite height
 --! @ingroup environment
@@ -1062,7 +1062,7 @@ function environment.fix_base_pos(entity, center_to_bottom)
 			dbg_mobf.environment_lvl3("MOBF: fixing y position / base position required? "
 				.. node_pos.name .. " " .. node_pos_check.name)
 			if node_pos.name ~= node_pos_check.name then
-				distance_to_ground = mobf_surface_distance(pos)
+				local distance_to_ground = mobf_surface_distance(pos)
 
 				pos.y = pos.y + (center_to_bottom - distance_to_ground +0.5)
 				dbg_mobf.environment_lvl2("MOBF: fixing y position of " .. entity.data.name
@@ -1077,7 +1077,7 @@ function environment.fix_base_pos(entity, center_to_bottom)
 end
 
 -------------------------------------------------------------------------------
--- name: register(name, environment)
+-- @function [parent=#environment] register(name, environment)
 --
 --! @brief register an environment to mob framework
 --! @ingroup environment
@@ -1097,7 +1097,7 @@ function environment.register(name, environment)
 end
 
 -------------------------------------------------------------------------------
--- name: pos_state_is_impossible(entity,pos)
+-- @function [parent=#environment] pos_state_is_impossible(entity,pos)
 --
 --! @brief checks if a entity can be there (not if it would move there by its own)
 --! @ingroup environment

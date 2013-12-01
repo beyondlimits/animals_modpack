@@ -119,7 +119,8 @@ end
 --
 --! @brief calculate calculate x and z components of a directed speed
 --
---! @param dir_radians direction of movement radians
+--! @param xz_plane_radians direction of movement within x-z plane radians
+--! @param xy_plane_radians direction of movement within x-y plane radians
 --! @param absolute_speed speed in direction
 --
 --! @return {x,z}

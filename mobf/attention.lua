@@ -28,7 +28,7 @@ mobf_assert_backtrace(attention == nil)
 attention = {}
 
 -------------------------------------------------------------------------------
--- name: aggression(entity)
+-- @function [parent=#attention] aggression(entity)
 --
 --! @brief old agression handler to be used for legacy mobs
 --! @memberof attention
@@ -86,7 +86,7 @@ function attention.aggression(entity,now)
 end
 
 -------------------------------------------------------------------------------
--- name: callback(entity)
+-- @function [parent=#attention] callback(entity)
 --
 --! @brief calculate attenntion level for mob mob
 --! @memberof attention
@@ -289,6 +289,7 @@ function attention.callback(entity,now)
 		dump(entity.data.attention.watch_threshold))
 
 	local toattack = nil
+	local attack_attention_value = nil
 
 	if mobf_rtd.factions_available then
 		if top_attention_enemy ~= nil then
@@ -329,7 +330,7 @@ function attention.callback(entity,now)
 end
 
 -------------------------------------------------------------------------------
--- name: init_dynamic_data(entity)
+-- @function [parent=#attention] init_dynamic_data(entity)
 --
 --! @brief initialize all dynamic data on activate
 --! @memberof attention
@@ -349,7 +350,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: increase_attention_level(entity,source,value)
+-- @function [parent=#attention] increase_attention_level(entity,source,value)
 --
 --! @brief initialize all dynamic data on activate
 --! @memberof attention
@@ -374,7 +375,7 @@ function attention.increase_attention_level(entity,source,value)
 end
 
 -------------------------------------------------------------------------------
--- name: is_enemy(entity,object)
+-- @function [parent=#attention] is_enemy(entity,object)
 --
 --! @brief initialize all dynamic data on activate
 --! @memberof attention

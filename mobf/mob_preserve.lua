@@ -27,8 +27,7 @@ mob_preserve = {}
 mob_preserve.entrys_per_page = 10
 
 ------------------------------------------------------------------------------
--- name: init()
--- @function [parent=#mob_preserve] preserve handler
+-- @function [parent=#mob_preserve] init()
 --
 --! @brief initialize dynamic data
 --! @memberof mob_preserve
@@ -60,8 +59,7 @@ function mob_preserve.init()
 end
 
 ------------------------------------------------------------------------------
--- name: handle_remove(entity,reason)
--- @function [parent=#mob_preserve] preserve handler
+-- @function [parent=#mob_preserve] handle_remove(entity,reason)
 --
 --! @brief check if a mob needs to be preserved
 --! @memberof mob_preserve
@@ -106,8 +104,7 @@ function mob_preserve.handle_remove(entity,reason)
 end
 
 ------------------------------------------------------------------------------
--- name: handle_rightclick(name,param)
--- @function [parent=#mob_preserve] preserve handler
+-- @function [parent=#mob_preserve] handle_rightclick(name,param)
 --
 --! @brief show list of removed mobs
 --! @memberof mob_preserve
@@ -124,8 +121,7 @@ end
 
 
 ------------------------------------------------------------------------------
--- name: get_formspec(name,page)
--- @function [parent=#mob_preserve] get formspec
+-- @function [parent=#mob_preserve] get_formspec(name,page)
 --
 --! @brief generate page form for mob_preserve
 --! @memberof mob_preserve
@@ -207,8 +203,7 @@ end
 
 
 ------------------------------------------------------------------------------
--- name: button_callback(player,formname,fields)
--- @function [parent=#mob_preserve] handle button callback
+-- @function [parent=#mob_preserve] button_callback(player,formname,fields)
 --
 --! @brief handle button callback
 --! @memberof mob_preserve
@@ -263,8 +258,7 @@ function mob_preserve.button_callback(player, formname, fields)
 end
 
 ------------------------------------------------------------------------------
--- name: retake_mob(player,entrynumber,totalnumber)
--- @function [parent=#mob_preserve] give mob back to player
+-- @function [parent=#mob_preserve] retake_mob(player,entrynumber,totalnumber)
 --
 --! @brief give mob back to player
 --! @memberof mob_preserve

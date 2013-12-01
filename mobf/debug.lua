@@ -22,7 +22,7 @@ mobf_assert_backtrace(mobf_debug == nil)
 mobf_debug = {}
 
 -------------------------------------------------------------------------------
--- name: print_usage(player,command,toadd)
+-- @function [parent=#mobf_debug] print_usage(player,command,toadd)
 --
 --! @brief send errormessage to player
 --
@@ -58,7 +58,7 @@ function mobf_debug.print_usage(player, command, toadd)
 end
 
 -------------------------------------------------------------------------------
--- name: spawn_mob(name,param)
+-- @function [parent=#mobf_debug] spawn_mob(name,param)
 --
 --! @brief handle a spawn mob command
 --
@@ -125,7 +125,7 @@ function mobf_debug.spawn_mob(name,param)
 		local maxtries = 10
 
 		while (found == false) and (maxtries > 0) do
-			toadd = {}
+			local toadd = {}
 			toadd.x = pos.x + (math.random(20) -10)
 			toadd.z = pos.z + (math.random(20) -10)
 
@@ -146,7 +146,7 @@ function mobf_debug.spawn_mob(name,param)
 end
 
 -------------------------------------------------------------------------------
--- name: list_active_mobs(name,param)
+-- @function [parent=#mobf_debug] list_active_mobs(name,param)
 --
 --! @brief print list of all current active mobs
 --
@@ -168,7 +168,7 @@ function mobf_debug.list_active_mobs(name,param)
 end
 
 -------------------------------------------------------------------------------
--- name: list_spawners(name,param)
+-- @function [parent=#mobf_debug] list_spawners(name,param)
 --
 --! @brief print list of all spawners around player
 --
@@ -192,7 +192,7 @@ function mobf_debug.list_spawners(name,param)
 end
 
 -------------------------------------------------------------------------------
--- name: mob_count(name,param)
+-- @function [parent=#mobf_debug] mob_count(name,param)
 --
 --! @brief count active mobs
 --
@@ -212,7 +212,7 @@ function mobf_debug.mob_count(name,param)
 end
 
 -------------------------------------------------------------------------------
--- name: add_tools(name,param)
+-- @function [parent=#mobf_debug] add_tools(name,param)
 --
 --! @brief add toolset for testing
 --
@@ -232,7 +232,7 @@ function mobf_debug.add_tools(name,param)
 end
 
 -------------------------------------------------------------------------------
--- name: list_defined_mobs(name,param)
+-- @function [parent=#mobf_debug] list_defined_mobs(name,param)
 --
 --! @brief list all registred mobs
 --
@@ -249,7 +249,7 @@ function mobf_debug.list_defined_mobs(name,param)
 end
 
 -------------------------------------------------------------------------------
--- name: init()
+-- @function [parent=#mobf_debug] init()
 --
 --! @brief initialize debug commands chat handler
 --
@@ -340,7 +340,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: handle_spawnhouse(name,message)
+-- @function [parent=#mobf_debug] handle_spawnhouse(name,message)
 --
 --! @brief spawn small house
 --

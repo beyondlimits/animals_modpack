@@ -443,6 +443,8 @@ end
 --
 --! @param pos_raw position to check
 --! @param media table of blocks not considered to be ground
+--! @param max_check_height abort looking for ground after this number of nodes
+--
 --! @return number of blocks to ground
 -------------------------------------------------------------------------------
 function mobf_ground_distance(pos_raw,media,max_check_height)

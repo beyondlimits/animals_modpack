@@ -26,7 +26,7 @@ mob_state = {}
 mob_state.default_state_time = 30
 
 -------------------------------------------------------------------------------
--- name: initialize(entity,now)
+-- @function [parent=#mob_state] initialize(entity,now)
 --
 --! @brief initialize state dynamic data
 --! @memberof mob_state
@@ -76,7 +76,7 @@ function mob_state.initialize(entity,now)
 end
 
 -------------------------------------------------------------------------------
--- name: get_state_by_name(entity,name)
+-- @function [parent=#mob_state] get_state_by_name(entity,name)
 --
 --! @brief get a state by its name
 --! @memberof mob_state
@@ -100,7 +100,7 @@ function mob_state.get_state_by_name(entity,name)
 end
 
 -------------------------------------------------------------------------------
--- name: lock(entity,value)
+-- @function [parent=#mob_state] lock(entity,value)
 --
 --! @brief disable random state changes for a mob
 --! @memberof mob_state
@@ -124,7 +124,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: callback(entity,now,dstep)
+-- @function [parent=#mob_state] callback(entity,now,dstep)
 --
 --! @brief callback handling state changes
 --! @memberof mob_state
@@ -231,7 +231,7 @@ function mob_state.callback(entity,now,dstep)
 end
 
 -------------------------------------------------------------------------------
--- name: switch_switch_movgenentity(entity,state)
+-- @function [parent=#mob_state] switch_switch_movgenentity(entity,state)
 --
 --! @brief helper function to swich a movement based on new state
 --! @memberof mob_state
@@ -265,7 +265,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: change_state(entity,state)
+-- @function [parent=#mob_state] change_state(entity,state)
 --
 --! @brief change state for an entity
 --! @memberof mob_state
@@ -349,7 +349,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: getTimeToNextState(typical_state_time)
+-- @function [parent=#mob_state] getTimeToNextState(typical_state_time)
 --
 --! @brief helper function to calculate a gauss distributed random value
 --! @memberof mob_state
@@ -405,7 +405,7 @@ function mob_state.getTimeToNextState(typical_state_time)
 end
 
 -------------------------------------------------------------------------------
--- name: prepare_states(mob)
+-- @function [parent=#mob_state] prepare_states(mob)
 --
 --! @brief prepare mobs states upon registration
 --! @memberof mob_state
@@ -464,7 +464,7 @@ function mob_state.prepare_states(mob)
 end
 
 -------------------------------------------------------------------------------
--- name: switch_model(entity,state)
+-- @function [parent=#mob_state] switch_model(entity,state)
 --
 --! @brief switch model used for a entity
 --! @memberof mob_state
@@ -478,7 +478,7 @@ function mob_state.switch_model(entity,state)
 end
 
 -------------------------------------------------------------------------------
--- name: BuiltinHungerPrecondition(mob)
+-- @function [parent=#mob_state] BuiltinHungerPrecondition(mob)
 --
 --! @brief prepare builtin hunger precondition handler
 --! @memberof mob_state
@@ -598,7 +598,7 @@ function mob_state.BuiltinHungerPrecondition(mob)
 end
 
 -------------------------------------------------------------------------------
--- name: BuiltinHungerLeave(mob)
+-- @function [parent=#mob_state] BuiltinHungerLeave(mob)
 --
 --! @brief prepare builtin hunger leave handler
 --! @memberof mob_state
@@ -621,7 +621,7 @@ function mob_state.BuiltinHungerLeave(mob)
 end
 
 -------------------------------------------------------------------------------
--- name: BuiltinHungerEnter(mob)
+-- @function [parent=#mob_state] BuiltinHungerEnter(mob)
 --
 --! @brief prepare builtin hunger enter handler
 --! @memberof mob_state
@@ -655,7 +655,7 @@ function mob_state.BuiltinHungerEnter(mob)
 end
 
 -------------------------------------------------------------------------------
--- name: BuiltinHungerTargetReached(entity)
+-- @function [parent=#mob_state] BuiltinHungerTargetReached(entity)
 --
 --! @brief handle target reached
 --! @memberof mob_state

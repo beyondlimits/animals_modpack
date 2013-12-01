@@ -34,7 +34,7 @@ fighting = {}
 fighting.on_death_callbacks = {}
 
 -------------------------------------------------------------------------------
--- name: register_on_death_callback(callback)
+-- @function [parent=#fighting] register_on_death_callback(callback)
 --
 --! @brief register an additional callback to be called on death of a mob
 --! @memberof fighting
@@ -53,7 +53,7 @@ function fighting.register_on_death_callback(callback)
 end
 
 -------------------------------------------------------------------------------
--- name: do_on_death_callback(entity,hitter)
+-- @function [parent=#fighting] do_on_death_callback(entity,hitter)
 --
 --! @brief call all registred on_death callbacks
 --! @memberof fighting
@@ -69,7 +69,7 @@ function fighting.do_on_death_callback(entity,hitter)
 end
 
 -------------------------------------------------------------------------------
--- name: push_back(entity,player)
+-- @function [parent=#fighting] push_back(entity,player)
 --
 --! @brief move a mob backward if it's punched
 --! @memberof fighting
@@ -108,7 +108,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: hit(entity,attacker)
+-- @function [parent=#fighting] hit(entity,attacker)
 --
 --! @brief handler for mob beeing hit
 --! @memberof fighting
@@ -232,7 +232,7 @@ function fighting.hit(entity,attacker)
 end
 
 -------------------------------------------------------------------------------
--- name: run_away(entity,dir_to_enemy,enemy)
+-- @function [parent=#fighting] run_away(entity,dir_to_enemy,enemy)
 --
 --! @brief make a mob run away
 --! @memberof fighting
@@ -269,7 +269,7 @@ function fighting.run_away(entity,dir_to_enemy,enemy)
 end
 
 -------------------------------------------------------------------------------
--- name: identify_combat_state(entity,target,distance)
+-- @function [parent=#fighting] identify_combat_state(entity,target,distance)
 --
 --! @brief identify combat state to use
 --! @memberof fighting
@@ -282,7 +282,7 @@ end
 -------------------------------------------------------------------------------
 function fighting.identify_combat_state(entity,distance)
 
-	target = entity.dynamic_data.combat.target
+	local target = entity.dynamic_data.combat.target
 	mobf_assert_backtrace(entity ~= nil)
 	mobf_assert_backtrace(target ~= nil)
 
@@ -317,7 +317,7 @@ function fighting.identify_combat_state(entity,distance)
 end
 
 -------------------------------------------------------------------------------
--- name: switch_to_combat_state(entity,now,target)
+-- @function [parent=#fighting] switch_to_combat_state(entity,now,target)
 --
 --! @brief switch to combat state
 --! @memberof fighting
@@ -384,7 +384,7 @@ function fighting.switch_to_combat_state(entity,now,target)
 end
 
 -------------------------------------------------------------------------------
--- name: restore_previous_state(entity,now)
+-- @function [parent=#fighting] restore_previous_state(entity,now)
 --
 --! @brief restore default movement generator of mob
 --! @memberof fighting
@@ -431,7 +431,7 @@ function fighting.restore_previous_state(entity,now)
 end
 
 -------------------------------------------------------------------------------
--- name: in_range(entity,now)
+-- @function [parent=#fighting] in_range(entity,now)
 --
 --! @brief check if mob is within range of target
 --! @memberof fighting
@@ -464,7 +464,7 @@ function fighting.in_range(entity,distance)
 end
 
 -------------------------------------------------------------------------------
--- name: combat(entity,now)
+-- @function [parent=#fighting] combat(entity,now)
 --
 --! @brief periodic callback called to do mobs own combat related actions
 --! @memberof fighting
@@ -610,7 +610,7 @@ function fighting.combat(entity,now,dtime)
 end
 
 -------------------------------------------------------------------------------
--- name: get_target(entity)
+-- @function [parent=#fighting] get_target(entity)
 --
 --! @brief find and possible target next to mob
 --! @memberof fighting
@@ -729,7 +729,7 @@ function fighting.get_target(entity)
 end
 
 -------------------------------------------------------------------------------
--- name: self_destruct_trigger(entity,distance)
+-- @function [parent=#fighting] self_destruct_trigger(entity,distance)
 --
 --! @brief handle self destruct features
 --! @memberof fighting
@@ -758,7 +758,7 @@ function fighting.self_destruct_trigger(entity,distance,now)
 	end
 end
 -------------------------------------------------------------------------------
--- name: self_destruct_handler(entity)
+-- @function [parent=#fighting] self_destruct_handler(entity)
 --
 --! @brief handle self destruct features
 --! @memberof fighting
@@ -829,7 +829,7 @@ function fighting.self_destruct_handler(entity,now)
 end
 
 -------------------------------------------------------------------------------
--- name: melee_attack_handler(entity,now)
+-- @function [parent=#fighting] melee_attack_handler(entity,now)
 --
 --! @brief handle melee attack
 --! @memberof fighting
@@ -910,7 +910,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: distance_attack_handler(entity,now)
+-- @function [parent=#fighting] distance_attack_handler(entity,now)
 --
 --! @brief handle distance attack
 --! @memberof fighting
@@ -1019,7 +1019,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: sun_damage_handler(entity,now)
+-- @function [parent=#fighting] sun_damage_handler(entity,now)
 --
 --! @brief handle damage done by sun
 --! @memberof fighting
@@ -1094,7 +1094,7 @@ function fighting.sun_damage_handler(entity,now)
 end
 
 -------------------------------------------------------------------------------
--- name: get_target_name(target)
+-- @function [parent=#fighting] get_target_name(target)
 --
 --! @brief get name of target
 --! @memberof fighting
@@ -1124,7 +1124,7 @@ function fighting.get_target_name(target)
 end
 
 -------------------------------------------------------------------------------
--- name: set_target(entity,target)
+-- @function [parent=#fighting] set_target(entity,target)
 --
 --! @brief decide if only switching target or state
 --! @memberof fighting
@@ -1164,7 +1164,7 @@ function fighting.set_target(entity,target)
 end
 
 -------------------------------------------------------------------------------
--- name: is_valid_target(target)
+-- @function [parent=#fighting] is_valid_target(target)
 --
 --! @brief check if a target is a valid target
 --! @memberof fighting
@@ -1194,7 +1194,7 @@ function fighting.is_valid_target(target)
 end
 
 -------------------------------------------------------------------------------
--- name: fighting.init_dynamic_data(entity)
+-- @function [parent=#fighting] fighting.init_dynamic_data(entity)
 --
 --! @brief initialize all dynamic data on activate
 --! @memberof fighting

@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file api.lua
@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
--- name: mobf_register_on_death_callback(callback)
+-- @function mobf_register_on_death_callback(callback)
 --
 --! @brief get version of mob framework
 --! @ingroup framework_mob
@@ -28,7 +28,7 @@ function mobf_register_on_death_callback(callback)
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_get_mob_definition(mobname)
+-- @function mobf_get_mob_definition(mobname)
 --
 --! @brief get COPY of mob definition
 --! @ingroup framework_mob
@@ -45,7 +45,7 @@ function mobf_get_mob_definition(mobname)
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_get_version()
+-- @function mobf_get_version()
 --
 --! @brief get version of mob framework
 --! @ingroup framework_mob
@@ -57,7 +57,7 @@ function mobf_get_version()
 end
 
 ------------------------------------------------------------------------------
--- name: mobf_add_mob(mob)
+-- @function mobf_add_mob(mob)
 --
 --! @brief register a mob within mob framework
 --! @ingroup framework_mob
@@ -71,39 +71,39 @@ function mobf_add_mob(mob)
 		minetest.log(LOGLEVEL_ERROR,"MOBF: name and modname are mandatory for ALL mobs!")
 		return false
 	end
-	
+
 	--check if mob may be added
 	if mobf_contains(mobf_rtd.registred_mob,mob.modname.. ":"..mob.name) then
 		mobf.blacklisthandling(mob)
 		return false
 	end
-	
+
 	--if a random drop is specified for this mob register it
 	if mob.random_drop ~= nil then
 		random_drop.register(mob.random_drop)
 	end
-	
+
 	--create default entity
 	minetest.log(LOGLEVEL_INFO,"MOBF: adding: " .. mob.name)
 	mob_state.prepare_states(mob)
 
 	mobf.register_entity(":" .. mob.modname .. ":"..mob.name,
 							graphics.graphics_by_statename(mob,"default"), mob)
-	
+
 	--add compatibility entity to replace old __default entities by new ones
-	minetest.log(LOGLEVEL_INFO,"MOBF: registering compatibility entity: >" .. 
+	minetest.log(LOGLEVEL_INFO,"MOBF: registering compatibility entity: >" ..
 					":" .. mob.modname .. ":"..mob.name .. "__default" .. "<")
 	minetest.register_entity(":" .. mob.modname .. ":"..mob.name .. "__default",
 			{
 			replacement_name = mob.modname .. ":"..mob.name,
 			on_activate = function(self,staticdata)
-			
+
 					local pos = self.object:getpos()
-					
+
 					if pos ~= nil then
 						local newobject = minetest.add_entity(pos,self.replacement_name)
 						local spawned_entity = mobf_find_entity(newobject)
-						
+
 						if spawned_entity ~= nil then
 						spawned_entity.dynamic_data.initialized = false
 						spawned_entity.dynamic_data.last_static_data = staticdata
@@ -112,16 +112,16 @@ function mobf_add_mob(mob)
 					self.object:remove()
 				end,
 			})
-	
+
 	mobf.register_mob_item(mob.name,mob.modname,mob.generic.description)
-	
+
 	--check if a movement pattern was specified
 	if mobf_rtd.movement_patterns[mob.movement.pattern] == nil then
 		minetest.log(LOGLEVEL_WARNING,"MOBF: no movement pattern specified!")
 	end
-	
+
 	spawning.register_mob(mob)
-	
+
 	--register factions required by mob
 	mobf_factions.setupmob(mob.factions)
 
@@ -132,12 +132,12 @@ function mobf_add_mob(mob)
 	--register mob name to internal data structures
 	table.insert(mobf_rtd.registred_mob,mob.modname.. ":"..mob.name)
 	mobf_rtd.registred_mob_data[mob.modname.. ":"..mob.name] = mob;
-	
+
 	return true
 end
 
 ------------------------------------------------------------------------------
--- name: mobf_is_known_mob(name)
+-- @function mobf_is_known_mob(name)
 --
 --! @brief check if mob of name is known
 --! @ingroup framework_mob
@@ -156,7 +156,7 @@ function mobf_is_known_mob(name)
 end
 
 ------------------------------------------------------------------------------
--- name: mobf_register_environment(name,environment)
+-- @function mobf_register_environment(name,environment)
 --
 --! @brief register an environment to mob framework
 --! @ingroup framework_mob
@@ -170,7 +170,7 @@ function mobf_register_environment(name,environment)
 end
 
 ------------------------------------------------------------------------------
--- name: mobf_probab_movgen_register_pattern(pattern)
+-- @function mobf_probab_movgen_register_pattern(pattern)
 --
 --! @brief register an movement pattern for probabilistic movement gen
 --! @ingroup framework_mob

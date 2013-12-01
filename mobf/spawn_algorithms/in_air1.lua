@@ -54,14 +54,12 @@ function mobf_random_air_y_pos(x,z,min_y,max_y)
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_spawner_air_above_grass_spawner_spawnfunc(spawning_data,pos,min_y,max_y)
+-- name: mobf_spawner_air_above_grass_spawner_spawnfunc(spawning_data,pos)
 --
 --! @brief function to spawn a spawner entity
 --
 --! @param spawning_data spawning configuration
 --! @param pos position do spawn
---! @param min_y minimum y value of generated chunk
---! @param max_y maximum y value of generated chunk
 -------------------------------------------------------------------------------
 function mobf_spawner_air_above_grass_spawner_spawnfunc(spawning_data,pos)
 
