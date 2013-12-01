@@ -522,6 +522,7 @@ function fighting.combat(entity,now,dtime)
 		local targetpos  = entity.dynamic_data.combat.target:getpos()
 		local distance   = mobf_calc_distance(mob_pos,targetpos)
 		local dir        = mobf_get_direction(targetpos,mob_pos)
+		local target     = entity.dynamic_data.combat.target
 
 		--look towards target
 		if entity.mode == "3d" then
@@ -880,11 +881,11 @@ function fighting.melee_attack_handler(entity,now,distance)
 			math.floor(math.random(0,entity.data.combat.melee.maxdamage)) + 1
 
 		--TODO call punch instead of manually setting health for player too
-		if target:is_player() then
-			local target_health = target:get_hp()
+		if target_obj:is_player() then
+			local target_health = target_obj:get_hp()
 
 			--do damage
-			target:set_hp(target_health -damage_done)
+			target_obj:set_hp(target_health -damage_done)
 		else
 			target_obj:punch(entity.object, 1.0, {
 							full_punch_interval=1.0,

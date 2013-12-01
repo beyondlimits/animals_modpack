@@ -18,6 +18,9 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.3.1
+-fix crash due to missing target variable
+
 Changes 2.3
 -updated docs
 
