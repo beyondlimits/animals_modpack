@@ -25,7 +25,7 @@ env_shallow_waters = {
 					},
 			surfaces = nil,
 			--ground is first node above/below not beeing of media type
-			max_height_above_ground		= -1,
+			max_height_above_ground		= 1,
 			min_height_above_ground     = -10		
 		}
 --!@}

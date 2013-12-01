@@ -27,11 +27,6 @@ local flight_pattern1_prototype = 	{
 		random_jump_initial_speed       =0,
 		random_jump_delay               =10,
 		random_acceleration_change      =0.3,
---
---      --run towards player or run away?  1 <-> -1
---		player_attraction				=0,
---		--maximum distance a player has an effect
---		player_attraction_range         =-1,
 	}
 	
 --!@}

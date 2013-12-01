@@ -27,3 +27,21 @@ function mobf_assert_backtrace(value)
 		assert(value)
 	end
 end
+
+-------------------------------------------------------------------------------
+-- name: mobf_assert_validpos(pos)
+--
+--! @brief check if a pos is valid
+--
+--! @param pos to evaluate
+-------------------------------------------------------------------------------
+function mobf_assert_validpos(pos)
+	mobf_assert_backtrace(pos ~= nil)
+	mobf_assert_backtrace(type(pos) == "table")
+	mobf_assert_backtrace(pos.x ~= nil)
+	mobf_assert_backtrace(pos.y ~= nil)
+	mobf_assert_backtrace(pos.z ~= nil)
+	mobf_assert_backtrace(type(pos.x) == "number")
+	mobf_assert_backtrace(type(pos.y) == "number")
+	mobf_assert_backtrace(type(pos.z) == "number")
+end

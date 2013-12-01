@@ -30,10 +30,15 @@
 function printpos(pos)
 	if pos ~= nil then
 		if pos.y ~= nil then
+			mobf_assert_backtrace(type(pos.x) == "number")
+			mobf_assert_backtrace(type(pos.z) == "number")
+			mobf_assert_backtrace(type(pos.y) == "number")
 			return "("..string.format("%3f",pos.x)..","
 						..string.format("%3f",pos.y)..","
 						..string.format("%3f",pos.z)..")"
 		else
+			mobf_assert_backtrace(type(pos.x) == "number")
+			mobf_assert_backtrace(type(pos.z) == "number")
 			return "("..string.format("%3f",pos.x)..", ? ,"
 						..string.format("%3f",pos.z)..")"
 		end

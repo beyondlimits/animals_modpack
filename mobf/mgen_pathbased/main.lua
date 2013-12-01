@@ -78,18 +78,26 @@ function p_mov_gen.callback(entity,now,dstep)
 		--return to begining of path
 		if entity.dynamic_data.p_movement.next_path_index 
 				== #entity.dynamic_data.p_movement.path then
-				
-			if entity.data.patrol ~= nil and
-				entity.data.patrol.cycle_path then
+			
+			if entity.dynamic_data.p_movement.cycle_path or
+				(entity.dynamic_data.p_movement.cycle_path == nil and
+				entity.data.patrol ~= nil and
+				entity.data.patrol.cycle_path) then
 				--0 is correct as it's incremented by one later
 				entity.dynamic_data.p_movement.next_path_index = 0
 			else
+				if entity.dynamic_data.p_movement.HANDLER_end_of_path ~= nil
+					and type(entity.dynamic_data.p_movement.HANDLER_end_of_path) == "function" then
+					entity.dynamic_data.p_movement.HANDLER_end_of_path(entity)
+				end
 				dbg_mobf.path_mov_lvl1("MOBF: cycle not set not updating point")
 				update_target = false
+				handled = true
 			end
 		end
 		
 		if update_target then
+			mobf_assert_backtrace(entity.dynamic_data.p_movement.path ~= nil)
 			entity.dynamic_data.p_movement.next_path_index = 
 				entity.dynamic_data.p_movement.next_path_index + 1
 				
@@ -106,6 +114,7 @@ function p_mov_gen.callback(entity,now,dstep)
 	
 	if not handled and
 		entity.dynamic_data.movement.target == nil then
+		mobf_assert_backtrace(entity.dynamic_data.p_movement.path ~= nil)
 		
 		entity.dynamic_data.movement.target = 
 				entity.dynamic_data.p_movement.path
@@ -189,6 +198,66 @@ function p_mov_gen.init_dynamic_data(entity,now,restored_data)
 	entity.dynamic_data.p_movement = data
 	
 	mgen_follow.init_dynamic_data(entity,now)
+end
+
+-------------------------------------------------------------------------------
+-- name: set_path(entity,path)
+--
+--! @brief set target for movgen
+--! @memberof p_mov_gen
+--! @public
+--
+--! @param entity mob to apply to
+--! @param path to set
+-------------------------------------------------------------------------------
+function p_mov_gen.set_path(entity,path)
+	mobf_assert_backtrace(entity.dynamic_data.p_movement ~= nil)
+	if path ~= nil then
+		entity.dynamic_data.p_movement.next_path_index = 1
+		entity.dynamic_data.movement.max_distance = 0.5
+		entity.dynamic_data.p_movement.path = path
+	
+		--a valid path has at least 2 positions
+		mobf_assert_backtrace(#entity.dynamic_data.p_movement.path > 1)
+		entity.dynamic_data.movement.target = 
+				entity.dynamic_data.p_movement.path[2]
+		return true
+	else
+		entity.dynamic_data.p_movement.next_path_index = nil
+		entity.dynamic_data.movement.max_distance = nil
+		entity.dynamic_data.p_movement.path = nil
+		entity.dynamic_data.movement.target = nil
+		return false
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: set_cycle_path(entity,value)
+--
+--! @brief set state of path cycle mechanism
+--! @memberof p_mov_gen
+--! @public
+--
+--! @param entity mob to apply to
+--! @param value to set true/false/nil(mob global default)
+-------------------------------------------------------------------------------
+function p_mov_gen.set_cycle_path(entity,value)
+	mobf_assert_backtrace(entity.dynamic_data.p_movement ~= nil)
+	entity.dynamic_data.p_movement.cycle_path = value
+end
+
+-------------------------------------------------------------------------------
+-- name: set_end_of_path_handler(entity,handler)
+--
+--! @brief set handler to call for non cyclic paths if final target is reached
+--! @memberof p_mov_gen
+--! @public
+--
+--! @param entity mob to apply to
+--! @param handler to call at final target
+-------------------------------------------------------------------------------
+function p_mov_gen.set_end_of_path_handler(entity,handler)
+	entity.dynamic_data.p_movement.HANDLER_end_of_path = handler
 end
 
 -------------------------------------------------------------------------------

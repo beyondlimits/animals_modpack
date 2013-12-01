@@ -1,7 +1,18 @@
 --(c) Celeron55
 
+if minetest.world_setting_get("mobf_vault_spawner_spawnpos") == nil then
+	local array = {}
+	minetest.world_setting_set("mobf_vault_spawner_spawnpos",minetest.serialize(array))
+end
+
 
 local vault = {}
+
+vault.spawnpositions = minetest.deserialize(mobf_get_world_setting("mobf_vault_spawner_spawnpos"))
+
+if vault.spawnpositions == nil then
+	vault.spawnpositions = {}
+end
 
 function vault.cmp(v, w)
     return (
@@ -31,7 +42,7 @@ vault.make_vault_part = function(p, part, seed)
     local ns = nil
     local top_y = 2
     local mob = nil
-    
+
     --choose what to do at position
     if part == 'w' then
         ns = {
@@ -90,7 +101,7 @@ vault.make_vault_part = function(p, part, seed)
             {name='air'},
             {name='default:cobble'},
         }
-        mob = "animal_dm:dm__default"
+        mob = "animal_dm:dm"
     elseif part == 'C' then
         top_y = 3
         ns = {
@@ -185,11 +196,11 @@ vault.make_vault_part = function(p, part, seed)
     for i=1,#ns do
         local dy = top_y + 1 - i
         local p2 = {x=p.x,y=p.y+dy,z=p.z}
- 
+
         --get node at position
         local oldn = minetest.get_node(p2)
         local n = ns[i]
- 
+
         --don't do anything if no new node is specified or
         --old node is air
         if n and oldn.name ~= "air" then
@@ -200,11 +211,11 @@ vault.make_vault_part = function(p, part, seed)
                     n.name = 'default:mossycobble'
                 end
             end
-            
+
             --set node
             --dm_debug("pos: " .. minetest.pos_to_string(p2) .. " replacing " .. oldn.name .. " by " .. n.name)
             minetest.set_node(p2, ns[i])
-            
+
             --special handling for chests
             if n.inv then
                 dm_debug("adding chest at " .. minetest.pos_to_string(p2) )
@@ -217,15 +228,15 @@ vault.make_vault_part = function(p, part, seed)
         else
             --dm_debug("pos: " .. minetest.pos_to_string(p) .. " not replacing " .. oldn.name)
         end
-        
+
     end
     if mob then
         --dm_debug("adding dm at " .. minetest.pos_to_string({x=p.x,y=p.y+1,z=p.z}) )
         local newobject = minetest.add_entity({x=p.x,y=p.y+1,z=p.z}, mob)
         local newentity = mobf_find_entity(newobject)
-        
+
         if newentity and
-            newentity.dynamic_data and 
+            newentity.dynamic_data and
             newentity.dynamic_data.spawning then
             newentity.dynamic_data.spawning.player_spawned = playerspawned
             newentity.dynamic_data.spawning.spawner = "vault"
@@ -233,26 +244,51 @@ vault.make_vault_part = function(p, part, seed)
     end
 end
 
+
+vault.checkdistance = function(pos,mindistance)
+
+	for i=1,#vault.spawnpositions,1 do
+		local distance = mobf_calc_distance(pos,vault.spawnpositions[i])
+		dm_debug("Distance to vault: " .. i .. " at " ..minetest.pos_to_string(vault.spawnpositions[i]) .. " is : " .. distance)
+		if distance < mindistance then
+			return false
+		end
+	end
+
+	return true
+end
+
+vault.addvaultpos = function(pos)
+	table.insert(vault.spawnpositions,pos)
+	mobf_set_world_setting("mobf_vault_spawner_spawnpos",minetest.serialize(vault.spawnpositions))
+end
+
 vault.generate_vault = function(vault_def, p, dir, seed)
     local dim_z = #vault_def
     assert(dim_z > 0)
     local dim_x = #vault_def[1]
-    
+
     --don't generate vault if entrance dir not z +1
     if not vault.cmp(dir, {x=0,y=0,z=1}) then
         --dm_debug("entrance direction wrong: " .. minetest.pos_to_string(p))
         return
-    else
-        dm_debug("generating vault at: " .. minetest.pos_to_string(p))
     end
-    
+
+	--make sure minimum distance between vault entrances is at least 200 nodes
+    if not vault.checkdistance(p,200) then
+    	return
+    end
+
+    dm_debug("generating vault at: " .. minetest.pos_to_string(p))
+    vault.addvaultpos(p)
+
     --print("Making vault at "..minetest.pos_to_string(p))
     if dim_x >= 14 then
         --dm_debug("Making large vault at "..minetest.pos_to_string(p))
     else
         --dm_debug("Making vault at "..minetest.pos_to_string(p))
     end
-    
+
     -- Find door in definition
     local def_door_p = nil
     for dx=1,dim_x do
@@ -373,13 +409,13 @@ function vault.node_is_solid(n)
     return (n and n.name and minetest.registered_nodes[n.name] and
             minetest.registered_nodes[n.name].walkable)
 end
-    
+
 vault.generate_random_vault = function(p, dir, seed)
 
     --random select of vault template
     local pr = PseudoRandom(seed+9322)
     local vault_def = vault.vault_defs[pr:next(1, #vault.vault_defs)]
-    
+
     --generate vault by template
     vault.generate_vault(vault_def, p, dir, seed)
 end
@@ -395,20 +431,20 @@ minetest.register_on_generated(function(minp, maxp, seed)
     if maxp.y > -10 then
         return
     end
-    
+
     --calculate area of generated chunk
     local area = (maxp.x-minp.x+1)*(maxp.z-minp.z+1)
-    
+
     --initialize dungeon level with 2
     local dungeon_level_y = 2
-    
+
     --get random dungeon level within generated chunk
     if maxp.y < 2 then
         local pr = PseudoRandom(seed+932)
         dungeon_level_y = pr:next(minp.y, maxp.y)
     end
-    
-    
+
+
     --initialize check values
     local is_empty = false
     local light = nil
@@ -416,52 +452,52 @@ minetest.register_on_generated(function(minp, maxp, seed)
     local last_light = nil
     local possible_entrances = {}
     local d = 4
-    
-    
+
+
     --loop through chunk using d frames in x direction
     for x=minp.x/d+1,maxp.x/d-1 do
         --set to unknown on start of x-loop (why?)
         local last_node_known = false
-        
+
     --loop through cunk in z direction
     for z=minp.z+1,maxp.z-1 do
-        
+
         --get information of current node to check
         local p = {x=x*d, y=dungeon_level_y, z=z}
         local n = minetest.get_node(p)
-        
+
         --save values from last loop
         last_empty = is_empty
         last_light = light
-        
+
         --get new values
         is_empty = not vault.node_is_solid(n)
         light = minetest.get_node_light(p, 0.5)
-        
+
         --if last node was known
         if last_node_known then
-        
+
             --initialize values
             local useful_light = nil
-            
+
             --save values
             if is_empty then
                 useful_light = light
             else
                 useful_light = last_light
             end
-            
+
             --if current node isn't solid,
             --last was solid and we're not at daylight
             if is_empty and not last_empty and useful_light < 15 then
-            
+
                 --calculate ??? positions next to current pos
                 local p1 = vault.add(p,  {x=0,  y=0, z=-1})
                 local p2 = vault.add(p1, {x=0,  y=2, z=-1})
                 local p3 = vault.add(p1, {x=0,  y=2, z=-8})
                 local p4 = vault.add(p1, {x=-3, y=1, z=-2})
                 local p5 = vault.add(p1, {x=3,  y=1, z=-2})
-                
+
                 --if all nodes are solid
                 if  vault.node_is_solid(minetest.get_node(p2)) and
                     vault.node_is_solid(minetest.get_node(p3)) and
@@ -476,7 +512,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
                     table.insert(possible_entrances, entrance)
                 end
             end
-            
+
             --if current node isn't solid,
             --last was solid and we're not at daylight
             if last_empty and not is_empty and useful_light < 15 then
@@ -485,7 +521,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
                 local p3 = vault.add(p1, {x=0,  y=2, z=8})
                 local p4 = vault.add(p1, {x=-3, y=1, z=2})
                 local p5 = vault.add(p1, {x=3,  y=1, z=2})
-                
+
                 --if all nodes are solid
                 if vault.node_is_solid(minetest.get_node(p2)) and
                     vault.node_is_solid(minetest.get_node(p3)) and
@@ -504,20 +540,20 @@ minetest.register_on_generated(function(minp, maxp, seed)
         last_node_known = true
     end
     end
-    
+
     --for _,entrance in ipairs(possible_entrances) do
     --  dm_debug("Possible entrance: "..dump(entrance))
     --end
     --calculate number of entrances to generate per area
     local num_entrances_to_generate = area/200
-    
+
     --check if there are enough possible entrances
     if num_entrances_to_generate > #possible_entrances then
         num_entrances_to_generate = #possible_entrances
     end
-    
+
     local pr = PseudoRandom(seed+9452)
-    
+
     --generate vault for max number of entraces to generate at random
     --selected possible entrances
     for entrances_generate_i=1,num_entrances_to_generate do

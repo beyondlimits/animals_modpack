@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file random_drop.lua
@@ -26,9 +26,9 @@ random_drop = {}
 
 
 -------------------------------------------------------------------------------
--- name: callback(entity)
+-- @function [parent=#random_drop] callback(entity)
 --
---! @brief random drop periodic callback 
+--! @brief random drop periodic callback
 --! @memberof random_drop
 --
 --! @param entity mob calling it
@@ -45,9 +45,9 @@ function random_drop.callback(entity,now)
 
 			dbg_mobf.random_drop_lvl3("MOBF: enough time passed give drop a chance")
 			if math.random() < entity.data.random_drop.chance then
-			
+
 				entity.dynamic_data.random_drop.ts_last_drop = now
-				
+
 				local entitybasepos = entity.getbasepos(entity)
 
 				--find pos around
@@ -63,13 +63,13 @@ function random_drop.callback(entity,now)
 					dbg_mobf.random_drop_lvl2("MOBF: didn't find a place to put random drop for ".. entity.data.name)
 				end
 			end
-		
+
 		end
 	end
 end
 
 -------------------------------------------------------------------------------
--- name: register_random_drop(random_drop)
+-- @function [parent=#random_drop] register_random_drop(random_drop)
 --
 --! @brief register random drop item and entity
 --! @memberof random_drop
@@ -78,30 +78,30 @@ end
 -------------------------------------------------------------------------------
 function random_drop.register(random_drop)
 
-		--get basename from random drop item name		
+		--get basename from random drop item name
 		local start_pos = 1
 		local end_pos = string.find(random_drop.result,":")
 
 		if end_pos == nil then
 			return
 		end
-		
+
 		local drop_basename = string.sub(random_drop.result,start_pos,end_pos-1)
 		local drop_itemname = string.sub(random_drop.result,end_pos+1)
-		
-		
+
+
 		if drop_itemname == nil or
 			drop_basename == nil then
 			return
 		end
-		
+
 		minetest.log("LOGLEVEL_INFO","MOBF:\tregistering random drop entity: "..":"..random_drop.result.."_ent"..
 				" item="..drop_itemname .. " basename=" .. drop_basename)
-		
+
 		local ent_graphics = {}
 		local id = drop_basename .. "_" .. drop_itemname
-		
-		if minetest.world_setting_get("mobf_disable_3d_mode") or 
+
+		if minetest.world_setting_get("mobf_disable_3d_mode") or
 			animalmaterialsdata[id] == nil or
 			animalmaterialsdata[id].graphics_3d == nil then
 			ent_graphics.visual = "sprite"
@@ -114,8 +114,8 @@ function random_drop.register(random_drop)
 			ent_graphics.collisionbox = animalmaterialsdata[id].graphics_3d.collisionbox
 			ent_graphics.visual_size = animalmaterialsdata[id].graphics_3d.visual_size
 		end
-		
-		
+
+
 		--Entity
 		minetest.register_entity(":"..random_drop.result.."_ent",
 			{
@@ -130,11 +130,11 @@ function random_drop.register(random_drop)
 
 					self.object:setacceleration({x=0,y=-9.81,z=0})
 					local now = mobf_get_current_time()
-					
+
 					if staticdata == "" then
 						self.dropped 	= now
 					else
-					
+
 						self.dropped = tonumber(staticdata)
 					end
 
@@ -154,7 +154,7 @@ function random_drop.register(random_drop)
 						dbg_mobf.random_drop_lvl2("MOBF: random drop entity timed out")
 						self.object:remove()
 					end
-		
+
 				end,
 
 
@@ -169,7 +169,7 @@ function random_drop.register(random_drop)
 end
 
 -------------------------------------------------------------------------------
--- name: init_dynamic_data(entity,now)
+-- @function [parent=#random_drop] init_dynamic_data(entity,now)
 --
 --! @brief initialize dynamic data required by random drop
 --! @memberof random_drop

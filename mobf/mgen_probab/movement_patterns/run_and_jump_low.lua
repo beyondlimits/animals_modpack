@@ -28,12 +28,6 @@ local run_and_jump_low_prototype = 	{
 		random_jump_initial_speed       =3.5,
 		random_jump_delay               =2,
 		random_acceleration_change      =0.6,
-
---
---      --run towards player or run away?  1 <-> -1
---		player_attraction				=0,
---		--maximum distance a player has an effect
---		player_attraction_range         =-1,
 	}
 
 --!~@}	

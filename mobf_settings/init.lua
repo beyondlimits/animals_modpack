@@ -356,7 +356,7 @@ function mobf_settings.show_main_tab(sender_data)
 		end	
 	end
 	
-	formspec = formspec .. toadd .. ";0]"
+	formspec = formspec .. toadd .. ";]"
 	
 	if formspec ~= nil then
 		minetest.show_formspec(sender_data.player:get_player_name(),
@@ -649,14 +649,21 @@ function mobf_settings.show_settings_tab(sender_data)
 				"cb_" .. sender_data.tab .. "_enable_statistics;" ..
 				"Enable statistics;" .. 
 				mobf_settings.setting_gettext("mobf_enable_statistics") .."]"
+				
 	formspec = formspec .. "checkbox[1,5.5;" .. 
 				"cb_" .. sender_data.tab .. "_delayed_spawning;" ..
 				"Delay spawning at mapgen;" .. 
 				mobf_settings.setting_gettext("mobf_delayed_spawning") .."]"
+				
 	formspec = formspec .. "checkbox[1,6;" .. 
 				"cb_" .. sender_data.tab .. "_disable_pathfinding;" ..
 				"Disable core pathfinding support;" .. 
 				mobf_settings.setting_gettext("mobf_disable_pathfinding") .."]"
+				
+	formspec = formspec .. "checkbox[1,6.5;" .. 
+				"cb_" .. sender_data.tab .. "_show_spawners;" ..
+				"Show spawner entities;" .. 
+				mobf_settings.setting_gettext("mobf_show_spawners") .."]"
 	--print("formspec: " .. formspec)
 	if formspec ~= nil then
 		minetest.show_formspec(sender_data.player:get_player_name(),
@@ -822,7 +829,7 @@ function mobf_settings.handle_main_tab_input(sender_data)
 	if sender_data.name == "mobs" then
 		local tl_event = explode_textlist_event(sender_data.value)
 		if tl_event.typ == "DCL" and
-			tl_event.index < #mobf_rtd.registred_mob then
+			tl_event.index <= #mobf_rtd.registred_mob then
 			local clicked_mob = mobf_rtd.registred_mob[tl_event.index]
 		
 			local mobf_mob_blacklist_string = minetest.world_setting_get("mobf_blacklist")
@@ -918,6 +925,11 @@ function mobf_settings.handle_settings_tab_input(sender_data)
 	
 	if sender_data.name == "disable_pathfinding" then
 		mobf_set_world_setting("mobf_disable_pathfinding",
+								mobf_settings.tobool(sender_data.value))
+	end
+	
+	if sender_data.name == "show_spawners" then
+		mobf_set_world_setting("mobf_show_spawners",
 								mobf_settings.tobool(sender_data.value))
 	end
 end

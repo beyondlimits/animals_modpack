@@ -17,18 +17,16 @@
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
--- name: mobf_spawn_none(mob_name,mob_transform,spawning_data)
+-- name: mobf_spawner_initialize_none(spawning_data)
 --
 --! @brief don't spawn at all
 --
---! @param mob_name name of mob
---! @param mob_transform secondary name of mob
 --! @param spawning_data spawning configuration
 -------------------------------------------------------------------------------
-function mobf_spawn_none(mob_name,mob_transform,spawning_data)
+function mobf_spawner_initialize_none(spawning_data)
 	--intended to do nothing!
 end
 
 --!@}
 
-spawning.register_spawn_algorithm("none", mobf_spawn_none)
+spawning.register_spawn_algorithm("none", mobf_spawner_initialize_none)

@@ -1,4 +1,4 @@
-local version = "0.0.13"
+local version = "0.1.0"
 
 minetest.log("action","MOD: animal_fish_blue_white loading ...")
 
@@ -97,16 +97,25 @@ fish_blue_white_prototype = {
 						visible_height = 1,
 						visible_width = 1,
 						},
-					typical_state_time = 30,
+					typical_state_time = 5,
 				},
 				{ 
 					name = "swiming",
 					movgen = "probab_mov_gen",
-					chance = 0.9,
+					chance = 0.45,
 					animation = "swim",
-					typical_state_time = 180,
+					typical_state_time = 30,
 				},
 				},
+		hunger = {
+			target_entities = {
+					"fishing:bobber_entity"
+					},
+			range = 15,
+			chance = 0.5,
+			typical_walk_time = 30,
+			keep_food = true,
+		},
 		}
 
 

@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file sound.lua
@@ -24,7 +24,7 @@ sound =  {}
 --!@}
 
 -------------------------------------------------------------------------------
--- name: play(entity) 
+-- @function [parent=#sound] play(entity)
 --
 --! @brief play a sound at a specified position
 --! @memberof sound
@@ -42,7 +42,7 @@ function sound.play(pos,soundspec)
 						max_hear_distance = soundspec.max_hear_distance,
 						loop = false,
 						}
-		
+
 		minetest.sound_play(soundspec.name,toplay)
 	else
 		dbg_mobf.sound_lvl2("MOBF: no soundspec")
@@ -52,7 +52,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- name: play_random(entity,now) 
+-- @function [parent=#sound] play_random(entity,now)
 --
 --! @brief play a random sound for mob
 --! @memberof sound
@@ -70,7 +70,7 @@ function sound.play_random(entity,now)
 
 	if entity.data.sound ~= nil and
 		entity.data.sound.random ~= nil then
-		
+
 		if (entity.dynamic_data.sound.random_last + entity.data.sound.random.min_delta < now) then
 
 			if math.random() < entity.data.sound.random.chance then
@@ -94,7 +94,7 @@ function sound.play_random(entity,now)
 end
 
 -------------------------------------------------------------------------------
--- name: sound.init_dynamic_data(entity) 
+-- @function [parent=#sound] sound.init_dynamic_data(entity)
 --
 --! @brief initialize all dynamic data for sound on activate
 --! @memberof sound
@@ -104,8 +104,8 @@ end
 -------------------------------------------------------------------------------
 function sound.init_dynamic_data(entity,now)
 	local data = {
-		random_last					= now,	
-	}	
-	
+		random_last					= now,
+	}
+
 	entity.dynamic_data.sound = data
 end

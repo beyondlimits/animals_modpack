@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file forrest.lua
@@ -16,25 +16,53 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
+MOBF_ADDITIONAL_TREE_NODES = {}
+
 -------------------------------------------------------------------------------
--- name: mobf_spawn_in_forrest(mob_name,mob_transform,spawning_data,environment)
+-- name: mobf_spawner_in_forrest_spawnfunc(spawning_data,pos)
 --
 --! @brief find a place in the forrest to spawn an mob
 --
---! @param mob_name name of mob
---! @param mob_transform secondary name of mob
 --! @param spawning_data spawning configuration
---! @param environment environment of mob
+--! @param pos position to spawn at
 -------------------------------------------------------------------------------
-function mobf_spawn_in_forrest(mob_name,mob_transform,spawning_data,environment) 
+function mobf_spawner_in_forrest_spawnfunc(spawning_data,pos)
+	mobf_assert_validpos(pos)
+
+	local tree_around = false
+
+	--check if tree around
+	if (minetest.find_node_near(pos, 8, { "default:leaves" } ) ~= nil) and
+		(minetest.find_node_near(pos, 5, { "default:tree"} ) ~= nil) or
+		minetest.find_node_near(pos, 8, MOBF_ADDITIONAL_TREE_NODES ) ~= nil then
+		tree_around = true
+	end
+
+
+	if tree_around then
+		local spawnpos = {x=pos.x,y=pos.y+1,z=pos.z}
+		spawning.spawn_and_check(spawning_data.name,spawnpos,"in_forrest_mapgen")
+		return true
+	end
+	return false
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_spawner_initialize_in_forrest_abm(spawning_data)
+--
+--! @brief find a place in the forrest to spawn an mob
+--
+--! @param spawning_data spawning configuration
+-------------------------------------------------------------------------------
+function mobf_spawner_initialize_in_forrest_abm(spawning_data)
 	minetest.log(LOGLEVEL_WARNING,"MOBF: using deprecated abm based spawn algorithm \"spawn_in_forrest\" most likely causing lag in server!\t Use spawn_in_forrest_mapgen instead!")
-	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering forrest spawn abm callback for mob "..mob_name)
-	
+	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering forrest spawn abm callback for mob ".. spawning_data.name)
+
 	local media = nil
-	
+
 	if environment ~= nil and
 		environment.media ~= nil then
-		media = environment.media	
+		media = environment.media
 	end
 
 	minetest.register_abm({
@@ -53,103 +81,83 @@ function mobf_spawn_in_forrest(mob_name,mob_transform,spawning_data,environment)
 				--never try to spawn an mob at pos (0,0,0) it's initial entity spawnpos and
 				--used to find bugs in initial spawnpoint setting code
 				if mobf_pos_is_zero(pos) then
-					mobf_warn_long_fct(starttime,"mobf_spawn_in_forrest")
+					mobf_warn_long_fct(starttime,"mobf_spawn_in_forrest_abm_r1")
 					return
 				end
 
 				--check if there s enough space above to place mob
-				if mobf_air_above(pos,spawning_data.height) ~= true then
-					mobf_warn_long_fct(starttime,"mobf_spawn_in_forrest")
+				if spawning_data.height ~= nil and mobf_air_above(pos,spawning_data.height) ~= true then
+					mobf_warn_long_fct(starttime,"mobf_spawn_in_forrest_abm_r2")
 					return
 				end
 
-
-				local node_above = minetest.get_node(pos_above)
-
-				if mob_name == nil then
-					minetest.log(LOGLEVEL_ERROR,"MOBF Bug!!!: mob name not available")
-				else
-					--print("Try to spawn mob: "..mob_name)
-				
-					if node_above.name == "air" then
-						--print("Find mobs of same type around:"..mob_name.. " pop dens: ".. population_density)
-					if mobf_mob_around(mob_name,mob_transform,pos,spawning_data.density,true) == 0 then
-
-							if minetest.find_node_near(pos, 3, { "default:leaves",
-																	"default:tree"} ) ~= nil then
-
-								local newobject = minetest.add_entity(pos_above,mob_name .. "__default")
-
-								local newentity = mobf_find_entity(newobject)
-								
-								if newentity == nil then
-									minetest.log(LOGLEVEL_ERROR,"MOBF Bug!!!: no "..mob_name.." has been created!")
-								end
-
-								minetest.log(LOGLEVEL_INFO,"MOBF: Spawning "..mob_name.." in forrest at position "..printpos(pos))
-							end
-						end
-					end
+				--check if pos is ok
+				if not environment.evaluate_state(
+									spawning.pos_quality(spawning_data,pos_above),
+									LT_SAFE_POS) then
+					mobf_warn_long_fct(starttime,"mobf_spawn_in_forrest_abm_r3")
+					return
 				end
-				mobf_warn_long_fct(starttime,"mobf_spawn_in_forrest")
+
+				--check population density
+				if mobf_mob_around(spawning_data.name,
+									spawning_data.name_secondary,
+									pos_above,spawning_data.density,true) > 0 then
+					mobf_warn_long_fct(starttime,"mobf_spawn_in_forrest_abm_r4")
+					return
+				end
+
+				mobf_spawner_in_forrest_spawnfunc(spawning_data,pos)
+				mobf_warn_long_fct(starttime,"mobf_spawn_in_forrest_abm_done")
 			end,
 		})
 end
 
-function mobf_spawn_in_forrest_mapgen(mob_name,mob_transform,spawning_data,environment)
+-------------------------------------------------------------------------------
+-- name: mobf_spawner_initialize_in_forrest_mapgen(spawning_data)
+--
+--! @brief find a place in the forrest to spawn an mob on mapgen
+--
+--! @param spawning_data spawning configuration
+-------------------------------------------------------------------------------
+function mobf_spawner_initialize_in_forrest_mapgen(spawning_data)
 
-	minetest.log(LOGLEVEL_INFO,"MOBF:\tregistering forrest spawn mapgen callback for mob "..mob_name)
-	local spawnfunc = function(name,pos,min_y,max_y)
-			
-			--check if there s enough space above to place mob
-			if mobf_air_above(pos,spawning_data.height) then
-				dbg_mobf.spawning_lvl3("enough air above " ..printpos(centerpos) 
-				.. " minimum is: " .. spawning_data.height )
-				
-				if minetest.find_node_near(pos, 3, { "default:leaves",
-														"default:tree"} ) ~= nil or
-					minetest.find_node_near(pos, 3, growing_trees_nodes ) ~= nil then
-					local spawnpos = {x=pos.x,y=pos.y+1,z=pos.z}
-					spawning.spawn_and_check(name,"__default",spawnpos,"in_forrest_mapgen")
-					return true
-				end -- forrest nodes
-			else
-				dbg_mobf.spawning_lvl3("not enough air above " ..printpos(centerpos) 
-				.. " for mob ".. name .. " minimum is: " .. spawning_data.height )
-			end -- air_above
-			return false
-		end
-		
+	minetest.log(LOGLEVEL_INFO,
+		"MOBF:\tregistering forrest spawn mapgen callback for mob "..
+		spawning_data.name)
+
 	if minetest.world_setting_get("mobf_delayed_spawning") then
 		minetest.register_on_generated(function(minp, maxp, seed)
-		
+			local starttime = mobf_get_time_ms()
 			local job = {
 				callback = spawning.divide_mapgen_jobfunc,
 				data = {
 					minp          = minp,
 					maxp          = maxp,
 					spawning_data = spawning_data,
-					mob_name      = mob_name,
-					mob_transform = mob_transform,
-					spawnfunc     = spawnfunc,
+					spawnfunc     = mobf_spawner_in_forrest_spawnfunc,
 					surfacefunc   = mobf_get_sunlight_surface,
 					maxtries      = 5
 					}
 				}
 			mobf_job_queue.add_job(job)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. spawning_data.name .. "_job_queued","mapgen")
 		end)
 	else
 		--add mob on map generation
 		minetest.register_on_generated(function(minp, maxp, seed)
 			local starttime = mobf_get_time_ms()
-			spawning.divide_mapgen(minp,maxp,spawning_data.density,mob_name,mob_transform,
-									spawnfunc,mobf_get_sunlight_surface,5)
-			mobf_warn_long_fct(starttime,"on_mapgen " .. mob_name,"mapgen")
+			spawning.divide_mapgen(minp,maxp,
+									spawning_data,
+									mobf_spawner_in_forrest_spawnfunc,
+									mobf_get_sunlight_surface,
+									5)
+			mobf_warn_long_fct(starttime,"on_mapgen " .. spawning_data.name,"mapgen")
 			end) --register mapgen
 	end
 end --end spawn algo
 
 --!@}
 
-spawning.register_spawn_algorithm("forrest_mapgen", mobf_spawn_in_forrest_mapgen)
-spawning.register_spawn_algorithm("forrest", mobf_spawn_in_forrest)
+spawning.register_spawn_algorithm("forrest_mapgen", mobf_spawner_initialize_in_forrest_mapgen)
+spawning.register_spawn_algorithm("forrest", mobf_spawner_initialize_in_forrest_abm)

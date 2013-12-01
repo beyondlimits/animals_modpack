@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file lifebar.lua
@@ -25,7 +25,7 @@ mobf_assert_backtrace(mobf_lifebar == nil)
 mobf_lifebar = {}
 
 -------------------------------------------------------------------------------
--- name: init()
+-- @function [parent=#mobf_lifebar] init()
 --
 --! @brief register lifebar entity
 --! @memberof mobf_lifebar
@@ -41,26 +41,26 @@ function mobf_lifebar.init()
 			groups = { immortal=1, },
 			is_visible = true,
 			initial_sprite_basepos = {x=0, y=0},
-			
+
 			lifetime = 0,
 			initialized = false,
 
-			on_step = function (self,dtime) 
+			on_step = function (self,dtime)
 					if not self.initialized then
 						self.lifetime = self.lifetime + dtime
-						
+
 						if self.lifetime > 1 then
 							dbg_mobf.lifebar_lvl3("MOBF: lifebar not attached deleting")
 							self.object:remove()
 						end
 					end
 				end
-			
+
 		})
 end
 
 -------------------------------------------------------------------------------
--- name: add(entity)
+-- @function [parent=#mobf_lifebar] add(entity)
 --
 --! @brief add a lifebat to an entity
 --! @memberof mobf_lifebar
@@ -72,19 +72,19 @@ end
 function mobf_lifebar.add(entity)
 	local pos = entity.object:getpos()
 	local BS = 10
-	
+
 	local lifebar_offset = (MAX(entity.collisionbox[4]-entity.collisionbox[1],
 								entity.collisionbox[6]-entity.collisionbox[3]) / 0.5) * 0.4
 	lifebar_offset = lifebar_offset * lifebar_offset
-	
+
 	pos.y = pos.y + entity.collisionbox[5] + lifebar_offset
 
 	local lifebar = minetest.add_entity(pos,"mobf:lifebar")
-	
+
 	if lifebar ~= nil then
 
 		lifebar:set_attach(entity.object,"",{x=0,y=(entity.collisionbox[5] + 0.1) * BS,z=0},{x=0,y=-90,z=0})
-		
+
 		local luaentity = lifebar:get_luaentity()
 		if luaentity ~= nil then
 			dbg_mobf.lifebar_lvl3("MOBF: marking lifebar as initialized")
@@ -93,13 +93,13 @@ function mobf_lifebar.add(entity)
 			dbg_mobf.lifebar_lvl3("MOBF: unable to create lifebar entity")
 		end
 	end
-	
+
 	return lifebar
 end
 
 
 -------------------------------------------------------------------------------
--- name: del(lifebar)
+-- @function [parent=#mobf_lifebar] del(lifebar)
 --
 --! @brief delete a lifebar
 --! @memberof mobf_lifebar
@@ -132,7 +132,7 @@ function mobf_lifebar.set(lifebar,value)
 end
 
 -------------------------------------------------------------------------------
--- name: get_imagename(value)
+-- @function [parent=#mobf_lifebar] get_imagename(value)
 --
 --! @brief calculate imagename from value
 --! @memberof mobf_lifebar
@@ -141,12 +141,12 @@ end
 --! @param value to get image for
 -------------------------------------------------------------------------------
 function mobf_lifebar.get_imagename(value)
-	
+
 	local number = math.floor((value*32) +0.5)
-	
+
 	dbg_mobf.lifebar_lvl2("MOBF: calculated number: " .. number )
 
-	if number < 5 then 
+	if number < 5 then
 		return "^mobf_lb_0" .. number * 2 .. ".png"
 	else
 		return "^mobf_lb_" .. number * 2 .. ".png"

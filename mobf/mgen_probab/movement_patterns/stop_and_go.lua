@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file stop_and_go.lua
@@ -21,19 +21,13 @@
 local stop_and_go_prototype = 	{
 		name                            ="stop_and_go",
 		jump_up							=0.4,
-	
+
 		random_jump_chance              =0,
 		random_jump_initial_speed       =0,
 		random_jump_delay               =0,
-		random_acceleration_change      =0.01,
-
---
---      --run towards player or run away?  1 <-> -1
---		player_attraction				=0,
---		--maximum distance a player has an effect
---		player_attraction_range         =-1,
+		random_acceleration_change      =0.05,
 	}
-	
+
 --!@}
-	
+
 table.insert(mov_patterns_defined,stop_and_go_prototype)

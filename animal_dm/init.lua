@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_dm loading ...")
-local version = "0.0.19"
+local version = "0.0.20"
 
 local dm_groups = {
                         not_in_creative_inventory=1
@@ -22,17 +22,17 @@ local dm_groups = {
 
 local selectionbox_dm = {-0.75, -1, -0.75, 0.75, 1, 0.75}
 
-dm_prototype = {   
+dm_prototype = {
 		name="dm",
 		modname="animal_dm",
-		
+
 		factions = {
 			member = {
 				"underground",
 				"monsters"
 				}
 			},
-	
+
 		generic = {
 					description="Dungeonmaster (MOBF)",
 					base_health=30,
@@ -43,7 +43,7 @@ dm_prototype = {
 					},
 					groups = dm_groups,
 					envid="simple_air"
-				},				
+				},
 		movement =  {
 					min_accel=0.2,
 					max_accel=0.4,
@@ -58,17 +58,17 @@ dm_prototype = {
 					sun_sensitive=true,
 					melee = {
 						maxdamage=3,
-						range=5, 
+						range=5,
 						speed=1,
 						},
 					distance = {
 						attack="mobf:fireball_entity",
 						range =15,
 						speed = 1,
-						},				
+						},
 					self_destruct = nil,
 					},
-		
+
 		spawning = {
 					primary_algorithms = {
 						{
@@ -119,7 +119,7 @@ dm_prototype = {
 					},
 			},
 		states = {
-				{ 
+				{
 				name = "default",
 				movgen = "none",
 				chance = 0,
@@ -138,7 +138,7 @@ dm_prototype = {
 					},
 				typical_state_time = 30,
 				},
-				{ 
+				{
 				name = "walking",
 				movgen = "probab_mov_gen",
 				chance = 0.25,
@@ -154,7 +154,7 @@ dm_prototype = {
 				},
 			},
 		}
-		
+
 dm_debug = function (msg)
     --minetest.log("action", "mobs: "..msg)
     --minetest.chat_send_all("mobs: "..msg)

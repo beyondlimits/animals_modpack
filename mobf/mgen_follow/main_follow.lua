@@ -165,10 +165,15 @@ function mgen_follow.callback(entity,now)
 		return
 	end
 	
-	local follow_speedup = 10
+	local follow_speedup =  {x=10,y=2,z=10 }
 	
 	if entity.data.movement.follow_speedup ~= nil then
-		follow_speedup = entity.data.movement.follow_speedup
+		if type(entity.data.movement.follow_speedup) == "table" then
+			follow_speedup = entity.data.movement.follow_speedup
+		else
+			follow_speedup.x= entity.data.movement.follow_speedup
+			follow_speedup.z= entity.data.movement.follow_speedup
+		end
 	end
 	
 	--check max speed limit
@@ -177,9 +182,11 @@ function mgen_follow.callback(entity,now)
 	
 	--check environment
 	local basepos  = entity.getbasepos(entity)
-	local state = environment.pos_is_ok(basepos,entity)
+	local pos_quality = environment.pos_quality(basepos,entity)
 	
-	if state == "ok" then
+	if environment.evaluate_state(pos_quality, LT_GOOD_POS) or
+		(entity.data.movement.canfly and 
+			environment.evaluate_state(pos_quality,LT_GOOD_FLY_POS)) then
 		local toset = {
 			x= basepos.x,
 			y= basepos.y - 0.5 - entity.collisionbox[2],
@@ -188,25 +195,88 @@ function mgen_follow.callback(entity,now)
 		entity.dynamic_data.movement.last_pos_in_env = toset
 	end
 	
-	if not environment.possible_pos(entity,basepos) or 
-		state == "in_water" or 
-		state == "above_water" or
-		state == "in_air" or
-		state == "drop_above_water" then
-		dbg_mobf.fmovement_lvl1("MOBF: followed to wrong place " .. state)
-		if entity.dynamic_data.movement.last_pos_in_env ~= nil then
-			entity.object:moveto(entity.dynamic_data.movement.last_pos_in_env)
-			basepos  = entity.getbasepos(entity)
-		else
-			local newpos = environment.get_suitable_pos_same_level(basepos,1,entity,true)
+	if pos_quality.media_quality == MQ_IN_AIR or                  -- wrong media
+		pos_quality.media_quality == MQ_IN_WATER or               -- wrong media
+		pos_quality.geometry_quality == GQ_NONE or               -- no ground contact (TODO this was drop above water before)
+		pos_quality.surface_quality_min == SQ_WATER then         -- above water
+		
+		
+		if entity.dynamic_data.movement.invalid_env_count == nil then
+			entity.dynamic_data.movement.invalid_env_count = 0
+		end
+		
+		entity.dynamic_data.movement.invalid_env_count = 
+			entity.dynamic_data.movement.invalid_env_count + 1
 			
-			if newpos == nil then
-				spawning.remove(entity,"mgen_follow poscheck")
-			else
-				newpos.y = newpos.y - (entity.collisionbox[2] + 0.49)
-				entity.object:moveto(newpos)
+		
+		--don't change at first invalid pos but give some steps to cleanup by
+		--other less invasive mechanisms
+		if entity.dynamic_data.movement.invalid_env_count > 10 then
+			dbg_mobf.fmovement_lvl1("MOBF: followed to wrong place " .. pos_quality.tostring(pos_quality))
+			if entity.dynamic_data.movement.last_pos_in_env ~= nil then
+				entity.object:moveto(entity.dynamic_data.movement.last_pos_in_env)
 				basepos  = entity.getbasepos(entity)
+			else
+				local newpos = environment.get_suitable_pos_same_level(basepos,1,entity,true)
+				
+				if newpos == nil then
+					newpos = environment.get_suitable_pos_same_level( {
+																		x=basepos.x,
+																		y=basepos.y-1,
+																		z=basepos.z }
+																		,1,entity,true)
+				end
+				
+				if newpos == nil then
+					newpos = environment.get_suitable_pos_same_level( {
+																		x=basepos.x,
+																		y=basepos.y+1,
+																		z=basepos.z }
+																		,1,entity,true)
+				end
+				
+				if newpos == nil then
+					dbg_mobf.fmovement_lvl1("MOBF: no way to fix it removing mob")
+					spawning.remove(entity,"mgen_follow poscheck")
+				else
+					newpos.y = newpos.y - (entity.collisionbox[2] + 0.49)
+					entity.object:moveto(newpos)
+					basepos  = entity.getbasepos(entity)
+				end
 			end
+		end
+	else
+		entity.dynamic_data.movement.invalid_env_count = 0
+	end
+	
+	if pos_quality.level_quality ~= LQ_OK and 
+		entity.data.movement.canfly then
+		local current_accel = entity.object:getacceleration()
+		
+		if pos_quality.level_quality == LQ_ABOVE then
+			if current_accel.y >= 0 then
+				current_accel.y = - entity.data.movement.max_accel
+			end
+		end
+		
+		if pos_quality.level_quality == LQ_BELOW then
+			local current_accel = entity.object:getacceleration()
+			if current_accel.y <= 0 then
+				current_accel.y = entity.data.movement.max_accel
+			end
+		end
+		
+		entity.object:setacceleration(current_accel)
+		return
+	end
+	
+	--fixup height fixup
+	if entity.data.movement.canfly then
+		local current_accel = entity.object:getacceleration()
+		
+		if current_accel.y ~= 0 then
+			current_accel.y = 0
+			entity.object:setacceleration(current_accel)
 		end
 	end
 	
@@ -240,12 +310,7 @@ function mgen_follow.callback(entity,now)
 			return
 		end
 		
-		local distance = mobf_calc_distance_2d(basepos,targetpos)
-		
-		local yaccel = environment.get_default_gravity(basepos,
-							entity.environment.media,
-							entity.data.movement.canfly)
-		dbg_mobf.fmovement_lvl3("MOBF:   default gravity is " .. yaccel )
+		local distance = mobf_calc_distance(basepos,targetpos)
 		
 		if mobf_line_of_sight({x=basepos.x,y=basepos.y+1,z=basepos.z},
 						 {x=targetpos.x,y=targetpos.y+1,z=targetpos.z})  == false then
@@ -254,7 +319,7 @@ function mgen_follow.callback(entity,now)
 			--TODO other ways to handle this?
 			--return						 
 		end
-		dbg_mobf.fmovement_lvl3("MOBF:   line of sight")
+		--dbg_mobf.fmovement_lvl3("MOBF:   line of sight")
 		
 		local max_distance = entity.dynamic_data.movement.max_distance
 		
@@ -274,7 +339,8 @@ function mgen_follow.callback(entity,now)
 
 			dbg_mobf.fmovement_lvl3("MOBF:   distance:" .. distance)
 			
-			local current_state = mgen_follow.identify_movement_state(basepos,targetpos)
+			local current_state =
+				mgen_follow.identify_movement_state(basepos,targetpos)
 			local handled = false
 			
 			if handled == false and 
@@ -282,12 +348,14 @@ function mgen_follow.callback(entity,now)
 				current_state == "above_los" or
 				current_state == "above_no_los" ) then
 				dbg_mobf.fmovement_lvl3("MOBF: \t Case 1: " .. current_state)
-				local accel_to_set = movement_generic.get_accel_to(targetpos,entity)
-				accel_to_set.y = yaccel
-				dbg_mobf.fmovement_lvl3("MOBF:   setting acceleration to: " .. printpos(accel_to_set));
-				mgen_follow.set_acceleration(entity,accel_to_set,follow_speedup)
+				local accel_to_set =
+					movement_generic.get_accel_to(targetpos,entity,true)
 				
-				handled = true
+				handled = 
+					mgen_follow.set_acceleration(entity,
+													accel_to_set,
+													follow_speedup,
+													basepos)
 			end
 			
 			if handled == false and
@@ -295,45 +363,66 @@ function mgen_follow.callback(entity,now)
 				 current_state == "below_no_los" or
 				 current_state == "same_height_no_los" ) then
 				dbg_mobf.fmovement_lvl3("MOBF: \t Case 2: " .. current_state)
-				local accel_to_set = movement_generic.get_accel_to(targetpos,entity)
-				accel_to_set.y = yaccel
+				local accel_to_set =
+					movement_generic.get_accel_to(targetpos,entity)
 				
-				local current_velocity = entity.object:getvelocity()
-				local predicted_pos = movement_generic.predict_next_block(basepos,current_velocity,accel_to_set)
-				local pos_state  = environment.pos_is_ok(predicted_pos,entity)
-				
-				if pos_state == "collision_jumpable" then
-					local pos_to_set = entity.object:getpos()
-					pos_to_set.y = pos_to_set.y + 1.1
-					entity.object:moveto(pos_to_set)
+				--seems to be a flying mob
+				if (accel_to_set.y >0) then
+					handled = 
+						mgen_follow.set_acceleration(entity,
+													accel_to_set,
+													follow_speedup,
+													basepos)
+				else
+					local current_velocity = entity.object:getvelocity()
+					local predicted_pos = 
+						movement_generic.predict_next_block(basepos,
+													current_velocity,
+													accel_to_set)
+					
+					--TODO replace by quality based mechanism!!!!!!!------------
+					local pos_state  = 
+						environment.pos_is_ok(predicted_pos,entity)
+					if pos_state == "collision_jumpable" then
+						local pos_to_set = entity.object:getpos()
+						pos_to_set.y = pos_to_set.y + 1.1
+						entity.object:moveto(pos_to_set)
+						basepos.y=basepos.y+1.1
+					end
+					------------------------------------------------------------
+					
+					dbg_mobf.fmovement_lvl3("MOBF:   setting acceleration to: " 
+						.. printpos(accel_to_set) .. " predicted_state: "
+						.. pos_state);
+					handled = 
+						mgen_follow.set_acceleration(entity,
+													accel_to_set,
+													follow_speedup,
+													basepos)
 				end
-				dbg_mobf.fmovement_lvl3("MOBF:   setting acceleration to: " 
-					.. printpos(accel_to_set) .. " predicted_state: "
-					.. pos_state);
-				mgen_follow.set_acceleration(entity,accel_to_set,follow_speedup)
-				
-				handled = true
 			end
 
 			if handled == false then
-				dbg_mobf.fmovement_lvl1("MOBF: \t Unexpected movement state: " .. current_state)
+				dbg_mobf.fmovement_lvl1(
+					"MOBF: \t Unexpected or unhandled movement state: "
+					 .. current_state)
+				local yaccel = environment.get_default_gravity(basepos,
+							entity.environment.media,
+							entity.data.movement.canfly)
+				--entity.object:setvelocity({x=0,y=0,z=0})
+				entity.object:setacceleration({x=0,y=yaccel,z=0})
 			end
 		--nothing to do
 		else
 			if entity.dynamic_data.movement.was_moving_last_step == true then
+				local yaccel = environment.get_default_gravity(basepos,
+							entity.environment.media,
+							entity.data.movement.canfly)
+							
 				dbg_mobf.fmovement_lvl3("MOBF:   next to target")
 				entity.object:setvelocity({x=0,y=0,z=0})
 				entity.object:setacceleration({x=0,y=yaccel,z=0})
 				entity.dynamic_data.movement.last_next_to_target = now
-				
-				
-				local dir = mobf_get_direction(basepos,targetpos)
-				--update mob orientation
-				if entity.mode == "3d" then
-					entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
-				else
-					entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
-				end
 			end
 		end
 	
@@ -342,6 +431,33 @@ function mgen_follow.callback(entity,now)
 	end
 end
 
+-------------------------------------------------------------------------------
+-- name: next_block_ok()
+--
+--! @brief check quality of next block
+--! @memberof mgen_follow
+--! @public
+-------------------------------------------------------------------------------
+function mgen_follow.next_block_ok(entity,pos,acceleration,velocity)
+	local current_velocity = velocity
+	
+	if current_velocity == nil then
+		current_velocity = entity.object:getvelocity()
+	end
+	
+	local predicted_pos = movement_generic.predict_next_block(pos,current_velocity,acceleration)
+	
+	local quality = environment.pos_quality(predicted_pos,entity)
+	
+	return (
+			(quality.media_quality == MQ_IN_MEDIA) and 
+			(quality.level_quality == LQ_OK) and
+			(
+				(quality.surface_quality_min == Q_UNKNOWN) or
+				(quality.surface_quality_min >= SQ_WRONG)
+			)
+		)
+end
 
 -------------------------------------------------------------------------------
 -- name: initialize()
@@ -373,7 +489,7 @@ function mgen_follow.init_dynamic_data(entity,now)
 			target = nil,
 			guardspawnpoint = false,
 			max_distance = entity.data.movement.max_distance,
-			orientation_fix_needed = true,
+			invalid_env_count = 0,
 			}
 	
 	if entity.data.movement.guardspawnpoint ~= nil and
@@ -432,11 +548,43 @@ end
 --! @param entity mob to apply to
 --! @param accel acceleration to set
 --! @param speedup speedup factor
+--! @param pos current position
 -------------------------------------------------------------------------------
-function mgen_follow.set_acceleration(entity,accel,speedup)
-		entity.object:setacceleration({x=accel.x*speedup,
-								   y=accel.y,
-								   z=accel.z*speedup})
+function mgen_follow.set_acceleration(entity,accel,speedup,pos)
+
+	accel.x = accel.x*speedup.x
+	accel.z = accel.z*speedup.z
+	
+	if entity.data.movement.canfly then
+		accel.y = accel.y*speedup.y
+	end
+
+	if mgen_follow.next_block_ok(entity,pos,accel) then
+		dbg_mobf.fmovement_lvl3("MOBF:   setting acceleration to: " .. printpos(accel));
+		entity.object:setacceleration(accel)
+		return true
+	elseif mgen_follow.next_block_ok(entity,pos,{x=0,y=0,z=0}) then
+		accel_to_set = {x=0,y=0,z=0}
+		dbg_mobf.fmovement_lvl3("MOBF:   setting acceleration to: " .. printpos(accel));
+		entity.object:setacceleration(accel)
+		return true
+	else
+		local current_velocity = entity.object:getvelocity()
+		current_velocity.y = 0
+		
+		if mgen_follow.next_block_ok(entity,pos,{x=0,y=0,z=0},current_velocity) then
+			accel_to_set = {x=0,y=0,z=0}
+			entity.object:setvelocity(current_velocity)
+			entity.object:setacceleration(accel)
+			return true
+		end
+	end
+	
+	dbg_mobf.fmovement_lvl1(
+		"MOBF: \t acceleration " .. printpos(accel) ..
+		" would result in invalid position not applying!")
+	
+	return false
 end
 
 -------------------------------------------------------------------------------

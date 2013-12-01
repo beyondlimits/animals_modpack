@@ -1,4 +1,4 @@
-local version = "0.0.2"
+local version = "0.0.3"
 
 minetest.log("action","MOD: trap mod loading ...")
 
@@ -52,7 +52,7 @@ minetest.register_entity(":trap:undead_ent",
 					
 					--TODO check if mobf names are required to use here
 					if luaentity ~= nil and
-						luaentity.name == "animal_vombie:vombie__default" then
+						luaentity.name == "animal_vombie:vombie" then
 						spawning.remove(luaentity)
 						
 						self.object:remove()

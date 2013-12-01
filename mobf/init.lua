@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allowed to pretend you have written it.
 --
 --! @file init.lua
@@ -16,7 +16,7 @@
 --! e.g. add additional spawn algorithms, movement generators, environments ...
 --
 --
---! @defgroup framework_mob Mob Framework API 
+--! @defgroup framework_mob Mob Framework API
 --! @brief this functions are used to add a mob to mob framework
 --
 -- Contact sapier a t gmx net
@@ -44,6 +44,8 @@ mobf_rtd = {
 	timesource				= "os.clock() (10ms ONLY!)",
 	--!total spawned mobs
 	total_spawned			= 0,
+	--!detailed debug state
+	detailed_state			= false,
 }
 
 --!path of mod
@@ -94,6 +96,7 @@ dofile (mobf_modpath .. "/inventory.lua")
 dofile (mobf_modpath .. "/mob_preserve.lua")
 dofile (mobf_modpath .. "/path.lua")
 dofile (mobf_modpath .. "/factions.lua")
+dofile (mobf_modpath .. "/step_quota.lua")
 
 --include spawning support
 dofile (mobf_modpath .. "/spawning.lua")
@@ -104,12 +107,13 @@ dofile (mobf_modpath .. "/mgen_follow/main_follow.lua")
 dofile (mobf_modpath .. "/mgen_rasterized/mgen_raster.lua")
 dofile (mobf_modpath .. "/mgen_jordan4ibanez/mgen_jordan4ibanez.lua")
 dofile (mobf_modpath .. "/mgen_pathbased/main.lua")
+dofile (mobf_modpath .. "/mgen_flee/main_flee.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "2.2.2"
+mobf_version = "2.3.0"
 
 --! @brief define tools used for more than one mob
-function mobf_init_basic_tools()	
+function mobf_init_basic_tools()
 	minetest.register_craft({
 		output = "animalmaterials:lasso 5",
 		recipe = {
@@ -118,7 +122,7 @@ function mobf_init_basic_tools()
 			{'',"wool:white",''},
 		}
 	})
-	
+
 	minetest.register_craft({
 		output = "animalmaterials:net 1",
 		recipe = {
@@ -127,7 +131,7 @@ function mobf_init_basic_tools()
 			{"wool:white",'',"wool:white"},
 		}
 	})
-	
+
 	minetest.register_craft({
 	output = 'animalmaterials:sword_deamondeath',
 	recipe = {
@@ -144,86 +148,86 @@ end
 function mobf_init_framework()
 
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing mob framework")
-	
-	
 
-	
 	mobf_init_basic_tools()
-	
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Reading mob blacklist")
 	local mobf_mob_blacklist_string = minetest.world_setting_get("mobf_blacklist")
-	
+
 	if mobf_mob_blacklist_string ~= nil then
 		mobf_rtd.registred_mob = minetest.deserialize(mobf_mob_blacklist_string)
-		
+
 		if mobf_rtd.registred_mob == nil then
 			minetest.log(LOGLEVEL_ERROR,"MOBF: Error on serializing blacklist!")
 			mobf_rtd.registred_mob = {}
 		end
 	end
-	
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize timesource...")
 	mobf_init_timesource()
-	
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize statistics...")
 	mobf_init_statistics()
-	
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize asynchronous job handling...")
 	mobf_job_queue.initialize()
-	
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize factions support...")
 	mobf_factions.init()
-	
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize external mod dependencys...")
 	mobf_init_mod_deps()
-	
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing probabilistic movement generator")
 	movement_gen.initialize()
-	
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing weaponry..")
 	mobf_init_weapons()
 
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing debug hooks..")
 	mobf_debug.init()
-	
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing mob preservation..")
 	mob_preserve.init()
-	
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize path handling subsystem..")
 	mobf_path.init()
-	
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize lifebar subsystem..")
 	mobf_lifebar.init()
-	
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize mobf supplied modules..")
 	mobf_init_modules()
-	
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Register rightclick button handler..")
 	minetest.register_on_player_receive_fields(mobf.rightclick_button_handler)
-	
+
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initializing step time quota .. ")
+	mobf_step_quota.initialize()
+
 	-- register privilege to change mobf settings
-	minetest.register_privilege("mobfw_admin", 
+	minetest.register_privilege("mobfw_admin",
 	{
 		description = "Player may change mobf settings",
 		give_to_singleplayer = true
 	})
-	
+
 	print("MOD: mob framework mod "..mobf_version.." loaded")
 end
 
 --! @brief initialize mod dependencys
 function mobf_init_mod_deps()
 	local modlist = minetest.get_modnames()
-	
+
 	for i=1,#modlist,1 do
 		if modlist[i] == "fire" then
 			mobf_rtd.fire_enabled = true
 		end
-		
+
 		if modlist[i] == "inventory_plus" then
 			mobf_rtd.inventory_plus_enabled = true
 		end
-	end	
+	end
 end
 
 --! @brief initialize mobf submodules
@@ -254,7 +258,7 @@ function mobf_init_modules()
 					return false
 				end
 				})
-	
+
 	--combat hook
 	mobf.register_on_step_callback({
 			name = "combat",
@@ -267,7 +271,7 @@ function mobf_init_modules()
 					return false
 				end
 				})
-				
+
 	--attention hook
 	mobf.register_on_step_callback({
 			name = "attention",
@@ -285,7 +289,7 @@ function mobf_init_modules()
 	--workaround for shortcomings in spawn algorithm
 	mobf.register_on_step_callback({
 			name = "check_pop_dense",
-			handler = spawning.check_population_density,
+			handler = spawning.population_density_check,
 			init = spawning.init_dynamic_data,
 			configcheck = function(entity)
 					return true
@@ -341,7 +345,7 @@ function mobf_init_modules()
 					return true
 				end
 				})
-				
+
 
 	--on punch callbacks
 	mobf.register_on_punch_callback({
@@ -357,13 +361,13 @@ function mobf_init_modules()
 					return false
 				end
 				})
-				
+
 	mobf.register_on_punch_callback({
 			name		= "riding",
 			handler		= mobf_ride.on_punch_callback,
 			configcheck	= mobf_ride.is_enabled
 			})
-	
+
 	mobf.register_on_punch_callback({
 			name = "punching",
 			handler = fighting.hit,
@@ -371,8 +375,8 @@ function mobf_init_modules()
 					return true
 				end
 				})
-				
-				
+
+
 	--on rightclick callbacks
 	mobf.register_on_rightclick_callback({
 			name = "tradercallback",
@@ -380,7 +384,7 @@ function mobf_init_modules()
 			handler		= mob_inventory.trader_callback,
 			configcheck	= mob_inventory.config_check
 			})
-			
+
 	mobf.register_on_rightclick_callback({
 			name = "debugcallback",
 			visiblename = "Show debuginfo",
@@ -397,7 +401,7 @@ function mobf_init_modules()
 			handler		= mobf_path.mob_rightclick_callback,
 			configcheck	= mobf_path.config_check
 			})
-			
+
 	mobf.register_on_rightclick_callback({
 			name = "factions",
 			visiblename = "Factions",
