@@ -90,9 +90,9 @@ function mobf_step_quota.consume(starttime)
 	local now = mobf_get_time_ms()
 	local passed = now - starttime
 
-	if passed > 0 then
+	if passed >= 0 then
 		mobf_step_quota.remaining_quota = mobf_step_quota.remaining_quota - passed
 	else
-		mobf_print("MOBF: error calculation consumed time: " .. starttime .. " --> " .. now)
+		--mobf_print("MOBF: error calculation consumed time: " .. starttime .. " --> " .. now)
 	end
 end
