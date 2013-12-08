@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_chicken mod loading ...")
-local version = "0.0.21"
+local version = "0.1.0"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
@@ -33,23 +33,23 @@ function chicken_drop()
 	else
 		table.insert(result,"animalmaterials:feather 1")
 	end
-	
+
 	table.insert(result,"animalmaterials:meat_chicken 1")
-	
+
 	return result
 end
 
-chicken_prototype = {
+local chicken_prototype = {
 		name="chicken",
 		modname="animal_chicken",
-		
+
 		factions = {
 			member = {
 				"animals",
 				"grassland_animals"
 				}
 			},
-	
+
 		generic = {
 					description="Chicken",
 					base_health=5,
@@ -58,7 +58,8 @@ chicken_prototype = {
 						fleshy=90,
 					},
 					groups = chicken_groups,
-					envid = "meadow"
+					envid = "meadow",
+					population_density=75,
 				},
 		movement =  {
 					min_accel=0.05,
@@ -73,20 +74,10 @@ chicken_prototype = {
 					consumed=true,
 					},
 		random_drop = {
- 					result="animalmaterials:egg",
- 					min_delay=60,
- 					chance=0.2
- 					},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0.001,
-						density=75,
-						algorithm="willow_mapgen",
-						height=1
-						},
-					}
-				},
+					result="animalmaterials:egg",
+					min_delay=60,
+					chance=0.2
+					},
 		sound = {
 					random_drop = {
 						name="animal_chicken_eggdrop",
@@ -118,7 +109,7 @@ chicken_prototype = {
 					},
 			},
 		states = {
-				{ 
+				{
 				name = "default",
 				movgen = "none",
 				chance = 0,
@@ -138,14 +129,14 @@ chicken_prototype = {
 					},
 				typical_state_time = 30,
 				},
-				{ 
+				{
 				name = "walking",
 				movgen = "probab_mov_gen",
 				chance = 0.50,
 				animation = "walk",
 				typical_state_time = 180,
 				},
-				{ 
+				{
 				name = "flee",
 				movgen = "flee_mov_gen",
 				typical_state_time = 5,
@@ -154,11 +145,11 @@ chicken_prototype = {
 				},
 			},
 		}
-		
-rooster_prototype = {   
+
+local rooster_prototype = {
 		name="rooster",
 		modname="animal_chicken",
-		
+
 		factions = {
 			member = {
 				"animals",
@@ -174,7 +165,8 @@ rooster_prototype = {
 						fleshy=90,
 					},
 					groups = chicken_groups,
-					envid = "meadow"
+					envid = "meadow",
+					population_density=75,
 				},
 		movement =  {
 					min_accel=0.05,
@@ -188,24 +180,6 @@ rooster_prototype = {
 					tool="animalmaterials:lasso",
 					consumed=true,
 					},
-		spawning = {
-				primary_algorithms = {
-						{
-							rate=0.001,
-							density=75,
-							algorithm="willow_mapgen",
-							height=1
-						}
-					},
-				secondary_algorithms = {
-						{
-						rate=0.001,
-						density=75,
-						algorithm="willow",
-						height=2
-						},
-					}
-				},
 		sound = {
 					random = {
 						name="animal_chicken_random_rooster",
@@ -226,7 +200,7 @@ rooster_prototype = {
 					},
 			},
 		states = {
-				{ 
+				{
 				name = "default",
 				movgen = "none",
 				chance = 0,
@@ -246,14 +220,14 @@ rooster_prototype = {
 					},
 				typical_state_time = 30,
 				},
-				{ 
+				{
 				name = "walking",
 				movgen = "probab_mov_gen",
 				chance = 0.25,
 				animation = "walk",
 				typical_state_time = 180,
 				},
-				{ 
+				{
 				name = "flee",
 				movgen = "flee_mov_gen",
 				typical_state_time = 5,
@@ -263,17 +237,17 @@ rooster_prototype = {
 			},
 		}
 
-chick_m_prototype = {
+local chick_m_prototype = {
 		name="chick_m",
 		modname="animal_chicken",
-		
+
 		factions = {
 			member = {
 				"animals",
 				"grassland_animals"
 				}
 			},
-		
+
 		generic = {
 				description="Chick - male",
 				base_health=5,
@@ -300,16 +274,6 @@ chick_m_prototype = {
 				result="animal_chicken:rooster",
 				delay=600,
 				},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0.001,
-						density=75,
-						algorithm="none",
-						height=1
-						},
-					}
-				},
 		animation = {
 				walk = {
 					start_frame = 1,
@@ -321,7 +285,7 @@ chick_m_prototype = {
 					},
 			},
 		states = {
-				{ 
+				{
 				name = "default",
 				movgen = "none",
 				chance = 0,
@@ -341,14 +305,14 @@ chick_m_prototype = {
 					},
 				typical_state_time = 30,
 				},
-				{ 
+				{
 				name = "walking",
 				movgen = "probab_mov_gen",
 				chance = 0.50,
 				animation = "walk",
 				typical_state_time = 180,
 				},
-				{ 
+				{
 				name = "flee",
 				movgen = "flee_mov_gen",
 				typical_state_time = 5,
@@ -358,17 +322,17 @@ chick_m_prototype = {
 			},
 		}
 
-chick_f_prototype = {   
+local chick_f_prototype = {
 		name="chick_f",
 		modname="animal_chicken",
-		
+
 		factions = {
 			member = {
 				"animals",
 				"grassland_animals"
 				}
 			},
-		
+
 		generic = {
 				description="Chick - female",
 				base_health=5,
@@ -395,16 +359,6 @@ chick_f_prototype = {
 				result="animal_chicken:chicken",
 				delay=600,
 				},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0.001,
-						density=75,
-						algorithm="none",
-						height=1
-						},
-					}
-				},
 		animation = {
 				walk = {
 					start_frame = 1,
@@ -416,7 +370,7 @@ chick_f_prototype = {
 					},
 			},
 		states = {
-				{ 
+				{
 				name = "default",
 				movgen = "none",
 				chance = 0,
@@ -436,14 +390,14 @@ chick_f_prototype = {
 					},
 				typical_state_time = 30,
 				},
-				{ 
+				{
 				name = "walking",
 				movgen = "probab_mov_gen",
 				chance = 0.50,
 				animation = "walk",
 				typical_state_time = 180,
 				},
-				{ 
+				{
 				name = "flee",
 				movgen = "flee_mov_gen",
 				typical_state_time = 5,
@@ -452,6 +406,89 @@ chick_f_prototype = {
 				},
 			},
 		}
+
+local chicken_name   = chicken_prototype.modname .. ":"  .. chicken_prototype.name
+local rooster_name = rooster_prototype.modname .. ":"  .. rooster_prototype.name
+
+local chicken_env = mobf_environment_by_name(chicken_prototype.generic.envid)
+
+mobf_spawner_register("chicken_spawner_1",chicken_name,
+	{
+	spawnee = chicken_name,
+	spawn_interval = 120,
+	spawn_inside = chicken_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=chicken_name,
+				distance=chicken_prototype.generic.population_density,threshold=2 },
+			{ type="MAX",entityname=rooster_name,
+				distance=chicken_prototype.generic.population_density,threshold=2 }
+		},
+
+	nodes_around =
+		{
+			{ type="MIN", name = { "default:grass_1",
+									"default:grass_2",
+									"default:grass_3",
+									"default:grass_4",
+									"default:grass_5", },distance=8,threshold=1}
+		},
+
+	absolute_height =
+	{
+		min = -10,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 20,
+		spawntotal = 3,
+	},
+
+	surfaces = chicken_env.surfaces.good,
+	collisionbox = selectionbox_chicken
+	})
+
+mobf_spawner_register("rooster_spawner_1",rooster_name,
+	{
+	spawnee = rooster_name,
+	spawn_interval = 120,
+	spawn_inside = chicken_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=chicken_name,
+				distance=chicken_prototype.generic.population_density,threshold=2 },
+			{ type="MAX",entityname=rooster_name,
+				distance=chicken_prototype.generic.population_density,threshold=2 }
+		},
+
+	nodes_around =
+		{
+			{ type="MIN", name = { "default:default:grass_1",
+									"default:default:grass_2",
+									"default:default:grass_3",
+									"default:default:grass_4",
+									"default:default:grass_5", },distance=8,threshold=1}
+		},
+
+	absolute_height =
+	{
+		min = -10,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 20,
+		spawntotal = 3,
+	},
+
+	surfaces = chicken_env.surfaces.good,
+	collisionbox = selectionbox_rooster
+	})
 
 --register with animals mod
 minetest.log("action","\tadding animal "..chicken_prototype.name)

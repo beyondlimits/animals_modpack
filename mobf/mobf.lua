@@ -551,7 +551,7 @@ end
 -------------------------------------------------------------------------------
 function mobf.register_entity(name, graphics, mob)
 	dbg_mobf.mobf_core_lvl1("MOBF: registering new entity: " .. name)
-	mobf_print("MOBF: registering new entity: \"" .. name .. "\"")
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: registering new entity: \"" .. name .. "\"")
 
 	mobf_assert_backtrace(environment_list[mob.generic.envid] ~= nil)
 	minetest.register_entity(name,

@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_rat loading ...")
 
-local version = "0.0.11"
+local version = "0.1.0"
 
 local selectionbox_rat = {-0.2, -0.0625, -0.2, 0.2, 0.125, 0.2}
 
@@ -23,16 +23,16 @@ local rat_groups = {
 						not_in_creative_inventory=1
 					}
 
-rat_prototype = {
-		name="rat", 
+local rat_prototype = {
+		name="rat",
 		modname="animal_rat",
-		
+
 		factions = {
 			member = {
 				"animals",
 				}
 			},
-	
+
 		generic = {
 					description="Rat (Animals)",
 					base_health=2,
@@ -42,6 +42,7 @@ rat_prototype = {
 					},
 					groups = rat_groups,
 					envid="on_ground_1",
+					population_density = 250,
 				},
 		movement =  {
 					default_gen="probab_mov_gen",
@@ -55,37 +56,6 @@ rat_prototype = {
 					tool="animalmaterials:net",
 					consumed=true,
 					},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0.02,
-						density=250,
-						algorithm="forrest_mapgen",
-						height=1
-						},
-						{
-						rate=0.01,
-						density=250,
-						algorithm="shadows_spawner",
-						height=1,
-						respawndelay = 120,
-						},
-					},
-					secondary_algorithms = {
-						{
-						rate=0.002,
-						density=250,
-						algorithm="forrest",
-						height=2
-						},
-						{
-						rate=0.002,
-						density=250,
-						algorithm="shadows",
-						height=2
-						},
-					}
-				},
 		animation = {
 				walk = {
 					start_frame = 1,
@@ -98,7 +68,7 @@ rat_prototype = {
 					},
 			},
 		states = {
-				{ 
+				{
 				name = "default",
 				movgen = "none",
 				chance = 0,
@@ -115,10 +85,10 @@ rat_prototype = {
 					sprite_div = {x=6,y=1},
 					visible_height = 1,
 					visible_width = 1,
-					},	
+					},
 				typical_state_time = 10,
 				},
-				{ 
+				{
 				name = "walking",
 				movgen = "probab_mov_gen",
 				chance = 0.75,
@@ -128,7 +98,72 @@ rat_prototype = {
 			},
 		}
 
+local rat_name   = rat_prototype.modname .. ":"  .. rat_prototype.name
 
+local rat_env = mobf_environment_by_name(rat_prototype.generic.envid)
+
+mobf_spawner_register("rat_spawner_1",rat_name,
+	{
+	spawnee = rat_name,
+	spawn_interval = 120,
+	spawn_inside = rat_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=rat_name,
+				distance=rat_prototype.generic.population_density,threshold=2 },
+		},
+
+	nodes_around =
+		{
+			{ type="MIN", name = { "default:leaves","default:tree"},distance=1,threshold=2}
+		},
+
+	absolute_height =
+	{
+		min = -10,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 10,
+		spawntotal = 3,
+	},
+
+	collisionbox = selectionbox_rat
+	})
+
+mobf_spawner_register("rat_spawner_2",rat_name,
+	{
+	spawnee = rat_name,
+	spawn_interval = 120,
+	spawn_inside = rat_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=rat_name,
+				distance=rat_prototype.generic.population_density,threshold=2 },
+		},
+
+	light_around =
+	{
+		{ type="CURRENT_MAX", distance = 2, threshold=6 }
+	},
+
+	absolute_height = {
+		max = 100,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 10,
+		spawntotal = 3,
+	},
+
+	collisionbox = selectionbox_rat
+	})
 
 --register mod
 minetest.log("action","\tadding "..rat_prototype.name)

@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_guard mod loading ...")
 
-local version = "0.0.4"
+local version = "0.1.0"
 local guard_groups = {
 						not_in_creative_inventory=1
 					}
@@ -23,14 +23,14 @@ local guard_groups = {
 guard_prototype = {
 		name="guard",
 		modname="mob_guard",
-		
+
 		factions = {
 			member = {
 				"npc",
 				"hireling"
 				}
 			},
-	
+
 		generic = {
 					description="Guard",
 					base_health=40,
@@ -57,16 +57,6 @@ guard_prototype = {
 					tool="animalmaterials:contract",
 					consumed=true,
 					},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0,
-						density=0,
-						algorithm="none",
-						height=2
-						},
-					}
-				},
 		combat = {
 					angryness=0.99,
 					starts_attack=true,
@@ -74,7 +64,7 @@ guard_prototype = {
 					attack_hostile_mobs = true,
 					melee = {
 						maxdamage=2,
-						range=2, 
+						range=2,
 						speed=1,
 						},
 					self_destruct = nil,
@@ -84,7 +74,7 @@ guard_prototype = {
 					cycle_path = true,
 				},
 		states = {
-				{ 
+				{
 				name = "combat_melee",
 				movgen = "none",
 				typical_state_time = 9999,
@@ -92,7 +82,7 @@ guard_prototype = {
 				animation = "punch",
 				state_mode = "combat",
 				},
-				{ 
+				{
 				name = "combat",
 				movgen = "follow_mov_gen",
 				typical_state_time = 9999,
@@ -100,7 +90,7 @@ guard_prototype = {
 				animation = "walk",
 				state_mode = "combat",
 				},
-				{ 
+				{
 				name = "default",
 				movgen = "follow_mov_gen",
 				typical_state_time = 180,
@@ -115,7 +105,7 @@ guard_prototype = {
 					visual_size= {x=1, y=1},
 					},
 				},
-				{ 
+				{
 				name = "patrol",
 				movgen = "mgen_path",
 				typical_state_time = 9999,

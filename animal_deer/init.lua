@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_deer mod loading ... ")
 
-local version = "0.1.3"
+local version = "0.2.0"
 
 local deer_groups = {
 						not_in_creative_inventory=1
@@ -71,7 +71,7 @@ function deer_watch_callback(entity,target)
 	entity.dynamic_data.current_movement_gen.set_target(entity,target)
 end
 
-deer_m_prototype = {
+local deer_m_prototype = {
 	name="deer_m",
 	modname = "animal_deer",
 
@@ -91,6 +91,7 @@ deer_m_prototype = {
 				},
 				groups = deer_groups,
 				envid="meadow",
+				population_density=200,
 			},
 	movement =  {
 				default_gen="probab_mov_gen",
@@ -120,24 +121,6 @@ deer_m_prototype = {
 			attention_max = 25,
 			watch_callback = deer_watch_callback
 	},
-	spawning = {
-				primary_algorithms = {
-					{
-					rate=0.002,
-					density=200,
-					algorithm="forrest_mapgen",
-					height=2
-					},
-				},
-				secondary_algorithms = {
-					{
-					rate=0.002,
-					density=200,
-					algorithm="forrest",
-					height=2
-					},
-				}
-			},
 	animation = {
 			walk = {
 				start_frame = 0,
@@ -213,7 +196,7 @@ deer_m_prototype = {
 		}
 	}
 
-deer_f_prototype = {
+local deer_f_prototype = {
 	name="deer_f",
 	modname = "animal_deer",
 
@@ -233,6 +216,7 @@ deer_f_prototype = {
 				},
 				groups = deer_groups,
 				envid="meadow",
+				population_density=200,
 			},
 	movement =  {
 				default_gen="probab_mov_gen",
@@ -262,24 +246,6 @@ deer_f_prototype = {
 			attention_max = 25,
 			watch_callback = deer_watch_callback
 	},
-	spawning = {
-				primary_algorithms = {
-					{
-					rate=0.002,
-					density=200,
-					algorithm="forrest_mapgen",
-					height=2
-					},
-				},
-				secondary_algorithms = {
-					{
-					rate=0.002,
-					density=200,
-					algorithm="forrest",
-					height=2
-					},
-				}
-			},
 	animation = {
 			walk = {
 				start_frame = 0,
@@ -362,6 +328,83 @@ minetest.register_entity(":animal_deer:deer__default",
 			minetest.add_entity(self.object:getpos(),"animal_deer:deer_m")
 			self.object:remove()
 		end
+	})
+
+local deer_m_name   = deer_m_prototype.modname .. ":"  .. deer_m_prototype.name
+local deer_f_name   = deer_f_prototype.modname .. ":"  .. deer_f_prototype.name
+
+local deer_env = mobf_environment_by_name(deer_m_prototype.generic.envid)
+
+mobf_spawner_register("deer_m_spawner_1",deer_m_name,
+	{
+	spawnee = deer_m_name,
+	spawn_interval = 120,
+	spawn_inside = deer_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",distance=5,threshold=1 },
+			{ type="MAX",entityname=deer_m_name,
+				distance=deer_m_prototype.generic.population_density,threshold=2 },
+			{ type="MAX",entityname=deer_f_name,
+				distance=deer_m_prototype.generic.population_density,threshold=2 }
+		},
+
+	nodes_around =
+		{
+			{ type="MIN", name = { "default:leaves","default:tree"},distance=5,threshold=4}
+		},
+
+	absolute_height =
+	{
+		min = -10,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 30,
+		spawntotal = 1,
+	},
+
+	surfaces = deer_env.surfaces.good,
+	collisionbox = selectionbox_deer
+	})
+
+mobf_spawner_register("deer_f_spawner_1",deer_f_name,
+	{
+	spawnee = deer_f_name,
+	spawn_interval = 120,
+	spawn_inside = deer_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",distance=5,threshold=1 },
+			{ type="MAX",entityname=deer_f_name,
+				distance=deer_f_prototype.generic.population_density,threshold=2 },
+			{ type="MAX",entityname=deer_f_name,
+				distance=deer_f_prototype.generic.population_density,threshold=2 }
+		},
+
+	nodes_around =
+		{
+			{ type="MIN", name = { "default:leaves","default:tree"},distance=3,threshold=4}
+		},
+
+	absolute_height =
+	{
+		min = -10,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 30,
+		spawntotal = 1,
+	},
+
+	surfaces = deer_env.surfaces.good,
+	collisionbox = selectionbox_deer
 	})
 
 --register with animals mod

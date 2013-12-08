@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_archer mod loading ...")
 
-local version = "0.0.5"
+local version = "0.1.0"
 local archer_groups = {
 						not_in_creative_inventory=1
 					}
@@ -23,14 +23,14 @@ local archer_groups = {
 archer_prototype = {
 		name="archer",
 		modname="mob_archer",
-		
+
 		factions = {
 			member = {
 				"npc",
 				"hireling"
 				}
 			},
-	
+
 		generic = {
 					description="Archer",
 					base_health=40,
@@ -56,16 +56,6 @@ archer_prototype = {
 					tool="animalmaterials:contract",
 					consumed=true,
 					},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0,
-						density=0,
-						algorithm="none",
-						height=2
-						},
-					}
-				},
 		combat = {
 					angryness=0.99,
 					starts_attack=true,
@@ -73,7 +63,7 @@ archer_prototype = {
 					attack_hostile_mobs = true,
 					melee = {
 						maxdamage=1,
-						range=2, 
+						range=2,
 						speed=1,
 						},
 					distance = {
@@ -86,7 +76,7 @@ archer_prototype = {
 					self_destruct = nil,
 					},
 		states = {
-				{ 
+				{
 				name = "combat_distance",
 				movgen = "none",
 				typical_state_time = 9999,
@@ -94,7 +84,7 @@ archer_prototype = {
 				animation = "shoot",
 				state_mode = "combat",
 				},
-				{ 
+				{
 				name = "combat",
 				movgen = "none",
 				typical_state_time = 9999,
@@ -102,7 +92,7 @@ archer_prototype = {
 				animation = "punch",
 				state_mode = "combat",
 				},
-				{ 
+				{
 				name = "default",
 				movgen = "follow_mov_gen",
 				typical_state_time = 180,

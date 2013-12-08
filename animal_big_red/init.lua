@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_big_red mod loading ...")
-local version = "0.0.20"
+local version = "0.1.0"
 
 local big_red_groups = {
 						not_in_creative_inventory=1
@@ -22,10 +22,10 @@ local big_red_groups = {
 
 local selectionbox_big_red = {-0.75, -1.9, -0.75, 0.75, 1.9, 0.75}
 
-big_red_prototype = {
+local big_red_prototype = {
 		name="big_red",
 		modname="animal_big_red",
-		
+
 		factions = {
 			member = {
 				"underground",
@@ -33,7 +33,7 @@ big_red_prototype = {
 				"daemonic"
 				}
 			},
-		
+
 		generic = {
 					description="Big Red",
 					base_health=8,
@@ -44,6 +44,7 @@ big_red_prototype = {
 					},
 					groups = big_red_groups,
 					envid="on_ground_1",
+					population_density=1000,
 				},
 		movement = {
 					default_gen="probab_mov_gen",
@@ -54,10 +55,10 @@ big_red_prototype = {
 					canfly=false,
 					follow_speedup=30,
 					},
-		harvest = {	
+		harvest = {
 					tool="",
 					tool_consumed=false,
-					result="", 
+					result="",
 					transforms_to="",
 					min_delay=-1,
 					},
@@ -71,24 +72,12 @@ big_red_prototype = {
 						speed=2,
 						},
 					distance = {
-						attack="mobf:plasmaball_entity", 
+						attack="mobf:plasmaball_entity",
 						range=10,
 						speed=2,
 						},
 					self_destruct = nil,
 					},
-		
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0.01,
-						density=1000,
-						algorithm="shadows_spawner",
-						height=4,
-						respawndelay = 60,
-						},
-					}
-				},
 		sound = {
 			random = {
 					name="animal_big_red_random_1",
@@ -117,7 +106,7 @@ big_red_prototype = {
 				}
 			},
 		states = {
-				{ 
+				{
 				name = "default",
 				movgen = "none",
 				chance = 0,
@@ -137,7 +126,7 @@ big_red_prototype = {
 					},
 				typical_state_time = 30,
 				},
-				{ 
+				{
 				name = "walking",
 				movgen = "probab_mov_gen",
 				chance = 0.25,
@@ -154,6 +143,48 @@ big_red_prototype = {
 			},
 		}
 
+local big_red_name   = big_red_prototype.modname .. ":"  .. big_red_prototype.name
+local big_red_env = mobf_environment_by_name(big_red_prototype.generic.envid)
+local spawnbox = minetest.deserialize(minetest.serialize(selectionbox_big_red))
+
+spawnbox[5] = 3
+
+mobf_spawner_register("big_red_spawner_1",big_red_name,
+	{
+	spawnee = big_red_name,
+	spawn_interval = 60,
+	spawn_inside = big_red_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=big_red_name,
+				distance=100,threshold=2 },
+		},
+
+	light_around =
+	{
+		{ type="CURRENT_MAX", distance = 2, threshold=6 }
+	},
+
+	absolute_height = {
+		max = -100,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 10,
+		spawntotal = 3,
+	},
+
+	surfaces = { "default:dirt",
+					"default:cobble",
+					"default:stone",
+					"default:desert_stone",
+					"default:gravel"},
+
+	collisionbox = spawnbox
+	})
 
 --register with animals mod
 minetest.log("action","\tadding mob "..big_red_prototype.name)

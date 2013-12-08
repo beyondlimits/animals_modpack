@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_oerkki mod loading ...")
-local version = "0.0.4"
+local version = "0.1.0"
 
 local oerkki_groups = {
 						not_in_creative_inventory=1
@@ -22,17 +22,17 @@ local oerkki_groups = {
 
 local selectionbox_oerkki = {-0.75, -1.25, -0.75, 0.75, 0.75, 0.75}
 
-oerkki_prototype = {
+local oerkki_prototype = {
 		name="oerkki",
 		modname="mob_oerkki",
-		
+
 		factions = {
 			member = {
 				"underground",
 				"monsters"
 				}
 			},
-		
+
 		generic = {
 					description="Oerkki",
 					base_health=3,
@@ -43,6 +43,7 @@ oerkki_prototype = {
 					},
 					groups = oerkki_groups,
 					envid="on_ground_1",
+					population_density=750,
 				},
 		movement = {
 					default_gen="probab_mov_gen",
@@ -53,10 +54,10 @@ oerkki_prototype = {
 					canfly=false,
 					follow_speedup=30,
 					},
-		harvest = {	
+		harvest = {
 					tool="",
 					tool_consumed=false,
-					result="", 
+					result="",
 					transforms_to="",
 					min_delay=-1,
 					},
@@ -71,18 +72,6 @@ oerkki_prototype = {
 						},
 					self_destruct = nil,
 					},
-		
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0.01,
-						density=750,
-						algorithm="shadows_spawner",
-						height=4,
-						respawndelay = 60,
-						},
-					}
-				},
 		sound = {
 			},
 		animation = {
@@ -96,7 +85,7 @@ oerkki_prototype = {
 					},
 			},
 		states = {
-				{ 
+				{
 				name = "default",
 				movgen = "none",
 				chance = 0,
@@ -116,7 +105,7 @@ oerkki_prototype = {
 					},
 				typical_state_time = 30,
 				},
-				{ 
+				{
 				name = "walking",
 				movgen = "probab_mov_gen",
 				chance = 0.5,
@@ -133,6 +122,45 @@ oerkki_prototype = {
 			},
 		}
 
+local oerkki_name   = oerkki_prototype.modname .. ":"  .. oerkki_prototype.name
+local oerkki_env = mobf_environment_by_name(oerkki_prototype.generic.envid)
+
+mobf_spawner_register("oerkki_spawner_1",oerkki_name,
+	{
+	spawnee = oerkki_name,
+	spawn_interval = 60,
+	spawn_inside = oerkki_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=oerkki_name,
+				distance=100,threshold=2 },
+		},
+
+	light_around =
+	{
+		{ type="CURRENT_MAX", distance = 2, threshold=6 }
+	},
+
+	absolute_height = {
+		max = -50,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 10,
+		spawntotal = 3,
+	},
+
+	surfaces = { "default:dirt",
+					"default:cobble",
+					"default:stone",
+					"default:desert_stone",
+					"default:gravel"},
+
+	collisionbox = selectionbox_oerkki
+	})
 
 --register with animals mod
 minetest.log("action","\tadding mob "..oerkki_prototype.name)

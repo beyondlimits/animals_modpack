@@ -120,7 +120,12 @@ function mobf_add_mob(mob)
 		minetest.log(LOGLEVEL_WARNING,"MOBF: no movement pattern specified!")
 	end
 
-	spawning.register_mob(mob)
+	if mob.spawning ~= nil then
+		minetest.log(LOGLEVEL_WARNING,"MOBF: \"" .. mob.name ..
+			"\" is still using mob internal spawning," ..
+			" this is DEPRECATED and going to be removed soon!")
+		spawning.register_mob(mob)
+	end
 
 	--register factions required by mob
 	mobf_factions.setupmob(mob.factions)
@@ -170,6 +175,23 @@ function mobf_register_environment(name,environment)
 end
 
 ------------------------------------------------------------------------------
+-- @function mobf_environment_by_name(name)
+--
+--! @brief get environment by name
+--! @ingroup framework_mob
+--
+--! @param name of environment
+--! @return environment definition
+-------------------------------------------------------------------------------
+function mobf_environment_by_name(name)
+	if environment_list[name] ~= nil then
+		return minetest.deserialize(minetest.serialize(environment_list[name]))
+	else
+		return nil
+	end
+end
+
+------------------------------------------------------------------------------
 -- @function mobf_probab_movgen_register_pattern(pattern)
 --
 --! @brief register an movement pattern for probabilistic movement gen
@@ -180,4 +202,31 @@ end
 -------------------------------------------------------------------------------
 function mobf_probab_movgen_register_pattern(pattern)
 	return movement_gen.register_pattern(pattern)
+end
+
+------------------------------------------------------------------------------
+-- @function mobf_spawner_register(name,spawndef)
+--
+--! @brief register a spawndef to adv_spawning
+--! @ingroup framework_mob
+--
+--! @param name of spawner
+--! @param spawndef defintion of spawner
+--! @return true/false
+-------------------------------------------------------------------------------
+function mobf_spawner_register(name,mobname,spawndef)
+
+	--check if spawning is enabled
+--	if minetest.world_setting_get("mobf_disable_animal_spawning") then
+--		return false
+--	end
+
+	--check if mob is blacklisted
+	if mobf_contains(mobf_rtd.registred_mob,mobname) then
+		minetest.log(LOGLEVEL_NOTICE,"MOBF: " .. mobname .. " is blacklisted, not adding spawner")
+		return false
+	end
+
+	--register
+	adv_spawning.register(name,spawndef)
 end

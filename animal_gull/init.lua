@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_gull loading ...")
 
-local version = "0.0.14"
+local version = "0.1.0"
 
 local gull_groups = {
 						not_in_creative_inventory=1
@@ -23,17 +23,17 @@ local gull_groups = {
 
 local selectionbox_gull = {-1, -0.3, -1, 1, 0.3, 1}
 
-gull_prototype = {   
+gull_prototype = {
 		name="gull",
 		modname="animal_gull",
-		
+
 		factions = {
 			member = {
 				"animals",
 				"birds"
 				}
 			},
-	
+
 		generic = {
 					description="Gull",
 					base_health=5,
@@ -43,7 +43,8 @@ gull_prototype = {
 					},
 					groups = gull_groups,
 					envid="flight_1",
-				},				
+					population_density = 250,
+				},
 		movement =  {
 					min_accel=0.5,
 					max_accel=1,
@@ -51,18 +52,6 @@ gull_prototype = {
 					pattern="flight_pattern1",
 					canfly=true,
 					},
-		
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0.02,
-						density=250,
-						algorithm="in_air1_spawner",
-						height=-1,
-						respawndelay=60
-						},
-					}
-				},
 		animation = {
 				fly = {
 					start_frame = 0,
@@ -92,6 +81,37 @@ gull_prototype = {
 				},
 			}
 		}
+
+
+local gullname = gull_prototype.modname .. ":"  .. gull_prototype.name
+local gull_env = mobf_environment_by_name(gull_prototype.generic.envid)
+
+mobf_spawner_register("gull_spawner_1",gullname,
+	{
+	spawnee = gullname,
+	spawn_interval = 60,
+	spawn_inside = gull_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=gullname,
+				distance=gull_prototype.generic.population_density,threshold=2 },
+		},
+
+	relative_height =
+	{
+		min = gull_env.min_height_above_ground,
+		max = gull_env.min_height_above_ground
+	},
+
+	absolute_height =
+	{
+		min = 10,
+	},
+
+	surfaces = { "default:water_source", "default:water_flowing"},
+	collisionbox = selectionbox_gull
+	})
 
 
 --register with animals mod

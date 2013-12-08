@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.1.3"
+local version = "0.2.0"
 
 local sheep_groups = {
 						sheerable=1,
@@ -26,7 +26,7 @@ local sheep_groups = {
 local selectionbox_sheep = {-0.65, -0.8, -0.65, 0.65, 0.45, 0.65}
 local selectionbox_lamb = {-0.65*0.6, -0.8*0.6, -0.65*0.6, 0.65*0.6, 0.45*0.6, 0.65*0.65}
 
-sheep_prototype = {
+local sheep_prototype = {
 		name="sheep",
 		modname="animal_sheep",
 
@@ -46,6 +46,7 @@ sheep_prototype = {
 					},
 					groups = sheep_groups,
 					envid="meadow",
+					population_density = 50
 				},
 		movement =  {
 					min_accel=0.05,
@@ -67,24 +68,6 @@ sheep_prototype = {
 					tool="animalmaterials:lasso",
 					consumed=true,
 					},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0.002,
-						density=50,
-						algorithm="willow_mapgen",
-						height=2
-						},
-					},
-					secondary_algorithms = {
-						{
-						rate=0.002,
-						density=50,
-						algorithm="willow",
-						height=2
-						},
-					}
-				},
 		sound = {
 					random = {
 								name="Mudchute_sheep_1",
@@ -186,7 +169,7 @@ sheep_prototype = {
 			}
 		}
 
-lamb_prototype = {
+local lamb_prototype = {
 		name="lamb",
 		modname="animal_sheep",
 
@@ -205,6 +188,7 @@ lamb_prototype = {
 						fleshy=85,
 					},
 					envid="meadow",
+					population_density = 0
 				},
 		movement =  {
 					canfly=false,
@@ -223,16 +207,6 @@ lamb_prototype = {
 					result="animal_sheep:sheep",
 					delay=1800
 					},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0,
-						density=0,
-						algorithm="none",
-						height=1
-						},
-					}
-				},
 		sound = {
 					random = {
 								name="Mudchute_lamb_1",
@@ -328,7 +302,7 @@ lamb_prototype = {
 			}
 		}
 
-sheep_naked_prototype = {
+local sheep_naked_prototype = {
 		name="sheep_naked",
 		modname="animal_sheep",
 
@@ -346,7 +320,8 @@ sheep_naked_prototype = {
 					armor_groups= {
 						fleshy=85,
 					},
-					envid="meadow"
+					envid="meadow",
+					population_density = 0
 				},
 		movement =  {
 					canfly=false,
@@ -364,16 +339,6 @@ sheep_naked_prototype = {
 					result="animal_sheep:sheep",
 					delay=300
 					},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0,
-						density=0,
-						algorithm="none",
-						height=2
-						},
-					}
-				},
 		sound = {
 					random = {
 								name="Mudchute_sheep_1",
@@ -478,6 +443,51 @@ minetest.register_craft({
 		{"default:stick",'',"default:stick"},
 	}
 })
+
+local spawneename   = sheep_prototype.modname .. ":"  .. sheep_prototype.name
+local secondaryname = sheep_naked_prototype.modname .. ":"  .. sheep_naked_prototype.name
+
+local sheep_env = mobf_environment_by_name(sheep_prototype.generic.envid)
+
+mobf_spawner_register("sheep_spawner_1",spawneename,
+	{
+	spawnee = spawneename,
+	spawn_interval = 120,
+	spawn_inside = sheep_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=spawneename,
+				distance=sheep_prototype.generic.population_density,threshold=2 },
+			{ type="MAX",entityname=secondaryname,
+				distance=sheep_prototype.generic.population_density,threshold=2 }
+		},
+
+	nodes_around =
+		{
+			{ type="MAX", name = { "default:leaves","default:tree"},distance=5,threshold=0}
+		},
+
+	absolute_height =
+	{
+		min = -10,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 10,
+		spawntotal = 3,
+	},
+
+	flat_area =
+	{
+		range = 1,
+	},
+
+	surfaces = sheep_env.surfaces.good,
+	collisionbox = selectionbox_sheep
+	})
 
 minetest.log("action","\tadding animal "..sheep_prototype.name)
 mobf_add_mob(sheep_prototype)

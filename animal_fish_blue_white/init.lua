@@ -10,31 +10,31 @@ local fish_blue_white_groups = {
 
 function fish_blue_white_drop()
 	local result = {}
-	
+
 	if math.random() < 0.01 then
 		table.insert(result,"animalmaterials:scale_blue 1")
 	end
-	
+
 	if math.random() < 0.01 then
 		table.insert(result,"animalmaterials:scale_white 1")
 	end
-	
+
 	table.insert(result,"animalmaterials:fish_bluewhite 3")
-	
+
 	return result
 end
 
-fish_blue_white_prototype = {
+local fish_blue_white_prototype = {
 		name="fish_blue_white",
 		modname="animal_fish_blue_white",
-		
+
 		factions = {
 			member = {
 				"animals",
 				"fish"
 				}
 			},
-	
+
 		generic = {
 					description="Blue white fish",
 					base_health=5,
@@ -44,8 +44,9 @@ fish_blue_white_prototype = {
 					},
 					groups = fish_blue_white_groups,
 					envid="shallow_waters",
+					population_density=150,
 				},
-		movement =  { 
+		movement =  {
 					default_gen="probab_mov_gen",
 					min_accel=0.1,
 					max_accel=0.3,
@@ -56,17 +57,6 @@ fish_blue_white_prototype = {
 		catching = {
 					tool="animalmaterials:net",
 					consumed=true,
-				},
-		spawning = {
-					primary_algorithms = {
-						{
-							rate=0.02,
-							density=150,
-							algorithm="in_shallow_water_spawner",
-							height=-1,
-							respawndelay = 60,
-						},
-					}
 				},
 		animation = {
 				swim = {
@@ -79,7 +69,7 @@ fish_blue_white_prototype = {
 					},
 				},
 		states = {
-				{ 
+				{
 					name = "default",
 					movgen = "none",
 					chance = 0,
@@ -99,7 +89,7 @@ fish_blue_white_prototype = {
 						},
 					typical_state_time = 5,
 				},
-				{ 
+				{
 					name = "swiming",
 					movgen = "probab_mov_gen",
 					chance = 0.45,
@@ -117,6 +107,41 @@ fish_blue_white_prototype = {
 			keep_food = true,
 		},
 		}
+
+local fish_blue_white_name = fish_blue_white_prototype.modname .. ":"  .. fish_blue_white_prototype.name
+local fish_blue_white_env = mobf_environment_by_name(fish_blue_white_prototype.generic.envid)
+
+mobf_spawner_register("fish_bw_spawner_1",fish_blue_white_name,
+	{
+	spawnee = fish_blue_white_name,
+	spawn_interval = 60,
+	spawn_inside = fish_blue_white_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=fish_blue_white_name,
+				distance=fish_blue_white_prototype.generic.population_density,threshold=2 },
+		},
+
+	absolute_height =
+	{
+		min = -10,
+		max = 1
+	},
+
+	nodes_around =
+	{
+		{type="MIN",distance=2, name={ "default:water_flowing","default:water_source"},threshold=22},
+		{type="MIN",distance=10,name={"default:dirt","default:dirt_with_grass"},threshold=1}
+	},
+
+	-- set to empty to disable relative check
+	relative_height = {},
+
+	collisionbox = selectionbox_fish_blue_white,
+
+	spawns_per_interval = 5
+	})
 
 
 --register with animals mod

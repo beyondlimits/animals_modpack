@@ -283,7 +283,7 @@ function environment.is_jumpable_surface(name)
 end
 
 -------------------------------------------------------------------------------
--- @function [parent=#environment] checksurfacek(pos,surfaces)
+-- @function [parent=#environment] checksurface(pos,surfaces)
 --
 --! @brief check if a position is suitable for an mob
 --! @ingroup environment

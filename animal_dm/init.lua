@@ -14,15 +14,15 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_dm loading ...")
-local version = "0.0.20"
+local version = "0.1.0"
 
 local dm_groups = {
-                        not_in_creative_inventory=1
-                    }
+					not_in_creative_inventory=1
+				}
 
 local selectionbox_dm = {-0.75, -1, -0.75, 0.75, 1, 0.75}
 
-dm_prototype = {
+local dm_prototype = {
 		name="dm",
 		modname="animal_dm",
 
@@ -42,7 +42,8 @@ dm_prototype = {
 						deamon=40,
 					},
 					groups = dm_groups,
-					envid="simple_air"
+					envid="simple_air",
+					population_density=750,
 				},
 		movement =  {
 					min_accel=0.2,
@@ -68,18 +69,6 @@ dm_prototype = {
 						},
 					self_destruct = nil,
 					},
-
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0.02,
-						density=750,
-						algorithm="shadows_spawner",
-						height=3,
-						respawndelay = 60,
-						},
-					}
-				},
 		sound = {
 					random = {
 								name="animal_dm_random_1",
@@ -163,7 +152,52 @@ end
 local modpath = minetest.get_modpath("animal_dm")
 dofile (modpath .. "/vault.lua")
 
---register with animals mod
+local dm_name   = dm_prototype.modname .. ":"  .. dm_prototype.name
+local dm_env = mobf_environment_by_name(dm_prototype.generic.envid)
+
+mobf_spawner_register("dm_spawner_1",dm_name,
+	{
+	spawnee = dm_name,
+	spawn_interval = 60,
+	spawn_inside = dm_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=dm_name,
+				distance=750,threshold=2 },
+		},
+
+	light_around =
+	{
+		{ type="CURRENT_MAX", distance = 2, threshold=6 }
+	},
+
+	absolute_height = {
+		max = -50,
+	},
+
+	nodes_around =
+	{
+		{ type="MIN",name = {"default:lava_source"},distance=3,threshold=1}
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 10,
+		spawntotal = 3,
+	},
+
+	surfaces = { "default:dirt",
+					"default:cobble",
+					"default:stone",
+					"default:desert_stone",
+					"default:gravel"},
+
+	collisionbox = selectionbox_dm
+	})
+
+
 minetest.log("action", "adding mob "..dm_prototype.name)
 if mobf_add_mob(dm_prototype) then
 	dofile (modpath .. "/vault.lua")

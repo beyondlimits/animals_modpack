@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_npc mod loading ...")
 
-local version = "0.0.14"
+local version = "0.1.0"
 local npc_groups = {
 						not_in_creative_inventory=1
 					}
@@ -24,16 +24,16 @@ local modpath = minetest.get_modpath("mob_npc")
 
 dofile (modpath .. "/spawn_building.lua")
 
-npc_prototype = {
+local npc_prototype = {
 		name="npc",
 		modname="mob_npc",
-		
+
 		factions = {
 			member = {
 				"npc",
 				}
 			},
-	
+
 		generic = {
 					description="NPC",
 					base_health=40,
@@ -43,6 +43,7 @@ npc_prototype = {
 					},
 					groups = npc_groups,
 					envid="on_ground_1",
+					population_density=0,
 				},
 		movement =  {
 					min_accel=0.3,
@@ -52,26 +53,15 @@ npc_prototype = {
 					pattern="stop_and_go",
 					canfly=false,
 					},
-		
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0,
-						density=0,
-						algorithm="none",
-						height=2
-						},
-					}
-				},
 		states = {
-				{ 
+				{
 				name = "walking",
 				movgen = "probab_mov_gen",
 				typical_state_time = 180,
 				chance = 0.50,
 				animation = "walk",
 				},
-				{ 
+				{
 				name = "default",
 				movgen = "none",
 				typical_state_time = 180,
@@ -97,17 +87,17 @@ npc_prototype = {
 					},
 			},
 		}
-		
-npc_trader_prototype = {
+
+local npc_trader_prototype = {
 		name="npc_trader",
 		modname="mob_npc",
-		
+
 		factions = {
 			member = {
 				"npc",
 				}
 			},
-	
+
 		generic = {
 					description="Trader",
 					base_health=200,
@@ -118,6 +108,7 @@ npc_trader_prototype = {
 					groups = npc_groups,
 					envid="on_ground_1",
 					custom_on_activate_handler=mob_inventory.init_trader_inventory,
+					population_density=0,
 				},
 		movement =  {
 					min_accel=0.3,
@@ -127,19 +118,8 @@ npc_trader_prototype = {
 					pattern="stop_and_go",
 					canfly=false,
 					},
-		
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0,
-						density=750,
-						algorithm="building_spawner",
-						height=2
-						},
-					}
-				},
 		states = {
-				{ 
+				{
 				name = "default",
 				movgen = "none",
 				chance = 0,
@@ -205,7 +185,37 @@ npc_trader_prototype = {
 				random_names = { "Hans","Franz","Xaver","Fritz","Thomas","Martin"},
 			}
 		}
-		
+
+
+mobf_spawner_register("npc_trader_spawner_1",
+				npc_trader_prototype.modname .. ":" .. npc_trader_prototype.name,
+	{
+	spawnee = building_spawner.spawnfunc,
+	spawn_interval = 120,
+	spawn_inside = { "air" },
+
+	absolute_height =
+	{
+		min = 0,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 20,
+		spawntotal = 1,
+	},
+
+	light_around =
+	{
+		{ type="TIMED_MIN", distance = 0, threshold=LIGHT_MAX +1,time=0.5 },
+	},
+
+	cyclic_spawning = false,
+	custom_check = building_spawner.spawn_check,
+	})
+
+
 --register with animals mod
 minetest.log("action","\tadding mob "..npc_trader_prototype.name)
 mobf_add_mob(npc_trader_prototype)
