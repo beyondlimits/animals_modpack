@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_oerkki mod loading ...")
-local version = "0.1.0"
+local version = "0.1.1"
 
 local oerkki_groups = {
 						not_in_creative_inventory=1
@@ -121,6 +121,20 @@ local oerkki_prototype = {
 				},
 			},
 		}
+
+minetest.register_entity("mob_oerkki:oerkki_spawner_shadows",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
+
+		local pos = self.object:getpos();
+		minetest.add_entity(pos,"mobf:compat_spawner")
+		self.object:remove()
+	end,
+})
 
 local oerkki_name   = oerkki_prototype.modname .. ":"  .. oerkki_prototype.name
 local oerkki_env = mobf_environment_by_name(oerkki_prototype.generic.envid)

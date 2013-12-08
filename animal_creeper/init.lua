@@ -106,7 +106,7 @@ local creeper_prototype = {
 			}
 		}
 
-		--compatibility code
+--compatibility code
 minetest.register_entity("animal_creeper:creeper_spawner",
  {
 	physical        = false,
@@ -116,7 +116,21 @@ minetest.register_entity("animal_creeper:creeper_spawner",
 	on_activate = function(self,staticdata)
 
 		local pos = self.object:getpos();
-		minetest.add_entity(pos,"animal_creeper:creeper_spawner_at_night")
+		minetest.add_entity(pos,"mobf:compat_spawner")
+		self.object:remove()
+	end,
+})
+
+minetest.register_entity("animal_creeper:creeper_spawner_at_night",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
+
+		local pos = self.object:getpos();
+		minetest.add_entity(pos,"mobf:compat_spawner")
 		self.object:remove()
 	end,
 })

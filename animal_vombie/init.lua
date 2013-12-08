@@ -1,4 +1,4 @@
-local version = "0.1.0"
+local version = "0.1.1"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -209,11 +209,40 @@ minetest.register_entity("animal_vombie:vombie_spawner",
 	on_activate = function(self,staticdata)
 
 		local pos = self.object:getpos();
-		minetest.add_entity(pos,"animal_vombie:vombie_spawner_at_night")
+		minetest.add_entity(pos,"mobf:compat_spawner")
 		self.object:remove()
 	end,
 })
 
+minetest.register_entity("animal_vombie:vombie_spawner_at_night",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
+
+		local pos = self.object:getpos();
+		minetest.add_entity(pos,"mobf:compat_spawner")
+		self.object:remove()
+	end,
+})
+
+minetest.register_entity("animal_vombie:vombie_spawner_shadows",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
+
+		local pos = self.object:getpos();
+		minetest.add_entity(pos,"mobf:compat_spawner")
+		self.object:remove()
+	end,
+})
+
+--spawning code
 local vombie_name   = vombie_prototype.modname .. ":"  .. vombie_prototype.name
 local vombie_env = mobf_environment_by_name(vombie_prototype.generic.envid)
 

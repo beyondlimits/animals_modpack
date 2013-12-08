@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_dm loading ...")
-local version = "0.1.0"
+local version = "0.1.1"
 
 local dm_groups = {
 					not_in_creative_inventory=1
@@ -143,6 +143,21 @@ local dm_prototype = {
 				},
 			},
 		}
+
+--compatibility code
+minetest.register_entity("animal_dm:dm_spawner_shadows",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
+
+		local pos = self.object:getpos();
+		minetest.add_entity(pos,"mobf:compat_spawner")
+		self.object:remove()
+	end,
+})
 
 dm_debug = function (msg)
     --minetest.log("action", "mobs: "..msg)

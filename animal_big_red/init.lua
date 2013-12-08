@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_big_red mod loading ...")
-local version = "0.1.0"
+local version = "0.1.1"
 
 local big_red_groups = {
 						not_in_creative_inventory=1
@@ -142,7 +142,22 @@ local big_red_prototype = {
 				},
 			},
 		}
+--compatibility code
+minetest.register_entity("animal_big_red:big_red_spawner_shadows",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
 
+		local pos = self.object:getpos();
+		minetest.add_entity(pos,"mobf:compat_spawner")
+		self.object:remove()
+	end,
+})
+
+--spawning code
 local big_red_name   = big_red_prototype.modname .. ":"  .. big_red_prototype.name
 local big_red_env = mobf_environment_by_name(big_red_prototype.generic.envid)
 local spawnbox = minetest.deserialize(minetest.serialize(selectionbox_big_red))

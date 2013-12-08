@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_clownfish mod loading ...")
 
-local version = "0.1.0"
+local version = "0.1.1"
 
 local selectionbox_clownfish = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
 
@@ -105,7 +105,22 @@ local clownfish_prototype = {
 				},
 				},
 		}
+--compatibility code
+minetest.register_entity("animal_clownfish:clownfish_spawner_shallow_water",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
 
+		local pos = self.object:getpos();
+		minetest.add_entity(pos,"mobf:compat_spawner")
+		self.object:remove()
+	end,
+})
+
+--spawning code
 local clownfish_name = clownfish_prototype.modname .. ":"  .. clownfish_prototype.name
 local clownfish_env = mobf_environment_by_name(clownfish_prototype.generic.envid)
 

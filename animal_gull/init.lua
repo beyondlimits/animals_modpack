@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_gull loading ...")
 
-local version = "0.1.0"
+local version = "0.1.1"
 
 local gull_groups = {
 						not_in_creative_inventory=1
@@ -82,7 +82,22 @@ gull_prototype = {
 			}
 		}
 
+--compatibility code
+minetest.register_entity("animal_gull:gull_spawner",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
 
+		local pos = self.object:getpos();
+		minetest.add_entity(pos,"mobf:compat_spawner")
+		self.object:remove()
+	end,
+})
+
+--spawning code
 local gullname = gull_prototype.modname .. ":"  .. gull_prototype.name
 local gull_env = mobf_environment_by_name(gull_prototype.generic.envid)
 

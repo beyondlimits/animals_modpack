@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_rat loading ...")
 
-local version = "0.1.0"
+local version = "0.1.1"
 
 local selectionbox_rat = {-0.2, -0.0625, -0.2, 0.2, 0.125, 0.2}
 
@@ -98,8 +98,23 @@ local rat_prototype = {
 			},
 		}
 
-local rat_name   = rat_prototype.modname .. ":"  .. rat_prototype.name
+--compatibility code
+minetest.register_entity("animal_rat:rat_spawner_shadows",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
 
+		local pos = self.object:getpos();
+		minetest.add_entity(pos,"mobf:compat_spawner")
+		self.object:remove()
+	end,
+})
+
+--spawning code
+local rat_name   = rat_prototype.modname .. ":"  .. rat_prototype.name
 local rat_env = mobf_environment_by_name(rat_prototype.generic.envid)
 
 mobf_spawner_register("rat_spawner_1",rat_name,

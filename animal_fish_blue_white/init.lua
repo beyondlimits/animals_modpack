@@ -107,7 +107,22 @@ local fish_blue_white_prototype = {
 			keep_food = true,
 		},
 		}
+--compatibility code
+minetest.register_entity("animal_fish_blue_white:fish_blue_white_spawner_shallow_water",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
 
+		local pos = self.object:getpos();
+		minetest.add_entity(pos,"mobf:compat_spawner")
+		self.object:remove()
+	end,
+})
+
+--spawning code
 local fish_blue_white_name = fish_blue_white_prototype.modname .. ":"  .. fish_blue_white_prototype.name
 local fish_blue_white_env = mobf_environment_by_name(fish_blue_white_prototype.generic.envid)
 
