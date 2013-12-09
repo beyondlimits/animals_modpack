@@ -164,7 +164,6 @@ function fighting.hit(entity,attacker)
 
 		mobf_lifebar.del(entity.lifebar)
 
-	--if entity.dynamic_data.generic.health < 1 then
 		local result = entity.data.generic.kill_result
 		if type(entity.data.generic.kill_result) == "function" then
 			result = entity.data.generic.kill_result()

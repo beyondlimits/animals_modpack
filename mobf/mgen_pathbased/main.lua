@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file path_based_movement_gen.lua
@@ -13,7 +13,7 @@
 --
 --! @defgroup mgen_path_based MGEN: Path based movement generator
 --! @ingroup framework_int
---! @{ 
+--! @{
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 
@@ -43,42 +43,42 @@ function p_mov_gen.callback(entity,now,dstep)
 	mobf_assert_backtrace(entity ~= nil)
 	mobf_assert_backtrace(entity.dynamic_data ~= nil)
 	mobf_assert_backtrace(entity.dynamic_data.p_movement ~= nil)
-	
+
 	if entity.dynamic_data.p_movement.eta ~= nil then
 		if now < entity.dynamic_data.p_movement.eta then
 			return
 		end
 	end
-	
+
 	local current_pos = entity.object:getpos()
 	local handled = false
-	
+
 	if entity.dynamic_data.p_movement.path == nil then
 		dbg_mobf.path_mov_lvl1(
 				"MOBF: path movement but mo path set!!")
 		return
 	end
-	
-	
+
+
 	local max_distance = entity.data.movement.max_distance
-	
+
 	if entity.dynamic_data.movement.max_distance ~= nil then
 		max_distance = entity.dynamic_data.movement.max_distance
 	end
-	
+
 	mobf_assert_backtrace(entity.dynamic_data.p_movement.next_path_index ~= nil)
 	mobf_assert_backtrace(max_distance ~= nil)
-	
+
 	--check if target is reached
-	if p_mov_gen.distance_to_next_point(entity,current_pos) 
+	if p_mov_gen.distance_to_next_point(entity,current_pos)
 						< max_distance then
 		dbg_mobf.path_mov_lvl1("MOBF: pathmov next to next point switching target")
 		local update_target = true
-		
+
 		--return to begining of path
-		if entity.dynamic_data.p_movement.next_path_index 
+		if entity.dynamic_data.p_movement.next_path_index
 				== #entity.dynamic_data.p_movement.path then
-			
+
 			if entity.dynamic_data.p_movement.cycle_path or
 				(entity.dynamic_data.p_movement.cycle_path == nil and
 				entity.data.patrol ~= nil and
@@ -95,36 +95,36 @@ function p_mov_gen.callback(entity,now,dstep)
 				handled = true
 			end
 		end
-		
+
 		if update_target then
 			mobf_assert_backtrace(entity.dynamic_data.p_movement.path ~= nil)
-			entity.dynamic_data.p_movement.next_path_index = 
+			entity.dynamic_data.p_movement.next_path_index =
 				entity.dynamic_data.p_movement.next_path_index + 1
-				
-			entity.dynamic_data.movement.target = 
+
+			entity.dynamic_data.movement.target =
 				entity.dynamic_data.p_movement.path
 					[entity.dynamic_data.p_movement.next_path_index]
-			
+
 			dbg_mobf.path_mov_lvl1("MOBF: (1) setting new target to index: " ..
 				entity.dynamic_data.p_movement.next_path_index .. " pos: " ..
 				printpos(entity.dynamic_data.movement.target))
 			handled = true
 		end
 	end
-	
+
 	if not handled and
 		entity.dynamic_data.movement.target == nil then
 		mobf_assert_backtrace(entity.dynamic_data.p_movement.path ~= nil)
-		
-		entity.dynamic_data.movement.target = 
+
+		entity.dynamic_data.movement.target =
 				entity.dynamic_data.p_movement.path
 					[entity.dynamic_data.p_movement.next_path_index]
-				
+
 		dbg_mobf.path_mov_lvl1("MOBF: (2) setting new target to index: " ..
 				entity.dynamic_data.p_movement.next_path_index .. " pos: " ..
 				printpos(entity.dynamic_data.movement.target))
 	end
-	
+
 	mgen_follow.callback(entity,now)
 end
 
@@ -138,7 +138,7 @@ end
 --
 --! @param entity mob to check
 --! @param current_pos position mob is atm
--- 
+--
 --! @retval distance
 -------------------------------------------------------------------------------
 function p_mov_gen.distance_to_next_point(entity,current_pos)
@@ -172,20 +172,21 @@ function p_mov_gen.init_dynamic_data(entity,now,restored_data)
 			pathowner           = nil,
 			pathname            = nil,
 			}
-	
-	if restored_data ~= nil then
+
+	if restored_data ~= nil and
+		type(restored_data) == "table" then
 		dbg_mobf.path_mov_lvl3(
 			"MOBF: path movement reading stored data: " .. dump(restored_data))
 		if restored_data.pathowner ~= nil and
 			restored_data.pathname ~= nil then
 			data.pathowner = restored_data.pathowner
 			data.pathname = restored_data.pathname
-			
+
 			data.path = mobf_path.getpoints(data.pathowner,data.pathname)
 			dbg_mobf.path_mov_lvl3(
 				"MOBF: path movement restored points: " .. dump(data.path))
 		end
-		
+
 		if restored_data.pathindex ~= nil and
 			type(restored_data.pathindex) == "number" and
 			restored_data.pathindex > 0 and
@@ -194,9 +195,9 @@ function p_mov_gen.init_dynamic_data(entity,now,restored_data)
 			data.next_path_index = restored_data.pathindex
 		end
 	end
-	
+
 	entity.dynamic_data.p_movement = data
-	
+
 	mgen_follow.init_dynamic_data(entity,now)
 end
 
@@ -216,10 +217,10 @@ function p_mov_gen.set_path(entity,path)
 		entity.dynamic_data.p_movement.next_path_index = 1
 		entity.dynamic_data.movement.max_distance = 0.5
 		entity.dynamic_data.p_movement.path = path
-	
+
 		--a valid path has at least 2 positions
 		mobf_assert_backtrace(#entity.dynamic_data.p_movement.path > 1)
-		entity.dynamic_data.movement.target = 
+		entity.dynamic_data.movement.target =
 				entity.dynamic_data.p_movement.path[2]
 		return true
 	else
@@ -272,10 +273,10 @@ end
 -------------------------------------------------------------------------------
 function p_mov_gen.set_target(entity,target)
 	mobf_assert_backtrace(target ~= nil)
-	
+
 	local current_pos = entity.getbasepos(entity)
 	local targetpos = nil
-	
+
 	if not mobf_is_pos(target) then
 		if target:is_player() then
 			targetpos = target:getpos()
@@ -290,55 +291,55 @@ function p_mov_gen.set_target(entity,target)
 	else
 		targetpos = target
 	end
-	
+
 	if targetpos == nil then
 		return false
 	end
-	
+
 	if entity.dynamic_data.p_movement.lasttargetpos ~= nil then
 		if mobf_pos_is_same(entity.dynamic_data.p_movement.lasttargetpos,
 			targetpos) then
 			return true
 		end
 	end
-	
+
 	entity.dynamic_data.p_movement.lasttargetpos = targetpos
-	
+
 	entity.dynamic_data.p_movement.path = nil
 	entity.dynamic_data.p_movement.next_path_index = 1
-	
+
 	--on target mode max distance is always 0.5
 	entity.dynamic_data.movement.max_distance = 0.5
-	
+
 	--try to find path on our own
 	if not mobf_get_world_setting("mobf_disable_pathfinding") then
-		entity.dynamic_data.p_movement.path = 
+		entity.dynamic_data.p_movement.path =
 			minetest.find_path(current_pos,targetpos,5,1,1,nil)
 	else
 		entity.dynamic_data.p_movement.path = nil
 	end
-				
+
 	if entity.dynamic_data.p_movement.path ~= nil then
 		--a valid path has at least 2 positions
 		mobf_assert_backtrace(#entity.dynamic_data.p_movement.path > 1)
-		entity.dynamic_data.movement.target = 
+		entity.dynamic_data.movement.target =
 				entity.dynamic_data.p_movement.path[2]
 		return true
 	end
 
-	
+
 	if entity.dynamic_data.p_movement.path == nil then
 		print(
 			"MOBF: no pathfinding support/ no path found directly setting targetpos as path")
-			
+
 		entity.dynamic_data.p_movement.path = {}
-		
+
 		table.insert(entity.dynamic_data.p_movement.path,targetpos)
-		entity.dynamic_data.movement.target = 
+		entity.dynamic_data.movement.target =
 				entity.dynamic_data.p_movement.path[1]
 		return true
 	end
-	
+
 	return false
 end
 
