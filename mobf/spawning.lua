@@ -35,6 +35,153 @@ mobf_assert_backtrace(mobf_spawn_algorithms == nil)
 --! @private
 mobf_spawn_algorithms = {}
 
+-------------------------------------------------------------------------------
+-- name: init()
+-- @function [parent=#spawning] init
+--
+--! @brief initialize spawning data
+--! @memberof spawning
+--
+-------------------------------------------------------------------------------
+function spawning.init()
+	--read from file
+	local world_path = minetest.get_worldpath()
+
+	local file,error = io.open(world_path .. "/mobf_spawning_data","r")
+
+	if file ~= nil then
+		local data_raw = file:read("*a")
+		file:close()
+
+		if data_raw ~= nil then
+			spawning.mob_spawn_data = minetest.deserialize(data_raw)
+		end
+	end
+
+	if spawning.mob_spawn_data == nil then
+		spawning.mob_spawn_data = {}
+	end
+
+	--register spawndata persistent storer to globalstep
+	minetest.after(300,spawning.preserve_spawn_data,true)
+
+	--register cleanup handler
+	minetest.register_on_shutdown(function(dstep) spawning.preserve_spawn_data(false) end)
+end
+
+-------------------------------------------------------------------------------
+-- name: preserve_spawn_data()
+-- @function [parent=#spawning] preserve_spawn_data
+--
+--! @brief save data on regular base
+--! @memberof spawning
+--
+--! @param force
+-------------------------------------------------------------------------------
+function spawning.preserve_spawn_data(cyclic)
+
+	local world_path = minetest.get_worldpath()
+	local file,error = io.open(world_path .. "/mobf_spawning_data","w")
+
+	if error ~= nil then
+		minetest.log(LOGLEVEL_ERROR,"MOBF: failed to spawning preserve file")
+	end
+	mobf_assert_backtrace(file ~= nil)
+
+	local serialized_data = minetest.serialize(spawning.mob_spawn_data)
+
+	file:write(serialized_data)
+
+	if cyclic then
+		minetest.after(300,spawning.preserve_spawn_data,cyclic)
+	end
+end
+
+-------------------------------------------------------------------------------
+-- name: total_offline_mobs()
+-- @function [parent=#spawning] total_offline_mobs
+--
+--! @brief count total number of offline mobs
+--! @memberof spawning
+--
+--! @return number of mobs
+-------------------------------------------------------------------------------
+function spawning.total_offline_mobs()
+	local count = 0
+	for key,value in pairs(spawning.mob_spawn_data) do
+		for hash,v in pairs(value) do
+			count = count +1
+		end
+	end
+
+	return count
+end
+
+-------------------------------------------------------------------------------
+-- name: count_deactivated_mobs(name,pos,range)
+-- @function [parent=#spawning] count_deactivated_mobs
+--
+--! @brief count number of mobs of specific type within a certain range
+--! @memberof spawning
+--
+--! @param name name of mob to count
+--! @param pos to check distance to
+--! @param range to check
+--
+--! @return number of mobs
+-------------------------------------------------------------------------------
+function spawning.count_deactivated_mobs(name,pos,range)
+	local count = 0
+	if spawning.mob_spawn_data[name] ~= nil then
+		for hash,v in pairs(spawning.mob_spawn_data[name]) do
+			local mobpos = mobf_hash_to_pos(hash)
+			local distance = vector.distance(pos,mobpos)
+			if distance < range then
+				count = count +1
+			end
+		end
+	end
+	return count
+end
+
+-------------------------------------------------------------------------------
+-- name: deactivate_mob(entity)
+-- @function [parent=#spawning] deactivate_mob
+--
+--! @brief add mob to deactivated list
+--! @memberof spawning
+--
+--! @param entity to deactivate
+-------------------------------------------------------------------------------
+function spawning.deactivate_mob(name,pos)
+	if spawning.mob_spawn_data[name] == nil then
+		spawning.mob_spawn_data[name] = {}
+	end
+
+	local rounded_pos = vector.round(pos)
+	local hash = minetest.hash_node_position(rounded_pos)
+	--assert (mobf_pos_is_same(mobf_hash_to_pos(hash),rounded_pos))
+	spawning.mob_spawn_data[name][hash] = true
+end
+
+-------------------------------------------------------------------------------
+-- name: activate_mob(name,pos)
+-- @function [parent=#spawning] preserve_spawn_data
+--
+--! @brief save data on regular base
+--! @memberof spawning
+--
+--! @param force
+-------------------------------------------------------------------------------
+function spawning.activate_mob(name,pos)
+	if spawning.mob_spawn_data[name] ~= nil then
+		local rounded_pos = vector.round(pos)
+		local hash = minetest.hash_node_position(rounded_pos)
+		--assert(mobf_pos_is_same(mobf_hash_to_pos(hash),rounded_pos))
+		spawning.mob_spawn_data[name][hash] = nil
+	end
+end
+
 
 -------------------------------------------------------------------------------
 -- name: remove_uninitialized(entity,staticdata)
@@ -198,7 +345,7 @@ function spawning.population_density_check(entity,now)
 			mob_count .. " mobs of same type around")
 		entity.removed = true
 		minetest.log(LOGLEVEL_WARNING,"MOBF: Too many ".. mob_count .. " "..
-			entity.data.name.." at one place dying: " ..
+			entity.data.name.." at one place dieing: " ..
 			tostring(entity.dynamic_data.spawning.player_spawned))
 		spawning.remove(entity, "population density check")
 		return false

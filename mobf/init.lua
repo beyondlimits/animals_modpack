@@ -196,6 +196,9 @@ function mobf_init_framework()
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize lifebar subsystem..")
 	mobf_lifebar.init()
 
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize spawning subsystem..")
+	spawning.init()
+
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize mobf supplied modules..")
 	mobf_init_modules()
 

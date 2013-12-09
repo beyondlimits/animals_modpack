@@ -467,7 +467,7 @@ function mobf.activate_handler(self,staticdata)
 	mobf_assert_backtrace(self.dynamic_data.current_movement_gen ~= nil)
 
 	--initialize movegen entity,current time, permanent data
-	self.dynamic_data.current_movement_gen.init_dynamic_data(self,now,retval)
+	self.dynamic_data.current_movement_gen.init_dynamic_data(self,now,preserved_data)
 
 	--call enter state fct
 	if self.dynamic_data.state.current.HANDLER_enter_state ~= nil then
@@ -632,6 +632,10 @@ function mobf.register_entity(name, graphics, mob)
 					return
 				end
 
+				if self.lifebar ~= nil then
+					self.lifebar:get_luaentity().lifetime = 0
+				end
+
 				--check lifetime
 				if spawning.lifecycle_callback(self,now) == false then
 					mobf_warn_long_fct(starttime,"on_step_total_lifecycle","on_step_total")
@@ -703,6 +707,9 @@ function mobf.register_entity(name, graphics, mob)
 					--make sure entity is in loaded area at initialization
 					local pos = self.object:getpos()
 
+					--remove from mob offline storage
+					spawning.activate_mob(self.data.modname .. ":"  .. self.data.name,pos)
+
 					if pos ~= nil and
 						entity_at_loaded_pos(pos,self.data.name) then
 						mobf.activate_handler(self,staticdata)
@@ -741,9 +748,12 @@ function mobf.register_entity(name, graphics, mob)
 				end,
 
 		--prepare permanent data
-			get_staticdata = function(self)
-				return mobf_serialize_permanent_entity_data(self)
-				end,
+		--NOTE this isn't called if a object is deleted
+		get_staticdata = function(self)
+			--add to mob offline storage
+			spawning.deactivate_mob(self.data.modname .. ":"  .. self.data.name,self.object:getpos())
+			return mobf_serialize_permanent_entity_data(self)
+			end,
 
 		--custom variables for each mob
 			data                    = mob,

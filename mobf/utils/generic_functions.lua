@@ -733,4 +733,28 @@ function mobf_is_pos(value)
 	return true
 end
 
+-------------------------------------------------------------------------------
+-- name: mobf_hash_to_pos(hash)
+--
+--! @brief restore a position from a pos hash value
+--
+--! @param hash to restore pos from
+--
+--! @return posistion reconstructed from hash
+-------------------------------------------------------------------------------
+function mobf_hash_to_pos(hash)
+	local retval = {}
+
+	local raw_x = (hash % 65536)
+	local raw_y = ((hash - raw_x) % (65536*65536)) / 65536
+	local raw_z = ((hash - raw_x - raw_y) / 65536) / 65536
+
+	local mobpos = {}
+	retval.x = raw_x - 32768
+	retval.y = raw_y - 32768
+	retval.z = math.floor(raw_z - 32768)
+
+	return retval
+end
+
 --!@}
