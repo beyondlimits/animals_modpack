@@ -314,6 +314,14 @@ function mobf_debug.init()
 			func		= mobf_debug.mob_count
 		})
 
+	minetest.register_chatcommand("mobf_mobs_offline",
+		{
+			params		= "",
+			description = "print offline mobs" ,
+			privs		= {},
+			func		= mobf_debug.print_offline_mobs
+		})
+
 
 	if mobf_rtd.luatrace_enabled then
 		minetest.register_chatcommand("traceon",
@@ -338,11 +346,34 @@ function mobf_debug.init()
 	end
 end
 
-
 -------------------------------------------------------------------------------
--- @function [parent=#mobf_debug] handle_spawnhouse(name,message)
+-- @function [parent=#mobf_debug] print_offline_mobs(name,message)
 --
 --! @brief spawn small house
+--
+--! @param name name of player
+--! @param param parameters
+------------------------------------------------------------------------------
+function mobf_debug.print_offline_mobs(name,param)
+
+	count = 0
+
+	for key,value in pairs(spawning.mob_spawn_data) do
+		for hash,enabled in pairs (value) do
+			count = count +1
+			local mobpos = mobf_hash_to_pos(hash)
+
+			print(string.format("%5d: ",count) .. key .. " " .. printpos(mobpos))
+		end
+	end
+
+	print("Total of " .. count .. " mobs stored as offline")
+end
+
+-------------------------------------------------------------------------------
+-- @function [parent=#mobf_debug] rightclick_callback(entity,player)
+--
+--! @brief show rightclick info
 --
 --! @param entity entity rightclicked
 --! @param player player doing rightclick
