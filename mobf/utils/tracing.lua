@@ -41,7 +41,7 @@ statistics.data.mapgen       = { current=0,maxabs=0,max=0 }
 statistics.data.activate     = { current=0,maxabs=0,max=0 }
 statistics.data.queue_load   = { current=0,maxabs=0,max=0 }
 statistics.data.mobs         = { current=0,maxabs=" ",max=0 }
-statistics.data.queue         = { current=0,maxabs=0,max=0 }
+statistics.data.queue         = { current=0,maxabs=" ",max=0 }
 statistics.data.spawn_onstep = { current=0,maxabs=0,max=0 }
 
 statistics.data.user_1 = { current=0,maxabs=0,max=0 }
@@ -122,7 +122,6 @@ function mobf_statistic_calc(dtime)
 		statistics.data.mobs.max = MAX(statistics.data.mobs.max,active_mobs)
 
 		statistics.data.queue.current = #mobf_job_queue.queue
-		statistics.data.queue.max = MAX(statistics.data.queue.max,#mobf_job_queue.queue)
 
 		statistics.data.user_1.current = current_user_1
 		statistics.data.user_1.maxabs = MAX(statistics.data.user_1.maxabs, math.floor(current_user_1*refresh_interval))
@@ -317,6 +316,13 @@ function mobf_init_timesource()
 			local status, module = pcall(require, 'socket')
 
 			if status and type(module.gettime) == "function" then
+				mobf_get_time_ms = function()
+						return socket.gettime()*1000
+					end
+				mobf_rtd.timesource = "socket.gettime()"
+			end
+		else
+			if type(socket.gettime) == "function" then
 				mobf_get_time_ms = function()
 						return socket.gettime()*1000
 					end
