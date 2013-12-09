@@ -467,7 +467,7 @@ function mobf.activate_handler(self,staticdata)
 	mobf_assert_backtrace(self.dynamic_data.current_movement_gen ~= nil)
 
 	--initialize movegen entity,current time, permanent data
-	self.dynamic_data.current_movement_gen.init_dynamic_data(self,now,retval)
+	self.dynamic_data.current_movement_gen.init_dynamic_data(self,now,preserved_data)
 
 	--call enter state fct
 	if self.dynamic_data.state.current.HANDLER_enter_state ~= nil then
