@@ -209,7 +209,8 @@ function fighting.hit(entity,attacker)
 		(	entity.data.combat.can_fight or
 			(entity.data.combat.angryness ~= nil and entity.data.combat.angryness > 0)
 
-		) then
+		) and
+		entity.object:get_hp() > (entity.data.generic.base_health/3) then
 
 		--face attacker
 		if entity.mode == "3d" then
@@ -506,6 +507,22 @@ function fighting.combat(entity,now,dtime)
 					.. dump(entity.dynamic_data.combat.target))
 				return true
 			end
+		end
+
+		--make mob run away if only 1/3 of health is left
+		if entity.object:get_hp() < (entity.data.generic.base_health/3) then
+			local old_target = fighting.get_target(entity)
+
+			--restore state before attack
+			fighting.restore_previous_state(entity,now)
+
+			--stop attack
+			entity.dynamic_data.combat.target = nil
+
+			--make mob run away
+			local dir        = mobf_get_direction(old_target:getpos(),entity.object:getpos())
+			fighting.run_away(entity,dir,old_target)
+			return true
 		end
 
 		local  targetname =
@@ -1195,7 +1212,7 @@ function fighting.is_valid_target(target)
 end
 
 -------------------------------------------------------------------------------
--- @function [parent=#fighting] fighting.init_dynamic_data(entity)
+-- @function [parent=#fighting] init_dynamic_data()
 --
 --! @brief initialize all dynamic data on activate
 --! @memberof fighting
