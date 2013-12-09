@@ -217,15 +217,69 @@ end
 function mobf_spawner_register(name,mobname,spawndef)
 
 	--check if spawning is enabled
---	if minetest.world_setting_get("mobf_disable_animal_spawning") then
---		return false
---	end
+	if minetest.world_setting_get("mobf_disable_animal_spawning") then
+		return false
+	end
 
 	--check if mob is blacklisted
 	if mobf_contains(mobf_rtd.registred_mob,mobname) then
 		minetest.log(LOGLEVEL_NOTICE,"MOBF: " .. mobname .. " is blacklisted, not adding spawner")
 		return false
 	end
+
+	local customcheck = spawndef.custom_check
+
+
+	spawndef.custom_check = function(pos,spawndef)
+			local entities_around = spawndef.entities_around
+
+			if entities_around ~= nil then
+				for i=1,#entities_around,1 do
+
+					--only do this check if relevant area is larger then activity range
+					if entities_around[i].distance > adv_spawning.active_range then
+						local count = spawning.count_deactivated_mobs(
+												mobname,
+												pos,
+												entities_around[i].distance)
+
+						local entity_active =
+							minetest.get_objects_inside_radius(pos,
+												entities_around[i].distance)
+
+						for j=1,#entity_active,1 do
+							local entity = entity_active[j]:get_luaentity()
+
+							if entity ~= nil then
+								if entity.name == entities_around[i].entityname then
+									count = count +1
+								end
+
+								if count + count > entities_around[i].threshold then
+									break
+								end
+							end
+						end
+
+						if entities_around[i].type == "MIN" and
+							count < entities_around[i].threshold then
+							return false
+						end
+
+						if entities_around[i].type == "MAX" and
+							count > entities_around[i].threshold then
+							return false
+						end
+					end
+				end
+			end
+
+			if type(customcheck) == "function" and not customcheck(pos,spawndef) then
+				return false
+			end
+
+			return true
+		end
 
 	--register
 	adv_spawning.register(name,spawndef)
