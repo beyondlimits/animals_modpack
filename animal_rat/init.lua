@@ -143,7 +143,7 @@ mobf_spawner_register("rat_spawner_1",rat_name,
 	{
 		enabled = true,
 		retries = 10,
-		spawntotal = 3,
+		spawntotal = 2,
 	},
 
 	collisionbox = selectionbox_rat

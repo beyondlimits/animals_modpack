@@ -294,7 +294,7 @@ mobf_spawner_register("vombie_spawner_2",vombie_name,
 
 	light_around =
 	{
-		{ type="CURRENT_MAX", distance = 2, threshold=6 }
+		{ type="OVERALL_MAX", distance = 2, threshold=6 }
 	},
 
 	absolute_height = {
