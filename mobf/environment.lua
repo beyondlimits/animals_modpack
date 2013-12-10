@@ -608,6 +608,8 @@ end
 function environment.pos_quality(pos,entity)
 	mobf_assert_backtrace(pos ~= nil)
 	mobf_assert_backtrace(entity ~= nil)
+	mobf_assert_backtrace(entity.collisionbox ~= nil)
+	mobf_assert_backtrace(entity.environment ~= nil)
 
 	local retval = {
 					media_quality           =  100,

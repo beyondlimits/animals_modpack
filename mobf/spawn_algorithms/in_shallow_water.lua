@@ -223,6 +223,9 @@ function mobf_spawn_initialize_in_shallow_water_abm(spawning_data)
 					return
 				end
 
+				spawning_data.minp = pos.y
+				spawning_data.maxp = pos.y
+
 				mobf_spawner_in_shallow_water_spawnfunc(spawning_data,pos)
 				mobf_warn_long_fct(starttime,"mobf_spawn_in_shallow_water_abm_done")
 			end,

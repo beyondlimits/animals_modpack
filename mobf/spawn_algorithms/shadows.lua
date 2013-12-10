@@ -31,6 +31,7 @@ local SHADOWS_SPAWNER_SUFFIX = "_shadows"
 --! @param pos position do spawn
 -------------------------------------------------------------------------------
 function mobf_spawner_in_shadows_spawner_spawnfunc(spawning_data,pos)
+
 	mobf_assert_backtrace(type(spawning_data.minp) == "number")
 	mobf_assert_backtrace(type(spawning_data.maxp) == "number")
 
@@ -157,6 +158,9 @@ function mobf_spawner_initialize_in_shadows_abm(spawning_data)
 					mobf_warn_long_fct(starttime,"mobf_spawn_in_shadows_abm_r4")
 					return
 				end
+
+				spawning_data.minp = pos.y
+				spawning_data.maxp = pos.y
 
 				mobf_spawner_in_shadows_spawner_spawnfunc(spawning_data,pos)
 				mobf_warn_long_fct(starttime,"mobf_spawn_in_shadows_abm_done")

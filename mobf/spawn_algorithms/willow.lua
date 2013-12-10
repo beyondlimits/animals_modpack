@@ -91,6 +91,9 @@ function mobf_spawner_initialize_on_willow_abm(spawning_data)
 					return
 				end
 
+				spawning_data.minp = pos.y
+				spawning_data.maxp = pos.y
+
 				mobf_spawner_willow_spawnfunc(spawning_data,pos)
 				mobf_warn_long_fct(starttime,"mobf_spawn_on_willow_abm_done")
 			end,

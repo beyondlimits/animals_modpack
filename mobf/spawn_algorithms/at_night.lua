@@ -149,6 +149,8 @@ function mobf_spawner_initialize_at_night_abm(spawning_data)
 					mobf_warn_long_fct(starttime,"mobf_spawn_at_night_abm_r4")
 					return
 				end
+				spawning_data.minp = pos.y
+				spawning_data.maxp = pos.y
 
 				mobf_spawner_at_night_spawnfunc(spawning_data,pos)
 				mobf_warn_long_fct(starttime,"mobf_spawn_at_night_abm_done")

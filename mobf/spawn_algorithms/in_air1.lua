@@ -153,6 +153,9 @@ function mobf_spawner_initialize_air_above_grass_abm(spawning_data)
 
 				--TODO check
 
+				spawning_data.minp = pos.y
+				spawning_data.maxp = pos.y
+
 				mobf_spawner_air_above_grass_spawnfunc(spawning_data,pos)
 				mobf_warn_long_fct(starttime,"mobf_spawn_air_above_grass_abm_done")
 			end,

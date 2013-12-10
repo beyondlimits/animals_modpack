@@ -131,6 +131,9 @@ function mobf_spawner_initialize_deep_large_caves_abm(spawning_data)
 					return
 				end
 
+				spawning_data.minp = pos.y
+				spawning_data.maxp = pos.y
+
 				mobf_spawner_deep_large_caves_spawnfunc(spawning_data,pos)
 				mobf_warn_long_fct(starttime,"mobf_spawn_in_deep_large_caves_abm_done")
 			end,
