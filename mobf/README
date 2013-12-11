@@ -18,6 +18,10 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.3.3
+-fix crash on path based movegen initialization
+-fix crash on spawn on shadows collisionbox evaluation
+
 Changes 2.3.2
 -fix mobf spawning server console
 

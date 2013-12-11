@@ -1162,7 +1162,7 @@ end
 function spawning.pos_quality(spawning_data,pos)
 	local dummyentity = {}
 
-	dummyentity.collisionbox = spawning_data.collisionbox
+	dummyentity.collisionbox = {-0.5,-0.5,-0.5,0.5,0.5,0.5}
 	dummyentity.environment = spawning_data.environment
 
 	--TODO find a way to pass this information!
