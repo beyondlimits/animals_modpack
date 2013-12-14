@@ -618,6 +618,17 @@ function mobf.register_entity(name, graphics, mob)
 
 				self.current_dtime = self.current_dtime + dtime
 
+				if self.lifebar ~= nil then
+					local luaentity = self.lifebar:get_luaentity()
+					if luaentity ~= nil then
+						luaentity.lifetime = 0
+					else
+						mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: on_step: "
+						.. "trying to update lifebar but no luaentity present!")
+						self.lifebar = nil
+					end
+				end
+
 				if mobf_step_quota.is_exceeded() then
 					return
 				end
@@ -630,10 +641,6 @@ function mobf.register_entity(name, graphics, mob)
 					mobf_warn_long_fct(starttime,"on_step_total_pre_update","on_step_total")
 					mobf_step_quota.consume(quotatime)
 					return
-				end
-
-				if self.lifebar ~= nil then
-					self.lifebar:get_luaentity().lifetime = 0
 				end
 
 				--check lifetime
