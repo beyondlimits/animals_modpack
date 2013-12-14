@@ -632,6 +632,10 @@ function mobf.register_entity(name, graphics, mob)
 					return
 				end
 
+				if self.lifebar ~= nil then
+					self.lifebar:get_luaentity().lifetime = 0
+				end
+
 				--check lifetime
 				if spawning.lifecycle_callback(self,now) == false then
 					mobf_warn_long_fct(starttime,"on_step_total_lifecycle","on_step_total")

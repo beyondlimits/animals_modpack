@@ -196,6 +196,7 @@ function fighting.hit(entity,attacker)
 				--todo check if spawning a stack is possible
 				minetest.add_item(mob_pos,result)
 			end
+			mobf_lifebar.del(entity.lifebar)
 			spawning.remove(entity, "killed")
 		else
 			dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name

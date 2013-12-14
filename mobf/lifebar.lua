@@ -46,13 +46,18 @@ function mobf_lifebar.init()
 			initialized = false,
 
 			on_step = function (self,dtime)
+					self.lifetime = self.lifetime + dtime
 					if not self.initialized then
-						self.lifetime = self.lifetime + dtime
 
 						if self.lifetime > 1 then
 							dbg_mobf.lifebar_lvl3("MOBF: lifebar not attached deleting")
 							self.object:remove()
 						end
+					end
+
+					--parent will reset lifetime while it's active
+					if self.lifetime > 5 then
+						self.object:remove()
 					end
 				end
 
