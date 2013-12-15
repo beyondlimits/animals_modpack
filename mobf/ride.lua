@@ -214,24 +214,31 @@ end
 function mobf_ride.on_punch_callback(entity,player)
 	dbg_mobf.ride_lvl2("MOBF: ride on punch callback")
 	print("MOBF: ride on punch callback")
+
+	local saddle = "animalmaterials:saddle"
+
+	if entity.data.ride.saddle ~= nil then
+		saddle = entity.data.ride.saddle
+	end
 	--detache
 	if entity.dynamic_data.ride.is_attached ~= false then
 		dbg_mobf.ride_lvl2("MOBF: punched ridden mob")
 		if entity.dynamic_data.ride.player == player then
 			dbg_mobf.ride_lvl2("MOBF: detaching player")
 			mobf_ride.dettache_player(entity)
-			player:get_inventory():add_item("main","animalmaterials:saddle 1")
+			player:get_inventory():add_item("main",saddle .. " 1")
 			return true
 		end
 	else
 		--check if player has saddle
 		dbg_mobf.ride_lvl2("MOBF: punched free mob")
-		if player:get_wielded_item():get_name() == "animalmaterials:saddle" then
+		if player:get_wielded_item():get_name() == saddle then
 			dbg_mobf.ride_lvl2("MOBF: punching with saddle")
-			if player:get_inventory():contains_item("main","animalmaterials:saddle 1") then
+
+			if player:get_inventory():contains_item("main",saddle .. " 1") then
 				dbg_mobf.ride_lvl2("MOBF: have saddle")
 				mobf_ride.attache_player(entity,player)
-				player:get_inventory():remove_item("main","animalmaterials:saddle 1")
+				player:get_inventory():remove_item("main",saddle .. " 1")
 				return true
 			end
 		else
