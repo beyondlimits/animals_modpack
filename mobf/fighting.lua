@@ -520,8 +520,10 @@ function fighting.combat(entity,now,dtime)
 			entity.dynamic_data.combat.target = nil
 
 			--make mob run away
-			local dir        = mobf_get_direction(old_target:getpos(),entity.object:getpos())
-			fighting.run_away(entity,dir,old_target)
+			if old_target ~= nil then
+				local dir        = mobf_get_direction(old_target:getpos(),entity.object:getpos())
+				fighting.run_away(entity,dir,old_target)
+			end
 			return true
 		end
 
