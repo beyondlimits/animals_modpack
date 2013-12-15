@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_bear loading ...")
 
-local version = "0.0.1"
+local version = "0.0.2"
 
 local bear_groups = {
 						not_in_creative_inventory=1
@@ -44,7 +44,8 @@ bear_prototype = {
 					},
 					groups = bear_groups,
 					addoncatch = "mob_bear:tamed_bear",
-					envid="on_ground_2"
+					envid="on_ground_2",
+					population_density=1200,
 				},
 		movement =  {
 					canfly=false,
@@ -70,25 +71,6 @@ bear_prototype = {
 					distance 		= nil,
 					self_destruct 	= nil,
 					},
-
-		spawning = {
-				primary_algorithms = {
-						{
-						rate=0.002,
-						density=800,
-						algorithm="forrest_mapgen",
-						height=2
-						},
-					},
-				secondary_algorithms = {
-						{
-						rate=0.001,
-						density=1200,
-						algorithm="forrest",
-						height=2
-						},
-					}
-				},
 		sound = {
 					random = nil,
 					},
@@ -161,6 +143,42 @@ bear_prototype = {
 				},
 			}
 		}
+
+local bear_name   = bear_prototype.modname .. ":"  .. bear_prototype.name
+local bear_env = mobf_environment_by_name(bear_prototype.generic.envid)
+
+mobf_spawner_register("bear_spawner_1",bear_name,
+	{
+	spawnee = bear_name,
+	spawn_interval = 300,
+	spawn_inside = bear_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=bear_name,
+				distance=bear_prototype.generic.population_density,threshold=1 },
+		},
+
+	nodes_around =
+		{
+			{ type="MIN", name = { "default:leaves","default:tree"},distance=3,threshold=4}
+		},
+
+	absolute_height =
+	{
+		min = -10,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 5,
+		spawntotal = 1,
+	},
+
+	surfaces = bear_env.surfaces.good,
+	collisionbox = selectionbox_bear
+	})
 
 if factions~= nil and
 	type(factions.set_base_reputation) == "function" then
