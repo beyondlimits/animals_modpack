@@ -42,7 +42,9 @@ blueprint_hut = {
 
 	--floor
 		{"default:cobble",{x=0,y=0,z=0},{x=5,y=0,z=4}},
+		{"stairs:slab_stonebrick",{x=-1,y=0,z=-2}, {x=3,y=0,z=-1}, nil, { "air" } },
 		{"default:cobble",{x=0,y=0,z=-1},{x=2,y=0,z=-1}},
+
 
 	--walls
 		{"default:tree",{x=0,y=1,z=0},{x=5,y=3,z=0}},
@@ -137,9 +139,10 @@ blueprint_normalhouse = {
 table.insert(mob_npc_houses,blueprint_normalhouse)
 table.insert(mob_npc_houses,blueprint_hut)
 
-function building_spawner.buid_wall(material,startpos,endpos,param2)
+function building_spawner.buid_wall(material,startpos,endpos,param2,optional)
 
-	--print("builder: wall: ".. dump(material) .. " " .. dump(startpos) .. " " .. dump(endpos))
+	print("builder: wall: ".. dump(material) .. " " .. dump(startpos) .. " "
+			.. dump(endpos).. " " .. dump(param2) .. " " .. dump(optional))
 
 	if startpos.x ~= endpos.x and
 		startpos.y ~= endpos.y and
@@ -157,7 +160,25 @@ function building_spawner.buid_wall(material,startpos,endpos,param2)
 
 		for y=startpos.y,endpos.y,1 do
 		for z=startpos.z,endpos.z,1 do
-			minetest.set_node({x=startpos.x,y=y,z=z},{ name=material,param2=param2 } )
+			if optional == nil then
+				minetest.set_node({x=startpos.x,y=y,z=z},{ name=material,param2=param2 } )
+			else
+				print("Optional wall detected")
+				local node = minetest.get_node({x=x,y=startpos.y,z=z})
+				if node ~= nil then
+					local replaceable = false
+					for i=1,#optional,1 do
+						print("comparing " .. node.name .. "<-->" .. optional[i])
+						if node.name == optional[i] then
+							replaceable = true
+						end
+					end
+
+					if replaceable then
+						minetest.set_node({x=x,y=startpos.y,z=z},{ name=material,param2=param2 })
+					end
+				end
+			end
 		end
 		end
 	end
@@ -165,7 +186,25 @@ function building_spawner.buid_wall(material,startpos,endpos,param2)
 	if startpos.y == endpos.y then
 		for x=startpos.x,endpos.x,1 do
 		for z=startpos.z,endpos.z,1 do
-			minetest.set_node({x=x,y=startpos.y,z=z},{ name=material,param2=param2 })
+			if optional == nil then
+				minetest.set_node({x=x,y=startpos.y,z=z},{ name=material,param2=param2 })
+			else
+				print("Optional wall detected")
+				local node = minetest.get_node({x=x,y=startpos.y,z=z})
+				if node ~= nil then
+					local replaceable = false
+					for i=1,#optional,1 do
+						print("comparing " .. node.name .. "<-->" .. optional[i])
+						if node.name == optional[i] then
+							replaceable = true
+						end
+					end
+
+					if replaceable then
+						minetest.set_node({x=x,y=startpos.y,z=z},{ name=material,param2=param2 })
+					end
+				end
+			end
 		end
 		end
 	end
@@ -173,7 +212,25 @@ function building_spawner.buid_wall(material,startpos,endpos,param2)
 	if startpos.z == endpos.z then
 		for y=startpos.y,endpos.y,1 do
 		for x=startpos.x,endpos.x,1 do
-			minetest.set_node({x=x,y=y,z=startpos.z},{ name=material,param2=param2 })
+			if optional == nil then
+				minetest.set_node({x=x,y=y,z=startpos.z},{ name=material,param2=param2 })
+			else
+				print("Optional wall detected")
+				local node = minetest.get_node({x=x,y=startpos.y,z=z})
+				if node ~= nil then
+					local replaceable = false
+					for i=1,#optional,1 do
+						print("comparing " .. node.name .. "<-->" .. optional[i])
+						if node.name == optional[i] then
+							replaceable = true
+						end
+					end
+
+					if replaceable then
+						minetest.set_node({x=x,y=startpos.y,z=z},{ name=material,param2=param2 })
+					end
+				end
+			end
 		end
 		end
 	end
@@ -257,7 +314,7 @@ function building_spawner.builder(startpos,blueprint,mobname)
 							y=startpos.y + blueprint.walls[i][3].y,
 							z=startpos.z + blueprint.walls[i][3].z
 						},
-						blueprint.walls[i][4])
+						blueprint.walls[i][4],blueprint.walls[i][5])
 		end
 
 		--mobf_print("Spawn building: populating with " .. #blueprint.entities .. " entities")
