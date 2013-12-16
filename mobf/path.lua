@@ -738,6 +738,10 @@ function mobf_path.switch_patrol(entity,pathowner,pathname)
 		if entity.dynamic_data.patrol_state_before ~= nil then
 			local new_state = mob_state.get_state_by_name(entity,entity.dynamic_data.patrol_state_before)
 
+			if new_state == nil then
+				new_state = mob_state.get_state_by_name(entity,"default")
+			end
+
 			mobf_assert_backtrace(new_state ~= nil)
 			mob_state.change_state(entity,new_state)
 			entity.dynamic_data.patrol_state_before = nil
