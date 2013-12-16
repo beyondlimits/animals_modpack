@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_archer mod loading ...")
 
-local version = "0.1.0"
+local version = "0.1.1"
 local archer_groups = {
 						not_in_creative_inventory=1
 					}
@@ -112,6 +112,7 @@ archer_prototype = {
 				walk = {
 					start_frame = 168,
 					end_frame   = 187,
+					basevelocity = 18,
 					},
 				stand = {
 					start_frame = 0,

@@ -20,7 +20,7 @@ local ostrich_groups = {
 						not_in_creative_inventory=1
 					}
 
-local selectionbox_ostrich = {-0.5, -0.9, -0.5, 0.5, 0.6, 0.5}
+local selectionbox_ostrich = {-0.5, -0.85, -0.5, 0.5, 0.6, 0.5}
 
 function ostrich_drop()
 	local result = {}

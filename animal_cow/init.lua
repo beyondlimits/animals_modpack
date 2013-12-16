@@ -14,14 +14,14 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_cow mod loading ...")
-local version = "0.2.0"
+local version = "0.2.1"
 
 local cow_groups = {
 						not_in_creative_inventory=1
 					}
 
-local selectionbox_cow = {-1.5, -1.5, -0.75, 0.8, 0.7, 0.75}
-local selectionbox_steer = {-1.5*1.1, -1.5*1.1, -0.75*1.1, 0.8*1.1, 0.7*1.1, 0.75*1.1}
+local selectionbox_cow = {-1.5, -1.54, -0.75, 0.8, 0.7, 0.75}
+local selectionbox_steer = {-1.5*1.1, -1.54*1.1, -0.75*1.1, 0.8*1.1, 0.7*1.1, 0.75*1.1}
 local selectionbox_baby_calf = {-0.8, -0.8, -0.5, 0.8, 0.8, 0.5}
 
 function cattle_drop()
@@ -73,6 +73,7 @@ local cow_prototype = {
 					min_speed=0.025,
 					pattern="stop_and_go",
 					canfly=false,
+					max_distance=0.1,
 					},
 		harvest = {
 					tool="vessels:drinking_glass",
@@ -80,11 +81,16 @@ local cow_prototype = {
 					result="animalmaterials:milk",
 					transforms_to="",
 					min_delay=60,
-				  	},
+					},
 		catching = {
 					tool="animalmaterials:lasso",
 					consumed=true,
 					},
+		--animation testing only
+		patrol = {
+				state = "patrol",
+				cycle_path = true,
+			},
 		sound = {
 					random = {
 								name="Mudchute_cow_1",
@@ -135,12 +141,20 @@ local cow_prototype = {
 					visual_size= {x=1,y=1,z=1},
 					},
 				},
+				{
+				name = "patrol",
+				movgen = "mgen_path",
+				typical_state_time = 9999,
+				chance = 0.0,
+				animation = "walk",
+				state_mode = "user_def",
+				},
 			},
 		animation = {
 				walk = {
 					start_frame = 170,
 					end_frame   = 250,
-					basevelocity = 0.35,
+					basevelocity = 5,
 					},
 				stand = {
 					start_frame = 0,
@@ -244,7 +258,7 @@ local steer_prototype = {
 				walk = {
 					start_frame = 170,
 					end_frame   = 250,
-					basevelocity = 0.35,
+					basevelocity = 3.5,
 					},
 				stand = {
 					start_frame = 0,

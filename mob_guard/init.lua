@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_guard mod loading ...")
 
-local version = "0.1.0"
+local version = "0.1.1"
 local guard_groups = {
 						not_in_creative_inventory=1
 					}
@@ -118,6 +118,7 @@ guard_prototype = {
 				walk = {
 					start_frame = 168,
 					end_frame   = 188,
+					basevelocity = 18,
 					},
 				stand = {
 					start_frame = 0,

@@ -15,13 +15,13 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_deer mod loading ... ")
 
-local version = "0.2.0"
+local version = "0.2.1"
 
 local deer_groups = {
 						not_in_creative_inventory=1
 					}
 
-local selectionbox_deer = {-0.7, -1.25, -0.7, 0.7, 0.8, 0.7}
+local selectionbox_deer = {-0.7, -1.1, -0.7, 0.7, 0.8, 0.7}
 
 function deer_m_drop()
 	local result = {}
@@ -101,6 +101,7 @@ local deer_m_prototype = {
 				min_speed=0.02,
 				pattern="stop_and_go",
 				canfly=false,
+--				max_distance = 0.1
 				},
 	catching = {
 				tool="animalmaterials:lasso",
@@ -125,7 +126,7 @@ local deer_m_prototype = {
 			walk = {
 				start_frame = 0,
 				end_frame   = 60,
-				basevelocity = 0.225,
+				basevelocity = 5.5,
 				},
 			stand = {
 				start_frame = 61,
@@ -140,6 +141,11 @@ local deer_m_prototype = {
 				end_frame   = 240,
 				},
 		},
+	--animation testing only
+--	patrol = {
+--				state = "patrol",
+--				cycle_path = true,
+--			},
 	states = {
 			{
 				name = "default",
@@ -193,6 +199,14 @@ local deer_m_prototype = {
 			chance = 0,
 			animation = "walk",
 			},
+--			{
+--			name = "patrol",
+--			movgen = "mgen_path",
+--			typical_state_time = 9999,
+--			chance = 0.0,
+--			animation = "walk",
+--			state_mode = "user_def",
+--			},
 		}
 	}
 
@@ -250,7 +264,7 @@ local deer_f_prototype = {
 			walk = {
 				start_frame = 0,
 				end_frame   = 60,
-				basevelocity = 0.225,
+				basevelocity = 5.5,
 				},
 			stand = {
 				start_frame = 61,

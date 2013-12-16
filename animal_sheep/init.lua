@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.2.0"
+local version = "0.2.1"
 
 local sheep_groups = {
 						sheerable=1,
@@ -23,7 +23,7 @@ local sheep_groups = {
 						not_in_creative_inventory=1
 					}
 
-local selectionbox_sheep = {-0.65, -0.8, -0.65, 0.65, 0.45, 0.65}
+local selectionbox_sheep = {-0.65, -0.75, -0.65, 0.65, 0.45, 0.65}
 local selectionbox_lamb = {-0.65*0.6, -0.8*0.6, -0.65*0.6, 0.65*0.6, 0.45*0.6, 0.65*0.65}
 
 local sheep_prototype = {
@@ -55,6 +55,7 @@ local sheep_prototype = {
 					min_speed=0.1,
 					pattern="stop_and_go",
 					canfly=false,
+--					max_distance = 0.1
 					},
 		harvest = {
 					tool="animalmaterials:scissors",
@@ -82,11 +83,16 @@ local sheep_prototype = {
 								max_hear_distance = 5
 								},
 					},
+		--animation testing only
+--		patrol = {
+--					state = "patrol",
+--					cycle_path = true,
+--				},
 		animation = {
 				walk = {
 					start_frame = 0,
 					end_frame   = 60,
-					basevelocity = 0.25,
+					basevelocity = 3,
 					},
 				stand = {
 					start_frame = 61,
@@ -154,6 +160,14 @@ local sheep_prototype = {
 				chance = 0,
 				animation = "walk",
 				},
+--				{
+--				name = "patrol",
+--				movgen = "mgen_path",
+--				typical_state_time = 9999,
+--				chance = 0.0,
+--				animation = "walk",
+--				state_mode = "user_def",
+--				},
 			},
 		hunger = {
 			target_nodes = { "default:junglegrass",
@@ -220,7 +234,7 @@ local lamb_prototype = {
 				walk = {
 					start_frame = 0,
 					end_frame   = 60,
-					basevelocity = 0.25,
+					basevelocity = 3,
 					},
 				stand = {
 					start_frame = 61,
