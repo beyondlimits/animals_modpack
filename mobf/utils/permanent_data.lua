@@ -41,7 +41,7 @@ function mobf_deserialize_permanent_entity_data(staticdata)
 
 	if deserialized ~= nil and
 		deserialized.version ~= nil then
-		--print("DEBUG: deserialized -> " ..dump(deserialized))
+		print("DEBUG: deserialized -> " ..dump(deserialized))
 		return deserialized
 	end
 
@@ -177,9 +177,11 @@ end
 -------------------------------------------------------------------------------
 function mobf_serialize_permanent_entity_data(entity)
 	if entity.dynamic_data ~= nil and
-			entity.dynamic_data.last_static_data ~= nil then
+			entity.dynamic_data.last_static_data ~= nil and
+			entity.dynamic_data.last_static_data ~= "" then
 			--mobf_print("MOBF: mob " .. entity.data.name .. "(" .. tostring(entity)
-			--	.. ") wasn't even completely activated by now: ")
+			--	.. ") wasn't even completely activated by now: " ..
+			--	dump(entity.dynamic_data.last_static_data))
 			return entity.dynamic_data.last_static_data
 	end
 
@@ -232,7 +234,7 @@ function mobf_serialize_permanent_entity_data(entity)
 								factions = factions,
 							}
 		local serialized = minetest.serialize(toserialize)
-		--print("DEBUG: serialized -> " .. serialized)
+		--mobf_print("DEBUG: serialized -> " .. serialized)
 		return serialized
 	else
 		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: >" .. dump(entity.data.name) ..
