@@ -106,7 +106,9 @@ function mobf_add_mob(mob)
 
 						if spawned_entity ~= nil then
 						spawned_entity.dynamic_data.initialized = false
-						spawned_entity.dynamic_data.last_static_data = staticdata
+						if (staticdata ~= "") then
+							spawned_entity.dynamic_data.last_static_data = staticdata
+						end
 						end
 					end
 					self.object:remove()

@@ -299,6 +299,7 @@ function mobf.activate_handler(self,staticdata)
 
 	--restore saved data
 	local preserved_data = mobf_deserialize_permanent_entity_data(staticdata)
+	self.dynamic_data.last_static_data = nil
 
 	local objectlist = minetest.get_objects_inside_radius(pos,0.25)
 
@@ -725,7 +726,8 @@ function mobf.register_entity(name, graphics, mob)
 					if self.dynamic_data.initialized ~= nil then
 						minetest.log(LOGLEVEL_INFO,
 							"MOBF: delaying activation")
-						if self.dynamic_data.last_static_data == nil then
+						if self.dynamic_data.last_static_data == nil and
+							staticdata ~= "" then
 							self.dynamic_data.last_static_data = staticdata
 						end
 					end
