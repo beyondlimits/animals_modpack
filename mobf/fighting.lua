@@ -213,9 +213,8 @@ function fighting.hit(entity,attacker)
 		entity.object:get_hp() > (entity.data.generic.base_health/3) then
 
 		--face attacker
-		if entity.mode == "3d" then
-			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
-		else
+		--TODO this may be wrong for 2d mode too
+		if entity.mode ~= "3d" then
 			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)-math.pi)
 		end
 
@@ -482,6 +481,11 @@ function fighting.combat(entity,now,dtime)
 		return false
 	end
 
+	--fight against generic enemy "sun"
+	if fighting.sun_damage_handler(entity,now) then
+		return false
+	end
+
 	if entity.dynamic_data.combat ~= nil and
 		entity.dynamic_data.combat.target ~= nil then
 
@@ -618,11 +622,6 @@ function fighting.combat(entity,now,dtime)
 				end
 			end
 		end
-	end
-
-	--fight against generic enemy "sun"
-	if fighting.sun_damage_handler(entity,now) then
-		return false
 	end
 
 	return true
