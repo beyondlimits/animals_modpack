@@ -333,7 +333,13 @@ function spawning.population_density_check(entity,now)
 		secondary_name = entity.data.harvest.transform_to
 	end
 
-	mobf_assert_backtrace(entity.dynamic_data.spawning.density ~= nil)
+	local check_density = entity.dynamic_data.spawning.density
+
+	if entity.data.generic.population_density ~= nil then
+		check_density = entity.data.generic.population_density
+	end
+
+	mobf_assert_backtrace(check_density ~= nil)
 
 	local mob_count = mobf_mob_around(entity.data.modname..":"..entity.data.name,
 										secondary_name,
