@@ -295,7 +295,12 @@ function mobf_init_modules()
 			handler = spawning.population_density_check,
 			init = spawning.init_dynamic_data,
 			configcheck = function(entity)
-					return true
+					if entity.data.generic.population_density ~= nil or
+						entity.data.spawning ~= nil then
+						return true
+					else
+						return false
+					end
 				end
 				})
 
