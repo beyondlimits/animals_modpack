@@ -18,6 +18,12 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.3.4
+-fix lifebar not removed on kill of mob
+-fix spawner information lost on mob deactivation
+-fix chicks not growing up
+-fix crash on delayed placement
+
 Changes 2.3.3
 -fix crash on path based movegen initialization
 -fix crash on spawn on shadows collisionbox evaluation
