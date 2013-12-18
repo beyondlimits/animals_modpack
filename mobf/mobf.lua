@@ -316,7 +316,9 @@ function mobf.activate_handler(self,staticdata)
 		end
 	end
 
-	if cleaned_objectcount > 1 then
+	--honor replaced marker
+	if (self.replaced ~= true and cleaned_objectcount > 1) or
+		cleaned_objectcount > 2 then
 		local spawner = "unknown"
 
 		if preserved_data ~= nil and
@@ -355,6 +357,9 @@ function mobf.activate_handler(self,staticdata)
 		mobf_step_quota.consume(starttime)
 		return
 	end
+
+	--reset replaced marker
+	self.replaced = nil
 
 	if environment.is_media_element(current_node.name,self.environment.media) == false then
 		minetest.log(LOGLEVEL_WARNING,"MOBF: trying to activate mob "
@@ -502,10 +507,10 @@ function mobf.activate_handler(self,staticdata)
 	self.dynamic_data.initialized = true
 
 	if self.dynamic_data.delayed_placement ~= nil then
-		entity.dynamic_data.spawning.player_spawned =
+		self.dynamic_data.spawning.player_spawned =
 			self.dynamic_data.delayed_placement.player_spawned
 
-		entity.dynamic_data.spawning.spawner =
+		self.dynamic_data.spawning.spawner =
 			self.dynamic_data.delayed_placement.spawner
 
 		if self.dynamic_data.delayed_placement.callback ~= nil then
@@ -710,6 +715,11 @@ function mobf.register_entity(name, graphics, mob)
 					local starttime = mobf_get_time_ms()
 					self.dynamic_data = {}
 					self.dynamic_data.initialized = false
+
+					--check for replace in progress marker and transfer to entity
+					if spawning.replacing_NOW then
+						self.replaced = true
+					end
 
 					--make sure entity is in loaded area at initialization
 					local pos = self.object:getpos()

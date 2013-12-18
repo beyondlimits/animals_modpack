@@ -267,7 +267,10 @@ function spawning.replace_entity(entity,name,preserve)
 	--removing is done after exiting lua!
 	spawning.remove(entity,"replaced")
 
+	--set marker to true to make sure activate handler knows it's replacing right now
+	spawning.replacing_NOW = true
 	local newobject = minetest.add_entity(pos,name)
+	spawning.replacing_NOW = false
 	local newentity = mobf_find_entity(newobject)
 
 	if newentity ~= nil then

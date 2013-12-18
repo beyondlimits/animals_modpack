@@ -225,6 +225,7 @@ function transform(entity,now)
 		if now - entity.dynamic_data.spawning.original_spawntime
 			> entity.data.auto_transform.delay then
 			spawning.replace_entity(entity,entity.data.auto_transform.result)
+			return false
 		end
 
 	end
