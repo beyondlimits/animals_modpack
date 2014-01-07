@@ -18,6 +18,11 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.3.5
+-fix some rare crashes
+-fix no revard on killing own mobs
+-make random drops stay 1/2 time to next drop instead of 1/4
+
 Changes 2.3.4
 -fix lifebar not removed on kill of mob
 -fix spawner information lost on mob deactivation
