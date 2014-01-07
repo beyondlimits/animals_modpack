@@ -662,24 +662,26 @@ function mobf.register_entity(name, graphics, mob)
 
 				mobf_warn_long_fct(movestart,"on_step_movement","movement")
 
-				if #self.on_step_hooks > 32 then
-					mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: "
-						.. tostring(self)
-						.. " incredible high number of onstep hooks! "
-						.. #self.on_step_hooks .. " ohlist: "
-						.. tostring(self.on_step_hooks))
-				end
-
-				--dynamic modules
-				for i = 1, #self.on_step_hooks, 1 do
-					local cb_starttime = mobf_get_time_ms()
-					--check return value if on_step hook tells us to stop any other processing
-					if self.on_step_hooks[i](self,now,self.current_dtime) == false then
-						dbg_mobf.mobf_core_lvl1("MOBF: on_step: " .. self.data.name
-							.. " aborting callback processing entity=" .. tostring(self))
-						break
+				if self.on_step_hooks ~= nil then
+					if #self.on_step_hooks > 32 then
+						mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: "
+							.. tostring(self)
+							.. " incredible high number of onstep hooks! "
+							.. #self.on_step_hooks .. " ohlist: "
+							.. tostring(self.on_step_hooks))
 					end
-					mobf_warn_long_fct(cb_starttime,"callback_os_" .. self.data.name .. "_" .. i,"callback nr " .. i)
+
+					--dynamic modules
+					for i = 1, #self.on_step_hooks, 1 do
+						local cb_starttime = mobf_get_time_ms()
+						--check return value if on_step hook tells us to stop any other processing
+						if self.on_step_hooks[i](self,now,self.current_dtime) == false then
+							dbg_mobf.mobf_core_lvl1("MOBF: on_step: " .. self.data.name
+								.. " aborting callback processing entity=" .. tostring(self))
+							break
+						end
+						mobf_warn_long_fct(cb_starttime,"callback_os_" .. self.data.name .. "_" .. i,"callback nr " .. i)
+					end
 				end
 
 				mobf_warn_long_fct(starttime,"on_step_" .. self.data.name .. "_total","on_step_total")
