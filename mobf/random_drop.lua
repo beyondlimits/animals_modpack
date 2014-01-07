@@ -162,7 +162,7 @@ function random_drop.register(random_drop)
 					return self.dropped
 				end,
 
-				random_drop_max_life 	= random_drop.min_delay/4,
+				random_drop_max_life 	= random_drop.min_delay/2,
 				dropped 		= 0,
 
 			})
