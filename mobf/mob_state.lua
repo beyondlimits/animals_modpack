@@ -286,7 +286,8 @@ function mob_state.change_state(entity,state)
 		if not state.HANDLER_precondition(entity,state) then
 			dbg_mobf.mob_state_lvl1("MOBF: " .. entity.data.name
 				.. " custom precondition handler didn't meet ")
-			mobf_assert_backtrace("trying to enter state but invalid precondition" == nil)
+			--don't assert but switch to default in this case
+			state = mob_state.get_state_by_name(entity,"default")
 		end
 	end
 
