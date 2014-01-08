@@ -257,37 +257,46 @@ function mobf_mob_around(mob_name,mob_transform,pos,range,ignore_playerspawned)
 		mob_transform = ""
 	end
 
+	local objcount = 0
+	if objectlist ~= nil then
+		objcount = #objectlist
+	end
+
+	dbg_mobf.generic_lvl1("MOBF: entity at "..printpos(pos)..
+					" looking for: "..mob_name ..
+					" or " .. mob_transform ..
+					" within " .. objcount .. " objects" )
+
 	for index,value in pairs(objectlist) do
 
 		local entity = mobf_find_entity(value)
-
-		dbg_mobf.generic_lvl1("MOBF: entity at "..printpos(pos)..
-							" looking for: "..mob_name ..
-							" or " .. mob_transform )
 
 		--any mob is required to have a name so we may use this to decide
 		--if an entity is an mob or not
 		if 	entity ~= nil and
 			entity.data ~= nil and
-			entity.dynamic_data ~= nil and
-			entity.dynamic_data.spawning ~= nil then
+			entity.dynamic_data ~= nil then
 
 			if entity.removed == false then
 
 				if entity.data.modname..":"..entity.data.name == mob_name or
 					entity.data.modname..":"..entity.data.name == mob_transform then
-					if (ignore_playerspawned and entity.dynamic_data.spawning.player_spawned) or
-						ignore_playerspawned ~= false then
-						dbg_mobf.generic_lvl1("MOBF: Found "..mob_name.. " or "
-							..mob_transform .. " within specified range of "..range)
+
+					-- oops we don't yet know if this is playerspawned,
+					-- for performance reasons assume it isn't
+					if entity.dynamic_data.spawning == nil then
 						count = count + 1
+					else
+						if (ignore_playerspawned and entity.dynamic_data.spawning.player_spawned) or
+							ignore_playerspawned ~= false then
+							dbg_mobf.generic_lvl1("MOBF: Found "..mob_name.. " or "
+								..mob_transform .. " within specified range of "..range)
+							count = count + 1
+						end
 					end
 				end
-
 			end
-
 		end
-
 		objectcount = objectcount +1
 	end
 
