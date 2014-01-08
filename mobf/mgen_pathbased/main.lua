@@ -329,7 +329,7 @@ function p_mov_gen.set_target(entity,target)
 
 
 	if entity.dynamic_data.p_movement.path == nil then
-		print(
+		minetest.log(LOGLEVEL_INFO,
 			"MOBF: no pathfinding support/ no path found directly setting targetpos as path")
 
 		entity.dynamic_data.p_movement.path = {}

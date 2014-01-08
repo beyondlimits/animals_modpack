@@ -602,7 +602,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 			end
 
 			if targetpos ~= nil then
-				minetest.log(LOGLEVEL_WARNING,
+				minetest.log(LOGLEVEL_INFO,
 							"MOBF: Your mob " ..
 							entity.data.name ..
 							" is within solid block moving to"..
