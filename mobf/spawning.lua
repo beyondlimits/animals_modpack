@@ -115,8 +115,15 @@ end
 -------------------------------------------------------------------------------
 function spawning.init_dynamic_data(entity,now)
 
+	local player_spawned = false
+
+	if entity.dynamic_data.spawning ~= nil and
+		entity.dynamic_data.spawning.player_spawned then
+		player_spawned = true
+	end
+
 	local data = {
-		player_spawned     = false,
+		player_spawned     = player_spawned,
 		ts_dense_check     = now,
 		spawnpoint         = entity.object:getpos(),
 		original_spawntime = now,
@@ -1202,7 +1209,7 @@ end
 
 ------------------------------------------------------------------------------
 -- name: population_density_limit(pos,spawndata)
--- @function [parent=#spawning] position_in_use
+-- @function [parent=#spawning] population_density_limit
 --
 --! @brief check if population density limit is reached
 --! @memberof spawning
@@ -1215,6 +1222,8 @@ end
 function spawning.population_density_limit(pos,spawndata)
 	mobf_assert_backtrace(spawndata ~= nil)
 	mobf_assert_validpos(pos)
+	mobf_assert_backtrace(spawndata.name ~= nil)
+	mobf_assert_backtrace(spawndata.density ~= nil)
 	local mobcount = mobf_mob_around(
 						spawndata.name,
 						spawndata.name_secondary,
