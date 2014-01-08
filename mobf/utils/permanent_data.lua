@@ -41,7 +41,6 @@ function mobf_deserialize_permanent_entity_data(staticdata)
 
 	if deserialized ~= nil and
 		deserialized.version ~= nil then
-		print("DEBUG: deserialized -> " ..dump(deserialized))
 		return deserialized
 	end
 

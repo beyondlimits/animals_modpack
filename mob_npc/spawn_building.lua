@@ -141,8 +141,8 @@ table.insert(mob_npc_houses,blueprint_hut)
 
 function building_spawner.buid_wall(material,startpos,endpos,param2,optional)
 
-	print("builder: wall: ".. dump(material) .. " " .. dump(startpos) .. " "
-			.. dump(endpos).. " " .. dump(param2) .. " " .. dump(optional))
+--	print("builder: wall: ".. dump(material) .. " " .. dump(startpos) .. " "
+--			.. dump(endpos).. " " .. dump(param2) .. " " .. dump(optional))
 
 	if startpos.x ~= endpos.x and
 		startpos.y ~= endpos.y and
@@ -163,12 +163,10 @@ function building_spawner.buid_wall(material,startpos,endpos,param2,optional)
 			if optional == nil then
 				minetest.set_node({x=startpos.x,y=y,z=z},{ name=material,param2=param2 } )
 			else
-				print("Optional wall detected")
 				local node = minetest.get_node({x=x,y=startpos.y,z=z})
 				if node ~= nil then
 					local replaceable = false
 					for i=1,#optional,1 do
-						print("comparing " .. node.name .. "<-->" .. optional[i])
 						if node.name == optional[i] then
 							replaceable = true
 						end
@@ -189,12 +187,10 @@ function building_spawner.buid_wall(material,startpos,endpos,param2,optional)
 			if optional == nil then
 				minetest.set_node({x=x,y=startpos.y,z=z},{ name=material,param2=param2 })
 			else
-				print("Optional wall detected")
 				local node = minetest.get_node({x=x,y=startpos.y,z=z})
 				if node ~= nil then
 					local replaceable = false
 					for i=1,#optional,1 do
-						print("comparing " .. node.name .. "<-->" .. optional[i])
 						if node.name == optional[i] then
 							replaceable = true
 						end
@@ -215,12 +211,10 @@ function building_spawner.buid_wall(material,startpos,endpos,param2,optional)
 			if optional == nil then
 				minetest.set_node({x=x,y=y,z=startpos.z},{ name=material,param2=param2 })
 			else
-				print("Optional wall detected")
 				local node = minetest.get_node({x=x,y=startpos.y,z=z})
 				if node ~= nil then
 					local replaceable = false
 					for i=1,#optional,1 do
-						print("comparing " .. node.name .. "<-->" .. optional[i])
 						if node.name == optional[i] then
 							replaceable = true
 						end
