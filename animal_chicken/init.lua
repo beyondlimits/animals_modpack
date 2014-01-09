@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_chicken mod loading ...")
-local version = "0.1.0"
+local version = "0.1.1"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
@@ -26,7 +26,7 @@ local selectionbox_chick = {-0.1, -0.125, -0.1, 0.1, 0.15, 0.1}
 
 local modpath = minetest.get_modpath("animal_chicken")
 
-function chicken_drop()
+local function chicken_drop()
 	local result = {}
 	if math.random() < 0.05 then
 		table.insert(result,"animalmaterials:feather 2")
@@ -37,6 +37,26 @@ function chicken_drop()
 	table.insert(result,"animalmaterials:meat_chicken 1")
 
 	return result
+end
+
+local function egg_timeout(entity)
+
+	if math.random() < 0.05 then
+		local tospawn = "animal_chicken:chick_f"
+		if math.random() > 0.5 then
+			tospawn = "animal_chicken:chick_m"
+		end
+
+		local eggpos = entity.object:getpos()
+
+		if (mobf_mob_around(
+						"animal_chicken:rooster",
+						nil,
+						eggpos,
+						5,false)) then
+			spawning.spawn_and_check(tospawn,eggpos,"spawn_from_chicken_egg")
+		end
+	end
 end
 
 local chicken_prototype = {
@@ -76,7 +96,8 @@ local chicken_prototype = {
 		random_drop = {
 					result="animalmaterials:egg",
 					min_delay=60,
-					chance=0.2
+					chance=0.2,
+					on_timeout_callback=egg_timeout
 					},
 		sound = {
 					random_drop = {

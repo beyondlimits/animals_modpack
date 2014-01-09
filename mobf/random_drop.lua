@@ -125,6 +125,8 @@ function random_drop.register(random_drop)
 				textures 		= ent_graphics.textures,
 				mesh			= ent_graphics.mesh,
 				visual_size		= ent_graphics.visual_size,
+				on_drop_callback= random_drop.on_drop_callback,
+				on_timeout_callback= random_drop.on_timeout_callback,
 
 				on_activate = function(self,staticdata)
 
@@ -133,6 +135,9 @@ function random_drop.register(random_drop)
 
 					if staticdata == "" then
 						self.dropped 	= now
+						if type(self.on_drop_callback) == "function" then
+							self:on_drop_callback()
+						end
 					else
 
 						self.dropped = tonumber(staticdata)
@@ -152,6 +157,9 @@ function random_drop.register(random_drop)
 				on_step = function(self,dtime)
 					if self.dropped + self.random_drop_max_life < mobf_get_current_time() then
 						dbg_mobf.random_drop_lvl2("MOBF: random drop entity timed out")
+						if type(self.on_timeout_callback) == "function" then
+							self:on_timeout_callback()
+						end
 						self.object:remove()
 					end
 
