@@ -357,8 +357,8 @@ function spawning.population_density_check(entity,now)
 		dbg_mobf.spawning_lvl1("MOBF: " .. entity.data.name ..
 			mob_count .. " mobs of same type around")
 		entity.removed = true
-		minetest.log(LOGLEVEL_WARNING,"MOBF: Too many ".. mob_count .. " "..
-			entity.data.name.." at one place dieing: " ..
+		minetest.log(LOGLEVEL_INFO,"MOBF: Too many ".. mob_count .. " "..
+			entity.data.name.." at one place dying: " ..
 			tostring(entity.dynamic_data.spawning.player_spawned))
 		spawning.remove(entity, "population density check")
 		return false
