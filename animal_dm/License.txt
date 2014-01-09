@@ -11,9 +11,10 @@ Unknown (most likely CC0 but no guarantee)
 	sounds/animal_dm_die.ogg
 	sounds/animal_dm_hit.ogg
 	sounds/animal_dm_random.ogg
-	
+
 Unknown, Author 4aiman
 	models/DM.blend
 
 Everything not mentioned:
-	CC-BY-SA, Author sapier
+	CC-BY-SA 3.0, Author sapier
+	URL: http://creativecommons.org/licenses/by-sa/3.0/de/legalcode
