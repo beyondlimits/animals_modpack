@@ -498,7 +498,7 @@ function movement_gen.fix_current_pos(entity,movement_state)
 					targetpos.y = targetpos.y - entity.collisionbox[2]
 				end
 
-				minetest.log(LOGLEVEL_WARNING,"MOBF: Your mob " ..
+				minetest.log(LOGLEVEL_INFO,"MOBF: Your mob " ..
 						entity.data.name .. " " ..
 						tostring(entity) .. " dropt into water moving to "..
 						printpos(targetpos).." state: "..
