@@ -1042,7 +1042,7 @@ function fighting.sun_damage_handler(entity,now)
 		local current_light = minetest.get_node_light(pos)
 
 		if current_light == nil then
-			minetest.log(LOGLEVEL_ERROR,"MOBF: Bug!!! didn't get a light value for "
+			mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: Bug!!! didn't get a light value for "
 				.. printpos(pos))
 			return false
 		end
