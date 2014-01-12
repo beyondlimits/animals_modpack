@@ -18,6 +18,12 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.3.6
+-fix crash on grow up chick combined with delayed activation
+-fix huge amounts of mobs beeing spawned in oveload state
+-update license information
+-lower loglevel of some messages
+
 Changes 2.3.5
 -fix some rare crashes
 -fix no revard on killing own mobs
