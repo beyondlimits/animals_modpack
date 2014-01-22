@@ -516,7 +516,8 @@ function mobf_path.show_manage_menu(playername,data)
 	local all_paths = mobf_path.get_pathlist(playername,isadmin)
 
 	mobf_print("data: " .. dump(data))
-	if data.selected_path ~= nil then
+	if data.selected_path ~= nil and
+	 all_paths[data.selected_path] ~= nil then
 		data.pathname = all_paths[data.selected_path].pathname
 		data.ownername = all_paths[data.selected_path].ownername
 	end
