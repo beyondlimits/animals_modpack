@@ -72,7 +72,8 @@ function mobf_add_mob(mob)
 		return false
 	end
 
-	--check if mob may be added
+	--check if mob is blacklisted
+	--mobs from the blacklist are pre-registered at startup
 	if mobf_contains(mobf_rtd.registred_mob,mob.modname.. ":"..mob.name) then
 		mobf.blacklisthandling(mob)
 		return false

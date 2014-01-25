@@ -211,7 +211,9 @@ end
 
 --!@}
 
-spawning.register_spawn_algorithm("shadows", mobf_spawner_initialize_in_shadows_abm)
+spawning.register_spawn_algorithm("shadows",
+									mobf_spawner_initialize_in_shadows_abm,
+									spawning.register_cleanup_spawner)
 spawning.register_spawn_algorithm(	"shadows_spawner",
 									mobf_spawner_initialize_in_shadows_mapgen,
 									spawning.register_cleanup_spawner)

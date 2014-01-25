@@ -531,7 +531,7 @@ function spawning.spawn_and_check(name,pos,text)
 end
 
 ------------------------------------------------------------------------------
--- name: register_cleanup_spawner(mobname)
+-- name: register_cleanup_spawner(spawnername)
 -- @function [parent=#spawning] register_cleanup_spawner
 --
 --! @brief register an entity to cleanup spawners
@@ -539,8 +539,9 @@ end
 --
 --! @param mobname mobname to create cleanup
 -------------------------------------------------------------------------------
-function spawning.register_cleanup_spawner(mobname)
-	minetest.register_entity(mobname .. "_spawner",
+function spawning.register_cleanup_spawner(spawnername)
+	dbg_mobf.mobf_core_lvl2("MOBF: registering spawner cleanup " .. spawnername)
+	minetest.register_entity(spawnername,
 		{
 			on_activate = function(self,staticdata)
 				self.object:remove()

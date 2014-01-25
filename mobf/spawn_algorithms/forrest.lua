@@ -159,5 +159,5 @@ end --end spawn algo
 
 --!@}
 
-spawning.register_spawn_algorithm("forrest_mapgen", mobf_spawner_initialize_in_forrest_mapgen)
-spawning.register_spawn_algorithm("forrest", mobf_spawner_initialize_in_forrest_abm)
+spawning.register_spawn_algorithm("forrest_mapgen", mobf_spawner_initialize_in_forrest_mapgen,spawning.register_cleanup_spawner)
+spawning.register_spawn_algorithm("forrest", mobf_spawner_initialize_in_forrest_abm,spawning.register_cleanup_spawner)
