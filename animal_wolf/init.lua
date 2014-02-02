@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_wolf loading ...")
 
-local version = "0.1.0"
+local version = "0.1.1"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
@@ -73,6 +73,16 @@ wolf_prototype = {
 					},
 		sound = {
 					random = nil,
+					meele = {
+						name="animal_wolf_melee",
+						gain = 0.8,
+						max_hear_distance = 10
+					},
+					start_attack = {
+						name="animal_wolf_attack",
+						gain = 0.8,
+						max_hear_distance = 20
+					},
 					},
 		animation = {
 				stand = {

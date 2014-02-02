@@ -379,6 +379,12 @@ function fighting.switch_to_combat_state(entity,now,target)
 
 	--set target
 	entity.dynamic_data.current_movement_gen.set_target(entity,target)
+
+	-- play start_attack sound
+	if entity.data.sound ~= nil and
+		entity.data.sound.start_attack ~= nil then
+		sound.play(entity.object:getpos(),entity.data.sound.start_attack);
+	end
 end
 
 -------------------------------------------------------------------------------
