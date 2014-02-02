@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.2.1"
+local version = "0.2.2"
 
 local sheep_groups = {
 						sheerable=1,
@@ -59,7 +59,7 @@ local sheep_prototype = {
 					},
 		harvest = {
 					tool="animalmaterials:scissors",
-					max_tool_usage=10,
+					max_tool_usage=40,
 					tool_consumed=false,
 					result="wool:white 1",
 					transforms_to="animal_sheep:sheep_naked",
