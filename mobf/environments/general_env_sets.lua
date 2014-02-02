@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file flight_1.lua
@@ -35,7 +35,12 @@ mobf_env_plants = {
 	"default:grass_2",
 	"default:grass_3",
 	"default:grass_4",
-	"default:grass_5"
+	"default:grass_5",
+	-- From the vines mod...
+	"vines:side",
+	-- From the plantlife mod...
+	"poisonivy:seedling",
+	"poisonivy:sproutling"
 }
 
 mobf_env_flowers = {
