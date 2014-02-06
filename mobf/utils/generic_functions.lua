@@ -233,6 +233,37 @@ function mobf_min_light_around(pos,distance,daytime)
 end
 
 -------------------------------------------------------------------------------
+-- name: mobf_objects_around(pos,range,ignorelist)
+--
+--! @brief get number of objects within a certain range
+--
+--! @param pos position to look around
+--! @param range range to check
+--! @param ignorelist list of entitynames to ignore
+--! @return count of objects
+-------------------------------------------------------------------------------
+function mobf_objects_around(pos,range,ignorelist)
+
+	local objectlist = minetest.get_objects_inside_radius(pos,range)
+
+	local cleaned_objectcount = 0
+
+	for i=1,#objectlist,1 do
+		local luaentity = objectlist[i]:get_luaentity()
+		if luaentity ~= nil then
+			if not luaentity.mobf_spawner and
+				not mobf_contains(ignorelist,luaentity.name) then
+				cleaned_objectcount = cleaned_objectcount + 1
+			end
+		else
+			cleaned_objectcount = cleaned_objectcount + 1
+		end
+	end
+
+	return cleaned_objectcount
+end
+
+-------------------------------------------------------------------------------
 -- name: mobf_mob_around(mob_name,mob_transform_name,pos,range,)
 --
 --! @brief get number of mobs of specified type within range of pos

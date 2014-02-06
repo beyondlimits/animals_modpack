@@ -90,6 +90,7 @@ function mobf_ride.on_step_callback(entity)
 		local walkspeed  = 3
 		local sneakspeed = 0.5
 		local jumpspeed  = 30
+		local runspeed   = walkspeed
 
 		if entity.data.ride ~= nil then
 			if entity.data.ride.walkspeed ~= nil then
@@ -168,7 +169,7 @@ function mobf_ride.on_step_callback(entity)
 
 
 				if setspeed then
-					speed_to_set_xz = mobf_calc_vector_components(dir,selected_speed)
+					local speed_to_set_xz = mobf_calc_vector_components(dir,selected_speed)
 
 					speed_to_set.x = speed_to_set_xz.x
 					speed_to_set.z = speed_to_set_xz.z

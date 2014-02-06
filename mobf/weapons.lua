@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file weapons.lua
@@ -32,7 +32,7 @@ function mobf_init_weapons()
 end
 
 -------------------------------------------------------------------------------
--- name: mobf_do_area_damage(pos,immune,damage_groups,range) 
+-- name: mobf_do_area_damage(pos,immune,damage_groups,range)
 --
 --! @brief damage all objects within a certain range
 --
@@ -45,14 +45,14 @@ function mobf_do_area_damage(pos,immune,damage_groups,range)
 	--damage objects within inner blast radius
 	mobf_assert_backtrace(type(range) ~= "table")
 
-	objs = minetest.get_objects_inside_radius(pos, range)
+	local objs = minetest.get_objects_inside_radius(pos, range)
 	for k, obj in pairs(objs) do
 
 		--don't do damage to issuer
 		if obj ~= immune and obj ~= nil then
-			
+
 			--TODO as long as minetest still crashes without puncher use this workaround
-			
+
 			local worst_damage = 0
 			if type(damage_groups) == "table" then
 				for k,v in pairs(damage_groups) do
@@ -66,10 +66,10 @@ function mobf_do_area_damage(pos,immune,damage_groups,range)
 				mobf_assert_backtrace("invalid damage_groups" == "selected")
 			end
 
-			
+
 			local current_hp = obj:get_hp()
 			obj:set_hp(current_hp - worst_damage)
-			
+
 			--punch
 			--obj:punch(nil, 1.0, {
 			--	full_punch_interval=1.0,
@@ -101,7 +101,7 @@ function mobf_do_node_damage(pos,immune_list,range,chance)
 
 					if toremove ~= nil then
 						local immune = false
-					
+
 						if immune_list ~= nil then
 							for i,v in ipairs(immune_list) do
 								if (torremove.name == v) then
@@ -111,7 +111,7 @@ function mobf_do_node_damage(pos,immune_list,range,chance)
 						end
 
 
-						if immune ~= true then					
+						if immune ~= true then
 							minetest.remove_node({x=i,y=j,z=k})
 						end
 					end
@@ -155,7 +155,7 @@ MOBF_FIREBALL_ENTITY = {
 --! @private
 --
 --! @param self fireball itself
---! @param staticdata 
+--! @param staticdata
 -------------------------------------------------------------------------------
 function MOBF_FIREBALL_ENTITY.on_activate(self,staticdata)
 	self.created = mobf_get_current_time()
@@ -178,18 +178,18 @@ function MOBF_FIREBALL_ENTITY.surfacefire(pos,range)
 		for i=pos.x-range/2, pos.x+range/2, 1 do
 		for j=pos.y-range/2, pos.y+range/2, 1 do
 		for k=pos.z-range/2, pos.z+range/2, 1 do
-		
+
 			local current = minetest.get_node({x=i,y=j,z=k})
 			local ontop  = minetest.get_node({x=i,y=j+1,z=k})
-			
+
 			--print("put fire? " .. printpos({x=i,y=j,z=k}) .. " " .. current.name .. " " ..ontop.name)
-			
+
 			if (current.name ~= "air") and
 				(current.name ~= "fire:basic_flame") and
 				(ontop.name == "air") then
 				minetest.set_node({x=i,y=j+1,z=k}, {name="fire:basic_flame"})
 			end
-					
+
 		end
 		end
 		end
@@ -232,7 +232,7 @@ function MOBF_FIREBALL_ENTITY.on_step(self, dtime)
 
 		--damage all objects within blast radius
 		mobf_do_area_damage(pos,self.owner,self.damage_inner,self.damage_range/2)
-		
+
 		MOBF_FIREBALL_ENTITY.surfacefire(pos,self.damage_range)
 
 		self.object:remove()
@@ -269,7 +269,7 @@ MOBF_PLASMABALL_ENTITY = {
 	damage = {
 			fleshy=4,
 			},
-			
+
 	damage_pass = {
 			fleshy=2,
 			},
@@ -287,7 +287,7 @@ MOBF_PLASMABALL_ENTITY = {
 --! @private
 --
 --! @param self fireball itself
---! @param staticdata 
+--! @param staticdata
 -------------------------------------------------------------------------------
 function MOBF_PLASMABALL_ENTITY.on_activate(self,staticdata)
 	self.created = mobf_get_current_time()
@@ -348,7 +348,7 @@ function MOBF_PLASMABALL_ENTITY.on_step(self, dtime)
 						if toremove ~= nil and
 							toremove.name ~= "default:stone" and
 							toremove.name ~= "default:cobble" then
-						
+
 							minetest.remove_node({x=i,y=j,z=k})
 						end
 					end
@@ -382,7 +382,7 @@ MOBF_ARROW_ENTITY={
 	textures = {"mobf:arrow_box"},
 	lastpos={},
 	collisionbox = {0,0,0,0,0,0},
-	
+
 	velocity =6,
 	damage_groups = {
 					fleshy=3,
@@ -411,7 +411,7 @@ MOBF_ARROW_ENTITY.on_step = function(self, dtime)
 		for k, obj in pairs(objs) do
 			if obj:get_luaentity() ~= nil and
 				obj ~= self.owner then
-				if obj:get_luaentity().name ~= "mobf:arrow_entity" and 
+				if obj:get_luaentity().name ~= "mobf:arrow_entity" and
 					obj:get_luaentity().name ~= "__builtin:item" then
 					obj:punch(self.object, 1.0, {
 						full_punch_interval=1.0,
@@ -456,7 +456,7 @@ minetest.register_node("mobf:arrow_box", {
 			{7.5/17, -2.5/17, 2.5/17, 6.5/17, -1.5/17, 1.5/17},
 			{7.5/17, 2.5/17, -2.5/17, 6.5/17, 1.5/17, -1.5/17},
 			{6.5/17, -1.5/17, -1.5/17, 7.5/17, -2.5/17, -2.5/17},
-			
+
 			{7.5/17, 2.5/17, 2.5/17, 8.5/17, 3.5/17, 3.5/17},
 			{8.5/17, -3.5/17, 3.5/17, 7.5/17, -2.5/17, 2.5/17},
 			{8.5/17, 3.5/17, -3.5/17, 7.5/17, 2.5/17, -2.5/17},
@@ -467,7 +467,7 @@ minetest.register_node("mobf:arrow_box", {
 			"mobf_arrow_front.png", "mobf_arrow_2.png", "mobf_arrow.png"},
 	groups = {not_in_creative_inventory=1},
 })
-	
+
 local mods = minetest.get_modnames()
 if mobf_contains(mods,"throwing") then
 	print("throwing mod found2!")

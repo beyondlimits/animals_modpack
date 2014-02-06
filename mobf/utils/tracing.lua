@@ -19,9 +19,9 @@
 --! @ingroup framework_int
 --! @{
 
-callback_statistics = {}
+local callback_statistics = {}
 
-statistics = {}
+local statistics = {}
 statistics.total = 0
 statistics.abms = 0
 statistics.onstep = 0

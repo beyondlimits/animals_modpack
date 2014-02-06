@@ -356,7 +356,7 @@ end
 ------------------------------------------------------------------------------
 function mobf_debug.print_offline_mobs(name,param)
 
-	count = 0
+	local count = 0
 
 	for key,value in pairs(spawning.mob_spawn_data) do
 		for hash,enabled in pairs (value) do

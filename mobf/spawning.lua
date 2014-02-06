@@ -794,6 +794,67 @@ function spawning.spawner_get_water_pos(pos,min_depth,max_depth,min_y,max_y)
 	return pos
 end
 
+-------------------------------------------------------------------------------
+-- name: check_activation_overlap(entity,pos,preserved_data)
+--
+--! @brief check if a activating entity is spawned within some other entity
+--
+--! @param entity entity to check
+--! @param position spawned at
+--! @return true
+-------------------------------------------------------------------------------
+function spawning.check_activation_overlap(entity,pos,preserved_data)
+
+	local cleaned_objectcount = mobf_objects_around(pos,0.25,{ "mobf:lifebar" })
+
+	--honor replaced marker
+	if (entity.replaced ~= true and cleaned_objectcount > 1) or
+		cleaned_objectcount > 2 then
+
+		------------------------------
+		-- debug output only
+		-- ---------------------------
+		local spawner = "unknown"
+		if preserved_data ~= nil and
+			preserved_data.spawner ~= nil then
+			spawner = preserved_data.spawner
+
+		mobf_bug_warning(LOGLEVEL_WARNING,
+			"MOBF: trying to activate mob \"" ..entity.data.name ..
+			" at " .. printpos(pos) .. " (" .. tostring(entity)
+			.. ")"..
+			"\" within something else!" ..
+			" originaly spawned by: " .. spawner ..
+			" --> removing")
+
+		for i=1,#objectlist,1 do
+			local luaentity = objectlist[i]:get_luaentity()
+			if luaentity ~= nil then
+				if luaentity.data ~= nil and
+					luaentity.data.name ~= nil then
+					dbg_mobf.mobf_core_helper_lvl3(
+						i .. " LE: " .. luaentity.name .. " (" .. tostring(luaentity) .. ") " ..
+						luaentity.data.name .. " " ..
+						printpos(objectlist[i]:getpos()))
+				else
+					dbg_mobf.mobf_core_helper_lvl3(
+						i .. " LE: " .. luaentity.name .. " (" .. tostring(luaentity) .. ") " ..
+						dump(luaentity))
+				end
+			else
+				dbg_mobf.mobf_core_helper_lvl3(
+					i .. " " .. tostring(objectlist[i]) ..
+					printpos(objectlist[i]:getpos()))
+			end
+		end
+		------------------------------
+		-- end debug output
+		-- ---------------------------
+		return false
+	end
+	return true
+end
+
 --------------------------------------------------------------------------------
 -- LEGACY CODE BELOW subject to be removed!
 --------------------------------------------------------------------------------
