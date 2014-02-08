@@ -302,7 +302,7 @@ function mobf.activate_handler(self,staticdata)
 	self.dynamic_data.last_static_data = nil
 
 	--check if position would collide with other entities
-	if not spawning.check_activation_overlap(entity,pos,preserved) then
+	if not spawning.check_activation_overlap(self,pos,preserved) then
 		spawning.remove_uninitialized(self,staticdata)
 		mobf_step_quota.consume(starttime)
 		return

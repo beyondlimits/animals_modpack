@@ -819,21 +819,21 @@ function spawning.check_activation_overlap(entity,pos,preserved_data)
 			preserved_data.spawner ~= nil then
 			spawner = preserved_data.spawner
 
-		mobf_bug_warning(LOGLEVEL_WARNING,
-			"MOBF: trying to activate mob \"" ..entity.data.name ..
-			" at " .. printpos(pos) .. " (" .. tostring(entity)
-			.. ")"..
-			"\" within something else!" ..
-			" originaly spawned by: " .. spawner ..
-			" --> removing")
+			mobf_bug_warning(LOGLEVEL_WARNING,
+				"MOBF: trying to activate mob \"" ..entity.data.name ..
+				" at " .. printpos(pos) .. " (" .. tostring(entity)
+				.. ")"..
+				"\" within something else!" ..
+				" originaly spawned by: " .. spawner ..
+				" --> removing")
 
-		for i=1,#objectlist,1 do
-			local luaentity = objectlist[i]:get_luaentity()
-			if luaentity ~= nil then
-				if luaentity.data ~= nil and
-					luaentity.data.name ~= nil then
-					dbg_mobf.mobf_core_helper_lvl3(
-						i .. " LE: " .. luaentity.name .. " (" .. tostring(luaentity) .. ") " ..
+			for i=1,#objectlist,1 do
+				local luaentity = objectlist[i]:get_luaentity()
+				if luaentity ~= nil then
+					if luaentity.data ~= nil and
+						luaentity.data.name ~= nil then
+						dbg_mobf.mobf_core_helper_lvl3(
+							i .. " LE: " .. luaentity.name .. " (" .. tostring(luaentity) .. ") " ..
 						luaentity.data.name .. " " ..
 						printpos(objectlist[i]:getpos()))
 				else
@@ -853,6 +853,7 @@ function spawning.check_activation_overlap(entity,pos,preserved_data)
 		return false
 	end
 	return true
+end
 end
 
 --------------------------------------------------------------------------------
