@@ -129,7 +129,7 @@ end
 
 
 -------------------------------------------------------------------------------
--- @function [parent=#mobf_factions] mob_rightclick_callback(entity,player)
+-- @function [parent=#mobf_factions] config_check(entity,player)
 --
 --! @brief show factions rightclick menu
 --! @memberof mobf_factions
@@ -138,6 +138,9 @@ end
 --
 -------------------------------------------------------------------------------
 function mobf_factions.config_check(entity)
+	if not mobf_rtd.factions_available then
+		return false
+	end
 	if entity.dynamic_data.spawning.spawner ~= nil then
 		return true
 	end
