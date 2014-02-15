@@ -323,7 +323,7 @@ function mobf.activate_handler(self,staticdata)
 	end
 
 	--reset replaced marker
-	entity.replaced = nil
+	self.replaced = nil
 
 	----------------------------------------------------------------------------
 	-- initialize environment <-> mob <-> player interaction
