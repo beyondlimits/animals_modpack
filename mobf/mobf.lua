@@ -701,7 +701,7 @@ function mobf.register_entity(name, graphics, mob)
 						mobf.activate_handler(self,staticdata)
 					end
 
-					if self.dynamic_data.initialized ~= nil then
+					if self.dynamic_data.initialized ~= true then
 						minetest.log(LOGLEVEL_INFO,
 							"MOBF: delaying activation")
 						if self.dynamic_data.last_static_data == nil and
