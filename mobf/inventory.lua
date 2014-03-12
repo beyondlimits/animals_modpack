@@ -18,6 +18,14 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if intllib then
+	S = intllib.Getter()
+else
+	S = function(s) return s end
+end
+-------------------------------------------------------------------------------
 mobf_assert_backtrace(mob_inventory == nil)
 --! @class mob_inventory
 --! @brief inventory handling for trader like mobs
@@ -392,21 +400,21 @@ function mob_inventory.init_trader_inventory(entity)
 		.. tostring(entity) .. "\"" )
 
 	local trader_formspec = "size[8,10;]" ..
-			"label[2,0;Trader " .. tradername .. " Inventory]" ..
-			"label[0,1;Selling:]" ..
+			"label[2,0;"..S("Trader %s Inventory"):format(tradername).."]" ..
+			"label[0,1;"..S("Selling:").."]" ..
 			"list[detached:" .. unique_entity_id .. ";goods;0,1.5;8,2;]" ..
-			"label[0,4.0;Selection]" ..
+			"label[0,4.0;"..S("Selection").."]" ..
 			"list[detached:" .. unique_entity_id .. ";selection;0,4.5;1,1;]" ..
 			"label[1.25,4.75;-->]" ..
-			"label[2,4.0;Price]" ..
+			"label[2,4.0;"..S("Price").."]" ..
 			"list[detached:" .. unique_entity_id .. ";price_1;2,4.5;1,1;]" ..
-			"label[3,4.0;or]" ..
+			"label[3,4.0;"..S("or").."]" ..
 			"list[detached:" .. unique_entity_id .. ";price_2;3,4.5;1,1;]" ..
 			"label[4.25,4.75;-->]" ..
-			"label[5,4.0;Pay]" ..
+			"label[5,4.0;"..S("Pay").."]" ..
 			"list[detached:" .. unique_entity_id .. ";pay;5,4.5;1,1;]" ..
 			"label[6.25,4.75;-->]" ..
-			"label[6.75,4.0;Takeaway]" ..
+			"label[6.75,4.0;"..S("Takeaway").."]" ..
 			"list[detached:" .. unique_entity_id .. ";takeaway;7,4.5;1,1;]" ..
 			"list[current_player;main;0,6;8,4;]"
 

@@ -13,6 +13,16 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: animal_dm loading ...")
 local version = "0.1.1"
 
@@ -34,7 +44,7 @@ local dm_prototype = {
 			},
 
 		generic = {
-					description="Dungeonmaster (MOBF)",
+					description= S("Dungeonmaster (MOBF)"),
 					base_health=30,
 					kill_result="",
 					armor_groups= {

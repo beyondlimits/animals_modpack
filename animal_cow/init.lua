@@ -13,6 +13,16 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: animal_cow mod loading ...")
 local version = "0.2.1"
 
@@ -55,7 +65,7 @@ local cow_prototype = {
 			},
 
 		generic = {
-					description="Cow",
+					description= S("Cow"),
 					base_health=40,
 					kill_result=cattle_drop,
 					armor_groups= {
@@ -179,7 +189,7 @@ local steer_prototype = {
 			},
 
 		generic = {
-			description="Steer",
+			description=S("Steer"),
 			base_health=40,
 			kill_result=cattle_drop,
 			armor_groups= {
@@ -283,7 +293,7 @@ baby_calf_f_prototype = {
 			},
 
 		generic = {
-			description="Baby Calf female",
+			description= S("Baby Calf female"),
 			base_health=40,
 			kill_result="animalmaterials:meat_beef 2",
 			armor_groups= {
@@ -378,7 +388,7 @@ baby_calf_m_prototype = {
 			},
 
 		generic = {
-				description="Baby Calf male",
+				description= S("Baby Calf male"),
 				base_health=40,
 				kill_result="animalmaterials:meat_beef 2",
 				armor_groups= {

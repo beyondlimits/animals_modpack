@@ -13,6 +13,16 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: mob_npc mod loading ...")
 
 local version = "0.1.0"
@@ -99,7 +109,7 @@ local npc_trader_prototype = {
 			},
 
 		generic = {
-					description="Trader",
+					description= S("Trader"),
 					base_health=200,
 					kill_result="",
 					armor_groups= {

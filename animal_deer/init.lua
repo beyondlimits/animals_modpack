@@ -13,6 +13,16 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: animal_deer mod loading ... ")
 
 local version = "0.2.1"
@@ -83,7 +93,7 @@ local deer_m_prototype = {
 		},
 
 	generic = {
-				description="Deer (m)",
+				description= S("Deer (m)"),
 				base_health=25,
 				kill_result=deer_m_drop,
 				armor_groups= {
@@ -222,7 +232,7 @@ local deer_f_prototype = {
 		},
 
 	generic = {
-				description="Deer (f)",
+				description= S("Deer (f)"),
 				base_health=25,
 				kill_result=deer_f_drop,
 				armor_groups= {

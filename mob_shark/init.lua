@@ -1,3 +1,28 @@
+-------------------------------------------------------------------------------
+-- Mob Framework Mod by Sapier
+--
+-- You may copy, use, modify or do nearly anything except removing this
+-- copyright notice.
+-- And of course you are NOT allow to pretend you have written it.
+--
+--! @file init.lua
+--! @brief shark implementation
+--! @copyright Sapier
+--! @author Sapier
+--! @date 2014-05-30
+--
+-- Contact sapier a t gmx net
+-------------------------------------------------------------------------------
+--
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 local version = "0.1.0"
 
 minetest.log("action","MOD: mob_shark loading ...")
@@ -37,7 +62,7 @@ local shark_prototype = {
 			},
 
 		generic = {
-					description="Shark",
+					description= S("Shark"),
 					base_health=5,
 					kill_result=shark_drop,
 					armor_groups= {

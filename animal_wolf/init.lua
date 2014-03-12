@@ -13,6 +13,16 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: mob_wolf loading ...")
 
 local version = "0.1.1"
@@ -36,7 +46,7 @@ wolf_prototype = {
 			},
 
 		generic = {
-					description="Wolf",
+					description= S("Wolf"),
 					base_health=5,
 					kill_result="animalmaterials:fur 1",
 					armor_groups= {
@@ -150,7 +160,7 @@ tamed_wolf_prototype = {
 		modname="animal_wolf",
 
 		generic = {
-					description="Tamed Wolf",
+					description= S("Tamed Wolf"),
 					base_health=10,
 					kill_result="animalmaterials:fur 1",
 					armor_groups= {

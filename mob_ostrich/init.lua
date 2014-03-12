@@ -13,6 +13,16 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: mob_ostrich mod loading ...")
 local version = "0.1.0"
 
@@ -47,7 +57,7 @@ ostrich_f_prototype = {
 			},
 
 		generic = {
-					description="Ostrich (f)",
+					description= S("Ostrich (f)"),
 					base_health=10,
 					kill_result=ostrich_drop,
 					armor_groups= {
@@ -138,7 +148,7 @@ ostrich_m_prototype = {
 			},
 
 		generic = {
-					description="Ostrich (m)",
+					description= S("Ostrich (m)"),
 					base_health=11,
 					kill_result=ostrich_drop,
 					armor_groups= {

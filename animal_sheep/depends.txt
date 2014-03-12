@@ -2,3 +2,4 @@ default
 animalmaterials
 mobf
 wool
+intllib?

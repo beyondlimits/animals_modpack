@@ -13,6 +13,16 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: mob_slime mod loading ...")
 local version = "0.1.0"
 
@@ -98,7 +108,7 @@ local prototype_mob_slime_L = {
 	--! @brief [MANDATORY] generic parameters for mob
 	generic = {
 		--! @brief [MANDATORY] description to show on mouse over in inventory
-		description="Slime",
+		description= S("Slime"),
 
 		--! @brief [MANDATORY] maximum health
 		base_health=1,
@@ -228,7 +238,7 @@ local prototype_mob_slime_S = {
 	--! @brief [MANDATORY] generic parameters for mob
 	generic = {
 		--! @brief [MANDATORY] description to show on mouse over in inventory
-		description="Slime",
+		description= S("Slime"),
 
 		--! @brief [MANDATORY] maximum health
 		base_health=1,
@@ -341,7 +351,7 @@ local prototype_mob_slime_M = {
 	--! @brief [MANDATORY] generic parameters for mob
 	generic = {
 		--! @brief [MANDATORY] description to show on mouse over in inventory
-		description="Slime",
+		description= S("Slime"),
 
 		--! @brief [MANDATORY] maximum health
 		base_health=1,

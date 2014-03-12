@@ -12,6 +12,16 @@
 --! @date 2013-02-09
 --
 -- Contact sapier a t gmx net
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 -------------------------------------------------------------------------------
 mobf_assert_backtrace(mobf_path == nil)
 mobf_path = {}
@@ -59,7 +69,7 @@ function mobf_path.init()
 			})
 
 	minetest.register_craftitem(":mobf:path_marker", {
-		description = "Path marker tool",
+		description = S("Path marker tool"),
 		image = "mobf_path_marker_item.png",
 		on_place = function(item, placer, pointed_thing)
 			if pointed_thing.type == "node" then

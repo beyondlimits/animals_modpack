@@ -13,6 +13,16 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
 local version = "0.2.2"
@@ -38,7 +48,7 @@ local sheep_prototype = {
 			},
 
 		generic = {
-					description="Sheep",
+					description= S("Sheep"),
 					base_health=10,
 					kill_result="animalmaterials:meat_lamb 2",
 					armor_groups= {
@@ -195,7 +205,7 @@ local lamb_prototype = {
 			},
 
 		generic = {
-					description="Lamp",
+					description= S("Lamb"),
 					base_health=3,
 					kill_result="animalmaterials:meat_lamb 1",
 					armor_groups= {
@@ -328,7 +338,7 @@ local sheep_naked_prototype = {
 			},
 
 		generic = {
-					description="Naked sheep",
+					description= S("Naked sheep"),
 					base_health=10,
 					kill_result="animalmaterials:meat_lamb 2",
 					armor_groups= {
@@ -511,3 +521,4 @@ minetest.log("action","\tadding animal "..lamb_prototype.name)
 mobf_add_mob(lamb_prototype)
 
 minetest.log("action","MOD: animal_sheep mod           version " .. version .. " loaded")
+
