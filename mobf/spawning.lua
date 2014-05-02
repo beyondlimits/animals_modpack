@@ -827,6 +827,8 @@ function spawning.check_activation_overlap(entity,pos,preserved_data)
 				" originaly spawned by: " .. spawner ..
 				" --> removing")
 
+			objectlist = minetest.get_objects_inside_radius(pos,0.25)
+
 			for i=1,#objectlist,1 do
 				local luaentity = objectlist[i]:get_luaentity()
 				if luaentity ~= nil then
