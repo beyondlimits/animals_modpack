@@ -140,6 +140,17 @@ function mobf_statistic_calc(dtime)
 end
 
 -------------------------------------------------------------------------------
+-- name: mobf_get_statistics()
+--
+--! @brief get mobf statistic information
+--
+--! @return mobf statistics
+-------------------------------------------------------------------------------
+function mobf_get_statistics()
+	return statistics
+end
+
+-------------------------------------------------------------------------------
 -- name: mobf_warn_long_fct(starttime,fctname,facility)
 --
 --! @brief alias to get current time

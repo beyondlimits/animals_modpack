@@ -836,24 +836,24 @@ function spawning.check_activation_overlap(entity,pos,preserved_data)
 							i .. " LE: " .. luaentity.name .. " (" .. tostring(luaentity) .. ") " ..
 						luaentity.data.name .. " " ..
 						printpos(objectlist[i]:getpos()))
+					else
+						dbg_mobf.mobf_core_helper_lvl3(
+							i .. " LE: " .. luaentity.name .. " (" .. tostring(luaentity) .. ") " ..
+							dump(luaentity))
+					end
 				else
 					dbg_mobf.mobf_core_helper_lvl3(
-						i .. " LE: " .. luaentity.name .. " (" .. tostring(luaentity) .. ") " ..
-						dump(luaentity))
+						i .. " " .. tostring(objectlist[i]) ..
+						printpos(objectlist[i]:getpos()))
 				end
-			else
-				dbg_mobf.mobf_core_helper_lvl3(
-					i .. " " .. tostring(objectlist[i]) ..
-					printpos(objectlist[i]:getpos()))
 			end
+			------------------------------
+			-- end debug output
+			-- ---------------------------
+			return false
 		end
-		------------------------------
-		-- end debug output
-		-- ---------------------------
-		return false
 	end
 	return true
-end
 end
 
 --------------------------------------------------------------------------------

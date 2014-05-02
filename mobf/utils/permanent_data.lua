@@ -196,7 +196,7 @@ function mobf_serialize_permanent_entity_data(entity)
 		if entity.dynamic_data.spawning.original_spawntime == nil then
 			entity.dynamic_data.spawning.original_spawntime = mobf_get_current_time()
 			minetest.log(LOGLEVEL_WARNING,
-				"MOBF: deactivating entity without spawntime setting current time")
+				"MOBF: saving entity without spawntime setting current time")
 		end
 
 		local pathowner = ""

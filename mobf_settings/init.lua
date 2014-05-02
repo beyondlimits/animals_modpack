@@ -405,6 +405,7 @@ function mobf_settings.show_info_tab(sender_data)
 	local formspec = mobf_settings.formspec_header(sender_data)
 	local adv_stats = adv_spawning.get_statistics()
 	local mobs_offline = spawning.total_offline_mobs()
+	local statistics = mobf_get_statistics()
 
 	formspec = formspec ..
 		"label[0.75,0.25;Timesource:]" ..
@@ -440,6 +441,7 @@ end
 function mobf_settings.show_statistics_tab(sender_data)
 	local formspec = mobf_settings.formspec_header(sender_data)
 	local adv_stats = adv_spawning.get_statistics()
+	local statistics = mobf_get_statistics()
 
 	formspec = formspec ..
 
@@ -791,7 +793,7 @@ function mobf_settings.handle_factions_tab_input(sender_data)
 
 	if action == "available_factions" then
 		if sender_data.value ~= nil then
-			local event = explode_textlist_event(sender_data.value)
+			local event = minetest.explode_textlist_event(sender_data.value)
 
 			if event.typ ~= "INV" then
 				sender_data.factions_tab_data.available_factions_selected = event.index
@@ -801,7 +803,7 @@ function mobf_settings.handle_factions_tab_input(sender_data)
 
 	if action == "faction_reputation" then
 		if sender_data.value ~= nil then
-			local event = explode_textlist_event(sender_data.value)
+			local event = minetest.explode_textlist_event(sender_data.value)
 
 			if event.typ ~= "INV" then
 				sender_data.factions_tab_data.faction_reputation_selected = event.index
@@ -822,8 +824,8 @@ end
 function mobf_settings.handle_main_tab_input(sender_data)
 
 	if sender_data.name == "mobs" then
-		local tl_event = explode_textlist_event(sender_data.value)
-		if tl_event.typ == "DCL" and
+		local tl_event = minetest.explode_textlist_event(sender_data.value)
+		if tl_event.type == "DCL" and
 			tl_event.index <= #mobf_rtd.registred_mob then
 			local clicked_mob = mobf_rtd.registred_mob[tl_event.index]
 
