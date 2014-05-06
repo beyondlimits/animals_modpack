@@ -64,6 +64,12 @@ function harvesting.callback(entity,player,now)
 	if entity.data.catching ~= nil and
 		entity.data.catching.tool ~= "" then
 
+		assert(
+			(entity.dynamic_data.spawning.player_spawned and entity.dynamic_data.spawning.spawner ~= nil)
+			or
+			(not entity.dynamic_data.spawning.player_spawned)
+			)
+
 		--grief protection
 		if minetest.world_setting_get("mobf_grief_protection") and
 			entity.dynamic_data.spawning.player_spawned and
@@ -77,6 +83,29 @@ function harvesting.callback(entity,player,now)
 
 		if tool:get_name() == entity.data.catching.tool then
 			dbg_mobf.harvesting_lvl1("MOBF: player wearing ".. entity.data.catching.tool)
+
+			--check if player has enough room
+			local inventory_add_result = nil
+
+			if entity.data.generic.addoncatch ~= nil then
+				inventory_add_result = player:get_inventory():add_item("main",
+					entity.data.generic.addoncatch.." 1")
+				dbg_mobf.harvesting_lvl2(
+					"MOBF: adding specified oncatch item: " ..
+					entity.data.generic.addoncatch)
+			else
+				inventory_add_result = player:get_inventory():add_item("main",
+					entity.data.modname ..":"..entity.data.name.." 1")
+				dbg_mobf.harvesting_lvl2(
+					"MOBF: adding automatic oncatch item: " ..
+					entity.data.modname ..":"..entity.data.name)
+			end
+
+			if not inventory_add_result:is_empty() then
+				minetest.chat_send_player(player:get_player_name(),
+					"You don't have any room left in inventory!")
+				return true
+			end
 
 			--play catch sound
 			if entity.data.sound ~= nil then
@@ -92,19 +121,7 @@ function harvesting.callback(entity,player,now)
 					else
 						mobf_bug_warning(LOGLEVEL_ERROR,"MOBF: BUG!!! player is"
 						.. " wearing a item he doesn't have in inventory!!!")
-						--handled but not ok so don't attack
-						return true
 					end
-			end
-
-			--TODO check if player has enough room
-
-			if entity.data.generic.addoncatch ~= nil then
-				player:get_inventory():add_item("main",
-					entity.data.generic.addoncatch.." 1")
-			else
-				player:get_inventory():add_item("main",
-					entity.data.modname ..":"..entity.data.name.." 1")
 			end
 			spawning.remove(entity, "cought")
 			return true
