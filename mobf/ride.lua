@@ -27,7 +27,7 @@ mobf_assert_backtrace(mobf_ride == nil)
 mobf_ride = {}
 
 ------------------------------------------------------------------------------
--- @function [parent=#mobf_ride] attache_player(entity,player)
+-- @function [parent=#mobf_ride] attach_player(entity,player)
 --
 --! @brief make a player ride this mob
 --! @class mobf_ride
@@ -36,7 +36,7 @@ mobf_ride = {}
 --! @param entity entity to be ridden
 --! @param player player riding
 -------------------------------------------------------------------------------
-function mobf_ride.attache_player(entity,player)
+function mobf_ride.attach_player(entity,player)
 
 	entity.dynamic_data.ride.is_attached = true
 	entity.dynamic_data.ride.player = player
@@ -50,14 +50,19 @@ function mobf_ride.attache_player(entity,player)
 		attacheoffset = entity.data.ride.attacheoffset
 	end
 
-	player:set_attach(entity.object,"",attacheoffset, {x=0,y=0,z=0})
+	player:set_attach(entity.object,"",attacheoffset, {x=0,y=90,z=0})
+
+-- default always overrides animations even for attached players
+--	if type(default.player_set_animation) == "function" then
+--		default.player_set_animation(player, "sit")
+--	end
 	if entity.data.ride.texturemod ~= nil then
 		entity.object:settexturemod(entity.data.ride.texturemod);
 	end
 end
 
 ------------------------------------------------------------------------------
--- @function [parent=#mobf_ride] dettache_player(entity,player)
+-- @function [parent=#mobf_ride] dettach_player(entity,player)
 --
 --! @brief make a player ride this mob
 --! @class mobf_ride
@@ -65,7 +70,7 @@ end
 --
 --! @param entity entity to be ridden
 -------------------------------------------------------------------------------
-function mobf_ride.dettache_player(entity)
+function mobf_ride.dettach_player(entity)
 
 	entity.dynamic_data.ride.is_attached = false
 	entity.dynamic_data.ride.player:set_detach()
@@ -226,7 +231,7 @@ function mobf_ride.on_punch_callback(entity,player)
 		dbg_mobf.ride_lvl2("MOBF: punched ridden mob")
 		if entity.dynamic_data.ride.player == player then
 			dbg_mobf.ride_lvl2("MOBF: detaching player")
-			mobf_ride.dettache_player(entity)
+			mobf_ride.dettach_player(entity)
 			player:get_inventory():add_item("main",saddle .. " 1")
 			return true
 		end
@@ -238,7 +243,7 @@ function mobf_ride.on_punch_callback(entity,player)
 
 			if player:get_inventory():contains_item("main",saddle .. " 1") then
 				dbg_mobf.ride_lvl2("MOBF: have saddle")
-				mobf_ride.attache_player(entity,player)
+				mobf_ride.attach_player(entity,player)
 				player:get_inventory():remove_item("main",saddle .. " 1")
 				return true
 			end
@@ -268,9 +273,9 @@ function mobf_ride.is_enabled(entity)
 end
 
 ------------------------------------------------------------------------------
--- @function [parent=#mobf_ride] attache_player(entity,player)
+-- @function [parent=#mobf_ride] init(entity)
 --
---! @brief make a player ride this mob
+--! @brief initialize ride dynamic data
 --! @class mobf_ride
 --! @public
 --
@@ -306,7 +311,7 @@ minetest.register_on_leaveplayer( function(player)
 						entity.dynamic_data.ride ~= nil and
 						entity.dynamic_data.ride.player == player then
 						print("MOBF: found player to be attached")
-						ride.dettache_player(entity)
+						ride.dettach_player(entity)
 						break
 					end
 				end

@@ -24,7 +24,7 @@ else
 end
 
 minetest.log("action","MOD: mob_ostrich mod loading ...")
-local version = "0.1.0"
+local version = "0.1.1"
 
 local ostrich_groups = {
 						not_in_creative_inventory=1
@@ -89,7 +89,7 @@ ostrich_f_prototype = {
 					walkspeed  = 7.8,
 					sneakspeed = 0.8,
 					jumpspeed  = 58,
-					attacheoffset = { x=0,y=2,z=0},
+					attacheoffset = { x=0,y=9.25,z=0},
 					texturemod = "^mob_ostrich_ostrich_saddle_mesh.png",
 					walk_anim = "walk"
 			},
@@ -175,7 +175,7 @@ ostrich_m_prototype = {
 					walkspeed  = 8,
 					sneakspeed = 1,
 					jumpspeed  = 60,
-					attacheoffset = { x=0,y=2,z=0},
+					attacheoffset = { x=0,y=9.25,z=0},
 					texturemod = "^mob_ostrich_ostrich_saddle_mesh.png",
 					walk_anim = "walk"
 				},
