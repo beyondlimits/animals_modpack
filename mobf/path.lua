@@ -78,16 +78,6 @@ function mobf_path.init()
 		})
 
 	minetest.register_on_player_receive_fields(mobf_path.button_handler)
-
-	minetest.register_chatcommand("mobf_manage_paths",
-	{
-		params		= "",
-		description = "Manage paths for mobf" ,
-		privs		= {mobfw_admin=true},
-		func		= function(name,param)
-						mobf_path.show_manage_menu(name,data)
-						end
-	})
 end
 
 -------------------------------------------------------------------------------
@@ -301,75 +291,60 @@ function mobf_path.button_handler(player, formname, fields)
 		return true
 	end
 
-	if formname == "mobf:path:management_menu" then
-		dbg_mobf.path_lvl2("MOBF: Path management menu button")
-		for k,v in pairs(fields) do
-			local data = mobf_path.parse_button_name(k)
-
-			if data ~= nil then
-				if data.buttonid == "lock_path" then
-					mobf_rtd.path_data.users[data.ownername].paths[data.pathname].locked = true
-					mobf_path.save()
-				end
-
-				if data.buttonid == "unlock_path" then
-					mobf_rtd.path_data.users[data.ownername].paths[data.pathname].locked = false
-					mobf_path.save()
-				end
-
-				if data.buttonid == "show_points" then
-					for i,v in ipairs(mobf_rtd.path_data.users[data.ownername].paths[data.pathname].points) do
-						local objects = minetest.get_objects_inside_radius(v,0.5)
-
-						dbg_mobf.path_lvl3("MOBF: got " .. #objects ..
-							" around pos checking for marker")
-						local found = false;
-						for i=1,#objects,1 do
-							local luaentity = objects[i]:get_luaentity()
-							dbg_mobf.path_lvl3("MOBF: checking: " .. dump(luaentity))
-							if luaentity.name == "mobf:path_marker_entity" then
-								found = true
-								break
-							end
-						end
-
-						local node_at = minetest.get_node(v)
-
-						if not found and
-							node_at.name ~= nil and
-							node_at.name ~= "ignore" then
-							spawning.spawn_and_check("mobf:path_marker_entity","",
-												v,"mark_path")
-						end
-					end
-				end
-
-				if data.buttonid == "delete_path" then
-					dbg_mobf.path_lvl1("MOBF: delete path issued: "
-						.. data.pathname .. " owner: " .. data.ownername)
-					mobf_rtd.path_data.users[data.ownername].paths[data.pathname] = nil
-					mobf_path.save()
-					data.pathname = nil
-					data.ownername = nil
-				end
-
-				if data.buttonid == "tl_paths" then
-					local event = explode_textlist_event(v)
-					--TODO honor event type
-					data.selected_path = event.index
-				end
-
-				--dbg_mobf.path_lvl3
-				mobf_print("MOBF: Got button click with id: " ..
-									data.buttonid)
-				mobf_path.show_manage_menu(playername,data)
-			end
-		end
-		return true
-	end
-
 	--not handled by this callback
 	return false
+end
+
+-------------------------------------------------------------------------------
+-- @function [parent=#mobf_path] delete_path(ownername,pathname)
+--
+--! @brief show path markers
+--! @ingroup mobf_path
+--
+--! @param ownername name of path owner
+--! @param pathname name of path
+--
+-------------------------------------------------------------------------------
+function mobf_path.delete_path(ownername, pathname)
+	dbg_mobf.path_lvl1("MOBF: delete path issued: "
+			.. pathname .. " owner: " .. ownername)
+	mobf_rtd.path_data.users[ownername].paths[pathname] = nil
+	mobf_path.save()
+end
+-------------------------------------------------------------------------------
+-- @function [parent=#mobf_path] show_pathmarkers(ownername,pathname)
+--
+--! @brief show path markers
+--! @ingroup mobf_path
+--
+--! @param ownername name of path owner
+--! @param pathname name of path
+--
+-------------------------------------------------------------------------------
+function mobf_path.show_pathmarkers(ownername,pathname)
+	for i,v in ipairs(mobf_rtd.path_data.users[ownername].paths[pathname].points) do
+		local objects = minetest.get_objects_inside_radius(v,0.5)
+
+		dbg_mobf.path_lvl3("MOBF: got " .. #objects ..
+			" around pos checking for marker")
+		local found = false;
+		for i=1,#objects,1 do
+			local luaentity = objects[i]:get_luaentity()
+			dbg_mobf.path_lvl3("MOBF: checking: " .. dump(luaentity))
+			if luaentity.name == "mobf:path_marker_entity" then
+				found = true
+				break
+			end
+		end
+
+		local node_at = minetest.get_node(v)
+
+		if not found and
+			node_at.name ~= nil and
+			node_at.name ~= "ignore" then
+			spawning.spawn_and_check("mobf:path_marker_entity",v,"mark_path")
+		end
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -412,164 +387,6 @@ function mobf_path.get_pathlist(playername,isadmin)
 	end
 
 	return retval
-end
--------------------------------------------------------------------------------
--- @function [parent=#mobf_path] point_textlist(playername,pathname)
---
---! @brief create a gui point gui element
---! @ingroup mobf_path
---
---! @param data data required for this menu
---
---! @return string containing gui point list description
--------------------------------------------------------------------------------
-function mobf_path.point_textlist(data)
-	local retval = ""
-	local first = true
-
-	retval = "textlist[6,2.15;6.25,7;" ..
-		mobf_path.make_button_name("tl_path_points",data) ..";"
-
-	--TODO don't need playername to path here!
-	for i,v in ipairs(mobf_rtd.path_data.users[data.ownername].paths[data.pathname].points) do
-
-		if not first then
-			retval = retval .. ","
-		else
-			first = false
-		end
-		retval = retval .. minetest.formspec_escape(
-				mobf_fixed_size_string(i .. ": ",5) .. printpos(v))
-	end
-
-	retval = retval .. ";]"
-
-	return retval
-end
-
--------------------------------------------------------------------------------
--- @function [parent=#mobf_path] path_textlist(paths, playername, data, isadmin)
---
---! @brief get buttons for paths
---! @ingroup mobf_path
---
---! @param paths paths to add
---! @param playername name of player
---! @param data information to add to button
---! @param isadmin create admin list
---
---! @return text
--------------------------------------------------------------------------------
-function mobf_path.path_textlist(paths, playername,data,isadmin)
-	local retval = ""
-	local first = true
-
-	--preserve current data values
-	local oldpathname  = data.pathname
-	local oldownername = data.ownername
-
-	retval = "textlist[0,1.5;5.25,8.5;" ..
-			mobf_path.make_button_name("tl_paths",data) ..";"
-
-	for i,value in ipairs(paths) do
-		if not first then
-			retval = retval .. ","
-		else
-			first = false
-		end
-		retval = retval ..
-			minetest.formspec_escape(paths[i].pathname ..
-										" (" .. paths[i].ownername .. ")")
-	end
-
-	retval = retval ..";]"
-
-	--restore data values
-	data.pathname  = oldpathname
-	data.ownername = oldownername
-
-	return retval
-end
-
--------------------------------------------------------------------------------
--- name: show_manage_menu(playername,data)
---
---! @brief show management menu for paths
---! @ingroup mobf_path
---
---! @param playername name of player
---! @param data current menu data prepared by previous functions
--------------------------------------------------------------------------------
-function mobf_path.show_manage_menu(playername,data)
-
-	mobf_assert_backtrace(playername ~= nil)
-
-	if data == nil then
-		data = {}
-	end
-
-	--check privs
-	local isadmin = minetest.check_player_privs(playername, {mobfw_admin=true})
-						or minetest.is_singleplayer()
-
-	local pathtextlixt = ""
-	local all_paths = mobf_path.get_pathlist(playername,isadmin)
-
-	mobf_print("data: " .. dump(data))
-	if data.selected_path ~= nil and
-	 all_paths[data.selected_path] ~= nil then
-		data.pathname = all_paths[data.selected_path].pathname
-		data.ownername = all_paths[data.selected_path].ownername
-	end
-
-	mobf_print("data2: " .. dump(data))
-
-	local pathtextlist =
-		mobf_path.path_textlist(all_paths,playername, data, isadmin)
-
-	local formspec = "size[13,10]"
-
-	formspec = formspec ..
-			"label[0,-0.125;Mobf path management]" ..
-			"label[0,1;Pathname]"
-
-	if isadmin then
-		formspec = formspec ..
-			"label[3,1;Owner]"
-	end
-
-	formspec = formspec ..
-			"label[6,1.5;Points]" ..
-			pathtextlist
-
-	if data.pathname ~= nil then
-		formspec = formspec ..
-			"label[7,1;" .. data.pathname .."]" ..
-			"label[9,1;" .. data.ownername .. "]"
-			if not mobf_rtd.path_data.users[data.ownername].paths[data.pathname].locked then
-				formspec = formspec ..
-				"button[11.25,1.125;1.25,0.5;" ..
-					mobf_path.make_button_name("lock_path",data) .. ";lock]" ..
-				"button[6,9.5;2,0.5;" ..
-					mobf_path.make_button_name("delete_path",data) .. ";delete]"
-			else
-				formspec = formspec ..
-				"button[11.25,1.125;1.25,0.5;" ..
-					mobf_path.make_button_name("unlock_path",data) .. ";unlock]"
-			end
-
-			formspec = formspec ..
-				"button[8.5,9.5;2,0.5;" ..
-					mobf_path.make_button_name("show_points",data) .. ";show points]" ..
-				"button[10.5,9.5;2,0.5;" ..
-					mobf_path.make_button_name("unused",data) .. ";unused]"
-
-			formspec = formspec ..
-				mobf_path.point_textlist(data)
-	end
-
-	--show formspec
-	minetest.show_formspec(playername,"mobf:path:management_menu",formspec)
 end
 
 -------------------------------------------------------------------------------
