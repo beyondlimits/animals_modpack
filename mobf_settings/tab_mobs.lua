@@ -21,12 +21,27 @@ local function get_formspec(tabview, name, tabdata)
 		fgettext("Insufficient permissions to view this tab.")
 		.. "]"
 	end
+	
+	local retval = ""
+	
+	if tabdata.lastselected ~= nil then
+		local mobdef = minetest.registered_entities[tabdata.lastselected]
+		
+		if mobdef ~= nil and mobdef.data ~= nil then
+		
+			retval = retval ..
+				"label[2.25,0.25;Name:]label[4,0.25;" .. mobdef.data.name .. "]" ..
+				"label[2.25,0.75;Mod:]label[4,0.75;" .. mobdef.data.modname .. "]" ..
+				"label[2.25,1.25;Description:]label[4,1.25;" .. mobdef.data.generic.description .. "]" ..
+				"image[0.25,0.25;2,2;" .. mobdef.data.modname  .. "_" .. mobdef.data.name .. "_item.png]"
+		end
+	end
 
-	local retval =
-			"label[0.5,0;Mobs:]"
+	retval = retval ..
+			"label[0.5,2;Mobs:]"
 			.. "label[0.5,8.5;doubleclick to change!]"
 			.. "label[4,8.5;green=enabled, red=disabled]"
-			.. "textlist[0.5,0.5;7,8;tl_mobs_moblist;"
+			.. "textlist[0.5,2.5;7,6;tl_mobs_moblist;"
 
 	local mobf_mob_blacklist_string = minetest.world_setting_get("mobf_blacklist")
 	local mobf_mobs_blacklisted = nil
@@ -87,6 +102,11 @@ local function handle_settings_buttons(self, fields, tabname, tabdata)
 			end
 
 			minetest.world_setting_set("mobf_blacklist",core.serialize(new_blacklist))
+		end
+		
+		if tl_event.type == "CHG" and
+			tl_event.index <= #mobf_rtd.registred_mob then
+			tabdata.lastselected = mobf_rtd.registred_mob[tl_event.index]
 		end
 		return true
 	end

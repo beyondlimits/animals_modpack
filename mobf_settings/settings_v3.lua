@@ -21,7 +21,9 @@ local mobf_settings_version = "1.9.0"
 local modpath = minetest.get_modpath("mobf_settings")
 
 --!basepath of tools
-local basepath = core.get_builtin_path()
+--TODO remove included fstk once minetest is updated
+--local basepath = core.get_builtin_path()
+local basepath = modpath
 
 --!unique id of ui
 local unique_id = "mobf_settings"
@@ -33,7 +35,6 @@ dofile(basepath .. DIR_DELIM .. "fstk" .. DIR_DELIM .. "ui_mod.lua")
 dofile(modpath .. DIR_DELIM .. "common.lua")
 dofile(modpath .. DIR_DELIM .. "tab_main.lua")
 dofile(modpath .. DIR_DELIM .. "tab_info.lua")
-dofile(modpath .. DIR_DELIM .. "tab_statistics.lua")
 dofile(modpath .. DIR_DELIM .. "tab_feature_config.lua")
 dofile(modpath .. DIR_DELIM .. "tab_factions.lua")
 dofile(modpath .. DIR_DELIM .. "tab_mobs.lua")
@@ -57,7 +58,7 @@ local function init_player_ui(playername, param)
 
 		assert( playerui ~= nil)
 
-		local tv_main = tabview_create("mainview",{x=10,y=9},{x=-0.3,y=-0.99}, playerui)
+		local tv_main = tabview_create("mainview",{x=8,y=9},{x=0,y=0}, playerui)
 
 		tv_main:add(mobf_settings_tab_main)
 
@@ -67,9 +68,6 @@ local function init_player_ui(playername, param)
 		end
 
 		tv_main:add(mobf_settings_tab_info)
-		if core.world_setting_get("mobf_enable_statistics") then
-			tv_main:add(mobf_settings_tab_statistics)
-		end
 
 		if mobf_rtd.factions_available then
 			tv_main:add(mobf_settings_tab_factions,

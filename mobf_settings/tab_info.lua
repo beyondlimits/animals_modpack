@@ -21,25 +21,111 @@ local function get_formspec(tabview, name, tabdata)
 	local statistics   = mobf_get_statistics()
 
 	local retval =
-		"label[0.75,0.25;Timesource:]" ..
-		"label[2.75,0.25;" .. mobf_fixed_size_string(mobf_rtd.timesource,30) .. "]" ..
-		"label[0.75,0.75;Mobs spawned by internal mapgen this session:]" ..
-		"label[6,0.75;" .. string.format("%10d",mobf_rtd.total_spawned) .. "]" ..
-		"label[0.75,1.25;Mobs spawned by adv_spawning this session:]" ..
-		"label[6,1.25;" .. string.format("%10d",adv_stats.session.entities_created) .. "]" ..
-		mobf_settings.printfac("Type",{current="cur count",maxabs="",max="max count"},2,"%s") ..
-		"box[0.75,2.5;6.75,0.05;#FFFFFF]" ..
-		mobf_settings.printfac("Active mobs",statistics.data.mobs,2.5,"%6d") ..
-		mobf_settings.printfac("Offline mobs",{current=mobs_offline,maxabs="",max=-1},3,"%6d") ..
-		mobf_settings.printfac("Jobs in queue",statistics.data.queue,3.5,"%6d") ..
-		"label[0.75,5.0;Daytime:]" ..
-		"label[2.5,5.0;" .. string.format("%5d",minetest.get_timeofday()*24000) .. "]"
+		"label[0.75,1.25;Timesource:]" ..
+		"label[2.75,1.25;" .. mobf_fixed_size_string(mobf_rtd.timesource,30) .. "]" ..
+		"label[0.75,1.75;Mobs spawned by internal mapgen this session:]" ..
+		"label[6,1.75;" .. string.format("%10d",mobf_rtd.total_spawned) .. "]" ..
+		"label[0.75,2.25;Mobs spawned by adv_spawning this session:]" ..
+		"label[6,2.25;" .. string.format("%10d",adv_stats.session.entities_created) .. "]" ..
+		mobf_settings.printfac("Type",{current="cur count",maxabs="",max="max count"},3,"%s") ..
+		"box[0.75,3.5;6.75,0.05;#FFFFFF]" ..
+		mobf_settings.printfac("Active mobs",statistics.data.mobs,3.5,"%6d") ..
+		mobf_settings.printfac("Offline mobs",{current=mobs_offline,maxabs="",max=-1},4,"%6d") ..
+		mobf_settings.printfac("Jobs in queue",statistics.data.queue,4.5,"%6d") ..
+		"label[0.75,6.0;Daytime:]" ..
+		"label[2.5,6.0;" .. string.format("%5d",minetest.get_timeofday()*24000) .. "]"
 
 	return retval
 end
 
-mobf_settings_tab_info = {
+-------------------------------------------------------------------------------
+mobf_settings_tab_info_sub = {
 	name = "info",
-	caption = fgettext("Info"),
+	caption = fgettext("Generic"),
 	cbf_formspec = get_formspec
 	}
+	
+---------------------------------------------------------------------------------
+local function get_formspec(tabview, name, tabdata)
+	local adv_stats  = adv_spawning.get_statistics()
+	local statistics = mobf_get_statistics()
+
+	local retval =
+		mobf_settings.printfac("Facility",
+			{
+				current = "Current",
+				maxabs  = "Abs.Max (ms)",
+				max     = "Maximum"
+			},
+			"0","%s") ..
+		"box[0.75,0.5;6.75,0.05;#FFFFFF]" ..
+		mobf_settings.printfac("Total",          statistics.data.total,       "0.5", "%2.2f%%") ..
+		mobf_settings.printfac("Onstep",         statistics.data.onstep,      "1",   "%2.2f%%") ..
+		mobf_settings.printfac("Job processing", statistics.data.queue_load,  "1.5", "%2.2f%%") ..
+		mobf_settings.printfac("ABM",            statistics.data.abm,         "2",   "%.2f%%") ..
+		mobf_settings.printfac("MapGen",         statistics.data.mapgen,      "2.5", "%2.2f%%") ..
+		mobf_settings.printfac("Spawn onstep",   statistics.data.spawn_onstep,"3",   "%2.2f%%") ..
+		mobf_settings.printfac("Activate",       statistics.data.activate,    "3.5", "%2.2f%%") ..
+		mobf_settings.printfac("User 1",         statistics.data.user_1,      "6.5", "%2.2f%%") ..
+		mobf_settings.printfac("User 2",         statistics.data.user_2,      "7",   "%2.2f%%") ..
+		mobf_settings.printfac("User 3",         statistics.data.user_3,      "7.5", "%2.2f%%") ..
+		mobf_settings.printfac("Adv.Spawning",
+			{
+				current = adv_stats.load.cur,
+				maxabs  = adv_stats.step.max,
+				max     = adv_stats.load.max
+			},
+			"4","%2.2f%%")
+
+	return retval
+end
+
+-------------------------------------------------------------------------------
+mobf_settings_tab_statistics = {
+	name = "statistics",
+	caption = fgettext("Statistics"),
+	cbf_formspec = get_formspec
+	}
+	
+-------------------------------------------------------------------------------
+local function init_tab(type, from, to, tabview)
+	print("init_tab: type=" .. type .. "\nfrom=" .. dump(from) .. "\nto=" .. dump(to))
+	
+	if (to == "info_top") then
+		local tabdata = tabview:get_tabdata("info_top")
+		assert(tabdata ~= nil)
+		
+		if tabdata.subtabview == nil then
+			tabdata.subtabview = tabview_create("infoview",
+				{x=8,y=8},{x=0,y=0.25}, tabview.parent_ui)
+			tabdata.subtabview:add(mobf_settings_tab_info_sub)
+			if core.world_setting_get("mobf_enable_statistics") then
+				tabdata.subtabview:add(mobf_settings_tab_statistics)
+			end
+		end
+		tabdata.subtabview:show()
+	elseif (from == "info_top") then
+		local tabdata = tabview:get_tabdata("info_top")
+		assert(tabdata ~= nil)
+		tabdata.subtabview:hide()
+	end
+end
+
+-------------------------------------------------------------------------------
+local function get_formspec_tab(tabview, name, tabdata)
+	return ""
+end
+
+-------------------------------------------------------------------------------
+local function btn_handler_tab(tabview, fields, tabname, tabdata)
+	return false
+end
+
+-------------------------------------------------------------------------------
+mobf_settings_tab_info = {
+	name = "info_top",
+	caption = fgettext("Info"),
+	cbf_button_handler = btn_handler_tab,
+	cbf_formspec       = get_formspec_tab,
+	on_change          = init_tab
+}
