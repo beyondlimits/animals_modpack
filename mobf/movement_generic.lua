@@ -23,7 +23,7 @@ movement_generic = {}
 --!@}
 
 -------------------------------------------------------------------------------
--- @function [parent=#movement_generic] get_accel_to(new_pos,entity,ymovement)
+-- @function [parent=#movement_generic] get_accel_to(new_pos,entity,ymovement,accel)
 --
 --! @brief calculate a random speed directed to new_pos
 --
@@ -54,8 +54,13 @@ function movement_generic.get_accel_to(new_pos,entity,ymovement)
 	local xz_direction =
 		mobf_calc_yaw(new_pos.x-old_pos.x,new_pos.z-old_pos.z)
 
+	local absolute_accel = nil
 	--find a new speed
-	local absolute_accel = minaccel + (maxaccel - minaccel) * math.random()
+	if accel == nil then
+		absolute_accel = minaccel + (maxaccel - minaccel) * math.random()
+	else
+		absolute_accel = accel
+	end
 
 	local new_accel_vector = nil
 
