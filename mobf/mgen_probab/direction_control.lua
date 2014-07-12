@@ -64,7 +64,7 @@ function direction_control.changeaccel(pos,entity,current_velocity)
 		if maxtries <= 0 then
 			dbg_mobf.pmovement_lvl1(
 				"MOBF: Aborting acceleration finding for this cycle due to max retries")
-			if 	state == "collision_jumpable" then
+			if state == "collision_jumpable" then
 				dbg_mobf.movement_lvl1("Returning "
 					..printpos(new_accel).." as new accel as mob may jump")
 				return new_accel
@@ -320,12 +320,45 @@ function direction_control.precheck_movement(
 					speedfactor = speedfactor +0.1
 				until ( speedfactor > 1 or speed_found)
 				
+				-- try if our state would at least keep same if we walk towards
+				-- the good pos
+				if not speed_found then
+				
+					dbg_mobf.pmovement_lvl2("MOBF: trying min speed towards good pos")
+					movement_state.accel_to_set =
+						movement_generic.get_accel_to(new_pos, entity, nil,
+								entity.data.movement.min_accel)
+					local next_pos =
+							movement_generic.predict_next_block(
+									movement_state.basepos,
+									movement_state.current_velocity,
+									movement_state.accel_to_set)
+									
+					local next_quality = environment.pos_quality(
+												next_pos,
+												entity
+												)
+					
+					if ((mobf_calc_distance(next_pos,new_pos) <
+						(mobf_calc_distance(movement_state.basepos,new_pos))) and
+						environment.evaluate_state(next_quality,
+												LT_DROP_PENDING)) then
+							speed_found = true
+					end
+				end
+				
 				if speed_found then
 					dbg_mobf.pmovement_lvl2("MOBF: redirecting to safe position .. "
 						.. printpos(new_pos))
 					movement_state.changed = true
 					return
 				end
+			end
+			
+			if new_pos == nil then
+				dbg_mobf.pmovement_lvl2("MOBF: no suitable pos found")
+			else
+				dbg_mobf.pmovement_lvl2("MOBF: didn't find a way to suitable pos")
 			end
 			
 			--no suitable pos found, if mob is safe atm just stop it
@@ -342,14 +375,14 @@ function direction_control.precheck_movement(
 						movement_generic.get_accel_to(targetpos, entity, nil,
 								entity.data.movement.min_accel)
 					dbg_mobf.pmovement_lvl2(
-						"MOBF: no suitable pos found but at good pos, slowing down")
+						"MOBF: good pos, slowing down")
 					movement_state.changed = true
 					return
-				else --stopp immediatlely
+				else --stop immediatlely
 					entity.object:setvelocity({x=0,y=0,z=0})
 					movement_state.accel_to_set = {x=0,y=nil,z=0}
 					dbg_mobf.pmovement_lvl2(
-						"MOBF: no suitable pos found stopping at safe pos")
+						"MOBF: stopping at safe pos")
 					movement_state.changed = true
 					return
 				end

@@ -895,6 +895,8 @@ function environment.pos_is_ok(pos,entity,dont_do_jumpcheck)
 	local lastpos = nil
 
 	local retval = "temp_ok"
+	
+	local min_ground_distance = 33000 -- above max height
 
 	--check if mob at pos will be in correct environment
 	for i=1,#cornerpositions,1 do
@@ -929,6 +931,10 @@ function environment.pos_is_ok(pos,entity,dont_do_jumpcheck)
 					retval = "collision"
 				end
 			end
+			
+			min_ground_distance =
+				MIN(min_ground_distance,
+					mobf_ground_distance(cornerpositions[i],entity.environment.media))
 		end
 		lastpos = cornerpositions[i]
 	end
@@ -944,7 +950,7 @@ function environment.pos_is_ok(pos,entity,dont_do_jumpcheck)
 
 			if mobf_above_water(pos) then
 
-				if ground_distance > max_ground_distance then
+				if min_ground_distance > max_ground_distance then
 					dbg_mobf.environment_lvl2("MOBF: \tdropping above water")
 					retval = "drop_above_water"
 				end
@@ -952,7 +958,7 @@ function environment.pos_is_ok(pos,entity,dont_do_jumpcheck)
 				retval = "above_water"
 			end
 
-			if ground_distance > max_ground_distance then
+			if min_ground_distance > max_ground_distance then
 				dbg_mobf.environment_lvl2("MOBF: \tdropping "
 					.. ground_distance .. " / " .. max_ground_distance)
 				retval = "drop"
