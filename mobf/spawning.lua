@@ -351,7 +351,7 @@ function spawning.population_density_check(entity,now)
 	local mob_count = mobf_mob_around(entity.data.modname..":"..entity.data.name,
 										secondary_name,
 										entitypos,
-										entity.dynamic_data.spawning.density,
+										check_density,
 										true)
 	if  mob_count > 5 then
 		dbg_mobf.spawning_lvl1("MOBF: " .. entity.data.name ..
