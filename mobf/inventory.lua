@@ -477,15 +477,23 @@ end
 --
 --! @return true/false if handled by harvesting or not
 -------------------------------------------------------------------------------
-function mob_inventory.trader_callback(entity,player)
+function mob_inventory.trader_callback(entity, player)
 	local unique_entity_id = string.gsub(tostring(entity),"table: ","")
 	--local unique_entity_id = "testinv"
 	local playername = player.get_player_name(player)
 
 	if mob_inventory.formspecs["formspec_" .. unique_entity_id] ~= nil then
+	
+		local pos = entity.object:getpos()
+		
+		if pos == nil then
+			dbg_mobf.trader_inv_lvl1("MOBF: unable to get trader pos")
+			minetest.show_formspec(playername,"")
+			return
+		end
+	
 		--rotate mob to face player
-		local direction = mobf_get_direction(entity.object:getpos(),
-												player:getpos())
+		local direction = mobf_get_direction(pos, player:getpos())
 
 		if entity.mode == "3d" then
 			entity.object:setyaw(
