@@ -1169,7 +1169,7 @@ function fighting.set_target(entity,target)
 		dbg_mobf.fighting_lvl2("MOBF: switching attack target")
 
 		--set movement target
-		entity.dynamic_data.current_movement_gen.set_target(entity,target)
+		entity.dynamic_data.current_movement_gen.set_target(entity,target,true)
 
 		--set attack target
 		entity.dynamic_data.combat.target = target

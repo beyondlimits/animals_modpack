@@ -120,7 +120,8 @@ function mgen_follow.handleteleport(entity,now,targetpos)
 												z=targetpos.z
 												})) and
 				current_offset < maxoffset do
-				print("MOBF: teleport target within block trying above: " .. current_offset)
+				dbg_mobf.fmovement_lvl2(
+					"MOBF: teleport target within block trying above: " .. current_offset)
 				current_offset = current_offset +1
 			end
 
@@ -174,6 +175,11 @@ function mgen_follow.callback(entity,now)
 			follow_speedup.x= entity.data.movement.follow_speedup
 			follow_speedup.z= entity.data.movement.follow_speedup
 		end
+	end
+	
+	--if speedup is disabled reset
+	if not entity.dynamic_data.movement.follow_speedup then
+		follow_speedup = { x=1, y=1, z=1}
 	end
 
 	--check max speed limit
@@ -490,6 +496,7 @@ function mgen_follow.init_dynamic_data(entity,now)
 			guardspawnpoint = false,
 			max_distance = entity.data.movement.max_distance,
 			invalid_env_count = 0,
+			follow_speedup = true,
 			}
 
 	if entity.data.movement.guardspawnpoint ~= nil and
