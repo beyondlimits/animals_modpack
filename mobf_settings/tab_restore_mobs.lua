@@ -76,9 +76,11 @@ local function handle_settings_buttons(self, fields, tabname, tabdata)
 		end
 
 		for i=1,#mob_preserve.current_preserve_list,1 do
+			mobf_assert_backtrace(tabdata ~= nil)
+			mobf_assert_backtrace(mob_preserve.current_preserve_list[i] ~= nil)
 
 			if mob_preserve.current_preserve_list[i].owner == tabdata.playername or
-				isadmin then
+				tabdata.isadmin then
 				elementcount = elementcount +1
 			end
 
@@ -94,6 +96,7 @@ local function handle_settings_buttons(self, fields, tabname, tabdata)
 					mobf_set_world_setting("mobf_preserve_mobs",
 							core.serialize(mob_preserve.current_preserve_list))
 				end
+				return true
 			end
 		end
 
