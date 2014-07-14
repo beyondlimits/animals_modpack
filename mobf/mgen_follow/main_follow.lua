@@ -316,7 +316,13 @@ function mgen_follow.callback(entity,now)
 			return
 		end
 
-		local distance = mobf_calc_distance(basepos,targetpos)
+		local distance = nil
+
+		if entity.data.movement.canfly then
+			distance = mobf_calc_distance(basepos,targetpos)
+		else
+			distance = mobf_calc_distance_2d(basepos,targetpos)
+		end
 
 		if mobf_line_of_sight({x=basepos.x,y=basepos.y+1,z=basepos.z},
 						 {x=targetpos.x,y=targetpos.y+1,z=targetpos.z})  == false then
