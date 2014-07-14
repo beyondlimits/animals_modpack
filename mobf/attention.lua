@@ -285,7 +285,7 @@ function attention.callback(entity,now)
 		current_attention_value = top_attention_value
 	end
 	dbg_mobf.attention_lvl3("MOBF: value=" .. current_attention_value .. " attack_threshold=" ..
-		dump(entity.data.attention.attack_threshold) .. "watch_threshold= " ..
+		dump(entity.data.attention.attack_threshold) .. " watch_threshold=" ..
 		dump(entity.data.attention.watch_threshold))
 
 	local toattack = nil
@@ -318,6 +318,9 @@ function attention.callback(entity,now)
 	else
 		if entity.data.attention.watch_threshold ~= nil and
 			current_attention_value > entity.data.attention.watch_threshold then
+			dbg_mobf.attention_lvl2("MOBF: watch threshold exceeded: value=" ..
+				current_attention_value .. " threshold=" ..
+				entity.data.attention.watch_threshold )
 			if entity.data.attention.watch_callback ~= nil and
 				type(entity.data.attention.watch_callback) == "function" then
 					entity.data.attention.watch_callback(entity,
@@ -388,20 +391,25 @@ function attention.is_enemy(entity,object)
 	mobf_assert_backtrace(entity ~= nil)
 	mobf_assert_backtrace(object ~= nil)
 	if mobf_rtd.factions_available then
+	
+		if entity.object == object then
+			return false
+		end
 
 		local remote_factions = factions.get_factions(object)
 
 		if remote_factions == nil or
 			#remote_factions < 1 then
-			dbg_mobf.attention_lvl3("MOBF: no remote factions for: " .. tostring(object))
+			dbg_mobf.attention_lvl3("MOBF: " .. entity.data.name ..
+				" no remote factions for: " .. tostring(object))
 			return false
 		end
 
 		for j=1, #remote_factions, 1 do
 			local rep = factions.get_reputation(remote_factions[j],entity)
-
 			if rep < 0 then
-				dbg_mobf.attention_lvl3("MOBF: ".. remote_factions[j] .. " " .. tostring(object) .. " is enemy: " .. rep)
+				dbg_mobf.attention_lvl3("MOBF: ".. remote_factions[j] .. " "
+					.. tostring(object) .. " is enemy: " .. rep)
 				return true
 			end
 		end
