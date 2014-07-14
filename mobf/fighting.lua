@@ -133,6 +133,20 @@ function fighting.hit(entity,attacker)
 	local mob_basepos = entity.getbasepos(entity)
 	local targetpos   = attacker:getpos()
 	local dir         = mobf_get_direction(targetpos,mob_basepos)
+	
+	
+	--don't attack spawner
+	if entity.dynamic_data.spawning.spawner ~= nil and
+		attacker:is_player() then
+		local playername = attacker:get_player_name()
+		if entity.dynamic_data.spawning.spawner == playername then
+			if entity.dynamic_data.state.current ~= "combat" then
+				local current_yaw = entity.object:getyaw()
+				entity.object:setyaw(current_yaw + math.pi/4)
+			end
+			return
+		end
+	end
 
 	--play hit sound
 	if entity.data.sound ~= nil then
@@ -187,19 +201,6 @@ function fighting.hit(entity,attacker)
 				.. " custom on kill handler superseeds generic handling")
 		end
 		return
-	end
-
-	--don't attack spawner
-	if entity.dynamic_data.spawning.spawner ~= nil and
-		attacker:is_player() then
-		local playername = attacker:get_player_name()
-		if entity.dynamic_data.spawning.spawner == playername then
-			if entity.dynamic_data.state.current ~= "combat" then
-				local current_yaw = entity.object:getyaw()
-				entity.object:setyaw(current_yaw + math.pi/4)
-			end
-			return
-		end
 	end
 
 	--dbg_mobf.fighting_lvl2("MOBF: attack chance is ".. entity.data.combat.angryness)
@@ -909,16 +910,29 @@ function fighting.melee_attack_handler(entity,now,distance)
 			--do damage
 			target_obj:set_hp(target_health -damage_done)
 		else
+			local damage_groups = nil
+			
+			if entity.data.combat.melee.weapon_groupcaps ~= nil then
+				damage_groups = entity.data.combat.melee.weapon_damage_groups
+			end
+			
+			if damage_groups == nil and
+				entity.data.combat.melee.weapongroups ~= nil then
+				damage_groups = {}
+				
+				for i=1, #entity.data.combat.melee.weapongroups, 1 do
+					damage_groups[entity.data.combat.melee.weapon_damage_groups[i]] = damage_done
+				end
+			end
+			
+			if damage_groups == nil then
+				damage_groups= { fleshy=damage_done }
+			
+			end
+		
 			target_obj:punch(entity.object, 1.0, {
 							full_punch_interval=1.0,
-							groupcaps={
-								fleshy={times={	[1]=1/(damage_done-2),
-												[2]=1/(damage_done-1),
-												[3]=1/damage_done}},
-								snappy={times={	[1]=1/(damage_done-2),
-												[2]=1/(damage_done-1),
-												[3]=1/damage_done}},
-							}
+							damage_groups = damage_groups,
 						}, nil)
 		end
 

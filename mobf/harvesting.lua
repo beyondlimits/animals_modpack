@@ -64,11 +64,11 @@ function harvesting.callback(entity,player,now)
 	if entity.data.catching ~= nil and
 		entity.data.catching.tool ~= "" then
 
-		assert(
-			(entity.dynamic_data.spawning.player_spawned and entity.dynamic_data.spawning.spawner ~= nil)
-			or
-			(not entity.dynamic_data.spawning.player_spawned)
-			)
+		if (entity.dynamic_data.spawning.player_spawned and
+				entity.dynamic_data.spawning.spawner == nil) then
+			dbg_mobf.harvesting_lvl1("MOBF: mob flagged as player spanwned but no spawner set!")
+			entity.dynamic_data.spawning.player_spawned = false
+		end
 
 		--grief protection
 		if minetest.world_setting_get("mobf_grief_protection") and
