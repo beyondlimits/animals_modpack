@@ -231,13 +231,13 @@ function mobf_factions.handle_rightclick(current_fields,fields,formname,player,f
 				print("MOBF Factions: trying to delete from faction but no faction selected")
 			end
 		elseif current_fields[2] == "tl_mob_factions" then
-			local event = explode_textlist_event(fields[fieldname])
+			local event = core.explode_textlist_event(fields[fieldname])
 
 			if event.typ ~= "INV" then
 				menu_data.tl_mob_selected = event.index
 			end
 		elseif current_fields[2] == "tl_owner_factions" then
-			local event = explode_textlist_event(fields[fieldname])
+			local event = core.explode_textlist_event(fields[fieldname])
 
 			if event.typ ~= "INV" then
 				menu_data.tl_owner_selected = event.index
