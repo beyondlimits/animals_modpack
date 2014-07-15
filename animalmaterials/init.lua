@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -24,7 +24,7 @@ else
 end
 
 minetest.log("action","MOD: animalmaterials loading ...")
-local version = "0.1.0"
+local version = "0.1.1"
 
 
 animalmaterialsdata = {}
@@ -172,14 +172,14 @@ minetest.register_craftitem("animalmaterials:meat_venison", {
 })
 minetest.register_craftitem("animalmaterials:meat_undead", {
 	description = S("Meat (not quite dead)"),
-	image = "animalmaterials_meat_raw.png",
+	image = "animalmaterials_meat_undead_raw.png",
 	on_use = minetest.item_eat(-2),
 	groups = { meat=1, eatable=1 },
 	stack_max=5
 })
 minetest.register_craftitem("animalmaterials:meat_toxic", {
 	description = S("Toxic Meat"),
-	image = "animalmaterials_meat_raw.png",
+	image = "animalmaterials_meat_toxic_raw.png",
 	on_use = minetest.item_eat(-5),
 	groups = { meat=1, eatable=1 },
 	stack_max=5
