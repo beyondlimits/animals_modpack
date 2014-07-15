@@ -141,10 +141,14 @@ function fighting.hit(entity,attacker)
 		local playername = attacker:get_player_name()
 		if entity.dynamic_data.spawning.spawner == playername then
 			if entity.dynamic_data.state.current ~= "combat" then
-				local current_yaw = entity.object:getyaw()
-				entity.object:setyaw(current_yaw + math.pi/4)
+				local tool = attacker:get_wielded_item()
+				-- rotation is only done if player punches using hand
+				if tool:get_name() == "" then
+					local current_yaw = entity.object:getyaw()
+					entity.object:setyaw(current_yaw + math.pi/4)
+					return
+				end
 			end
-			return
 		end
 	end
 
