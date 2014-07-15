@@ -255,9 +255,11 @@ function mgen_follow.callback(entity,now)
 		entity.dynamic_data.movement.invalid_env_count = 0
 	end
 
+	local current_accel = entity.object:getacceleration()
+
 	if pos_quality.level_quality ~= LQ_OK and
 		entity.data.movement.canfly then
-		local current_accel = entity.object:getacceleration()
+		
 
 		if pos_quality.level_quality == LQ_ABOVE then
 			if current_accel.y >= 0 then
@@ -278,8 +280,6 @@ function mgen_follow.callback(entity,now)
 
 	--fixup height fixup
 	if entity.data.movement.canfly then
-		local current_accel = entity.object:getacceleration()
-
 		if current_accel.y ~= 0 then
 			current_accel.y = 0
 			entity.object:setacceleration(current_accel)
@@ -426,12 +426,14 @@ function mgen_follow.callback(entity,now)
 			end
 		--nothing to do
 		else
-			if entity.dynamic_data.movement.was_moving_last_step == true then
-				local yaccel = environment.get_default_gravity(basepos,
+			local yaccel = environment.get_default_gravity(basepos,
 							entity.environment.media,
 							entity.data.movement.canfly)
+							
+			if entity.dynamic_data.movement.was_moving_last_step == true or
+				current_accel.Y ~= yaccel then
 
-				dbg_mobf.fmovement_lvl3("MOBF:   next to target")
+				dbg_mobf.fmovement_lvl3("MOBF: next to target")
 				entity.object:setvelocity({x=0,y=0,z=0})
 				entity.object:setacceleration({x=0,y=yaccel,z=0})
 				entity.dynamic_data.movement.last_next_to_target = now
