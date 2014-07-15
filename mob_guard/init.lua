@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: mob_guard mod loading ...")
 
-local version = "0.1.1"
+local version = "0.1.2"
 local guard_groups = {
 						not_in_creative_inventory=1
 					}
@@ -50,6 +50,7 @@ guard_prototype = {
 					},
 					groups = guard_groups,
 					envid="on_ground_1",
+					stepheight = 0.51,
 				},
 		movement =  {
 					guardspawnpoint = true,

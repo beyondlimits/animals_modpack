@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: mob_archer mod loading ...")
 
-local version = "0.1.1"
+local version = "0.1.2"
 local archer_groups = {
 						not_in_creative_inventory=1
 					}
@@ -50,6 +50,7 @@ archer_prototype = {
 					},
 					groups = archer_groups,
 					envid="on_ground_1",
+					stepheight = 0.51,
 				},
 		movement =  {
 					guardspawnpoint = true,
