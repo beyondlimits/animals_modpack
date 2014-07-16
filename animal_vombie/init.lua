@@ -1,4 +1,4 @@
-local version = "0.1.1"
+local version = "0.1.2"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -111,6 +111,7 @@ local vombie_prototype = {
 					custom_on_step_handler = vombie_on_step_handler,
 					custom_on_activate_handler = vombie_on_activate_handler,
 					population_density=20,
+					stepheight = 0.51,
 				},
 		movement =  {
 					min_accel=0.3,
