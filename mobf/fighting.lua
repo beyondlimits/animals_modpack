@@ -28,6 +28,7 @@ MOBF_AGRESSION_FACTOR = 5
 mobf_assert_backtrace(fighting == nil)
 --! @brief fighting class reference
 fighting = {}
+fighting.healdb = minetest.world_setting_get("fighting.healdb")
 
 --! @brief user defined on death callback
 --! @memberof fighting
@@ -106,6 +107,67 @@ function fighting.push_back(entity,dir)
 	end
 end
 
+-------------------------------------------------------------------------------
+-- @function [parent=#fighting] dodamage(entity,attacker)
+--
+--! @brief cause damage to be done to entity
+--! @memberof fighting
+--
+--! @param entity mob being hit
+--! @param attacker player/object hitting the mob
+--! @param kill_reason reason to log for killing
+-------------------------------------------------------------------------------
+function fighting.dodamage(entity,attacker, kill_reason)
+	local mob_pos = entity.object:getpos()
+
+	--update lifebar
+	mobf_lifebar.set(entity.lifebar,entity.object:get_hp()/entity.hp_max)
+
+	-- make it die
+	if entity.object:get_hp() < 0.5 then
+
+		mobf_lifebar.del(entity.lifebar)
+
+		local result = entity.data.generic.kill_result
+		if type(entity.data.generic.kill_result) == "function" then
+			result = entity.data.generic.kill_result()
+		end
+
+
+		--call on kill callback and superseed normal on kill handling
+		if entity.data.generic.on_kill_callback == nil or
+			entity.data.generic.on_kill_callback(entity,attacker) == false
+			then
+
+			if entity.data.sound ~= nil then
+				sound.play(mob_pos,entity.data.sound.die);
+			end
+
+			if attacker:is_player() then
+				if type(result) == "table" then
+					for i=1,#result, 1 do
+						if attacker:get_inventory():room_for_item("main", result[i]) then
+							attacker:get_inventory():add_item("main", result[i])
+						end
+					end
+				else
+					if attacker:get_inventory():room_for_item("main", result) then
+						attacker:get_inventory():add_item("main", result)
+					end
+				end
+			else
+				--todo check if spawning a stack is possible
+				minetest.add_item(mob_pos,result)
+			end
+			spawning.remove(entity, kill_reason)
+		else
+			dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name
+				.. " custom on kill handler superseeds generic handling")
+		end
+		return
+	end
+end
+
 
 -------------------------------------------------------------------------------
 -- @function [parent=#fighting] hit(entity,attacker)
@@ -159,53 +221,9 @@ function fighting.hit(entity,attacker)
 
 	--push mob back
 	fighting.push_back(entity,dir)
-
-	--update lifebar
-	mobf_lifebar.set(entity.lifebar,entity.object:get_hp()/entity.hp_max)
-
-	-- make it die
-	if entity.object:get_hp() < 0.5 then
-
-		mobf_lifebar.del(entity.lifebar)
-
-		local result = entity.data.generic.kill_result
-		if type(entity.data.generic.kill_result) == "function" then
-			result = entity.data.generic.kill_result()
-		end
-
-
-		--call on kill callback and superseed normal on kill handling
-		if entity.data.generic.on_kill_callback == nil or
-			entity.data.generic.on_kill_callback(entity,attacker) == false
-			then
-
-			if entity.data.sound ~= nil then
-				sound.play(mob_pos,entity.data.sound.die);
-			end
-
-			if attacker:is_player() then
-				if type(result) == "table" then
-					for i=1,#result, 1 do
-						if attacker:get_inventory():room_for_item("main", result[i]) then
-							attacker:get_inventory():add_item("main", result[i])
-						end
-					end
-				else
-					if attacker:get_inventory():room_for_item("main", result) then
-						attacker:get_inventory():add_item("main", result)
-					end
-				end
-			else
-				--todo check if spawning a stack is possible
-				minetest.add_item(mob_pos,result)
-			end
-			spawning.remove(entity, "killed")
-		else
-			dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name
-				.. " custom on kill handler superseeds generic handling")
-		end
-		return
-	end
+	
+	--cause damage to be evaluated
+	fighting.dodamage(entity, attacker, "killed")
 
 	--dbg_mobf.fighting_lvl2("MOBF: attack chance is ".. entity.data.combat.angryness)
 	-- fight back
@@ -1257,3 +1275,133 @@ function fighting.init_dynamic_data(entity,now)
 
 	entity.dynamic_data.combat = data
 end
+
+-------------------------------------------------------------------------------
+-- @function [parent=#fighting] heal()
+--
+--! @brief heal a mob
+--! @memberof fighting
+--
+--! @param entity mob to do action
+--! @param player the one doing the rightclick
+-------------------------------------------------------------------------------
+function fighting.heal(entity,player)
+
+	local health = entity.object:get_hp()
+	
+	if entity.data.generic.base_health == entity.object:get_hp() then
+		return
+	end
+	
+	if not player:is_player() then
+		return
+	end
+	
+	local tool = player:get_wielded_item()
+		
+	if tool == nil then
+		return
+	end
+	
+	tool = tool:get_name()
+	
+	if not fighting.healdb[tool] then
+		print("unknown heal item: " .. tool)
+		return
+	end
+	
+	local new_health = 0
+	
+	print("healdb value: " .. dump(fighting.healdb[tool].value))
+	
+	if fighting.healdb[tool].value >= 0 then
+		new_health = MIN(entity.object:get_hp() + fighting.healdb[tool].value,
+							 entity.data.generic.base_health)
+	else
+		new_health = MAX(entity.object:get_hp() + fighting.healdb[tool].value, 0)
+	end
+	
+	entity.object:set_hp(new_health)
+	
+	if new_health <= 0.5 then
+		fighting.dodamage(entity, player, "poisoned")
+	else
+		mobf_lifebar.set(entity.lifebar,new_health/entity.hp_max)
+	end
+	
+	player:get_inventory():remove_item("main",tool.." 1")
+	
+	if fighting.healdb[tool].replacement ~= nil then
+		player:get_inventory():add_item("main",
+					fighting.healdb[tool].replacement.." 1")
+	end
+end
+
+-------------------------------------------------------------------------------
+-- @function [parent=#fighting] heal_caption()
+--
+--! @brief get caption for heal button
+--! @memberof fighting
+--
+--! @param entity mob to do action
+-------------------------------------------------------------------------------
+function fighting.heal_caption(entity)
+	if entity.data.generic.base_health ~= entity.object:get_hp() then
+		return "heal"
+	else
+		return "nothing to heal"
+	end
+end
+
+-------------------------------------------------------------------------------
+-- @function [parent=#fighting] update_healdb()
+--
+--! @brief update mobfs heal db
+--! @memberof fighting
+--
+--! @param hp_change
+--! @param replace_with_item
+--! @param itemstac -- unused
+--! @param player
+--! @param pointed_thing -- unused
+-------------------------------------------------------------------------------
+function fighting.update_healdb(hp_change, replace_with_item, itemstack, player, pointed_thing)
+	if not player:is_player() then
+		return
+	end
+	
+	local tool = player:get_wielded_item()
+	
+	if tool == nil then
+		return
+	end
+	
+	tool = tool:get_name()
+	
+	local replacement = nil
+	if replace_with_item ~= nil then
+		replacement = replace_with_item:get_name()
+	end
+	
+	if fighting.healdb == nil then
+		fighting.healdb = {}
+	end
+	
+	if fighting.healdb[tool] ~= nil and
+		fighting.healdb[tool].value == hp_change and
+		fighting.healdb[tool].replacement == replacement or
+		hp_change == nil then
+		return false
+	end
+	
+	
+	fighting.healdb[tool] = {
+		value = hp_change,
+		replacement = replacement
+	}
+	
+	minetest.world_setting_set("fighting.healdb",fighting.healdb)
+	return false
+end
+
+minetest.register_on_item_eat(fighting.update_healdb)

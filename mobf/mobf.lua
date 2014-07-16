@@ -769,7 +769,7 @@ function mobf.rightclick_handler(entity,clicker)
 		return
 	end
 
-	if #entity.on_rightclick_hooks > 1 then
+	if #entity.on_rightclick_hooks >= 1 then
 
 		--get rightclick storage id
 		local storage_id = mobf_global_data_store(entity)
@@ -852,7 +852,7 @@ function mobf.rightclick_button_handler(player, formname, fields)
 
 				if entity ~= nil and
 					callback ~= nil then
-					callback(entity,player)
+					callback(entity, player)
 				else
 					dbg_mobf.mobf_core_lvl1("MOBF: unable to do callback: "
 						.. dump(entity) .. " " .. dump(callback))

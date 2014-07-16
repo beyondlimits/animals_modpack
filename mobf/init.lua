@@ -416,6 +416,15 @@ function mobf_init_modules()
 			handler		= mobf_factions.mob_rightclick_callback,
 			configcheck	= mobf_factions.config_check
 			})
+			
+	mobf.register_on_rightclick_callback({
+			name = "heal",
+			visiblename = fighting.heal_caption,
+			handler		= fighting.heal,
+			configcheck	= function(entity)
+					return true
+				end,
+			})
 end
 
 mobf_init_framework()
