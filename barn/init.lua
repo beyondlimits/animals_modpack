@@ -24,7 +24,7 @@ else
 end
 
 minetest.log("action","MOD: barn mod loading ...")
-local version = "0.0.11"
+local version = "0.0.12"
 
 local modpath = minetest.get_modpath("barn")
 
