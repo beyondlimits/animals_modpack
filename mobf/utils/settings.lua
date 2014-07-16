@@ -55,7 +55,7 @@ function mobf_init_world_specific_settings()
 		minetest.world_setting_set = function(name,value)
 			mobf_world_settings_data[name] = value
 
-			local file,error = io.open(mobf_world_path .. "/mobf_settings.conf","w")
+			local file,error = io.open(mobf_world_path .. "/mobf_settings.conf.new","w")
 
 			if error ~= nil then
 				minetest.log(LOGLEVEL_ERROR,"MOBF: failed to open world specific config file")
@@ -116,6 +116,11 @@ function mobf_init_world_specific_settings()
 			end
 			file:write("\n")
 			file:close()
+			
+			if not os.rename(mobf_world_path .. "/mobf_settings.conf.new",
+				mobf_world_path .. "/mobf_settings.conf") then
+				minetest.log(LOGLEVEL_ERROR,"MOBF: failed to swap old conf file to new one")
+			end
 		end
 
 		minetest.world_setting_get = function(name)
