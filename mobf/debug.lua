@@ -385,6 +385,7 @@ function mobf_debug.rightclick_callback(entity,player)
 	print("MOBF: \tAbsolute spawntime:          " .. entity.dynamic_data.spawning.original_spawntime)
 	print("MOBF: \tCurrent state:               " .. entity.dynamic_data.state.current.name )
 	print("MOBF: \tCurrent movgen:              " .. entity.dynamic_data.current_movement_gen.name )
+	print("MOBF: \tHP:                          " .. entity.object:get_hp())
 	if entity.dynamic_data.current_movement_gen.name == "follow_mov_gen" or
 		entity.dynamic_data.current_movement_gen.name == "mgen_path" then
 
@@ -450,6 +451,7 @@ function mobf_debug.rightclick_callback(entity,player)
 	end
 	print("MOBF: \tCan fly:                     " .. dump(entity.data.movement.canfly))
 	print("MOBF: \tCurrent accel:               " .. printpos(entity.object:getacceleration()))
+	print("MOBF: \tDefault gravity:             " .. dump(environment.get_default_gravity(basepos, entity.environment.media, entity.data.movement.canfly)))
 	print("MOBF: \tCurrent speed:               " .. printpos(entity.object:getvelocity()))
 	print("MOBF: \tSpawnpoint:                  " .. printpos(entity.dynamic_data.spawning.spawnpoint))
 	print("MOBF: \tSpawner:                     " .. dump(entity.dynamic_data.spawning.spawner))
