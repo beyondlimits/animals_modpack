@@ -89,8 +89,6 @@ mobf_settings_tab_statistics = {
 	
 -------------------------------------------------------------------------------
 local function init_tab(type, from, to, tabview)
-	print("init_tab: type=" .. type .. "\nfrom=" .. dump(from) .. "\nto=" .. dump(to))
-	
 	if (to == "info_top") then
 		local tabdata = tabview:get_tabdata("info_top")
 		assert(tabdata ~= nil)
