@@ -84,10 +84,16 @@ local function get_formspec(tabview, name, tabdata)
 				"Disable core pathfinding support;" ..
 				mobf_settings.setting_gettext("mobf_disable_pathfinding") .."]"
 
+
+	local showspawner = core.setting_get("adv_spawning.debug")
+	local spawner_setting_text = "false"
+	if (showspawner) then
+		spawner_setting_text = "true"
+	end
+
 	retval = retval .. "checkbox[1,6.5;" ..
 				"cb_features_show_spawners;" ..
-				"Show spawner entities;" ..
-				mobf_settings.setting_gettext("mobf_show_spawners") .."]"
+				"Show spawner entities;" .. spawner_setting_text .."]"
 
 	return retval
 end
@@ -173,8 +179,8 @@ local function handle_settings_buttons(self, fields, tabname, tabdata)
 	end
 
 	if fields["cb_features_show_spawners"] then
-		mobf_set_world_setting("mobf_show_spawners",
-				core.is_yes(fields["cb_features_show_spawners"]))
+		core.setting_set("adv_spawning.debug",
+			fields["cb_features_show_spawners"])
 		return true
 	end
 
