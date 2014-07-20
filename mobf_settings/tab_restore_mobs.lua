@@ -47,7 +47,7 @@ local function get_formspec(tabview, name, tabdata)
 	if tabdata.selected_entry ~= 0 then
 
 		retval = retval ..
-			"button[0.25,8.5;3.75,0.5;btn_restore_mob;Take]"
+			"button[0.25,8.5;3.75,0.5;btn_restore_mob;" .. fgettext("Take") .. "]"
 	end
 
 	return retval
