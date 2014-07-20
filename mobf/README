@@ -19,6 +19,25 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.3.91
+-improve advanced spawning
+-make fighting mobs (a little bit) more smart
+-add bear
+-improve building spawner
+-fix mob orientation in combat
+-fix mob orientation on riding
+-update license information
+-make ckick spawn from egg
+-add plantlive plants and vines
+-rewrite mobf_settings
+-add intllib support (thanks xanthin)
+-fix b3d models spaming server log due to missing texture
+-improve partroling mode
+-fix factions support
+-fix slabs for some mobs
+-add support for healing own mobs
+-lots of minor bugfixes ... see github commit log
+
 Changes 2.3.90
 -switched to adv_spawning
 
