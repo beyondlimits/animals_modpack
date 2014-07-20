@@ -16,55 +16,55 @@
 
 local function get_formspec_cheat_leftclick(tabview, name, tabdata)
 	return
-		"box[0.25,2.40;7.25,6.05;#000000]" ..
-		"label[0.5,2.7;"  .. fgettext("target: own mob,") .. "]" ..
-		"label[3,2.7;"    .. fgettext("wielditem: hand") .. "]" ..
-		"label[0.75,3;"   .. fgettext("-->rotate mob by 45°") .. "]" ..
-		"label[0.5,3.5;"  .. fgettext("target: own mob,") .. "]" ..
-		"label[3,3.5;"    .. fgettext("wielditem: various weapons") .. "]" ..
-		"label[0.75,3.8;" .. fgettext("-->attack") .. "]" ..
-		"label[0.5,4.3;"  .. fgettext("target: any mob,") .. "]" ..
-		"label[3,4.3;"    .. fgettext("wielditem: catching (net/lasso/...)") .. "]" ..
-		"label[0.75,4.6;" .. fgettext("-->catch") .."]" ..
-		"label[0.5,5.1;"  .. fgettext("target: (small) barn,") .. "]" ..
-		"label[3,5.1;"    .. fgettext("wielditem: grass/leaves") .. "]" ..
-		"label[0.75,5.4;" .. fgettext("-->fill barn for breeding") .. "]" ..
-		"label[0.5,5.9;"  .. fgettext("target: (small) barn,") .. "]" ..
-		"label[3,5.9;"    .. fgettext("wielditem: hand/tool") .. "]" ..
-		"label[0.75,6.2;" .. fgettext("-->take barn") .. "]" ..
-		"label[0.5,6.7;"  .. fgettext("target: mob,") .. "]" ..
-		"label[3,6.7;"    .. fgettext("wielditem: harvest-tool") .. "]" ..
-		"label[0.75,7;"   .. fgettext("-->harvest e.g. gather wool or milk") .. "]" ..
-		"label[0.5,7.5;"  .. fgettext("target: ridable mob,") .. "]" ..
-		"label[3,7.5;"    .. fgettext("wielditem: saddle (mob specific)") .. "]" ..
-		"label[0.75,7.8;" .. fgettext("--> mount a mob to ride") .. "]"
+		"box[0.25,2.90;7.25,6.05;#000000]" ..
+		"label[0.5,3.2;"  .. fgettext("target: own mob,") .. "]" ..
+		"label[3,3.2;"    .. fgettext("wielditem: hand") .. "]" ..
+		"label[0.75,3.5;"   .. fgettext("-->rotate mob by 45°") .. "]" ..
+		"label[0.5,4;"  .. fgettext("target: own mob,") .. "]" ..
+		"label[3,4;"    .. fgettext("wielditem: various weapons") .. "]" ..
+		"label[0.75,4.3;" .. fgettext("-->attack") .. "]" ..
+		"label[0.5,4.8;"  .. fgettext("target: any mob,") .. "]" ..
+		"label[3,4.8;"    .. fgettext("wielditem: catching (net/lasso/...)") .. "]" ..
+		"label[0.75,5.1;" .. fgettext("-->catch") .."]" ..
+		"label[0.5,5.6;"  .. fgettext("target: (small) barn,") .. "]" ..
+		"label[3,5.6;"    .. fgettext("wielditem: grass/leaves") .. "]" ..
+		"label[0.75,5.9;" .. fgettext("-->fill barn for breeding") .. "]" ..
+		"label[0.5,6.4;"  .. fgettext("target: (small) barn,") .. "]" ..
+		"label[3,6.4;"    .. fgettext("wielditem: hand/tool") .. "]" ..
+		"label[0.75,6.7;" .. fgettext("-->take barn") .. "]" ..
+		"label[0.5,7.2;"  .. fgettext("target: mob,") .. "]" ..
+		"label[3,7.2;"    .. fgettext("wielditem: harvest-tool") .. "]" ..
+		"label[0.75,7.5;"   .. fgettext("-->harvest e.g. gather wool or milk") .. "]" ..
+		"label[0.5,8;"  .. fgettext("target: ridable mob,") .. "]" ..
+		"label[3,8;"    .. fgettext("wielditem: saddle (mob specific)") .. "]" ..
+		"label[0.75,8.3;" .. fgettext("--> mount a mob to ride") .. "]"
 end
 
 local function get_formspec_cheat_rightclick(tabview, name, tabdata)
 	return
-		"box[0.25,2.40;7.25,6.05;#000000]" ..
-		"label[0.5,2.7;"  .. fgettext("Rightclicking a mob opens a mob specific rightclick menu,") .. "]" ..
-		"label[0.5,3;"    .. fgettext("following menu elements are possible:") .. "]" ..
-		"label[0.5,3.5;"  .. fgettext("Show debuginfo") .. "]" ..
-		"label[0.75,3.8;" .. fgettext("print debuginfo about this mob to console") .. "]" ..
-		"label[0.5,4.3;"  .. fgettext("Select path") .. "]" ..
-		"label[0.75,4.6;" .. fgettext("Select a path to put mob in guard mode") .. "]" ..
-		"label[0.5,5.1;"  .. fgettext("Factions") .. "]" ..
-		"label[0.75,5.4;" .. fgettext("configure factions for this mob") .. "]" ..
-		"label[0.5,5.9;"  .. fgettext("heal / nothing to heal(full health)") .. "]" ..
-		"label[0.75,6.2;" .. fgettext("heal mob using the currently wielded food") .. "]" ..
-		"label[0.5,6.7;"  .. fgettext("Trade") .. "]" ..
-		"label[0.75,7;"   .. fgettext("open trade inventory") .. "]"
+		"box[0.25,2.90;7.25,6.05;#000000]" ..
+		"label[0.5,3.2;"  .. fgettext("Rightclicking a mob opens a mob specific rightclick menu,") .. "]" ..
+		"label[0.5,3.5;"    .. fgettext("following menu elements are possible:") .. "]" ..
+		"label[0.5,4;"  .. fgettext("Show debuginfo") .. "]" ..
+		"label[0.75,4.3;" .. fgettext("print debuginfo about this mob to console") .. "]" ..
+		"label[0.5,4.8;"  .. fgettext("Select path") .. "]" ..
+		"label[0.75,5.1;" .. fgettext("Select a path to put mob in guard mode") .. "]" ..
+		"label[0.5,5.6;"  .. fgettext("Factions") .. "]" ..
+		"label[0.75,5.9;" .. fgettext("configure factions for this mob") .. "]" ..
+		"label[0.5,6.4;"  .. fgettext("heal / nothing to heal(full health)") .. "]" ..
+		"label[0.75,6.7;" .. fgettext("heal mob using the currently wielded food") .. "]" ..
+		"label[0.5,7.2;"  .. fgettext("Trade") .. "]" ..
+		"label[0.75,7.5;"   .. fgettext("open trade inventory") .. "]"
 end
 
 local function get_formspec_cheat_mixed(tabview, name, tabdata)
 
-	return "box[0.25,2.40;7.25,6.05;#000000]" ..
-		"label[0.5,2.7;"  .. fgettext("Missing mobs") .. "]" ..
-		"label[0.75,3;"   .. fgettext("Case you're missing any of your mobs have a look at") .. "]" ..
-		"label[0.75,3.3;" .. fgettext("\"Lost mobs\" in control panel, they may be preserved") .. "]" ..
-		"label[0.5,3.8;"  .. fgettext("Path configuration for guard mode") .. "]" ..
-		"label[0.5,4.1;"  .. fgettext("See \"Paths\" in control panel") .. "]"
+	return "box[0.25,2.90;7.25,6.05;#000000]" ..
+		"label[0.5,3.2;"  .. fgettext("Missing mobs") .. "]" ..
+		"label[0.75,3.5;"   .. fgettext("Case you're missing any of your mobs have a look at") .. "]" ..
+		"label[0.75,3.8;" .. fgettext("\"Lost mobs\" in control panel, they may be preserved") .. "]" ..
+		"label[0.5,4.3;"  .. fgettext("Path configuration for guard mode") .. "]" ..
+		"label[0.75,4.6;"  .. fgettext("See \"Paths\" in control panel") .. "]"
 end
 
 
@@ -94,10 +94,11 @@ local function init_tab(type, from, to, tabview)
 		
 		if tabdata.subtabview == nil then
 			tabdata.subtabview = tabview_create("cheatsheets",
-				{x=8,y=8},{x=0.5,y=2.75}, tabview.parent_ui)
+				{x=8,y=8},{x=0.5,y=3.25}, tabview.parent_ui)
 			tabdata.subtabview:add(mobf_settings_tab_cheat_leftclick)
 			tabdata.subtabview:add(mobf_settings_tab_cheat_rightclick)
 			tabdata.subtabview:add(mobf_settings_tab_cheat_mixed)
+			tabdata.subtabview:set_parent(tabview)
 		end
 		tabdata.subtabview:show()
 	elseif (from == "main") then

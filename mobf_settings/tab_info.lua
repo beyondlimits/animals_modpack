@@ -57,25 +57,25 @@ local function get_formspec(tabview, name, tabdata)
 				maxabs  = "Abs.Max (ms)",
 				max     = "Maximum"
 			},
-			"0","%s") ..
-		"box[0.75,0.5;6.75,0.05;#FFFFFF]" ..
-		mobf_settings.printfac("Total",          statistics.data.total,       "0.5", "%2.2f%%") ..
-		mobf_settings.printfac("Onstep",         statistics.data.onstep,      "1",   "%2.2f%%") ..
-		mobf_settings.printfac("Job processing", statistics.data.queue_load,  "1.5", "%2.2f%%") ..
-		mobf_settings.printfac("ABM",            statistics.data.abm,         "2",   "%.2f%%") ..
-		mobf_settings.printfac("MapGen",         statistics.data.mapgen,      "2.5", "%2.2f%%") ..
-		mobf_settings.printfac("Spawn onstep",   statistics.data.spawn_onstep,"3",   "%2.2f%%") ..
-		mobf_settings.printfac("Activate",       statistics.data.activate,    "3.5", "%2.2f%%") ..
-		mobf_settings.printfac("User 1",         statistics.data.user_1,      "6.5", "%2.2f%%") ..
-		mobf_settings.printfac("User 2",         statistics.data.user_2,      "7",   "%2.2f%%") ..
-		mobf_settings.printfac("User 3",         statistics.data.user_3,      "7.5", "%2.2f%%") ..
+			"0.5","%s") ..
+		"box[0.75,1;6.75,0.05;#FFFFFF]" ..
+		mobf_settings.printfac("Total",          statistics.data.total,       "1", "%2.2f%%") ..
+		mobf_settings.printfac("Onstep",         statistics.data.onstep,      "1.5",   "%2.2f%%") ..
+		mobf_settings.printfac("Job processing", statistics.data.queue_load,  "2", "%2.2f%%") ..
+		mobf_settings.printfac("ABM",            statistics.data.abm,         "2.5",   "%.2f%%") ..
+		mobf_settings.printfac("MapGen",         statistics.data.mapgen,      "3", "%2.2f%%") ..
+		mobf_settings.printfac("Spawn onstep",   statistics.data.spawn_onstep,"3.5",   "%2.2f%%") ..
+		mobf_settings.printfac("Activate",       statistics.data.activate,    "4", "%2.2f%%") ..
+		mobf_settings.printfac("User 1",         statistics.data.user_1,      "7", "%2.2f%%") ..
+		mobf_settings.printfac("User 2",         statistics.data.user_2,      "7.5",   "%2.2f%%") ..
+		mobf_settings.printfac("User 3",         statistics.data.user_3,      "8", "%2.2f%%") ..
 		mobf_settings.printfac("Adv.Spawning",
 			{
 				current = adv_stats.load.cur,
 				maxabs  = adv_stats.step.max,
 				max     = adv_stats.load.max
 			},
-			"4","%2.2f%%")
+			"4.5","%2.2f%%")
 
 	return retval
 end
@@ -95,17 +95,20 @@ local function init_tab(type, from, to, tabview)
 		
 		if tabdata.subtabview == nil then
 			tabdata.subtabview = tabview_create("infoview",
-				{x=8,y=8},{x=0,y=0.25}, tabview.parent_ui)
+				{x=8,y=8},{x=0,y=0.75}, tabview.parent_ui)
 			tabdata.subtabview:add(mobf_settings_tab_info_sub)
 			if core.world_setting_get("mobf_enable_statistics") then
 				tabdata.subtabview:add(mobf_settings_tab_statistics)
 			end
+			tabdata.subtabview:set_parent(tabview)
 		end
 		tabdata.subtabview:show()
 	elseif (from == "info_top") then
 		local tabdata = tabview:get_tabdata("info_top")
 		assert(tabdata ~= nil)
-		tabdata.subtabview:hide()
+		if tabdata.subtabview ~= nil then
+			tabdata.subtabview:hide()
+		end
 	end
 end
 
