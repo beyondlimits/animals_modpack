@@ -251,6 +251,17 @@ local function get_tabdata(self, name)
 	return nil
 end
 
+--------------------------------------------------------------------------------
+local function set_parent(self, parent)
+	if parent == nil then
+		self.type = "toplevel"
+	else
+		self.type = "addon"
+	end
+	
+	self.parent = parent
+end
+
 local tabview_metatable = {
 	add                       = add_tab,
 	handle_buttons            = handle_buttons,
@@ -259,7 +270,7 @@ local tabview_metatable = {
 	show                      = show_tabview,
 	hide                      = hide_tabview,
 	delete                    = delete,
-	set_parent                = function(self,parent) self.parent = parent end,
+	set_parent                = set_parent,
 	set_autosave_tab          =
 			function(self,value) self.autosave_tab = value end,
 	set_tab                   = set_tab_by_name,
