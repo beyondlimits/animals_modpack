@@ -11,8 +11,9 @@
 --! @author Sapier
 --! @date 2013-04-02
 --
---! @defgroup attention attention subcomponent
---! @brief Component handling attention of a mob
+--! @defgroup attention Attention subcomponent
+--! @brief Component handling attention of a mob. This incudes aggression as
+--! well as initial attack handling.
 --! @ingroup framework_int
 --! @{
 -- Contact: sapier a t gmx net

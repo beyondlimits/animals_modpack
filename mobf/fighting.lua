@@ -1361,11 +1361,13 @@ end
 --
 --! @param hp_change
 --! @param replace_with_item
---! @param itemstac -- unused
---! @param player
+--! @param itemstack -- unused
+--! @param player player issuing the update
 --! @param pointed_thing -- unused
 -------------------------------------------------------------------------------
-function fighting.update_healdb(hp_change, replace_with_item, itemstack, player, pointed_thing)
+function fighting.update_healdb(hp_change, replace_with_item, itemstack, player,
+		pointed_thing)
+		
 	if not player:is_player() then
 		return
 	end

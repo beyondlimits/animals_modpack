@@ -11,17 +11,13 @@
 --! @author Sapier
 --! @date 2014-12-07
 --
---! @ingroup framework_int
---! @{
---
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
-
 ------------------------------------------------------------------------------
 -- name: register_spawn_algorithm(name, spawnfunc, cleanupfunc)
 -- @function [parent=#spawning] register_spawn_algorithm
 --
---! @brief print current spawn statistics
+--! @brief (DEPRECATED) print current spawn statistics
 --! @memberof spawning
 --
 --! @param name name of spawn algorithm
@@ -50,7 +46,7 @@ end
 -- name: chunk_get_center(min,max,current_step,interval)
 -- @function [parent=#spawning] chunk_get_center
 --
---! @brief calculate center and deltas
+--! @brief (DEPRECATED) calculate center and deltas
 --! @memberof spawning
 --
 --! @return center,delta
@@ -75,7 +71,7 @@ end
 -- name: divide_mapgen_entity(minp,maxp,spawning_data,spawnfunc,maxtries)
 -- @function [parent=#spawning] divide_mapgen_entity
 --
---! @brief divide mapblock into 2d chunks and call spawnfunc with randomized parameters for each
+--! @brief (DEPRECATED) divide mapblock into 2d chunks and call spawnfunc with randomized parameters for each
 --! @memberof spawning
 --! @param minp minimum 3d point of map block
 --! @param maxp maximum 3d point of map block
@@ -177,7 +173,7 @@ end
 -- name: divide_mapgen(minp,maxp,spawning_data,spawnfunc,surfacefunc,maxtries)
 -- @function [parent=#spawning] divide_mapgen
 --
---! @brief divide mapblock into 2d chunks and call spawnfunc with randomized parameters for each
+--! @brief (DEPRECATED) divide mapblock into 2d chunks and call spawnfunc with randomized parameters for each
 --! @memberof spawning
 --
 --! @param minp minimum 3d point of map block
@@ -325,7 +321,7 @@ end
 -- name: register_spawner_entity(spawning_data,spawnfunc,suffix)
 -- @function [parent=#spawning] register_spawner_entity
 --
---! @brief register a spawner entity
+--! @brief (DEPRECATED) register a spawner entity
 --! @memberof spawning
 --
 --! @param spawning_data spawning information to use
@@ -542,7 +538,7 @@ end
 -- name: setup_algorithm(mob)
 -- @function [parent=#spawning] setup_algorithm
 --
---! @brief set up a specific algorithm for a mob
+--! @brief (DEPRECATED) set up a specific algorithm for a mob
 --! @memberof spawning
 --
 --! @param primary_name name of mob
@@ -582,7 +578,7 @@ end
 -- name: register_mob(mob)
 -- @function [parent=#spawning] register_mob
 --
---! @brief initialize spawn algorithms for a mob
+--! @brief (DEPRECATED) initialize spawn algorithms for a mob
 --! @memberof spawning
 --
 --! @param mob definition
@@ -644,7 +640,7 @@ end
 -- name: divide_mapgen_jobfunc(mob)
 -- @function [parent=#spawning] divide_mapgen_jobfunc
 --
---! @brief job wrapper function for divide mapgen
+--! @brief (DEPRECATED) job wrapper function for divide mapgen
 --! @memberof spawning
 --
 --! @param data job data
@@ -677,7 +673,7 @@ end
 -- name: divide_mapgen_jobfunc(mob)
 -- @function [parent=#spawning] divide_mapgen_jobfunc
 --
---! @brief job wrapper function for divide mapgen
+--! @brief (DEPRECATED) job wrapper function for divide mapgen
 --! @memberof spawning
 --
 --! @param data job data

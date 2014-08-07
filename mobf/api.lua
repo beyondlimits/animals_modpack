@@ -214,6 +214,7 @@ end
 --! @ingroup framework_mob
 --
 --! @param name of spawner
+--! @param mobname name of mob to register spawner for
 --! @param spawndef defintion of spawner
 --! @return true/false
 -------------------------------------------------------------------------------

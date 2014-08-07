@@ -17,8 +17,10 @@
 --! @ingroup framework_int
 --! @{
 --
---! @defgroup spawn_algorithms Spawn algorithms
---! @brief spawn algorithms provided by mob framework (can be extended by mods)
+--! @defgroup spawn_algorithms (DEPRECATED) Spawn algorithms
+--! @brief spawn algorithms provided by previous mob framework versions. New
+--! mobs are strongly encouraged to use advanced spawning mob as spawning will
+--! be removed from mobf as of version 2.5
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
@@ -76,7 +78,7 @@ end
 --! @brief save data on regular base
 --! @memberof spawning
 --
---! @param force
+--! @param cyclic if this is true spawn data is saved in cyclic intervals
 -------------------------------------------------------------------------------
 function spawning.preserve_spawn_data(cyclic)
 
@@ -151,7 +153,8 @@ end
 --! @brief add mob to deactivated list
 --! @memberof spawning
 --
---! @param entity to deactivate
+--! @param name name of mob to be deactivated
+--! @param pos position to deactivate mob at
 -------------------------------------------------------------------------------
 function spawning.deactivate_mob(name,pos)
 	if spawning.mob_spawn_data[name] == nil then
@@ -171,7 +174,8 @@ end
 --! @brief save data on regular base
 --! @memberof spawning
 --
---! @param force
+--! @param name name of mob to be activated
+--! @param pos position to activate mob at
 -------------------------------------------------------------------------------
 function spawning.activate_mob(name,pos)
 	if spawning.mob_spawn_data[name] ~= nil then
@@ -537,7 +541,7 @@ end
 --! @brief register an entity to cleanup spawners
 --! @memberof spawning
 --
---! @param mobname mobname to create cleanup
+--! @param spawnername name of spawner to create a cleanup entity for
 -------------------------------------------------------------------------------
 function spawning.register_cleanup_spawner(spawnername)
 	dbg_mobf.mobf_core_lvl2("MOBF: registering spawner cleanup " .. spawnername)
@@ -800,7 +804,8 @@ end
 --! @brief check if a activating entity is spawned within some other entity
 --
 --! @param entity entity to check
---! @param position spawned at
+--! @param pos position spawned at
+--! @param preserved_data data loaded for entity
 --! @return true
 -------------------------------------------------------------------------------
 function spawning.check_activation_overlap(entity,pos,preserved_data)

@@ -12,7 +12,7 @@
 --! @date 2013-01-29
 --
 
---! @defgroup mob_preserve gui to reclaim mobs removed by error handling
+--! @defgroup mob_preserve (DEPRECATED) gui to reclaim mobs removed by error handling
 --! @brief gui to reclaim error removed player spawned mobs
 --! @ingroup framework_int
 --! @{

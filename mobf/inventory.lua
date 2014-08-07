@@ -18,6 +18,12 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+mobf_assert_backtrace(mob_inventory == nil)
+--! @class mob_inventory
+--! @brief inventory handling for trader like mobs
+--! @}
+mob_inventory = {}
+
 -- Boilerplate to support localized strings if intllib mod is installed.
 local S
 if intllib then
@@ -26,11 +32,6 @@ else
 	S = function(s) return s end
 end
 -------------------------------------------------------------------------------
-mobf_assert_backtrace(mob_inventory == nil)
---! @class mob_inventory
---! @brief inventory handling for trader like mobs
---! @}
-mob_inventory = {}
 mob_inventory.trader_inventories = {}
 mob_inventory.formspecs = {}
 

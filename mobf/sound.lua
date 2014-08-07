@@ -18,10 +18,11 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 mobf_assert_backtrace(sound == nil)
---! @class sound
-sound =  {}
 
+--! @class sound
+--! @brief sound selection and play functions
 --!@}
+sound =  {}
 
 -------------------------------------------------------------------------------
 -- @function [parent=#sound] play(entity)
@@ -64,20 +65,25 @@ function sound.play_random(entity,now)
 
 	if entity.dynamic_data == nil or
 		entity.dynamic_data.sound == nil then
-		mobf_bug_warning(LOGLEVEL_ERROR,"MOBF BUG!!!: >" ..entity.data.name .. "< removed=" .. dump(entity.removed) .. " entity=" .. tostring(entity) .. " sound callback without dynamic data")
+		mobf_bug_warning(LOGLEVEL_ERROR,
+			"MOBF BUG!!!: >" ..entity.data.name .. "< removed=" ..
+			dump(entity.removed) .. " entity=" .. tostring(entity) ..
+			" sound callback without dynamic data")
 		return
 	end
 
 	if entity.data.sound ~= nil and
 		entity.data.sound.random ~= nil then
 
-		if (entity.dynamic_data.sound.random_last + entity.data.sound.random.min_delta < now) then
+		if (entity.dynamic_data.sound.random_last +
+			entity.data.sound.random.min_delta < now) then
 
 			if math.random() < entity.data.sound.random.chance then
 				local toplay = nil
 				if type(entity.data.sound.random) == "table" and
 					#entity.data.sound.random > 0 then
-					local current_random_sound = math.floor(math.random(1,#entity.data.sound.random) + 0.5)
+					local current_random_sound =
+						math.floor(math.random(1,#entity.data.sound.random) + 0.5)
 					toplay = entity.data.sound.random[current_random_sound]
 				else
 					toplay = entity.data.sound.random
