@@ -344,6 +344,8 @@ function mobf_gauss(center,max_deviation)
 
 	local p = math.sqrt( (-2*math.log(q))/q )
 
+	local retval = nil
+
 	--calculate normalized value of max deviation
 	if math.random() < 0.5 then
 		retval = center + ( u1*p * (center*max_deviation))

@@ -28,6 +28,7 @@ MOBF_AGRESSION_FACTOR = 5
 mobf_assert_backtrace(fighting == nil)
 --! @brief fighting class reference
 fighting = {}
+fighting.healdb = minetest.world_setting_get("fighting.healdb")
 
 --! @brief user defined on death callback
 --! @memberof fighting
@@ -106,41 +107,18 @@ function fighting.push_back(entity,dir)
 	end
 end
 
-
 -------------------------------------------------------------------------------
--- @function [parent=#fighting] hit(entity,attacker)
+-- @function [parent=#fighting] dodamage(entity,attacker)
 --
---! @brief handler for mob beeing hit
+--! @brief cause damage to be done to entity
 --! @memberof fighting
 --
 --! @param entity mob being hit
 --! @param attacker player/object hitting the mob
+--! @param kill_reason reason to log for killing
 -------------------------------------------------------------------------------
-function fighting.hit(entity,attacker)
-	mobf_assert_backtrace(entity ~= nil)
-	mobf_assert_backtrace(attacker ~= nil)
-
-	--execute user defined on_hit_callback
-	if entity.data.generic.on_hit_callback ~= nil and
-			entity.data.generic.on_hit_callback(entity,attacker) == true
-		then
-		dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name .. " custom on hit handler superseeds generic handling")
-		return
-	end
-
-	--get some base information
-	local mob_pos     = entity.object:getpos()
-	local mob_basepos = entity.getbasepos(entity)
-	local targetpos   = attacker:getpos()
-	local dir         = mobf_get_direction(targetpos,mob_basepos)
-
-	--play hit sound
-	if entity.data.sound ~= nil then
-		sound.play(mob_pos,entity.data.sound.hit);
-	end
-
-	--push mob back
-	fighting.push_back(entity,dir)
+function fighting.dodamage(entity,attacker, kill_reason)
+	local mob_pos = entity.object:getpos()
 
 	--update lifebar
 	mobf_lifebar.set(entity.lifebar,entity.object:get_hp()/entity.hp_max)
@@ -150,7 +128,6 @@ function fighting.hit(entity,attacker)
 
 		mobf_lifebar.del(entity.lifebar)
 
-	--if entity.dynamic_data.generic.health < 1 then
 		local result = entity.data.generic.kill_result
 		if type(entity.data.generic.kill_result) == "function" then
 			result = entity.data.generic.kill_result()
@@ -182,27 +159,71 @@ function fighting.hit(entity,attacker)
 				--todo check if spawning a stack is possible
 				minetest.add_item(mob_pos,result)
 			end
-			mobf_lifebar.del(entity.lifebar)
-			spawning.remove(entity, "killed")
+			spawning.remove(entity, kill_reason)
 		else
 			dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name
 				.. " custom on kill handler superseeds generic handling")
 		end
 		return
 	end
+end
 
+
+-------------------------------------------------------------------------------
+-- @function [parent=#fighting] hit(entity,attacker)
+--
+--! @brief handler for mob beeing hit
+--! @memberof fighting
+--
+--! @param entity mob being hit
+--! @param attacker player/object hitting the mob
+-------------------------------------------------------------------------------
+function fighting.hit(entity,attacker)
+	mobf_assert_backtrace(entity ~= nil)
+	mobf_assert_backtrace(attacker ~= nil)
+
+	--execute user defined on_hit_callback
+	if entity.data.generic.on_hit_callback ~= nil and
+			entity.data.generic.on_hit_callback(entity,attacker) == true
+		then
+		dbg_mobf.fighting_lvl2("MOBF: ".. entity.data.name .. " custom on hit handler superseeds generic handling")
+		return
+	end
+
+	--get some base information
+	local mob_pos     = entity.object:getpos()
+	local mob_basepos = entity.getbasepos(entity)
+	local targetpos   = attacker:getpos()
+	local dir         = mobf_get_direction(targetpos,mob_basepos)
+	
+	
 	--don't attack spawner
 	if entity.dynamic_data.spawning.spawner ~= nil and
 		attacker:is_player() then
 		local playername = attacker:get_player_name()
 		if entity.dynamic_data.spawning.spawner == playername then
 			if entity.dynamic_data.state.current ~= "combat" then
-				local current_yaw = entity.object:getyaw()
-				entity.object:setyaw(current_yaw + math.pi/4)
+				local tool = attacker:get_wielded_item()
+				-- rotation is only done if player punches using hand
+				if tool:get_name() == "" then
+					local current_yaw = entity.object:getyaw()
+					entity.object:setyaw(current_yaw + math.pi/4)
+					return
+				end
 			end
-			return
 		end
 	end
+
+	--play hit sound
+	if entity.data.sound ~= nil then
+		sound.play(mob_pos,entity.data.sound.hit);
+	end
+
+	--push mob back
+	fighting.push_back(entity,dir)
+	
+	--cause damage to be evaluated
+	fighting.dodamage(entity, attacker, "killed")
 
 	--dbg_mobf.fighting_lvl2("MOBF: attack chance is ".. entity.data.combat.angryness)
 	-- fight back
@@ -210,12 +231,12 @@ function fighting.hit(entity,attacker)
 		(	entity.data.combat.can_fight or
 			(entity.data.combat.angryness ~= nil and entity.data.combat.angryness > 0)
 
-		) then
+		) and
+		entity.object:get_hp() > (entity.data.generic.base_health/3) then
 
 		--face attacker
-		if entity.mode == "3d" then
-			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z))
-		else
+		--TODO this may be wrong for 2d mode too
+		if entity.mode ~= "3d" then
 			entity.object:setyaw(mobf_calc_yaw(dir.x,dir.z)-math.pi)
 		end
 
@@ -381,6 +402,12 @@ function fighting.switch_to_combat_state(entity,now,target)
 
 	--set target
 	entity.dynamic_data.current_movement_gen.set_target(entity,target)
+
+	-- play start_attack sound
+	if entity.data.sound ~= nil and
+		entity.data.sound.start_attack ~= nil then
+		sound.play(entity.object:getpos(),entity.data.sound.start_attack);
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -482,6 +509,11 @@ function fighting.combat(entity,now,dtime)
 		return false
 	end
 
+	--fight against generic enemy "sun"
+	if fighting.sun_damage_handler(entity,now) then
+		return false
+	end
+
 	if entity.dynamic_data.combat ~= nil and
 		entity.dynamic_data.combat.target ~= nil then
 
@@ -507,6 +539,24 @@ function fighting.combat(entity,now,dtime)
 					.. dump(entity.dynamic_data.combat.target))
 				return true
 			end
+		end
+
+		--make mob run away if only 1/3 of health is left
+		if entity.object:get_hp() < (entity.data.generic.base_health/3) then
+			local old_target = fighting.get_target(entity)
+
+			--restore state before attack
+			fighting.restore_previous_state(entity,now)
+
+			--stop attack
+			entity.dynamic_data.combat.target = nil
+
+			--make mob run away
+			if old_target ~= nil then
+				local dir        = mobf_get_direction(old_target:getpos(),entity.object:getpos())
+				fighting.run_away(entity,dir,old_target)
+			end
+			return true
 		end
 
 		local  targetname =
@@ -600,11 +650,6 @@ function fighting.combat(entity,now,dtime)
 				end
 			end
 		end
-	end
-
-	--fight against generic enemy "sun"
-	if fighting.sun_damage_handler(entity,now) then
-		return false
 	end
 
 	return true
@@ -887,16 +932,29 @@ function fighting.melee_attack_handler(entity,now,distance)
 			--do damage
 			target_obj:set_hp(target_health -damage_done)
 		else
+			local damage_groups = nil
+			
+			if entity.data.combat.melee.weapon_groupcaps ~= nil then
+				damage_groups = entity.data.combat.melee.weapon_damage_groups
+			end
+			
+			if damage_groups == nil and
+				entity.data.combat.melee.weapongroups ~= nil then
+				damage_groups = {}
+				
+				for i=1, #entity.data.combat.melee.weapongroups, 1 do
+					damage_groups[entity.data.combat.melee.weapon_damage_groups[i]] = damage_done
+				end
+			end
+			
+			if damage_groups == nil then
+				damage_groups= { fleshy=damage_done }
+			
+			end
+		
 			target_obj:punch(entity.object, 1.0, {
 							full_punch_interval=1.0,
-							groupcaps={
-								fleshy={times={	[1]=1/(damage_done-2),
-												[2]=1/(damage_done-1),
-												[3]=1/damage_done}},
-								snappy={times={	[1]=1/(damage_done-2),
-												[2]=1/(damage_done-1),
-												[3]=1/damage_done}},
-							}
+							damage_groups = damage_groups,
 						}, nil)
 		end
 
@@ -1147,7 +1205,7 @@ function fighting.set_target(entity,target)
 		dbg_mobf.fighting_lvl2("MOBF: switching attack target")
 
 		--set movement target
-		entity.dynamic_data.current_movement_gen.set_target(entity,target)
+		entity.dynamic_data.current_movement_gen.set_target(entity,target,true)
 
 		--set attack target
 		entity.dynamic_data.combat.target = target
@@ -1196,7 +1254,7 @@ function fighting.is_valid_target(target)
 end
 
 -------------------------------------------------------------------------------
--- @function [parent=#fighting] fighting.init_dynamic_data(entity)
+-- @function [parent=#fighting] init_dynamic_data()
 --
 --! @brief initialize all dynamic data on activate
 --! @memberof fighting
@@ -1217,3 +1275,135 @@ function fighting.init_dynamic_data(entity,now)
 
 	entity.dynamic_data.combat = data
 end
+
+-------------------------------------------------------------------------------
+-- @function [parent=#fighting] heal()
+--
+--! @brief heal a mob
+--! @memberof fighting
+--
+--! @param entity mob to do action
+--! @param player the one doing the rightclick
+-------------------------------------------------------------------------------
+function fighting.heal(entity,player)
+
+	local health = entity.object:get_hp()
+	
+	if entity.data.generic.base_health == entity.object:get_hp() then
+		return
+	end
+	
+	if not player:is_player() then
+		return
+	end
+	
+	local tool = player:get_wielded_item()
+		
+	if tool == nil then
+		return
+	end
+	
+	tool = tool:get_name()
+	
+	if not fighting.healdb[tool] then
+		print("unknown heal item: " .. tool)
+		return
+	end
+	
+	local new_health = 0
+	
+	print("healdb value: " .. dump(fighting.healdb[tool].value))
+	
+	if fighting.healdb[tool].value >= 0 then
+		new_health = MIN(entity.object:get_hp() + fighting.healdb[tool].value,
+							 entity.data.generic.base_health)
+	else
+		new_health = MAX(entity.object:get_hp() + fighting.healdb[tool].value, 0)
+	end
+	
+	entity.object:set_hp(new_health)
+	
+	if new_health <= 0.5 then
+		fighting.dodamage(entity, player, "poisoned")
+	else
+		mobf_lifebar.set(entity.lifebar,new_health/entity.hp_max)
+	end
+	
+	player:get_inventory():remove_item("main",tool.." 1")
+	
+	if fighting.healdb[tool].replacement ~= nil then
+		player:get_inventory():add_item("main",
+					fighting.healdb[tool].replacement.." 1")
+	end
+end
+
+-------------------------------------------------------------------------------
+-- @function [parent=#fighting] heal_caption()
+--
+--! @brief get caption for heal button
+--! @memberof fighting
+--
+--! @param entity mob to do action
+-------------------------------------------------------------------------------
+function fighting.heal_caption(entity)
+	if entity.data.generic.base_health ~= entity.object:get_hp() then
+		return "heal"
+	else
+		return "nothing to heal"
+	end
+end
+
+-------------------------------------------------------------------------------
+-- @function [parent=#fighting] update_healdb()
+--
+--! @brief update mobfs heal db
+--! @memberof fighting
+--
+--! @param hp_change
+--! @param replace_with_item
+--! @param itemstack -- unused
+--! @param player player issuing the update
+--! @param pointed_thing -- unused
+-------------------------------------------------------------------------------
+function fighting.update_healdb(hp_change, replace_with_item, itemstack, player,
+		pointed_thing)
+		
+	if not player:is_player() then
+		return
+	end
+	
+	local tool = player:get_wielded_item()
+	
+	if tool == nil then
+		return
+	end
+	
+	tool = tool:get_name()
+	
+	local replacement = nil
+	if replace_with_item ~= nil then
+		replacement = replace_with_item:get_name()
+	end
+	
+	if fighting.healdb == nil then
+		fighting.healdb = {}
+	end
+	
+	if fighting.healdb[tool] ~= nil and
+		fighting.healdb[tool].value == hp_change and
+		fighting.healdb[tool].replacement == replacement or
+		hp_change == nil then
+		return false
+	end
+	
+	
+	fighting.healdb[tool] = {
+		value = hp_change,
+		replacement = replacement
+	}
+	
+	minetest.world_setting_set("fighting.healdb",fighting.healdb)
+	return false
+end
+
+minetest.register_on_item_eat(fighting.update_healdb)

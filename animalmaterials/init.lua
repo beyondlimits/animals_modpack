@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -13,8 +13,18 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: animalmaterials loading ...")
-local version = "0.1.0"
+local version = "0.1.1"
 
 
 animalmaterialsdata = {}
@@ -37,7 +47,7 @@ animalmaterialsdata = {}
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 minetest.register_tool("animalmaterials:sword_deamondeath", {
-	description = "Sword (Deamondeath)",
+	description = S("Sword (Deamondeath)"),
 	inventory_image = "default_tool_steelsword.png",
 	tool_capabilities = {
 		full_punch_interval = 0.50,
@@ -57,7 +67,7 @@ minetest.register_tool("animalmaterials:sword_deamondeath", {
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 minetest.register_tool("animalmaterials:scissors", {
-	description = "Scissors",
+	description = S("Scissors"),
 	inventory_image = "animalmaterials_scissors.png",
 	tool_capabilities = {
 		max_drop_level=0,
@@ -73,7 +83,7 @@ minetest.register_tool("animalmaterials:scissors", {
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 minetest.register_craftitem("animalmaterials:lasso", {
-	description = "Lasso",
+	description = S("Lasso"),
 	image = "animalmaterials_lasso.png",
 	stack_max=10,
 })
@@ -84,7 +94,7 @@ minetest.register_craftitem("animalmaterials:lasso", {
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 minetest.register_craftitem("animalmaterials:net", {
-	description = "Net",
+	description = S("Net"),
 	image = "animalmaterials_net.png",
 	stack_max=10,
 })
@@ -95,7 +105,7 @@ minetest.register_craftitem("animalmaterials:net", {
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 minetest.register_craftitem("animalmaterials:saddle", {
-	description = "Saddle",
+	description = S("Saddle"),
 	image = "animalmaterials_saddle.png",
 	stack_max=1
 })
@@ -107,7 +117,7 @@ minetest.register_craftitem("animalmaterials:saddle", {
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 minetest.register_craftitem("animalmaterials:contract", {
-	description = "Contract",
+	description = S("Contract"),
 	image = "animalmaterials_contract.png",
 	stack_max=10,
 })
@@ -119,63 +129,63 @@ minetest.register_craftitem("animalmaterials:contract", {
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 minetest.register_craftitem("animalmaterials:meat_raw", {
-	description = "Raw meat",
+	description = S("Raw meat"),
 	image = "animalmaterials_meat_raw.png",
 	on_use = minetest.item_eat(1),
 	groups = { meat=1, eatable=1 },
 	stack_max=25
 })
 minetest.register_craftitem("animalmaterials:meat_pork", {
-	description = "Pork (raw)",
+	description = S("Pork (raw)"),
 	image = "animalmaterials_meat_raw.png",
 	on_use = minetest.item_eat(1),
 	groups = { meat=1, eatable=1 },
 	stack_max=25
 })
 minetest.register_craftitem("animalmaterials:meat_beef", {
-	description = "Beef (raw)",
+	description = S("Beef (raw)"),
 	image = "animalmaterials_meat_raw.png",
 	on_use = minetest.item_eat(1),
 	groups = { meat=1, eatable=1 },
 	stack_max=25
 })
 minetest.register_craftitem("animalmaterials:meat_chicken", {
-	description = "Chicken (raw)",
+	description = S("Chicken (raw)"),
 	image = "animalmaterials_meat_raw.png",
 	on_use = minetest.item_eat(1),
 	groups = { meat=1, eatable=1 },
 	stack_max=25
 })
 minetest.register_craftitem("animalmaterials:meat_lamb", {
-	description = "Lamb (raw)",
+	description = S("Lamb (raw)"),
 	image = "animalmaterials_meat_raw.png",
 	on_use = minetest.item_eat(1),
 	groups = { meat=1, eatable=1 },
 	stack_max=25
 })
 minetest.register_craftitem("animalmaterials:meat_venison", {
-	description = "Venison (raw)",
+	description = S("Venison (raw)"),
 	image = "animalmaterials_meat_raw.png",
 	on_use = minetest.item_eat(1),
 	groups = { meat=1, eatable=1 },
 	stack_max=25
 })
 minetest.register_craftitem("animalmaterials:meat_undead", {
-	description = "Meat (not quite dead)",
-	image = "animalmaterials_meat_raw.png",
+	description = S("Meat (not quite dead)"),
+	image = "animalmaterials_meat_undead_raw.png",
 	on_use = minetest.item_eat(-2),
 	groups = { meat=1, eatable=1 },
 	stack_max=5
 })
 minetest.register_craftitem("animalmaterials:meat_toxic", {
-	description = "Toxic Meat",
-	image = "animalmaterials_meat_raw.png",
+	description = S("Toxic Meat"),
+	image = "animalmaterials_meat_toxic_raw.png",
 	on_use = minetest.item_eat(-5),
 	groups = { meat=1, eatable=1 },
 	stack_max=5
 })
 minetest.register_craftitem("animalmaterials:meat_ostrich", {
-	description = "Ostrich Meat",
+	description = S("Ostrich Meat"),
 	image = "animalmaterials_meat_raw.png",
 	on_use = minetest.item_eat(3),
 	groups = { meat=1, eatable=1 },
@@ -183,7 +193,7 @@ minetest.register_craftitem("animalmaterials:meat_ostrich", {
 })
 
 minetest.register_craftitem("animalmaterials:fish_bluewhite", {
-	description = "Fish (bluewhite)",
+	description = S("Fish (bluewhite)"),
 	image = "animalmaterials_meat_raw.png",
 	on_use = minetest.item_eat(1),
 	groups = { meat=1, eatable=1 },
@@ -191,7 +201,7 @@ minetest.register_craftitem("animalmaterials:fish_bluewhite", {
 })
 
 minetest.register_craftitem("animalmaterials:fish_clownfish", {
-	description = "Fish (clownfish)",
+	description = S("Fish (clownfish)"),
 	image = "animalmaterials_meat_raw.png",
 	on_use = minetest.item_eat(1),
 	groups = { meat=1, eatable=1 },
@@ -204,7 +214,7 @@ minetest.register_craftitem("animalmaterials:fish_clownfish", {
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 minetest.register_craftitem("animalmaterials:feather", {
-	description = "Feather",
+	description = S("Feather"),
 	image = "animalmaterials_feather.png",
 	stack_max=25
 })
@@ -215,7 +225,7 @@ minetest.register_craftitem("animalmaterials:feather", {
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 minetest.register_craftitem("animalmaterials:milk", {
-	description = "Milk",
+	description = S("Milk"),
 	image = "animalmaterials_milk.png",
 	on_use = minetest.item_eat(1),
 	groups = { eatable=1 },
@@ -228,13 +238,13 @@ minetest.register_craftitem("animalmaterials:milk", {
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 minetest.register_craftitem("animalmaterials:egg", {
-	description = "Egg",
+	description = S("Egg"),
 	image = "animalmaterials_egg.png",
 	stack_max=10
 })
 
 minetest.register_craftitem("animalmaterials:egg_big", {
-	description = "Egg (big)",
+	description = S("Egg (big)"),
 	image = "animalmaterials_egg_big.png",
 	stack_max=5
 })
@@ -266,7 +276,7 @@ animalmaterialsdata["animalmaterials_egg_big"] = {
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 minetest.register_craftitem("animalmaterials:bone", {
-	description = "Bone",
+	description = S("Bone"),
 	image = "animalmaterials_bone.png",
 	stack_max=25
 })
@@ -277,19 +287,19 @@ minetest.register_craftitem("animalmaterials:bone", {
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 minetest.register_craftitem("animalmaterials:fur", {
-	description = "Fur",
+	description = S("Fur"),
 	image = "animalmaterials_fur.png",
 	stack_max=25
 })
 
 minetest.register_craftitem("animalmaterials:fur_deer", {
-	description = "Deer fur",
+	description = S("Deer fur"),
 	image = "animalmaterials_deer_fur.png",
 	stack_max=10
 })
 
 minetest.register_craftitem("animalmaterials:coat_cattle", {
-	description = "Cattle coat",
+	description = S("Cattle coat"),
 	image = "animalmaterials_cattle_coat.png",
 	stack_max=10
 })
@@ -301,13 +311,13 @@ minetest.register_craftitem("animalmaterials:coat_cattle", {
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 minetest.register_craftitem("animalmaterials:deer_horns", {
-	description = "Deer horns",
+	description = S("Deer horns"),
 	image = "animalmaterials_deer_horns.png",
 	stack_max=20
 })
 
 minetest.register_craftitem("animalmaterials:ivory", {
-	description = "Ivory",
+	description = S("Ivory"),
 	image = "animalmaterials_ivory.png",
 	stack_max=20
 })
@@ -319,22 +329,22 @@ minetest.register_craftitem("animalmaterials:ivory", {
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 minetest.register_craftitem("animalmaterials:scale_golden", {
-	description = "Scale (golden)",
+	description = S("Scale (golden)"),
 	image = "animalmaterials_scale_golden.png",
 	stack_max=25
 })
 minetest.register_craftitem("animalmaterials:scale_white", {
-	description = "Scale (white)",
+	description = S("Scale (white)"),
 	image = "animalmaterials_scale_white.png",
 	stack_max=25
 })
 minetest.register_craftitem("animalmaterials:scale_grey", {
-	description = "Scale (grey)",
+	description = S("Scale (grey)"),
 	image = "animalmaterials_scale_grey.png",
 	stack_max=25
 })
 minetest.register_craftitem("animalmaterials:scale_blue", {
-	description = "Scale (blue)",
+	description = S("Scale (blue)"),
 	image = "animalmaterials_scale_blue.png",
 	stack_max=25
 })
@@ -363,3 +373,4 @@ minetest.register_craft({
 })
 
 minetest.log("action","MOD: animalmaterials mod version " .. version .. " loaded")
+

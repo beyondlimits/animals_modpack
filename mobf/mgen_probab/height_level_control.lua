@@ -17,7 +17,8 @@
 -------------------------------------------------------------------------------
 
 --! @class height_level_control
---! @brief class containing height level functionality
+--! @brief Subcomponent of probabilistic movement generator containing height
+--! level control and change functionality
 height_level_control = {}
 
 

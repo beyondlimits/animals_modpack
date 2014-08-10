@@ -3,6 +3,7 @@ Mob Framework Mod (former animals mod) provides a framework for creating mobs
 
 (c) sapier (code,some graphics)
 (c) rinoux (many 2D graphics)
+(c) Xanthin (german translation)
 
 Contact sapier a t gmx net
 -------------------------------------------------------------------------------
@@ -18,6 +19,34 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.4.0
+-updated version information
+
+Changes 2.3.92
+-updated adv_spawning
+
+Changes 2.3.91
+-improve advanced spawning
+-make fighting mobs (a little bit) more smart
+-add bear
+-improve building spawner
+-fix mob orientation in combat
+-fix mob orientation on riding
+-update license information
+-make ckick spawn from egg
+-add plantlive plants and vines
+-rewrite mobf_settings
+-add intllib support (thanks xanthin)
+-fix b3d models spaming server log due to missing texture
+-improve partroling mode
+-fix factions support
+-fix slabs for some mobs
+-add support for healing own mobs
+-lots of minor bugfixes ... see github commit log
+
+Changes 2.3.90
+-switched to adv_spawning
+
 Changes 2.3.6
 -fix crash on grow up chick combined with delayed activation
 -fix huge amounts of mobs beeing spawned in oveload state

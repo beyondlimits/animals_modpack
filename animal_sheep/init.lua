@@ -13,9 +13,19 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.1.3"
+local version = "0.2.2"
 
 local sheep_groups = {
 						sheerable=1,
@@ -23,10 +33,10 @@ local sheep_groups = {
 						not_in_creative_inventory=1
 					}
 
-local selectionbox_sheep = {-0.65, -0.8, -0.65, 0.65, 0.45, 0.65}
+local selectionbox_sheep = {-0.65, -0.75, -0.65, 0.65, 0.45, 0.65}
 local selectionbox_lamb = {-0.65*0.6, -0.8*0.6, -0.65*0.6, 0.65*0.6, 0.45*0.6, 0.65*0.65}
 
-sheep_prototype = {
+local sheep_prototype = {
 		name="sheep",
 		modname="animal_sheep",
 
@@ -38,7 +48,7 @@ sheep_prototype = {
 			},
 
 		generic = {
-					description="Sheep",
+					description= S("Sheep"),
 					base_health=10,
 					kill_result="animalmaterials:meat_lamb 2",
 					armor_groups= {
@@ -46,6 +56,7 @@ sheep_prototype = {
 					},
 					groups = sheep_groups,
 					envid="meadow",
+					population_density = 50
 				},
 		movement =  {
 					min_accel=0.05,
@@ -54,10 +65,11 @@ sheep_prototype = {
 					min_speed=0.1,
 					pattern="stop_and_go",
 					canfly=false,
+--					max_distance = 0.1
 					},
 		harvest = {
 					tool="animalmaterials:scissors",
-					max_tool_usage=10,
+					max_tool_usage=40,
 					tool_consumed=false,
 					result="wool:white 1",
 					transforms_to="animal_sheep:sheep_naked",
@@ -67,24 +79,6 @@ sheep_prototype = {
 					tool="animalmaterials:lasso",
 					consumed=true,
 					},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0.002,
-						density=50,
-						algorithm="willow_mapgen",
-						height=2
-						},
-					},
-					secondary_algorithms = {
-						{
-						rate=0.002,
-						density=50,
-						algorithm="willow",
-						height=2
-						},
-					}
-				},
 		sound = {
 					random = {
 								name="Mudchute_sheep_1",
@@ -99,11 +93,16 @@ sheep_prototype = {
 								max_hear_distance = 5
 								},
 					},
+		--animation testing only
+--		patrol = {
+--					state = "patrol",
+--					cycle_path = true,
+--				},
 		animation = {
 				walk = {
 					start_frame = 0,
 					end_frame   = 60,
-					basevelocity = 0.25,
+					basevelocity = 3,
 					},
 				stand = {
 					start_frame = 61,
@@ -171,6 +170,14 @@ sheep_prototype = {
 				chance = 0,
 				animation = "walk",
 				},
+--				{
+--				name = "patrol",
+--				movgen = "mgen_path",
+--				typical_state_time = 9999,
+--				chance = 0.0,
+--				animation = "walk",
+--				state_mode = "user_def",
+--				},
 			},
 		hunger = {
 			target_nodes = { "default:junglegrass",
@@ -186,7 +193,7 @@ sheep_prototype = {
 			}
 		}
 
-lamb_prototype = {
+local lamb_prototype = {
 		name="lamb",
 		modname="animal_sheep",
 
@@ -198,13 +205,14 @@ lamb_prototype = {
 			},
 
 		generic = {
-					description="Lamp",
+					description= S("Lamb"),
 					base_health=3,
 					kill_result="animalmaterials:meat_lamb 1",
 					armor_groups= {
 						fleshy=85,
 					},
 					envid="meadow",
+					population_density = 0
 				},
 		movement =  {
 					canfly=false,
@@ -223,16 +231,6 @@ lamb_prototype = {
 					result="animal_sheep:sheep",
 					delay=1800
 					},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0,
-						density=0,
-						algorithm="none",
-						height=1
-						},
-					}
-				},
 		sound = {
 					random = {
 								name="Mudchute_lamb_1",
@@ -246,7 +244,7 @@ lamb_prototype = {
 				walk = {
 					start_frame = 0,
 					end_frame   = 60,
-					basevelocity = 0.25,
+					basevelocity = 3,
 					},
 				stand = {
 					start_frame = 61,
@@ -328,7 +326,7 @@ lamb_prototype = {
 			}
 		}
 
-sheep_naked_prototype = {
+local sheep_naked_prototype = {
 		name="sheep_naked",
 		modname="animal_sheep",
 
@@ -340,13 +338,14 @@ sheep_naked_prototype = {
 			},
 
 		generic = {
-					description="Naked sheep",
+					description= S("Naked sheep"),
 					base_health=10,
 					kill_result="animalmaterials:meat_lamb 2",
 					armor_groups= {
 						fleshy=85,
 					},
-					envid="meadow"
+					envid="meadow",
+					population_density = 0
 				},
 		movement =  {
 					canfly=false,
@@ -364,16 +363,6 @@ sheep_naked_prototype = {
 					result="animal_sheep:sheep",
 					delay=300
 					},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0,
-						density=0,
-						algorithm="none",
-						height=2
-						},
-					}
-				},
 		sound = {
 					random = {
 								name="Mudchute_sheep_1",
@@ -479,6 +468,51 @@ minetest.register_craft({
 	}
 })
 
+local spawneename   = sheep_prototype.modname .. ":"  .. sheep_prototype.name
+local secondaryname = sheep_naked_prototype.modname .. ":"  .. sheep_naked_prototype.name
+
+local sheep_env = mobf_environment_by_name(sheep_prototype.generic.envid)
+
+mobf_spawner_register("sheep_spawner_1",spawneename,
+	{
+	spawnee = spawneename,
+	spawn_interval = 120,
+	spawn_inside = sheep_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=spawneename,
+				distance=sheep_prototype.generic.population_density,threshold=2 },
+			{ type="MAX",entityname=secondaryname,
+				distance=sheep_prototype.generic.population_density,threshold=2 }
+		},
+
+	nodes_around =
+		{
+			{ type="MAX", name = { "default:leaves","default:tree"},distance=5,threshold=0}
+		},
+
+	absolute_height =
+	{
+		min = -10,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 10,
+		spawntotal = 3,
+	},
+
+	flat_area =
+	{
+		range = 1,
+	},
+
+	surfaces = sheep_env.surfaces.good,
+	collisionbox = selectionbox_sheep
+	})
+
 minetest.log("action","\tadding animal "..sheep_prototype.name)
 mobf_add_mob(sheep_prototype)
 minetest.log("action","\tadding animal "..sheep_naked_prototype.name)
@@ -487,3 +521,4 @@ minetest.log("action","\tadding animal "..lamb_prototype.name)
 mobf_add_mob(lamb_prototype)
 
 minetest.log("action","MOD: animal_sheep mod           version " .. version .. " loaded")
+

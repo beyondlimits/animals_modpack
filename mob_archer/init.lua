@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -13,9 +13,19 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: mob_archer mod loading ...")
 
-local version = "0.0.5"
+local version = "0.1.2"
 local archer_groups = {
 						not_in_creative_inventory=1
 					}
@@ -23,16 +33,16 @@ local archer_groups = {
 archer_prototype = {
 		name="archer",
 		modname="mob_archer",
-		
+
 		factions = {
 			member = {
 				"npc",
 				"hireling"
 				}
 			},
-	
+
 		generic = {
-					description="Archer",
+					description= S("Archer"),
 					base_health=40,
 					kill_result="",
 					armor_groups= {
@@ -40,6 +50,7 @@ archer_prototype = {
 					},
 					groups = archer_groups,
 					envid="on_ground_1",
+					stepheight = 0.51,
 				},
 		movement =  {
 					guardspawnpoint = true,
@@ -56,16 +67,6 @@ archer_prototype = {
 					tool="animalmaterials:contract",
 					consumed=true,
 					},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0,
-						density=0,
-						algorithm="none",
-						height=2
-						},
-					}
-				},
 		combat = {
 					angryness=0.99,
 					starts_attack=true,
@@ -73,7 +74,7 @@ archer_prototype = {
 					attack_hostile_mobs = true,
 					melee = {
 						maxdamage=1,
-						range=2, 
+						range=2,
 						speed=1,
 						},
 					distance = {
@@ -86,7 +87,7 @@ archer_prototype = {
 					self_destruct = nil,
 					},
 		states = {
-				{ 
+				{
 				name = "combat_distance",
 				movgen = "none",
 				typical_state_time = 9999,
@@ -94,7 +95,7 @@ archer_prototype = {
 				animation = "shoot",
 				state_mode = "combat",
 				},
-				{ 
+				{
 				name = "combat",
 				movgen = "none",
 				typical_state_time = 9999,
@@ -102,7 +103,7 @@ archer_prototype = {
 				animation = "punch",
 				state_mode = "combat",
 				},
-				{ 
+				{
 				name = "default",
 				movgen = "follow_mov_gen",
 				typical_state_time = 180,
@@ -122,6 +123,7 @@ archer_prototype = {
 				walk = {
 					start_frame = 168,
 					end_frame   = 187,
+					basevelocity = 18,
 					},
 				stand = {
 					start_frame = 0,

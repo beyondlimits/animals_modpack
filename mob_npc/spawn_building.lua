@@ -42,7 +42,9 @@ blueprint_hut = {
 
 	--floor
 		{"default:cobble",{x=0,y=0,z=0},{x=5,y=0,z=4}},
+		{"stairs:slab_stonebrick",{x=-1,y=0,z=-2}, {x=3,y=0,z=-1}, nil, { "air" } },
 		{"default:cobble",{x=0,y=0,z=-1},{x=2,y=0,z=-1}},
+
 
 	--walls
 		{"default:tree",{x=0,y=1,z=0},{x=5,y=3,z=0}},
@@ -137,9 +139,10 @@ blueprint_normalhouse = {
 table.insert(mob_npc_houses,blueprint_normalhouse)
 table.insert(mob_npc_houses,blueprint_hut)
 
-function building_spawner.buid_wall(material,startpos,endpos,param2)
+function building_spawner.buid_wall(material,startpos,endpos,param2,optional)
 
-	--print("builder: wall: ".. dump(material) .. " " .. dump(startpos) .. " " .. dump(endpos))
+--	print("builder: wall: ".. dump(material) .. " " .. dump(startpos) .. " "
+--			.. dump(endpos).. " " .. dump(param2) .. " " .. dump(optional))
 
 	if startpos.x ~= endpos.x and
 		startpos.y ~= endpos.y and
@@ -157,7 +160,23 @@ function building_spawner.buid_wall(material,startpos,endpos,param2)
 
 		for y=startpos.y,endpos.y,1 do
 		for z=startpos.z,endpos.z,1 do
-			minetest.set_node({x=startpos.x,y=y,z=z},{ name=material,param2=param2 } )
+			if optional == nil then
+				minetest.set_node({x=startpos.x,y=y,z=z},{ name=material,param2=param2 } )
+			else
+				local node = minetest.get_node({x=x,y=startpos.y,z=z})
+				if node ~= nil then
+					local replaceable = false
+					for i=1,#optional,1 do
+						if node.name == optional[i] then
+							replaceable = true
+						end
+					end
+
+					if replaceable then
+						minetest.set_node({x=x,y=startpos.y,z=z},{ name=material,param2=param2 })
+					end
+				end
+			end
 		end
 		end
 	end
@@ -165,7 +184,23 @@ function building_spawner.buid_wall(material,startpos,endpos,param2)
 	if startpos.y == endpos.y then
 		for x=startpos.x,endpos.x,1 do
 		for z=startpos.z,endpos.z,1 do
-			minetest.set_node({x=x,y=startpos.y,z=z},{ name=material,param2=param2 })
+			if optional == nil then
+				minetest.set_node({x=x,y=startpos.y,z=z},{ name=material,param2=param2 })
+			else
+				local node = minetest.get_node({x=x,y=startpos.y,z=z})
+				if node ~= nil then
+					local replaceable = false
+					for i=1,#optional,1 do
+						if node.name == optional[i] then
+							replaceable = true
+						end
+					end
+
+					if replaceable then
+						minetest.set_node({x=x,y=startpos.y,z=z},{ name=material,param2=param2 })
+					end
+				end
+			end
 		end
 		end
 	end
@@ -173,7 +208,23 @@ function building_spawner.buid_wall(material,startpos,endpos,param2)
 	if startpos.z == endpos.z then
 		for y=startpos.y,endpos.y,1 do
 		for x=startpos.x,endpos.x,1 do
-			minetest.set_node({x=x,y=y,z=startpos.z},{ name=material,param2=param2 })
+			if optional == nil then
+				minetest.set_node({x=x,y=y,z=startpos.z},{ name=material,param2=param2 })
+			else
+				local node = minetest.get_node({x=x,y=startpos.y,z=z})
+				if node ~= nil then
+					local replaceable = false
+					for i=1,#optional,1 do
+						if node.name == optional[i] then
+							replaceable = true
+						end
+					end
+
+					if replaceable then
+						minetest.set_node({x=x,y=startpos.y,z=z},{ name=material,param2=param2 })
+					end
+				end
+			end
 		end
 		end
 	end
@@ -257,7 +308,7 @@ function building_spawner.builder(startpos,blueprint,mobname)
 							y=startpos.y + blueprint.walls[i][3].y,
 							z=startpos.z + blueprint.walls[i][3].z
 						},
-						blueprint.walls[i][4])
+						blueprint.walls[i][4],blueprint.walls[i][5])
 		end
 
 		--mobf_print("Spawn building: populating with " .. #blueprint.entities .. " entities")
@@ -286,63 +337,58 @@ function building_spawner.builder(startpos,blueprint,mobname)
 	return false
 end
 
--------------------------------------------------------------------------------
--- name: mobf_spawn_on_willow_mapgen(mob_name,mob_transform,spawning_data,environment)
---
---! @brief find a place on willow to spawn a mob on map generation
---
---! @param mob_name name of mob
---! @param mob_transform secondary name of mob
---! @param spawning_data spawning configuration
---! @param environment environment of mob
--------------------------------------------------------------------------------
-function mob_npc_spawn_building(spawning_data)
-	minetest.log(LOGLEVEL_INFO,"MOBF:\tspawn_building spawner for mob "..spawning_data.name)
 
-	local spawnfunc = function(sp_data,pos)
+function building_spawner.spawn_check(pos)
 
-			if math.random() < 0.25 then
-				local blueprint = mob_npc_houses[math.random(1,#mob_npc_houses)]
+	pos.x = math.floor(pos.x)
+	pos.z = math.floor(pos.z)
 
-				pos.x = math.floor(pos.x)
-				pos.z = math.floor(pos.z)
+	if not building_spawner.checkdistance(pos,750) then
+		return false
+	end
 
-				if not building_spawner.checkdistance(pos,sp_data.density) then
-					return false
-				end
+	local blueprint = mob_npc_houses[math.random(1,#mob_npc_houses)]
 
-				if building_spawner.builder(pos,blueprint,sp_data.name) then
-					building_spawner.addspawnpoint(pos)
-					return true
-				end
-			end
-			return false
+	if not building_spawner.checkfloor(
+			{
+				x=pos.x -1,
+				y=pos.y,
+				z=pos.z -1
+			},
+			{
+				x=pos.x +blueprint.size.x + 1,
+				y=pos.y,
+				z=pos.z +blueprint.size.z + 1
+			}
+		) then
+		return false
+	end
+
+	building_spawner.checked_blueprint = { bp = blueprint, pos = pos }
+	return true
+end
+
+function building_spawner.spawnfunc(pos)
+
+	if building_spawner.checked_blueprint ~= nil and
+		pos.x == building_spawner.checked_blueprint.pos.x and
+		pos.y == building_spawner.checked_blueprint.pos.y and
+		pos.z == building_spawner.checked_blueprint.pos.z then
+
+		local retval = building_spawner.builder(pos,
+						building_spawner.checked_blueprint.bp,
+						"mob_npc:npc_trader")
+
+		building_spawner.checked_blueprint = nil
+		if retval then
+			building_spawner.addspawnpoint(pos)
 		end
 
-	if minetest.world_setting_get("mobf_delayed_spawning") then
-		minetest.register_on_generated(function(minp, maxp, seed)
-			local job = {
-				callback = spawning.divide_mapgen_jobfunc,
-				data = {
-					minp          = minp,
-					maxp          = maxp,
-					spawning_data = spawning_data,
-					spawnfunc     = spawnfunc,
-					surfacefunc   = mobf_get_sunlight_surface,
-					maxtries      = 20,
-					spawned       = 0,
-					func          = spawning.divide_mapgen_jobfunc
-					}
-				}
-			mobf_job_queue.add_job(job)
-		end)
-	else
-		--add mob on map generation
-		minetest.register_on_generated(function(minp, maxp, seed)
-			spawning.divide_mapgen(minp,maxp,spawning_data,spawnfunc,mobf_get_sunlight_surface,20)
-		end)
+		return retval
 	end
-end --end spawn algo
+
+	return false
+end
 
 function build_house_cmd_handler(name,param)
 	local parameters = param:split(" ")
@@ -398,5 +444,3 @@ minetest.register_chatcommand("build_house",
 				func		= build_house_cmd_handler,
 
 			})
-
-spawning.register_spawn_algorithm("building_spawner", mob_npc_spawn_building)

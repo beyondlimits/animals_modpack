@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file data_storage.lua
@@ -27,16 +27,16 @@
 --
 --! @return unique identifier
 -------------------------------------------------------------------------------
-mobf_global_data_identifier = 0
-mobf_global_data = {}
+local mobf_global_data_identifier = 0
+local mobf_global_data = {}
 mobf_global_data.cleanup_index = 0
 mobf_global_data.last_cleanup = mobf_get_current_time()
 function mobf_global_data_store(value)
 
 	local current_id = mobf_global_data_identifier
-	
+
 	mobf_global_data_identifier = mobf_global_data_identifier + 1
-	
+
 	mobf_global_data[current_id] = {
 									value = value,
 									added = mobf_get_current_time(),
@@ -58,7 +58,7 @@ function mobf_global_data_get(id)
 
 	local dataid = tonumber(id)
 
-	if dataid == nil or 
+	if dataid == nil or
 		mobf_global_data[dataid] == nil then
 		dbg_mobf.generic_lvl1("MOBF: data not found, id: " .. dump(dataid))
 		return nil
@@ -77,25 +77,25 @@ end
 -------------------------------------------------------------------------------
 function mobf_global_data_cleanup()
 
-	if mobf_global_data.last_cleanup + 500 < 
+	if mobf_global_data.last_cleanup + 500 <
 											mobf_get_current_time() then
 
 		for i=1,50,1 do
 			if mobf_global_data[mobf_global_data.cleanup_index] ~= nil then
-				if mobf_global_data[mobf_global_data.cleanup_index].added < 
+				if mobf_global_data[mobf_global_data.cleanup_index].added <
 						mobf_get_current_time() - 300 then
-						
+
 					mobf_global_data[mobf_global_data.cleanup_index] = nil
 				end
 				mobf_global_data.cleanup_index = mobf_global_data.cleanup_index +1
-				
+
 				if mobf_global_data.cleanup_index > #mobf_global_data then
 					mobf_global_data.cleanup_index = 0
 					break
 				end
 			end
 		end
-		
+
 		mobf_global_data.last_cleanup = mobf_get_current_time()
 	end
 end

@@ -170,6 +170,8 @@ local mob_template = {
 			range=2,
 			--! @brief [MANDATORY] minimum time between two hits
 			speed=2,
+			--! @brief [OPTIONAL] list of groups damage is done to, if not specified "fleshy" is used
+			weapon_damage_groups= { "fleshy" },
 			},
 		--! @brief [OPTIONAL] configuration of distance attack
 		distance = {

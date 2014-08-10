@@ -1,9 +1,18 @@
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 local version = "0.0.3"
 
 minetest.log("action","MOD: trap mod loading ...")
 
 minetest.register_craftitem("trap:undead", {
-			description = "Trap for undead mobs",
+			description = S("Trap for undead mobs"),
 			image = minetest.inventorycube("trap_undead.png","trap_undead.png","trap_undead.png"),
 			on_place = function(item, placer, pointed_thing)
 				if pointed_thing.type == "node" then
@@ -76,7 +85,7 @@ minetest.register_entity(":trap:undead_ent",
 	
 
 minetest.register_node("trap:cought_vombie", {
-		description = "Trap containing vombie",
+		description = S("Trap containing vombie"),
 		tile_images = {"trap_cought_vombie.png"},
 		drawtype = "normal",
 		groups = { snappy=3 },

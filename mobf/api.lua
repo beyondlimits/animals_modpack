@@ -72,7 +72,8 @@ function mobf_add_mob(mob)
 		return false
 	end
 
-	--check if mob may be added
+	--check if mob is blacklisted
+	--mobs from the blacklist are pre-registered at startup
 	if mobf_contains(mobf_rtd.registred_mob,mob.modname.. ":"..mob.name) then
 		mobf.blacklisthandling(mob)
 		return false
@@ -106,7 +107,9 @@ function mobf_add_mob(mob)
 
 						if spawned_entity ~= nil then
 						spawned_entity.dynamic_data.initialized = false
-						spawned_entity.dynamic_data.last_static_data = staticdata
+						if (staticdata ~= "") then
+							spawned_entity.dynamic_data.last_static_data = staticdata
+						end
 						end
 					end
 					self.object:remove()
@@ -120,7 +123,12 @@ function mobf_add_mob(mob)
 		minetest.log(LOGLEVEL_WARNING,"MOBF: no movement pattern specified!")
 	end
 
-	spawning.register_mob(mob)
+	if mob.spawning ~= nil then
+		minetest.log(LOGLEVEL_WARNING,"MOBF: \"" .. mob.name ..
+			"\" is still using mob internal spawning," ..
+			" this is DEPRECATED and going to be removed soon!")
+		spawning.register_mob(mob)
+	end
 
 	--register factions required by mob
 	mobf_factions.setupmob(mob.factions)
@@ -170,6 +178,23 @@ function mobf_register_environment(name,environment)
 end
 
 ------------------------------------------------------------------------------
+-- @function mobf_environment_by_name(name)
+--
+--! @brief get environment by name
+--! @ingroup framework_mob
+--
+--! @param name of environment
+--! @return environment definition
+-------------------------------------------------------------------------------
+function mobf_environment_by_name(name)
+	if environment_list[name] ~= nil then
+		return minetest.deserialize(minetest.serialize(environment_list[name]))
+	else
+		return nil
+	end
+end
+
+------------------------------------------------------------------------------
 -- @function mobf_probab_movgen_register_pattern(pattern)
 --
 --! @brief register an movement pattern for probabilistic movement gen
@@ -180,4 +205,86 @@ end
 -------------------------------------------------------------------------------
 function mobf_probab_movgen_register_pattern(pattern)
 	return movement_gen.register_pattern(pattern)
+end
+
+------------------------------------------------------------------------------
+-- @function mobf_spawner_register(name,spawndef)
+--
+--! @brief register a spawndef to adv_spawning
+--! @ingroup framework_mob
+--
+--! @param name of spawner
+--! @param mobname name of mob to register spawner for
+--! @param spawndef defintion of spawner
+--! @return true/false
+-------------------------------------------------------------------------------
+function mobf_spawner_register(name,mobname,spawndef)
+
+	--check if spawning is enabled
+	if minetest.world_setting_get("mobf_disable_animal_spawning") then
+		return false
+	end
+
+	--check if mob is blacklisted
+	if mobf_contains(mobf_rtd.registred_mob,mobname) then
+		minetest.log(LOGLEVEL_NOTICE,"MOBF: " .. mobname .. " is blacklisted, not adding spawner")
+		return false
+	end
+
+	local customcheck = spawndef.custom_check
+
+
+	spawndef.custom_check = function(pos,spawndef)
+			local entities_around = spawndef.entities_around
+
+			if entities_around ~= nil then
+				for i=1,#entities_around,1 do
+
+					--only do this check if relevant area is larger then activity range
+					if entities_around[i].distance > adv_spawning.active_range then
+						local count = spawning.count_deactivated_mobs(
+												mobname,
+												pos,
+												entities_around[i].distance)
+
+						local entity_active =
+							minetest.get_objects_inside_radius(pos,
+												entities_around[i].distance)
+
+						for j=1,#entity_active,1 do
+							local entity = entity_active[j]:get_luaentity()
+
+							if entity ~= nil then
+								if entity.name == entities_around[i].entityname then
+									count = count +1
+								end
+
+								if count + count > entities_around[i].threshold then
+									break
+								end
+							end
+						end
+
+						if entities_around[i].type == "MIN" and
+							count < entities_around[i].threshold then
+							return false
+						end
+
+						if entities_around[i].type == "MAX" and
+							count > entities_around[i].threshold then
+							return false
+						end
+					end
+				end
+			end
+
+			if type(customcheck) == "function" and not customcheck(pos,spawndef) then
+				return false
+			end
+
+			return true
+		end
+
+	--register
+	adv_spawning.register(name,spawndef)
 end

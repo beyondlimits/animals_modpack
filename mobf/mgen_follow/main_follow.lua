@@ -120,7 +120,8 @@ function mgen_follow.handleteleport(entity,now,targetpos)
 												z=targetpos.z
 												})) and
 				current_offset < maxoffset do
-				print("MOBF: teleport target within block trying above: " .. current_offset)
+				dbg_mobf.fmovement_lvl2(
+					"MOBF: teleport target within block trying above: " .. current_offset)
 				current_offset = current_offset +1
 			end
 
@@ -174,6 +175,11 @@ function mgen_follow.callback(entity,now)
 			follow_speedup.x= entity.data.movement.follow_speedup
 			follow_speedup.z= entity.data.movement.follow_speedup
 		end
+	end
+	
+	--if speedup is disabled reset
+	if not entity.dynamic_data.movement.follow_speedup then
+		follow_speedup = { x=1, y=1, z=1}
 	end
 
 	--check max speed limit
@@ -249,9 +255,11 @@ function mgen_follow.callback(entity,now)
 		entity.dynamic_data.movement.invalid_env_count = 0
 	end
 
+	local current_accel = entity.object:getacceleration()
+
 	if pos_quality.level_quality ~= LQ_OK and
 		entity.data.movement.canfly then
-		local current_accel = entity.object:getacceleration()
+		
 
 		if pos_quality.level_quality == LQ_ABOVE then
 			if current_accel.y >= 0 then
@@ -272,8 +280,6 @@ function mgen_follow.callback(entity,now)
 
 	--fixup height fixup
 	if entity.data.movement.canfly then
-		local current_accel = entity.object:getacceleration()
-
 		if current_accel.y ~= 0 then
 			current_accel.y = 0
 			entity.object:setacceleration(current_accel)
@@ -309,7 +315,6 @@ function mgen_follow.callback(entity,now)
 			.. " TGT: " .. dump(entity.dynamic_data.movement.target))
 			return
 		end
-
 
 		local distance = nil
 
@@ -421,12 +426,14 @@ function mgen_follow.callback(entity,now)
 			end
 		--nothing to do
 		else
-			if entity.dynamic_data.movement.was_moving_last_step == true then
-				local yaccel = environment.get_default_gravity(basepos,
+			local yaccel = environment.get_default_gravity(basepos,
 							entity.environment.media,
 							entity.data.movement.canfly)
+							
+			if entity.dynamic_data.movement.was_moving_last_step == true or
+				current_accel.Y ~= yaccel then
 
-				dbg_mobf.fmovement_lvl3("MOBF:   next to target")
+				dbg_mobf.fmovement_lvl3("MOBF: next to target")
 				entity.object:setvelocity({x=0,y=0,z=0})
 				entity.object:setacceleration({x=0,y=yaccel,z=0})
 				entity.dynamic_data.movement.last_next_to_target = now
@@ -497,6 +504,7 @@ function mgen_follow.init_dynamic_data(entity,now)
 			guardspawnpoint = false,
 			max_distance = entity.data.movement.max_distance,
 			invalid_env_count = 0,
+			follow_speedup = true,
 			}
 
 	if entity.data.movement.guardspawnpoint ~= nil and
@@ -531,13 +539,17 @@ function mgen_follow.checkspeed(entity)
 
 	if (xzspeed > entity.data.movement.max_speed) then
 
-		--preserver orientation when correcting speed
-		local dir = mobf_calc_yaw(current_velocity.x,current_velocity.z)
-		local velocity_to_set = mobf_calc_vector_components(dir,entity.data.movement.max_speed * 0.25)
+		local direction = mobf_calc_yaw(current_velocity.x,
+										current_velocity.z)
 
-		velocity_to_set.y=current_velocity.y
+		--reduce speed to 90% of current speed
+		local new_speed = mobf_calc_vector_components(direction,xzspeed*0.9)
 
-		entity.object:setvelocity(velocity_to_set)
+		local current_accel = entity.object:getacceleration()
+
+		new_speed.y = current_velocity.y
+		entity.object:setvelocity(new_speed)
+		entity.object:setacceleration({x=0,y=current_accel.y,z=0})
 
 		return true
 	end

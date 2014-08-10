@@ -314,6 +314,14 @@ function mobf_debug.init()
 			func		= mobf_debug.mob_count
 		})
 
+	minetest.register_chatcommand("mobf_mobs_offline",
+		{
+			params		= "",
+			description = "print offline mobs" ,
+			privs		= {},
+			func		= mobf_debug.print_offline_mobs
+		})
+
 
 	if mobf_rtd.luatrace_enabled then
 		minetest.register_chatcommand("traceon",
@@ -338,11 +346,34 @@ function mobf_debug.init()
 	end
 end
 
-
 -------------------------------------------------------------------------------
--- @function [parent=#mobf_debug] handle_spawnhouse(name,message)
+-- @function [parent=#mobf_debug] print_offline_mobs(name,message)
 --
 --! @brief spawn small house
+--
+--! @param name name of player
+--! @param param parameters
+------------------------------------------------------------------------------
+function mobf_debug.print_offline_mobs(name,param)
+
+	local count = 0
+
+	for key,value in pairs(spawning.mob_spawn_data) do
+		for hash,enabled in pairs (value) do
+			count = count +1
+			local mobpos = mobf_hash_to_pos(hash)
+
+			print(string.format("%5d: ",count) .. key .. " " .. printpos(mobpos))
+		end
+	end
+
+	print("Total of " .. count .. " mobs stored as offline")
+end
+
+-------------------------------------------------------------------------------
+-- @function [parent=#mobf_debug] rightclick_callback(entity,player)
+--
+--! @brief show rightclick info
 --
 --! @param entity entity rightclicked
 --! @param player player doing rightclick
@@ -354,6 +385,7 @@ function mobf_debug.rightclick_callback(entity,player)
 	print("MOBF: \tAbsolute spawntime:          " .. entity.dynamic_data.spawning.original_spawntime)
 	print("MOBF: \tCurrent state:               " .. entity.dynamic_data.state.current.name )
 	print("MOBF: \tCurrent movgen:              " .. entity.dynamic_data.current_movement_gen.name )
+	print("MOBF: \tHP:                          " .. entity.object:get_hp())
 	if entity.dynamic_data.current_movement_gen.name == "follow_mov_gen" or
 		entity.dynamic_data.current_movement_gen.name == "mgen_path" then
 
@@ -419,6 +451,7 @@ function mobf_debug.rightclick_callback(entity,player)
 	end
 	print("MOBF: \tCan fly:                     " .. dump(entity.data.movement.canfly))
 	print("MOBF: \tCurrent accel:               " .. printpos(entity.object:getacceleration()))
+	print("MOBF: \tDefault gravity:             " .. dump(environment.get_default_gravity(basepos, entity.environment.media, entity.data.movement.canfly)))
 	print("MOBF: \tCurrent speed:               " .. printpos(entity.object:getvelocity()))
 	print("MOBF: \tSpawnpoint:                  " .. printpos(entity.dynamic_data.spawning.spawnpoint))
 	print("MOBF: \tSpawner:                     " .. dump(entity.dynamic_data.spawning.spawner))

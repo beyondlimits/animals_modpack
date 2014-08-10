@@ -30,7 +30,9 @@ mobf_job_queue = {}
 -------------------------------------------------------------------------------
 function mobf_job_queue.add_job(job)
 	table.insert(mobf_job_queue.queue, job)
-	statistics.data.queue.maxabs = MAX(statistics.data.queue.maxabs,#mobf_job_queue.queue)
+	
+	mobf_get_statistics().data.queue.max =
+		MAX(mobf_get_statistics().data.queue.max,#mobf_job_queue.queue)
 end
 
 -------------------------------------------------------------------------------

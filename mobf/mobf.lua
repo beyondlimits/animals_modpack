@@ -299,60 +299,24 @@ function mobf.activate_handler(self,staticdata)
 
 	--restore saved data
 	local preserved_data = mobf_deserialize_permanent_entity_data(staticdata)
+	self.dynamic_data.last_static_data = nil
 
-	local objectlist = minetest.get_objects_inside_radius(pos,0.25)
-
-	local cleaned_objectcount = 0
-
-	for i=1,#objectlist,1 do
-		local luaentity = objectlist[i]:get_luaentity()
-		if luaentity ~= nil then
-			if not luaentity.mobf_spawner and
-				luaentity.name ~= "mobf:lifebar" then
-				cleaned_objectcount = cleaned_objectcount + 1
-			end
-		else
-			cleaned_objectcount = cleaned_objectcount + 1
-		end
+	--check if position would collide with other entities
+	if not spawning.check_activation_overlap(self,pos,preserved_data) then
+		spawning.remove_uninitialized(self,staticdata)
+		mobf_step_quota.consume(starttime)
+		return
 	end
 
-	--honor replaced marker
-	if (self.replaced ~= true and cleaned_objectcount > 1) or
-		cleaned_objectcount > 2 then
-		local spawner = "unknown"
-
-		if preserved_data ~= nil and
-			preserved_data.spawner ~= nil then
-			spawner = preserved_data.spawner
-		end
-
-		mobf_bug_warning(LOGLEVEL_WARNING,
-			"MOBF: trying to activate mob \"" ..self.data.name ..
-			" at " .. printpos(pos) .. " (" .. tostring(self)
-			.. ")"..
-			"\" within something else!" ..
-			" originaly spawned by: " .. spawner ..
-			" --> removing")
-		for i=1,#objectlist,1 do
-			local luaentity = objectlist[i]:get_luaentity()
-			if luaentity ~= nil then
-				if luaentity.data ~= nil and
-					luaentity.data.name ~= nil then
-					dbg_mobf.mobf_core_helper_lvl3(
-						i .. " LE: " .. luaentity.name .. " (" .. tostring(luaentity) .. ") " ..
-						luaentity.data.name .. " " ..
-						printpos(objectlist[i]:getpos()))
-				else
-					dbg_mobf.mobf_core_helper_lvl3(
-						i .. " LE: " .. luaentity.name .. " (" .. tostring(luaentity) .. ") " ..
-						dump(luaentity))
-				end
-			else
-				dbg_mobf.mobf_core_helper_lvl3(
-					i .. " " .. tostring(objectlist[i]) ..
-					printpos(objectlist[i]:getpos()))
-			end
-		end
+	--check if position environment os ok
+	if environment.is_media_element(current_node.name,self.environment.media) == false then
+		minetest.log(LOGLEVEL_WARNING,"MOBF: trying to activate mob "
+			.. self.data.name .. " at invalid position")
+		minetest.log(LOGLEVEL_WARNING,"	Activation at: " .. printpos(pos) .. " "
+			.. current_node.name .. " --> removing")
+		-----------------------------
+		--TODO try to move 1 block up
+		-----------------------------
 		spawning.remove_uninitialized(self,staticdata)
 		mobf_step_quota.consume(starttime)
 		return
@@ -361,20 +325,10 @@ function mobf.activate_handler(self,staticdata)
 	--reset replaced marker
 	self.replaced = nil
 
-	if environment.is_media_element(current_node.name,self.environment.media) == false then
-		minetest.log(LOGLEVEL_WARNING,"MOBF: trying to activate mob "
-			.. self.data.name .. " at invalid position")
-		minetest.log(LOGLEVEL_WARNING,"	Activation at: " .. printpos(pos) .. " "
-			.. current_node.name .. " --> removing")
-		--TODO try to move 1 block up
-		spawning.remove_uninitialized(self,staticdata)
-		mobf_step_quota.consume(starttime)
-		return
-	end
-
-	--do initialization of dynamic modules
+	----------------------------------------------------------------------------
+	-- initialize environment <-> mob <-> player interaction
+	----------------------------------------------------------------------------
 	local now = mobf_get_current_time()
-
 
 	spawning.init_dynamic_data(self,now)
 
@@ -397,6 +351,9 @@ function mobf.activate_handler(self,staticdata)
 		return
 	end
 
+	----------------------------------------------------------------------------
+	-- initialize preserved data
+	----------------------------------------------------------------------------
 	if self.dynamic_data.spawning ~= nil then
 		if mobf_pos_is_zero(preserved_data.spawnpoint) ~= true then
 			self.dynamic_data.spawning.spawnpoint = preserved_data.spawnpoint
@@ -427,6 +384,10 @@ function mobf.activate_handler(self,staticdata)
 
 	self.dynamic_data.custom_persistent = preserved_data.custom_persistent
 
+	----------------------------------------------------------------------------
+	-- initialize mob state
+	-- -------------------------------------------------------------------------
+
 	local default_state = mob_state.get_state_by_name(self,"default")
 
 	if self.dynamic_data.state.current == nil or
@@ -446,7 +407,9 @@ function mobf.activate_handler(self,staticdata)
 	dbg_mobf.mobf_core_lvl2("MOBF: " .. self.data.name .. " restoring state: "
 								.. self.dynamic_data.state.current.name)
 
-	--initialize move gen
+	----------------------------------------------------------------------------
+	-- initializing movement engine
+	----------------------------------------------------------------------------
 	if self.dynamic_data.state.current.movgen ~= nil then
 		dbg_mobf.mobf_core_lvl1(
 			"MOBF: setting movegen to: " .. self.dynamic_data.state.current.movgen)
@@ -504,8 +467,10 @@ function mobf.activate_handler(self,staticdata)
 		mobf_lifebar.set(self.lifebar,self.object:get_hp()/self.hp_max)
 	end
 
-	self.dynamic_data.initialized = true
 
+	----------------------------------------------------------------------------
+	-- activation may have been delayed due to quota
+	-- -------------------------------------------------------------------------
 	if self.dynamic_data.delayed_placement ~= nil then
 		self.dynamic_data.spawning.player_spawned =
 			self.dynamic_data.delayed_placement.player_spawned
@@ -521,6 +486,9 @@ function mobf.activate_handler(self,staticdata)
 
 		self.dynamic_data.delayed_placement = nil
 	end
+
+	--mark as initialized now
+	self.dynamic_data.initialized = true
 	mobf_step_quota.consume(starttime)
 end
 
@@ -540,7 +508,6 @@ function mobf.init_factions(entity)
 		return
 	end
 
-
 end
 
 ------------------------------------------------------------------------------
@@ -556,7 +523,7 @@ end
 -------------------------------------------------------------------------------
 function mobf.register_entity(name, graphics, mob)
 	dbg_mobf.mobf_core_lvl1("MOBF: registering new entity: " .. name)
-	mobf_print("MOBF: registering new entity: \"" .. name .. "\"")
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: registering new entity: \"" .. name .. "\"")
 
 	mobf_assert_backtrace(environment_list[mob.generic.envid] ~= nil)
 	minetest.register_entity(name,
@@ -693,7 +660,7 @@ function mobf.register_entity(name, graphics, mob)
 				local starttime = mobf_get_time_ms()
 				local now = mobf_get_current_time()
 
-				if self.dynamic_data.initialized == false then
+				if self.dynamic_data.initialized ~= true then
 					return
 				end
 
@@ -726,6 +693,9 @@ function mobf.register_entity(name, graphics, mob)
 					--make sure entity is in loaded area at initialization
 					local pos = self.object:getpos()
 
+					--remove from mob offline storage
+					spawning.activate_mob(self.data.modname .. ":"  .. self.data.name,pos)
+
 					if pos ~= nil and
 						entity_at_loaded_pos(pos,self.data.name) then
 						mobf.activate_handler(self,staticdata)
@@ -734,7 +704,8 @@ function mobf.register_entity(name, graphics, mob)
 					if self.dynamic_data.initialized ~= true then
 						minetest.log(LOGLEVEL_INFO,
 							"MOBF: delaying activation")
-						if self.dynamic_data.last_static_data == nil then
+						if self.dynamic_data.last_static_data == nil and
+							staticdata ~= "" then
 							self.dynamic_data.last_static_data = staticdata
 						end
 					end
@@ -764,9 +735,12 @@ function mobf.register_entity(name, graphics, mob)
 				end,
 
 		--prepare permanent data
-			get_staticdata = function(self)
-				return mobf_serialize_permanent_entity_data(self)
-				end,
+		--NOTE this isn't called if a object is deleted
+		get_staticdata = function(self)
+			--add to mob offline storage
+			spawning.deactivate_mob(self.data.modname .. ":"  .. self.data.name,self.object:getpos())
+			return mobf_serialize_permanent_entity_data(self)
+			end,
 
 		--custom variables for each mob
 			data                    = mob,
@@ -791,11 +765,11 @@ end
 function mobf.rightclick_handler(entity,clicker)
 	local starttime = mobf_get_time_ms()
 
-	if entity.dynamic_data.initialized == false then
+	if entity.dynamic_data.initialized ~= true then
 		return
 	end
 
-	if #entity.on_rightclick_hooks > 1 then
+	if #entity.on_rightclick_hooks >= 1 then
 
 		--get rightclick storage id
 		local storage_id = mobf_global_data_store(entity)
@@ -878,7 +852,7 @@ function mobf.rightclick_button_handler(player, formname, fields)
 
 				if entity ~= nil and
 					callback ~= nil then
-					callback(entity,player)
+					callback(entity, player)
 				else
 					dbg_mobf.mobf_core_lvl1("MOBF: unable to do callback: "
 						.. dump(entity) .. " " .. dump(callback))
@@ -889,8 +863,6 @@ function mobf.rightclick_button_handler(player, formname, fields)
 	end
 	return false
 end
-
-
 
 -------------------------------------------------------------------------------
 -- @function [parent=#mobf] register_mob_item(mob)
@@ -915,7 +887,6 @@ function mobf.register_mob_item(name,modname,description)
 					spawning.spawn_and_check(modname..":"..name,pos,"item_spawner")
 
 				if entity ~= nil then
-
 					if entity.dynamic_data.spawning ~= nil then
 						entity.dynamic_data.spawning.player_spawned = true
 
@@ -931,12 +902,15 @@ function mobf.register_mob_item(name,modname,description)
 															placer, pointed_thing)
 						end
 					else
+						--------------------------------------------------------
+						-- quota may have been exceeded make sure no data is lost
+						--------------------------------------------------------
 						entity.dynamic_data.delayed_placement =  {
 							player_spawned = true,
 							spawner = placer:get_player_name(placer),
 							placer = placer,
 							pointed_thing = pointed_thing,
-							calback = entity.data.generic.custom_on_place_handler
+							callback = entity.data.generic.custom_on_place_handler
 							}
 					end
 
@@ -949,7 +923,7 @@ function mobf.register_mob_item(name,modname,description)
 end
 
 -------------------------------------------------------------------------------
--- @function [parent=#mobf] blacklist_handling(mob)
+-- @function [parent=#mobf] blacklisthandling(mob)
 --
 --! @brief add mob item for catchable mobs
 --! @memberof mobf
@@ -958,6 +932,9 @@ end
 --! @param mob
 -------------------------------------------------------------------------------
 function mobf.blacklisthandling(mob)
+	dbg_mobf.mobf_core_lvl2("MOBF: blacklisthandling for " ..
+								mob.modname .. ":" .. mob.name)
+
 	local blacklisted = minetest.registered_entities[mob.modname.. ":"..mob.name]
 
 
@@ -971,16 +948,34 @@ function mobf.blacklisthandling(mob)
 
 		--cleanup spawners too
 		if minetest.registered_entities[mob.modname.. ":"..mob.name] == nil and
-			environment_list[mob.generic.envid] ~= nil and
-			mobf_spawn_algorithms[mob.spawning.algorithm] ~= nil and
-			type(mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup)
-															== "function" then
+			environment_list[mob.generic.envid] ~= nil then
 
-			mobf_spawn_algorithms[mob.spawning.algorithm].register_cleanup(mob.modname.. ":" .. mob.name)
+			if type(mob.spawning.primary_algorithms) == "table" then
+				for i=1 , #mob.spawning.primary_algorithms , 1 do
+					local sp = mob.spawning.primary_algorithms[i]
+					local cleanup = mobf_spawn_algorithms[sp.algorithm].initialize_cleanup
+					dbg_mobf.mobf_core_lvl2("MOBF: blacklist cleanup for primary spawner " .. sp.algorithm)
 
-			if mob.spawning.algorithm_secondary ~= nil and
-				type(mobf_spawn_algorithms[mob.spawning.algorithm_secondary].initialize_cleanup) == "function" then
-					mobf_spawn_algorithms[mob.spawning.algorithm_secondary].initialize_cleanup(mob.modname.. ":" .. mob.name)
+					if type(cleanup) == "function" then
+						cleanup(mob.modname.. ":" .. mob.name .. "_spawner_" .. sp.algorithm)
+					else
+						dbg_mobf.mobf_core_lvl2("MOBF: blacklist cleanup impossible - no cleanup function defined")
+					end
+				end
+			end
+			if type(mob.spawning.secondary_algorithms) == "table" then
+				for i=1 , #mob.spawning.secondary_algorithms , 1 do
+
+					local sp = mob.spawning.secondary_algorithms[i]
+					local cleanup = mobf_spawn_algorithms[sp.algorithm].initialize_cleanup
+					dbg_mobf.mobf_core_lvl2("MOBF: blacklist cleanup for secondary spawner " .. sp.algorithm)
+
+					if type(cleanup) == "function" then
+						cleanup(mob.modname.. ":" .. mob.name .. "_spawner_" .. sp.algorithm)
+					else
+						dbg_mobf.mobf_core_lvl2("MOBF: blacklist cleanup impossible - no cleanup function defined")
+					end
+				end
 			end
 		end
 	else

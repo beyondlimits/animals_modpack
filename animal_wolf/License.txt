@@ -1,4 +1,7 @@
 Licenses
+CC0:
+	animal_wolf_attack.ogg
+	aniaml_wolf_melee.ogg
 
 Everything not mentioned:
 	CC-BY-SA 3.0, Author sapier

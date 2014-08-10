@@ -21,6 +21,7 @@
 --! @brief a movement generator evaluating a path to a target and following it
 --!@}
 p_mov_gen = {}
+p_mov_gen.max_waypoint_distance = 0.5
 
 
 
@@ -60,11 +61,7 @@ function p_mov_gen.callback(entity,now,dstep)
 	end
 
 
-	local max_distance = entity.data.movement.max_distance
-
-	if entity.dynamic_data.movement.max_distance ~= nil then
-		max_distance = entity.dynamic_data.movement.max_distance
-	end
+	local max_distance = p_mov_gen.max_waypoint_distance
 
 	mobf_assert_backtrace(entity.dynamic_data.p_movement.next_path_index ~= nil)
 	mobf_assert_backtrace(max_distance ~= nil)
@@ -74,6 +71,10 @@ function p_mov_gen.callback(entity,now,dstep)
 						< max_distance then
 		dbg_mobf.path_mov_lvl1("MOBF: pathmov next to next point switching target")
 		local update_target = true
+		
+		if entity.dynamic_data.p_movement.waypoint_stop then
+			entity.object:setvelocity({x=0,y=0,z=0})
+		end
 
 		--return to begining of path
 		if entity.dynamic_data.p_movement.next_path_index
@@ -171,9 +172,11 @@ function p_mov_gen.init_dynamic_data(entity,now,restored_data)
 			force_target        = nil,
 			pathowner           = nil,
 			pathname            = nil,
+			waypoint_stop       = true,
 			}
 
-	if restored_data ~= nil then
+	if restored_data ~= nil and
+		type(restored_data) == "table" then
 		dbg_mobf.path_mov_lvl3(
 			"MOBF: path movement reading stored data: " .. dump(restored_data))
 		if restored_data.pathowner ~= nil and
@@ -198,6 +201,8 @@ function p_mov_gen.init_dynamic_data(entity,now,restored_data)
 	entity.dynamic_data.p_movement = data
 
 	mgen_follow.init_dynamic_data(entity,now)
+	
+	entity.dynamic_data.movement.follow_speedup = false
 end
 
 -------------------------------------------------------------------------------
@@ -209,24 +214,28 @@ end
 --
 --! @param entity mob to apply to
 --! @param path to set
+--! @param enable_speedup shall follow speedup be applied to path movement?
 -------------------------------------------------------------------------------
-function p_mov_gen.set_path(entity,path)
+function p_mov_gen.set_path(entity,path, enable_speedup)
 	mobf_assert_backtrace(entity.dynamic_data.p_movement ~= nil)
 	if path ~= nil then
 		entity.dynamic_data.p_movement.next_path_index = 1
-		entity.dynamic_data.movement.max_distance = 0.5
+		entity.dynamic_data.movement.max_distance =
+			p_mov_gen.max_waypoint_distance
 		entity.dynamic_data.p_movement.path = path
 
 		--a valid path has at least 2 positions
 		mobf_assert_backtrace(#entity.dynamic_data.p_movement.path > 1)
 		entity.dynamic_data.movement.target =
 				entity.dynamic_data.p_movement.path[2]
+		entity.dynamic_data.movement.follow_speedup = enable_speedup
 		return true
 	else
 		entity.dynamic_data.p_movement.next_path_index = nil
 		entity.dynamic_data.movement.max_distance = nil
 		entity.dynamic_data.p_movement.path = nil
 		entity.dynamic_data.movement.target = nil
+		entity.dynamic_data.movement.follow_speedup = nil
 		return false
 	end
 end
@@ -269,8 +278,9 @@ end
 --
 --! @param entity mob to apply to
 --! @param target to set
+--! @param follow_speedup use follow speedup to reach target
 -------------------------------------------------------------------------------
-function p_mov_gen.set_target(entity,target)
+function p_mov_gen.set_target(entity, target, follow_speedup)
 	mobf_assert_backtrace(target ~= nil)
 
 	local current_pos = entity.getbasepos(entity)
@@ -308,7 +318,7 @@ function p_mov_gen.set_target(entity,target)
 	entity.dynamic_data.p_movement.next_path_index = 1
 
 	--on target mode max distance is always 0.5
-	entity.dynamic_data.movement.max_distance = 0.5
+	entity.dynamic_data.movement.max_distance = p_mov_gen.max_waypoint_distance
 
 	--try to find path on our own
 	if not mobf_get_world_setting("mobf_disable_pathfinding") then
@@ -323,6 +333,7 @@ function p_mov_gen.set_target(entity,target)
 		mobf_assert_backtrace(#entity.dynamic_data.p_movement.path > 1)
 		entity.dynamic_data.movement.target =
 				entity.dynamic_data.p_movement.path[2]
+		entity.dynamic_data.movement.follow_speedup = true
 		return true
 	end
 
@@ -336,6 +347,7 @@ function p_mov_gen.set_target(entity,target)
 		table.insert(entity.dynamic_data.p_movement.path,targetpos)
 		entity.dynamic_data.movement.target =
 				entity.dynamic_data.p_movement.path[1]
+		entity.dynamic_data.movement.follow_speedup = true
 		return true
 	end
 

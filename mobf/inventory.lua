@@ -23,6 +23,15 @@ mobf_assert_backtrace(mob_inventory == nil)
 --! @brief inventory handling for trader like mobs
 --! @}
 mob_inventory = {}
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if intllib then
+	S = intllib.Getter()
+else
+	S = function(s) return s end
+end
+-------------------------------------------------------------------------------
 mob_inventory.trader_inventories = {}
 mob_inventory.formspecs = {}
 
@@ -392,21 +401,21 @@ function mob_inventory.init_trader_inventory(entity)
 		.. tostring(entity) .. "\"" )
 
 	local trader_formspec = "size[8,10;]" ..
-			"label[2,0;Trader " .. tradername .. " Inventory]" ..
-			"label[0,1;Selling:]" ..
+			"label[2,0;"..S("Trader %s Inventory"):format(tradername).."]" ..
+			"label[0,1;"..S("Selling:").."]" ..
 			"list[detached:" .. unique_entity_id .. ";goods;0,1.5;8,2;]" ..
-			"label[0,4.0;Selection]" ..
+			"label[0,4.0;"..S("Selection").."]" ..
 			"list[detached:" .. unique_entity_id .. ";selection;0,4.5;1,1;]" ..
 			"label[1.25,4.75;-->]" ..
-			"label[2,4.0;Price]" ..
+			"label[2,4.0;"..S("Price").."]" ..
 			"list[detached:" .. unique_entity_id .. ";price_1;2,4.5;1,1;]" ..
-			"label[3,4.0;or]" ..
+			"label[3,4.0;"..S("or").."]" ..
 			"list[detached:" .. unique_entity_id .. ";price_2;3,4.5;1,1;]" ..
 			"label[4.25,4.75;-->]" ..
-			"label[5,4.0;Pay]" ..
+			"label[5,4.0;"..S("Pay").."]" ..
 			"list[detached:" .. unique_entity_id .. ";pay;5,4.5;1,1;]" ..
 			"label[6.25,4.75;-->]" ..
-			"label[6.75,4.0;Takeaway]" ..
+			"label[6.75,4.0;"..S("Takeaway").."]" ..
 			"list[detached:" .. unique_entity_id .. ";takeaway;7,4.5;1,1;]" ..
 			"list[current_player;main;0,6;8,4;]"
 
@@ -469,15 +478,23 @@ end
 --
 --! @return true/false if handled by harvesting or not
 -------------------------------------------------------------------------------
-function mob_inventory.trader_callback(entity,player)
+function mob_inventory.trader_callback(entity, player)
 	local unique_entity_id = string.gsub(tostring(entity),"table: ","")
 	--local unique_entity_id = "testinv"
 	local playername = player.get_player_name(player)
 
 	if mob_inventory.formspecs["formspec_" .. unique_entity_id] ~= nil then
+	
+		local pos = entity.object:getpos()
+		
+		if pos == nil then
+			dbg_mobf.trader_inv_lvl1("MOBF: unable to get trader pos")
+			minetest.show_formspec(playername,"")
+			return
+		end
+	
 		--rotate mob to face player
-		local direction = mobf_get_direction(entity.object:getpos(),
-												player:getpos())
+		local direction = mobf_get_direction(pos, player:getpos())
 
 		if entity.mode == "3d" then
 			entity.object:setyaw(

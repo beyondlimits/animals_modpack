@@ -233,6 +233,37 @@ function mobf_min_light_around(pos,distance,daytime)
 end
 
 -------------------------------------------------------------------------------
+-- name: mobf_objects_around(pos,range,ignorelist)
+--
+--! @brief get number of objects within a certain range
+--
+--! @param pos position to look around
+--! @param range range to check
+--! @param ignorelist list of entitynames to ignore
+--! @return count of objects
+-------------------------------------------------------------------------------
+function mobf_objects_around(pos,range,ignorelist)
+
+	local objectlist = minetest.get_objects_inside_radius(pos,range)
+
+	local cleaned_objectcount = 0
+
+	for i=1,#objectlist,1 do
+		local luaentity = objectlist[i]:get_luaentity()
+		if luaentity ~= nil then
+			if not luaentity.mobf_spawner and
+				not mobf_contains(ignorelist,luaentity.name) then
+				cleaned_objectcount = cleaned_objectcount + 1
+			end
+		else
+			cleaned_objectcount = cleaned_objectcount + 1
+		end
+	end
+
+	return cleaned_objectcount
+end
+
+-------------------------------------------------------------------------------
 -- name: mobf_mob_around(mob_name,mob_transform_name,pos,range,)
 --
 --! @brief get number of mobs of specified type within range of pos
@@ -648,7 +679,7 @@ function entity_at_loaded_pos(pos,mobname)
 	if current_node ~= nil then
 		if current_node.name == "ignore" then
 			minetest.log(LOGLEVEL_WARNING,"MOBF: " ..mobname .. " spawned at unloaded pos! : "
-			.. dump(pos))
+			.. dump(pos) .. " node: " .. dump(current_node))
 			return false
 		else
 			return true
@@ -740,6 +771,30 @@ function mobf_is_pos(value)
 
 
 	return true
+end
+
+-------------------------------------------------------------------------------
+-- name: mobf_hash_to_pos(hash)
+--
+--! @brief restore a position from a pos hash value
+--
+--! @param hash to restore pos from
+--
+--! @return posistion reconstructed from hash
+-------------------------------------------------------------------------------
+function mobf_hash_to_pos(hash)
+	local retval = {}
+
+	local raw_x = (hash % 65536)
+	local raw_y = ((hash - raw_x) % (65536*65536)) / 65536
+	local raw_z = ((hash - raw_x - raw_y) / 65536) / 65536
+
+	local mobpos = {}
+	retval.x = raw_x - 32768
+	retval.y = raw_y - 32768
+	retval.z = math.floor(raw_z - 32768)
+
+	return retval
 end
 
 --!@}

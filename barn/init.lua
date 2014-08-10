@@ -13,8 +13,18 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: barn mod loading ...")
-local version = "0.0.11"
+local version = "0.0.12"
 
 local modpath = minetest.get_modpath("barn")
 
@@ -31,7 +41,7 @@ barn_breedpairs_small = {
 dofile (modpath .. "/model.lua")
 
 minetest.register_craftitem("barn:barn_empty", {
-			description = "Barn to breed animals",
+			description = S("Barn to breed animals"),
 			image = minetest.inventorycube("barn_3d_empty_top.png","barn_3d_empty_side.png","barn_3d_empty_side.png"),
 			on_place = function(item, placer, pointed_thing)
 				if pointed_thing.type == "node" then
@@ -47,7 +57,7 @@ minetest.register_craftitem("barn:barn_empty", {
 		})
 
 minetest.register_craftitem("barn:barn_small_empty", {
-			description = "Barn to breed small animals",
+			description = S("Barn to breed small animals"),
 			image = "barn_small.png",
 			on_place = function(item, placer, pointed_thing)
 				if pointed_thing.type == "node" then

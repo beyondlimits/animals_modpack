@@ -110,7 +110,7 @@ dofile (mobf_modpath .. "/mgen_pathbased/main.lua")
 dofile (mobf_modpath .. "/mgen_flee/main_flee.lua")
 dofile (mobf_modpath .. "/mov_gen_none.lua")
 
-mobf_version = "2.3.6"
+mobf_version = "2.4.0"
 
 --! @brief define tools used for more than one mob
 function mobf_init_basic_tools()
@@ -195,6 +195,9 @@ function mobf_init_framework()
 
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize lifebar subsystem..")
 	mobf_lifebar.init()
+
+	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize spawning subsystem..")
+	spawning.init()
 
 	minetest.log(LOGLEVEL_NOTICE,"MOBF: Initialize mobf supplied modules..")
 	mobf_init_modules()
@@ -292,7 +295,12 @@ function mobf_init_modules()
 			handler = spawning.population_density_check,
 			init = spawning.init_dynamic_data,
 			configcheck = function(entity)
-					return true
+					if entity.data.generic.population_density ~= nil or
+						entity.data.spawning ~= nil then
+						return true
+					else
+						return false
+					end
 				end
 				})
 
@@ -407,6 +415,15 @@ function mobf_init_modules()
 			visiblename = "Factions",
 			handler		= mobf_factions.mob_rightclick_callback,
 			configcheck	= mobf_factions.config_check
+			})
+			
+	mobf.register_on_rightclick_callback({
+			name = "heal",
+			visiblename = fighting.heal_caption,
+			handler		= fighting.heal,
+			configcheck	= function(entity)
+					return true
+				end,
 			})
 end
 

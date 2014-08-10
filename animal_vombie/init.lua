@@ -1,4 +1,4 @@
-local version = "0.0.26"
+local version = "0.1.2"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -87,7 +87,7 @@ function vombie_on_activate_handler(entity)
 	end
 end
 
-vombie_prototype = {
+local vombie_prototype = {
 		name="vombie",
 		modname="animal_vombie",
 
@@ -110,6 +110,8 @@ vombie_prototype = {
 					envid="on_ground_1",
 					custom_on_step_handler = vombie_on_step_handler,
 					custom_on_activate_handler = vombie_on_activate_handler,
+					population_density=20,
+					stepheight = 0.51,
 				},
 		movement =  {
 					min_accel=0.3,
@@ -130,25 +132,6 @@ vombie_prototype = {
 						},
 					distance 		= nil,
 					self_destruct 	= nil,
-					},
-
-		spawning = {
-					primary_algorithms = {
-							{
-								rate=0.05,
-								density=20,
-								algorithm="at_night_spawner",
-								height=2,
-								respawndelay=10,
-							},
-							{
-								rate=0.05,
-								density=25,
-								algorithm="shadows_spawner",
-								height=2,
-								respawndelay = 300,
-							},
-						},
 					},
 		sound = {
 					random = {
@@ -227,10 +210,107 @@ minetest.register_entity("animal_vombie:vombie_spawner",
 	on_activate = function(self,staticdata)
 
 		local pos = self.object:getpos();
-		minetest.add_entity(pos,"animal_vombie:vombie_spawner_at_night")
+		minetest.add_entity(pos,"mobf:compat_spawner")
 		self.object:remove()
 	end,
 })
+
+minetest.register_entity("animal_vombie:vombie_spawner_at_night",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
+
+		local pos = self.object:getpos();
+		minetest.add_entity(pos,"mobf:compat_spawner")
+		self.object:remove()
+	end,
+})
+
+minetest.register_entity("animal_vombie:vombie_spawner_shadows",
+ {
+	physical        = false,
+	collisionbox    = { 0.0,0.0,0.0,0.0,0.0,0.0},
+	visual          = "sprite",
+	textures        = { "invisible.png^[makealpha:128,0,0^[makealpha:128,128,0" },
+	on_activate = function(self,staticdata)
+
+		local pos = self.object:getpos();
+		minetest.add_entity(pos,"mobf:compat_spawner")
+		self.object:remove()
+	end,
+})
+
+--spawning code
+local vombie_name   = vombie_prototype.modname .. ":"  .. vombie_prototype.name
+local vombie_env = mobf_environment_by_name(vombie_prototype.generic.envid)
+
+mobf_spawner_register("vombie_spawner_1",vombie_name,
+	{
+	spawnee = vombie_name,
+	spawn_interval = 10,
+	spawn_inside = vombie_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=vombie_name,
+				distance=vombie_prototype.generic.population_density,threshold=2 },
+		},
+
+	absolute_height =
+	{
+		min = -10,
+	},
+
+	light_around =
+	{
+		{ type="TIMED_MIN", distance = 0, threshold=LIGHT_MAX +1,time=0.5 },
+		{ type="TIMED_MAX", distance = 0, threshold=6,time=0.0 },
+		{ type="CURRENT_MAX", distance = 0, threshold=5 }
+	},
+
+	daytimes =
+	{
+		{ begin = 0.75, stop=0.99 },
+		{ begin = 0.0,  stop=0.25 },
+	},
+
+	surfaces = { "default:dirt_with_grass", "default:sand", "default:desert_sand"},
+	collisionbox = selectionbox_vombie
+	})
+
+mobf_spawner_register("vombie_spawner_2",vombie_name,
+	{
+	spawnee = vombie_name,
+	spawn_interval = 60,
+	spawn_inside = vombie_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=vombie_name,
+				distance=100,threshold=2 },
+		},
+
+	light_around =
+	{
+		{ type="OVERALL_MAX", distance = 2, threshold=6 }
+	},
+
+	absolute_height = {
+		max = 100,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 10,
+		spawntotal = 3,
+	},
+
+	collisionbox = selectionbox_vombie
+	})
 
 
 --register with animals mod

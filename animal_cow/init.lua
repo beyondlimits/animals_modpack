@@ -13,15 +13,25 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: animal_cow mod loading ...")
-local version = "0.1.3"
+local version = "0.2.1"
 
 local cow_groups = {
 						not_in_creative_inventory=1
 					}
 
-local selectionbox_cow = {-1.5, -1.5, -0.75, 0.8, 0.7, 0.75}
-local selectionbox_steer = {-1.5*1.1, -1.5*1.1, -0.75*1.1, 0.8*1.1, 0.7*1.1, 0.75*1.1}
+local selectionbox_cow = {-1.5, -1.54, -0.75, 0.8, 0.7, 0.75}
+local selectionbox_steer = {-1.5*1.1, -1.54*1.1, -0.75*1.1, 0.8*1.1, 0.7*1.1, 0.75*1.1}
 local selectionbox_baby_calf = {-0.8, -0.8, -0.5, 0.8, 0.8, 0.5}
 
 function cattle_drop()
@@ -43,7 +53,7 @@ function cattle_drop()
 	return result
 end
 
-cow_prototype = {
+local cow_prototype = {
 		name="cow",
 		modname="animal_cow",
 
@@ -55,14 +65,15 @@ cow_prototype = {
 			},
 
 		generic = {
-					description="Cow",
+					description= S("Cow"),
 					base_health=40,
 					kill_result=cattle_drop,
 					armor_groups= {
 						fleshy=60,
 					},
 					groups = cow_groups,
-					envid = "meadow"
+					envid = "meadow",
+					population_density=200,
 				},
 		movement =  {
 					default_gen="none",
@@ -72,6 +83,7 @@ cow_prototype = {
 					min_speed=0.025,
 					pattern="stop_and_go",
 					canfly=false,
+					max_distance=0.1,
 					},
 		harvest = {
 					tool="vessels:drinking_glass",
@@ -79,29 +91,16 @@ cow_prototype = {
 					result="animalmaterials:milk",
 					transforms_to="",
 					min_delay=60,
-				  	},
+					},
 		catching = {
 					tool="animalmaterials:lasso",
 					consumed=true,
 					},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0.001,
-						density=200,
-						algorithm="big_willow_mapgen",
-						height=2
-						},
-					},
-					secondary_algorithms = {
-						{
-						rate=0.001,
-						density=200,
-						algorithm="big_willow",
-						height=2
-						},
-					}
-				},
+		--animation testing only
+		patrol = {
+				state = "patrol",
+				cycle_path = true,
+			},
 		sound = {
 					random = {
 								name="Mudchute_cow_1",
@@ -152,12 +151,20 @@ cow_prototype = {
 					visual_size= {x=1,y=1,z=1},
 					},
 				},
+				{
+				name = "patrol",
+				movgen = "mgen_path",
+				typical_state_time = 9999,
+				chance = 0.0,
+				animation = "walk",
+				state_mode = "user_def",
+				},
 			},
 		animation = {
 				walk = {
 					start_frame = 170,
 					end_frame   = 250,
-					basevelocity = 0.35,
+					basevelocity = 5,
 					},
 				stand = {
 					start_frame = 0,
@@ -170,91 +177,74 @@ cow_prototype = {
 			}
 		}
 
-steer_prototype = {
-        name="steer",
-        modname="animal_cow",
+local steer_prototype = {
+		name="steer",
+		modname="animal_cow",
 
-        factions = {
-            member = {
-                "animals",
-                "grassland_animals"
-                }
-            },
+		factions = {
+			member = {
+				"animals",
+				"grassland_animals"
+				}
+			},
 
-        generic = {
-                    description="Steer",
-                    base_health=40,
-                    kill_result=cattle_drop,
-                    armor_groups= {
-                        fleshy=60,
-                    },
-                    groups = cow_groups,
-                    envid = "meadow"
-                },
-        movement =  {
-                    default_gen="probab_mov_gen",
-                    min_accel=0.05,
-                    max_accel=0.1,
-                    max_speed=0.3,
-                    min_speed=0.025,
-                    pattern="stop_and_go",
-                    canfly=false,
-                    },
-        harvest = nil,
-        catching = {
-                    tool="animalmaterials:lasso",
-                    consumed=true,
-                    },
-        spawning = {
-					primary_algorithms = {
-						{
-						rate=0.001,
-						density=200,
-						algorithm="big_willow_mapgen",
-						height=2
-						},
-					},
-					secondary_algorithms = {
-						{
-						rate=0.001,
-						density=200,
-						algorithm="big_willow",
-						height=2
-						},
-					}
-				},
+		generic = {
+			description=S("Steer"),
+			base_health=40,
+			kill_result=cattle_drop,
+			armor_groups= {
+				fleshy=60,
+			},
+			groups = cow_groups,
+			envid = "meadow",
+			population_density=200,
+		},
+		movement =  {
+			default_gen="probab_mov_gen",
+			min_accel=0.05,
+			max_accel=0.1,
+			max_speed=0.3,
+			min_speed=0.025,
+			pattern="stop_and_go",
+			canfly=false,
+			},
+		harvest = nil,
+		catching = {
+			tool="animalmaterials:lasso",
+			consumed=true,
+			},
 		sound = {
-					random = {
-						name="Mudchute_cow_1",
-						min_delta = 30,
-						chance = 0.5,
-						gain = 1,
-						max_hear_distance = 10,
-						},
-					},
+			random = {
+				name="Mudchute_cow_1",
+				min_delta = 30,
+				chance = 0.5,
+				gain = 1,
+				max_hear_distance = 10,
+				},
+			},
 		states = {
-				{
+			{
 				name = "walking",
 				movgen = "probab_mov_gen",
 				typical_state_time = 180,
 				chance = 0.50,
 				animation = "walk",
-				},
-				{
+			},
+			{
 				name = "flee",
 				movgen = "flee_mov_gen",
 				typical_state_time = 30,
 				chance = 0,
 				animation = "walk",
-				},
-				{
+			},
+			{
 				name = "eating",
 				movgen = "none",
 				typical_state_time = 45,
 				chance = 0.25,
 				animation = "eat",
-				},
-				{
+			},
+			{
 				name = "default",
 				movgen = "none",
 				typical_state_time = 45,
@@ -264,7 +254,7 @@ steer_prototype = {
 					sprite_scale={x=4,y=4},
 					sprite_div = {x=6,y=1},
 					visible_height = 2,
-				},
+					},
 				graphics_3d = {
 					visual = "mesh",
 					mesh = "animal_steer.b3d",
@@ -272,13 +262,13 @@ steer_prototype = {
 					collisionbox = selectionbox_cow,
 					visual_size= {x=1,y=1,z=1},
 					},
-				},
 			},
+		},
 		animation = {
 				walk = {
 					start_frame = 170,
 					end_frame   = 250,
-					basevelocity = 0.35,
+					basevelocity = 3.5,
 					},
 				stand = {
 					start_frame = 0,
@@ -303,7 +293,7 @@ baby_calf_f_prototype = {
 			},
 
 		generic = {
-			description="Baby Calf female",
+			description= S("Baby Calf female"),
 			base_health=40,
 			kill_result="animalmaterials:meat_beef 2",
 			armor_groups= {
@@ -329,16 +319,6 @@ baby_calf_f_prototype = {
 			result="animal_cow:cow",
 			delay=7200,
 			},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0.001,
-						density=200,
-						algorithm="none",
-						height=2
-						},
-					}
-				},
 		sound = {
 			random = {
 				name="Mudchute_cow_1",
@@ -408,7 +388,7 @@ baby_calf_m_prototype = {
 			},
 
 		generic = {
-				description="Baby Calf male",
+				description= S("Baby Calf male"),
 				base_health=40,
 				kill_result="animalmaterials:meat_beef 2",
 				armor_groups= {
@@ -432,16 +412,6 @@ baby_calf_m_prototype = {
 		auto_transform = {
 				result="animal_cow:steer",
 				delay=7200,
-				},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0.001,
-						density=200,
-						algorithm="none",
-						height=2
-						},
-					}
 				},
 		sound = {
 				random = {
@@ -499,6 +469,97 @@ baby_calf_m_prototype = {
 				},
 			},
 		}
+
+local cowname   = cow_prototype.modname .. ":"  .. cow_prototype.name
+local steername = steer_prototype.modname .. ":"  .. steer_prototype.name
+
+local cow_env = mobf_environment_by_name(cow_prototype.generic.envid)
+local steer_env = mobf_environment_by_name(steer_prototype.generic.envid)
+
+mobf_spawner_register("cow_spawner_1",cowname,
+	{
+	spawnee = cowname,
+	spawn_interval = 20,
+	spawn_inside = cow_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=cowname,
+				distance=cow_prototype.generic.population_density,threshold=2 },
+			{ type="MAX",entityname=steername,
+				distance=cow_prototype.generic.population_density,threshold=2 },
+			{ type="MAX",entityname=steername,distance=30,threshold=1 },
+			{ type="MAX",entityname=cowname,distance=30,threshold=1 }
+		},
+
+	nodes_around =
+		{
+			{ type="MAX", name = { "default:leaves","default:tree"},distance=5,threshold=0}
+		},
+
+	absolute_height =
+	{
+		min = -10,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 30,
+		spawntotal = 2,
+	},
+
+	flat_area =
+	{
+		range = 2,
+		deviation = 1,
+	},
+
+	surfaces = cow_env.surfaces.good,
+	collisionbox = selectionbox_cow
+	})
+
+mobf_spawner_register("steer_spawner_1",steername,
+	{
+	spawnee = steername,
+	spawn_interval = 20,
+	spawn_inside = steer_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=2,threshold=0 },
+			{ type="MAX",entityname=steername,
+				distance=steer_prototype.generic.population_density,threshold=2 },
+			{ type="MAX",entityname=cowname,
+				distance=steer_prototype.generic.population_density,threshold=2 },
+			{ type="MAX",entityname=steername,distance=30,threshold=1 },
+			{ type="MAX",entityname=cowname,distance=30,threshold=1 }
+		},
+
+	nodes_around =
+		{
+			{ type="MAX", name = { "default:leaves","default:tree"},distance=5,threshold=0}
+		},
+
+	absolute_height =
+	{
+		min = -10,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 30,
+		spawntotal = 2,
+	},
+
+	surfaces = steer_env.surfaces.good,
+	flat_area =
+	{
+		range = 2,
+		deviation = 1,
+	},
+	collisionbox = selectionbox_steer
+	})
 
 --register with animals mod
 minetest.log("action","\tadding "..baby_calf_f_prototype.name)

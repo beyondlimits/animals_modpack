@@ -2,3 +2,4 @@ default
 animal_vombie
 mobf
 animalmaterials
+intllib?

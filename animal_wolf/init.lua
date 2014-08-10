@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allowed to pretend you have written it.
 --
 --! @file init.lua
@@ -13,9 +13,19 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: mob_wolf loading ...")
 
-local version = "0.0.17"
+local version = "0.1.1"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
@@ -26,7 +36,7 @@ local selectionbox_wolf = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
 wolf_prototype = {
 		name="wolf",
 		modname="animal_wolf",
-		
+
 		factions = {
 			member = {
 				"animals",
@@ -34,9 +44,9 @@ wolf_prototype = {
 				"wolfs"
 				}
 			},
-	
+
 		generic = {
-					description="Wolf",
+					description= S("Wolf"),
 					base_health=5,
 					kill_result="animalmaterials:fur 1",
 					armor_groups= {
@@ -44,7 +54,8 @@ wolf_prototype = {
 					},
 					groups = wolf_groups,
 					addoncatch = "animal_wolf:tamed_wolf",
-					envid="on_ground_2"
+					envid="on_ground_2",
+					population_density=800,
 				},
 		movement =  {
 					canfly=false,
@@ -64,33 +75,24 @@ wolf_prototype = {
 					sun_sensitive=false,
 					melee = {
 						maxdamage=5,
-						range=2, 
+						range=2,
 						speed=1,
 						},
 					distance 		= nil,
 					self_destruct 	= nil,
 					},
-		
-		spawning = {
-				primary_algorithms = {
-						{
-						rate=0.002,
-						density=800,
-						algorithm="forrest_mapgen",
-						height=2
-						},
-					},
-				secondary_algorithms = {
-						{
-						rate=0.002,
-						density=800,
-						algorithm="forrest",
-						height=2
-						},
-					}
-				},
 		sound = {
 					random = nil,
+					meele = {
+						name="animal_wolf_melee",
+						gain = 0.8,
+						max_hear_distance = 10
+					},
+					start_attack = {
+						name="animal_wolf_attack",
+						gain = 0.8,
+						max_hear_distance = 20
+					},
 					},
 		animation = {
 				stand = {
@@ -134,7 +136,7 @@ wolf_prototype = {
 						visual_size= {x=1,y=1,z=1},
 						},
 				},
-				{ 
+				{
 					name = "sleeping",
 					--TODO replace by check for night
 					custom_preconhandler = nil,
@@ -143,7 +145,7 @@ wolf_prototype = {
 					chance = 0.10,
 					animation = "sleep",
 				},
-				{ 
+				{
 					name = "combat",
 					typical_state_time = 9999,
 					chance = 0.0,
@@ -152,13 +154,13 @@ wolf_prototype = {
 				},
 			}
 		}
-		
+
 tamed_wolf_prototype = {
 		name="tamed_wolf",
 		modname="animal_wolf",
-	
+
 		generic = {
-					description="Tamed Wolf",
+					description= S("Tamed Wolf"),
 					base_health=10,
 					kill_result="animalmaterials:fur 1",
 					armor_groups= {
@@ -207,16 +209,6 @@ tamed_wolf_prototype = {
 					tool="animalmaterials:net",
 					consumed=true,
 					},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0.002,
-						density=150,
-						algorithm="none",
-						height=2
-						},
-					}
-				},
 		sound = {
 					random = nil,
 					},
@@ -247,12 +239,48 @@ tamed_wolf_prototype = {
 				},
 			}
 		}
-		
+
+local wolf_name   = wolf_prototype.modname .. ":"  .. wolf_prototype.name
+local wolf_env = mobf_environment_by_name(wolf_prototype.generic.envid)
+
+mobf_spawner_register("wolf_spawner_1",wolf_name,
+	{
+	spawnee = wolf_name,
+	spawn_interval = 300,
+	spawn_inside = wolf_env.media,
+	entities_around =
+		{
+			{ type="MAX",distance=1,threshold=0 },
+			{ type="MAX",entityname=wolf_name,
+				distance=wolf_prototype.generic.population_density,threshold=1 },
+		},
+
+	nodes_around =
+		{
+			{ type="MIN", name = { "default:leaves","default:tree"},distance=3,threshold=4}
+		},
+
+	absolute_height =
+	{
+		min = -10,
+	},
+
+	mapgen =
+	{
+		enabled = true,
+		retries = 5,
+		spawntotal = 1,
+	},
+
+	surfaces = wolf_env.surfaces.good,
+	collisionbox = selectionbox_wolf
+	})
+
 if factions~= nil and
 	type(factions.set_base_reputation) == "function" then
 	factions.set_base_reputation("wolfs","players",-25)
 end
-		
+
 minetest.log("action","\tadding mob "..wolf_prototype.name)
 mobf_add_mob(wolf_prototype)
 minetest.log("action","\tadding mob "..tamed_wolf_prototype.name)

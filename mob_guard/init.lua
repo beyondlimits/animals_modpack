@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Mob Framework Mod by Sapier
--- 
+--
 -- You may copy, use, modify or do nearly anything except removing this
--- copyright notice. 
+-- copyright notice.
 -- And of course you are NOT allow to pretend you have written it.
 --
 --! @file init.lua
@@ -13,9 +13,19 @@
 --
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
+
+-- Boilerplate to support localized strings if intllib mod is installed.
+local S
+if (minetest.get_modpath("intllib")) then
+  dofile(minetest.get_modpath("intllib").."/intllib.lua")
+  S = intllib.Getter(minetest.get_current_modname())
+else
+  S = function ( s ) return s end
+end
+
 minetest.log("action","MOD: mob_guard mod loading ...")
 
-local version = "0.0.4"
+local version = "0.1.2"
 local guard_groups = {
 						not_in_creative_inventory=1
 					}
@@ -23,16 +33,16 @@ local guard_groups = {
 guard_prototype = {
 		name="guard",
 		modname="mob_guard",
-		
+
 		factions = {
 			member = {
 				"npc",
 				"hireling"
 				}
 			},
-	
+
 		generic = {
-					description="Guard",
+					description= S("Guard"),
 					base_health=40,
 					kill_result="",
 					armor_groups= {
@@ -40,6 +50,7 @@ guard_prototype = {
 					},
 					groups = guard_groups,
 					envid="on_ground_1",
+					stepheight = 0.51,
 				},
 		movement =  {
 					guardspawnpoint = true,
@@ -57,16 +68,6 @@ guard_prototype = {
 					tool="animalmaterials:contract",
 					consumed=true,
 					},
-		spawning = {
-					primary_algorithms = {
-						{
-						rate=0,
-						density=0,
-						algorithm="none",
-						height=2
-						},
-					}
-				},
 		combat = {
 					angryness=0.99,
 					starts_attack=true,
@@ -74,7 +75,7 @@ guard_prototype = {
 					attack_hostile_mobs = true,
 					melee = {
 						maxdamage=2,
-						range=2, 
+						range=2,
 						speed=1,
 						},
 					self_destruct = nil,
@@ -84,7 +85,7 @@ guard_prototype = {
 					cycle_path = true,
 				},
 		states = {
-				{ 
+				{
 				name = "combat_melee",
 				movgen = "none",
 				typical_state_time = 9999,
@@ -92,7 +93,7 @@ guard_prototype = {
 				animation = "punch",
 				state_mode = "combat",
 				},
-				{ 
+				{
 				name = "combat",
 				movgen = "follow_mov_gen",
 				typical_state_time = 9999,
@@ -100,7 +101,7 @@ guard_prototype = {
 				animation = "walk",
 				state_mode = "combat",
 				},
-				{ 
+				{
 				name = "default",
 				movgen = "follow_mov_gen",
 				typical_state_time = 180,
@@ -115,7 +116,7 @@ guard_prototype = {
 					visual_size= {x=1, y=1},
 					},
 				},
-				{ 
+				{
 				name = "patrol",
 				movgen = "mgen_path",
 				typical_state_time = 9999,
@@ -128,6 +129,7 @@ guard_prototype = {
 				walk = {
 					start_frame = 168,
 					end_frame   = 188,
+					basevelocity = 18,
 					},
 				stand = {
 					start_frame = 0,
