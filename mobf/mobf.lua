@@ -950,7 +950,8 @@ function mobf.blacklisthandling(mob)
 		if minetest.registered_entities[mob.modname.. ":"..mob.name] == nil and
 			environment_list[mob.generic.envid] ~= nil then
 
-			if type(mob.spawning.primary_algorithms) == "table" then
+			if mob.spawning ~= nil and
+				type(mob.spawning.primary_algorithms) == "table" then
 				for i=1 , #mob.spawning.primary_algorithms , 1 do
 					local sp = mob.spawning.primary_algorithms[i]
 					local cleanup = mobf_spawn_algorithms[sp.algorithm].initialize_cleanup
