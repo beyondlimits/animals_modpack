@@ -964,7 +964,8 @@ function mobf.blacklisthandling(mob)
 					end
 				end
 			end
-			if type(mob.spawning.secondary_algorithms) == "table" then
+			if mob.spawning ~= nil and
+				type(mob.spawning.secondary_algorithms) == "table" then
 				for i=1 , #mob.spawning.secondary_algorithms , 1 do
 
 					local sp = mob.spawning.secondary_algorithms[i]
