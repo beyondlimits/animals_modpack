@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: animal_rat loading ...")
 
-local version = "0.1.1"
+local version = "0.2.0"
 
 local selectionbox_rat = {-0.2, -0.0625, -0.2, 0.2, 0.125, 0.2}
 
@@ -51,7 +51,7 @@ local rat_prototype = {
 						fleshy=90,
 					},
 					groups = rat_groups,
-					envid="on_ground_1",
+					envid="simple_air",
 					population_density = 250,
 				},
 		movement =  {

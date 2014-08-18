@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.2.2"
+local version = "0.3.0"
 
 local sheep_groups = {
 						sheerable=1,

@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: mob_npc mod loading ...")
 
-local version = "0.1.0"
+local version = "0.2.0"
 local npc_groups = {
 						not_in_creative_inventory=1
 					}
@@ -52,7 +52,7 @@ local npc_prototype = {
 						fleshy=90,
 					},
 					groups = npc_groups,
-					envid="on_ground_1",
+					envid="simple_air",
 					population_density=0,
 				},
 		movement =  {
@@ -116,7 +116,7 @@ local npc_trader_prototype = {
 						fleshy=60,
 					},
 					groups = npc_groups,
-					envid="on_ground_1",
+					envid="simple_air",
 					custom_on_activate_handler=mob_inventory.init_trader_inventory,
 					population_density=0,
 				},

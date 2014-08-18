@@ -24,7 +24,7 @@ else
 end
 
 minetest.log("action","MOD: animal_big_red mod loading ...")
-local version = "0.1.1"
+local version = "0.2.0"
 
 local big_red_groups = {
 						not_in_creative_inventory=1
@@ -53,7 +53,7 @@ local big_red_prototype = {
 						deamon=20,
 					},
 					groups = big_red_groups,
-					envid="on_ground_1",
+					envid="simple_air",
 					population_density=1000,
 				},
 		movement = {
@@ -82,7 +82,7 @@ local big_red_prototype = {
 						speed=2,
 						},
 					distance = {
-						attack="mobf:plasmaball_entity",
+						attack="animal_resources:plasmaball_entity",
 						range=10,
 						speed=2,
 						},

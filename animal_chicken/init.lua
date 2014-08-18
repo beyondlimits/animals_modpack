@@ -24,7 +24,7 @@ else
 end
 
 minetest.log("action","MOD: animal_chicken mod loading ...")
-local version = "0.1.1"
+local version = "0.2.0"
 
 local chicken_groups = {
 						not_in_creative_inventory=1

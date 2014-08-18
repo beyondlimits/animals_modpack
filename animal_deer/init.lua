@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: animal_deer mod loading ... ")
 
-local version = "0.2.1"
+local version = "0.3.0"
 
 local deer_groups = {
 						not_in_creative_inventory=1

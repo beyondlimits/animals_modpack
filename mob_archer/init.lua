@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: mob_archer mod loading ...")
 
-local version = "0.1.2"
+local version = "0.2.0"
 local archer_groups = {
 						not_in_creative_inventory=1
 					}
@@ -49,7 +49,7 @@ archer_prototype = {
 						fleshy=75,
 					},
 					groups = archer_groups,
-					envid="on_ground_1",
+					envid="simple_air",
 					stepheight = 0.51,
 				},
 		movement =  {
@@ -78,7 +78,7 @@ archer_prototype = {
 						speed=1,
 						},
 					distance = {
-						attack="mobf:arrow_entity",
+						attack="animal_resources:arrow_entity",
 						range=17,
 						min_range=5,
 						speed = 1,

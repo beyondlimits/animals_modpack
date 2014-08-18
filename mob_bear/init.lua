@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_bear loading ...")
 
-local version = "0.0.2"
+local version = "0.1.0"
 
 local bear_groups = {
 						not_in_creative_inventory=1

@@ -24,7 +24,7 @@ else
 end
 
 minetest.log("action","MOD: mob_ostrich mod loading ...")
-local version = "0.1.1"
+local version = "0.2.0"
 
 local ostrich_groups = {
 						not_in_creative_inventory=1

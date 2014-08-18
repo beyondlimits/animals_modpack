@@ -1,4 +1,4 @@
-local version = "0.1.2"
+local version = "0.2.0"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -107,7 +107,7 @@ local vombie_prototype = {
 						daemon=30,
 					},
 					groups = vombie_groups,
-					envid="on_ground_1",
+					envid="simple_air",
 					custom_on_step_handler = vombie_on_step_handler,
 					custom_on_activate_handler = vombie_on_activate_handler,
 					population_density=20,

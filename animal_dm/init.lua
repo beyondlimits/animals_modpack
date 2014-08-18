@@ -24,7 +24,7 @@ else
 end
 
 minetest.log("action","MOD: animal_dm loading ...")
-local version = "0.1.1"
+local version = "0.2.0"
 
 local dm_groups = {
 					not_in_creative_inventory=1
@@ -73,7 +73,7 @@ local dm_prototype = {
 						speed=1,
 						},
 					distance = {
-						attack="mobf:fireball_entity",
+						attack="animal_resources:fireball_entity",
 						range =15,
 						speed = 1,
 						},

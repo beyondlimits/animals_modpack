@@ -1,4 +1,5 @@
 default
 animalmaterials
+mob_environments
 mobf
 intllib?
