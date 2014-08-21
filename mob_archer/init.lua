@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: mob_archer mod loading ...")
 
-local version = "0.2.0"
+local version = "0.2.1"
 local archer_groups = {
 						not_in_creative_inventory=1
 					}
@@ -144,7 +144,17 @@ archer_prototype = {
 					gain = 0.5,
 					max_hear_distance = 17,
 					},
+				melee = {
+					name="mob_archer_meele",
+					gain = 0.5,
+					max_hear_distance = 5,
 				},
+				hit = {
+					name="animal_resources_mattgarkusha_human_male_grunt",
+					gain = 0.5,
+					max_hear_distance = 5,
+				}
+			},
 		}
 
 minetest.log("action","\tadding mob "..archer_prototype.name)
