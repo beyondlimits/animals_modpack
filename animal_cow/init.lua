@@ -102,14 +102,53 @@ local cow_prototype = {
 				cycle_path = true,
 			},
 		sound = {
-					random = {
-								name="Mudchute_cow_1",
-								min_delta = 30,
-								chance = 0.5,
-								gain = 1,
-								max_hear_distance = 10,
-								},
-					},
+				random = {
+					interval = 60,
+					max_interval_deviation = 20,
+					list = {
+						{
+						name="Mudchute_cow_1",
+						gain = 1,
+						max_hear_distance = 10,
+						},
+						{
+						name="animal_cow_random_1",
+						gain = 1,
+						max_hear_distance = 10,
+						},
+						{
+						name="animal_cow_random_2",
+						gain = 1,
+						max_hear_distance = 10,
+						},
+						{
+						name="animal_cow_random_3",
+						gain = 1,
+						max_hear_distance = 10,
+						},
+						{
+						name="animal_cow_random_4",
+						gain = 1,
+						max_hear_distance = 10,
+						},
+						{
+						name="animal_cow_random_5",
+						gain = 1,
+						max_hear_distance = 10,
+						},
+					}
+				},
+				hit = {
+							name="animal_cow_hit",
+							gain = 1,
+							max_hear_distance = 5,
+				},
+				harvest = {
+							name="animal_cow_harvest",
+							gain = 1,
+							max_hear_distance = 5,
+				},
+			},
 		states = {
 				{
 				name = "walking",
@@ -215,11 +254,45 @@ local steer_prototype = {
 			},
 		sound = {
 			random = {
-				name="Mudchute_cow_1",
-				min_delta = 30,
-				chance = 0.5,
+				interval = 60,
+				max_interval_deviation = 20,
+				list = {
+					{
+					name="Mudchute_cow_1",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+					{
+					name="animal_cow_random_1",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+					{
+					name="animal_cow_random_2",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+					{
+					name="animal_cow_random_3",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+					{
+					name="animal_cow_random_4",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+					{
+					name="animal_cow_random_5",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+				}
+			},
+			hit = {
+				name="animal_cow_hit",
 				gain = 1,
-				max_hear_distance = 10,
+				max_hear_distance = 5,
 				},
 			},
 		states = {
@@ -321,11 +394,45 @@ baby_calf_f_prototype = {
 			},
 		sound = {
 			random = {
-				name="Mudchute_cow_1",
-				min_delta = 30,
-				chance = 0.5,
+				interval = 60,
+				max_interval_deviation = 20,
+				list = {
+					{
+					name="Mudchute_cow_1",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+					{
+					name="animal_cow_random_1",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+					{
+					name="animal_cow_random_2",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+					{
+					name="animal_cow_random_3",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+					{
+					name="animal_cow_random_4",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+					{
+					name="animal_cow_random_5",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+				}
+			},
+			hit = {
+				name="animal_cow_hit",
 				gain = 1,
-				max_hear_distance = 10,
+				max_hear_distance = 5,
 				},
 			},
 		animation = {
@@ -414,14 +521,48 @@ baby_calf_m_prototype = {
 				delay=7200,
 				},
 		sound = {
-				random = {
+			random = {
+				interval = 60,
+				max_interval_deviation = 20,
+				list = {
+					{
 					name="Mudchute_cow_1",
-					min_delta = 30,
-					chance = 0.5,
 					gain = 1,
 					max_hear_distance = 10,
-				},
+					},
+					{
+					name="animal_cow_random_1",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+					{
+					name="animal_cow_random_2",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+					{
+					name="animal_cow_random_3",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+					{
+					name="animal_cow_random_4",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+					{
+					name="animal_cow_random_5",
+					gain = 1,
+					max_hear_distance = 10,
+					},
+				}
 			},
+			hit = {
+				name="animal_cow_hit",
+				gain = 1,
+				max_hear_distance = 5,
+			},
+		},
 		animation = {
 				walk = {
 					start_frame = 1,
