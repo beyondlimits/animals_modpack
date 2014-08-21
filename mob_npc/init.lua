@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: mob_npc mod loading ...")
 
-local version = "0.2.0"
+local version = "0.2.1"
 local npc_groups = {
 						not_in_creative_inventory=1
 					}
@@ -172,6 +172,13 @@ local npc_trader_prototype = {
 				attack_threshold = nil,
 				attention_distance = 7.5,
 				attention_max = 10,
+		},
+		sound = {
+			inventory_open = {
+				name="mob_npc_letstrade",
+				gain = 0.75,
+				max_hear_distance = 5,
+			}
 		},
 		trader_inventory = {
 				goods = {
