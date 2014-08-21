@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: mob_guard mod loading ...")
 
-local version = "0.2.0"
+local version = "0.2.1"
 local guard_groups = {
 						not_in_creative_inventory=1
 					}
@@ -141,12 +141,17 @@ guard_prototype = {
 					},
 			},
 		sound = {
-				punch = {
-					name="mob_guard_punch",
+				hit = {
+					name="animal_resources_mattgarkusha_human_male_grunt",
 					gain = 0.5,
 					max_hear_distance = 5,
-					},
 				},
+				melee = {
+					name="mob_guard_melee",
+					gain = 0.5,
+					max_hear_distance = 5,
+				}
+			}
 		}
 
 minetest.log("action","\tadding mob "..guard_prototype.name)
