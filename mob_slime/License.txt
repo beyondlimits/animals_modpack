@@ -2,6 +2,7 @@ Licenses
 
 CC0
 	sounds/mob_slime_die.ogg
+	sounds/mob_slime_bounce.ogg
 
 Everything not mentioned:
 	CC-BY-SA 3.0, Author sapier
