@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.3.0"
+local version = "0.3.1"
 
 local sheep_groups = {
 						sheerable=1,
@@ -81,18 +81,37 @@ local sheep_prototype = {
 					},
 		sound = {
 					random = {
+							interval = 10,
+							max_interval_deviation = 5,
+							list = {
+								{
 								name="Mudchute_sheep_1",
-								min_delta = 30,
-								chance = 0.5,
-								gain = 0.5,
+								gain = 0.4,
 								max_hear_distance = 10,
 								},
+								{
+								name="animal_sheep_random_2",
+								gain = 0.4,
+								max_hear_distance = 10,
+								},
+							}
+					},
 					harvest = {
 								name="animal_sheep_harvest",
 								gain = 0.8,
 								max_hear_distance = 5
-								},
 					},
+					hit = {
+								name="animal_sheep_hit_1",
+								gain = 0.8,
+								max_hear_distance = 5
+					},
+					catch = {
+								name="animal_sheep_catch",
+								gain = 0.8,
+								max_heat_distance = 5
+					},
+		},
 		--animation testing only
 --		patrol = {
 --					state = "patrol",
@@ -233,11 +252,25 @@ local lamb_prototype = {
 					},
 		sound = {
 					random = {
-								name="Mudchute_lamb_1",
-								min_delta = 30,
-								chance = 0.5,
+							interval = 60,
+							max_interval_deviation = 20,
+							list = {
+								{
+								name="animal_sheep_lamb_random_1",
 								gain = 0.4,
 								max_hear_distance = 10,
+								},
+							}
+					},
+					hit = {
+								name="animal_sheep_hit_1",
+								gain = 0.8,
+								max_hear_distance = 3
+								},
+					catch = {
+								name="animal_sheep_catch",
+								gain = 0.8,
+								max_heat_distance = 5
 								},
 					},
 		animation = {
@@ -365,13 +398,32 @@ local sheep_naked_prototype = {
 					},
 		sound = {
 					random = {
+							interval = 10,
+							max_interval_deviation = 5,
+							list = {
+								{
 								name="Mudchute_sheep_1",
-								min_delta = 30,
-								chance = 0.5,
-								gain = 0.5,
+								gain = 0.4,
 								max_hear_distance = 10,
 								},
+								{
+								name="animal_sheep_random_2",
+								gain = 0.4,
+								max_hear_distance = 10,
+								},
+							}
 					},
+					hit = {
+								name="animal_sheep_hit_1",
+								gain = 0.8,
+								max_hear_distance = 5
+					},
+					catch = {
+								name="animal_sheep_catch",
+								gain = 0.8,
+								max_heat_distance = 5
+					},
+		},
 		animation = {
 				walk = {
 					start_frame = 0,
