@@ -1,4 +1,4 @@
-local version = "0.2.0"
+local version = "0.2.1"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -146,6 +146,11 @@ local vombie_prototype = {
 								gain = 0.25,
 								max_hear_distance = 7,
 								},
+					hit = {
+								name="animal_vombie_hit",
+								gain = 0.25,
+								max_hear_distance = 5,
+								},
 					},
 		animation = {
 				stand = {
@@ -273,8 +278,8 @@ mobf_spawner_register("vombie_spawner_1",vombie_name,
 
 	daytimes =
 	{
-		{ begin = 0.75, stop=0.99 },
-		{ begin = 0.0,  stop=0.25 },
+		{ begin = 0.85, stop=0.99 },
+		{ begin = 0.0,  stop=0.15 },
 	},
 
 	surfaces = { "default:dirt_with_grass", "default:sand", "default:desert_sand"},
