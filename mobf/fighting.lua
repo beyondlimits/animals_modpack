@@ -1305,14 +1305,12 @@ function fighting.heal(entity,player)
 	
 	tool = tool:get_name()
 	
-	if not fighting.healdb[tool] then
+	if fighting.healdb ~= nil and not fighting.healdb[tool] then
 		print("unknown heal item: " .. tool)
 		return
 	end
 	
 	local new_health = 0
-	
-	print("healdb value: " .. dump(fighting.healdb[tool].value))
 	
 	if fighting.healdb[tool].value >= 0 then
 		new_health = MIN(entity.object:get_hp() + fighting.healdb[tool].value,
