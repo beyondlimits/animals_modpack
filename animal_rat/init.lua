@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: animal_rat loading ...")
 
-local version = "0.2.0"
+local version = "0.2.1"
 
 local selectionbox_rat = {-0.2, -0.0625, -0.2, 0.2, 0.125, 0.2}
 
@@ -106,7 +106,21 @@ local rat_prototype = {
 				typical_state_time = 180,
 				},
 			},
+			
+		sound = {
+			random = {
+				interval = 90,
+				max_interval_deviation = 20,
+				list = {
+					{
+					name="animal_rat_random",
+					gain = 1,
+					max_hear_distance = 5,
+					}
+				}
+			}
 		}
+	}
 
 --compatibility code
 minetest.register_entity("animal_rat:rat_spawner_shadows",
