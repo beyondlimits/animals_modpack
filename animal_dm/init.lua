@@ -223,7 +223,7 @@ mobf_spawner_register("dm_spawner_1",dm_name,
 	})
 
 
-minetest.log("action", "adding mob "..dm_prototype.name)
+minetest.log("action", "\tadding mob "..dm_prototype.name)
 if mobf_add_mob(dm_prototype) then
 	dofile (modpath .. "/vault.lua")
 end
