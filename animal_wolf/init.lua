@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: mob_wolf loading ...")
 
-local version = "0.2.0"
+local version = "0.2.1"
 
 local wolf_groups = {
 						not_in_creative_inventory=1
@@ -47,7 +47,7 @@ wolf_prototype = {
 
 		generic = {
 					description= S("Wolf"),
-					base_health=5,
+					base_health=10,
 					kill_result="animalmaterials:fur 1",
 					armor_groups= {
 						fleshy=90,
@@ -83,17 +83,22 @@ wolf_prototype = {
 					},
 		sound = {
 					random = nil,
-					meele = {
+					melee = {
 						name="animal_wolf_melee",
 						gain = 0.8,
 						max_hear_distance = 10
+					},
+					hit = {
+						name="animal_wolf_hit",
+						gain = 0.8,
+						max_hear_distance = 5
 					},
 					start_attack = {
 						name="animal_wolf_attack",
 						gain = 0.8,
 						max_hear_distance = 20
 					},
-					},
+			},
 		animation = {
 				stand = {
 					start_frame = 0,
