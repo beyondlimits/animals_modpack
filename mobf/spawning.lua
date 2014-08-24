@@ -139,7 +139,37 @@ function spawning.count_deactivated_mobs(name,pos,range)
 			local mobpos = mobf_hash_to_pos(hash)
 			local distance = vector.distance(pos,mobpos)
 			if distance < range then
-				count = count +1
+				local node = core.get_node(mobpos)
+				local notfound = true
+				-- if we are within active object range and
+				-- that position is loaded check if there's really a mob at that location
+				if node.name ~= "ignore" and distance < 32 then
+					local found = false
+					local objects_around = core.get_objects_inside_radius(mobpos, 1)
+					if objects_around and #objects_around > 0 then
+						for i,v in ipairs(objects_around) do
+							local luaentity = v:get_luaentity()
+							if luaentity ~= nil then
+								if luaentity.data ~= nil and
+									luaentity.data.name == name then
+									found = true
+									break
+								end
+							end
+						end
+					end
+					if not found then
+						dbg_mobf.spawning_lvl2(
+							"MOBF: clearing stall deactivated entry at: " ..
+							core.pos_to_string(mobpos))
+						notfound = false
+						spawning.mob_spawn_data[name][hash] = nil
+					end
+				end
+				
+				if notfound then
+					count = count +1
+				end
 			end
 		end
 	end
