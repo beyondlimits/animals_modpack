@@ -141,9 +141,6 @@ function mobf_factions.config_check(entity)
 	if not mobf_rtd.factions_available then
 		return false
 	end
-	if entity.dynamic_data.spawning.spawner ~= nil then
-		return true
-	end
 	return false
 end
 
@@ -319,7 +316,8 @@ function mobf_factions.show_mob_factions_menu(new_id,menu_data)
 
 
 	else
-		formspec = "label[0,0;This is not your mob keep away!]"
+		formspec = "size[4,1]label[0,0;This is not your mob keep away!]" ..
+			"button_exit[1,0.75;2,0.5;btn_exit;Okay Okay!]"
 	end
 
 	--show formspec

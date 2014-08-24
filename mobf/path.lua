@@ -466,6 +466,13 @@ end
 -------------------------------------------------------------------------------
 
 function mobf_path.mob_rightclick_callback(entity,player)
+	
+	if entity.dynamic_data.spawning.spawner ~= playername then
+		core.show_formspec(playername,"mobf:path:add_path_to_entity",
+			"size[4,1]label[0,0;This is not your mob keep away!]" ..
+			"button_exit[1,0.75;2,0.5;btn_exit;Okay Okay!]")
+		return
+	end
 
 	if entity.dynamic_data.patrol_state_before ~= nil then
 		mobf_path.switch_patrol(entity,nil,nil)
