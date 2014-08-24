@@ -19,6 +19,12 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.4.2
+-backport support for removing stall entries from offline mob list
+-fix crash for invalid spawning definitions
+-fix crash on uninitialized healdb
+-fix right click menu being abusable by non mob owner
+
 Changes 2.4.1
 -merge lost fixes from master
 -update advanced spawning mod (reduces lag)
