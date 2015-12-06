@@ -24,7 +24,7 @@ else
 end
 
 minetest.log("action","MOD: animal_chicken mod loading ...")
-local version = "0.2.1"
+local version = "0.2.2"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
@@ -281,7 +281,7 @@ local rooster_prototype = {
 				graphics_3d = {
 					visual = "mesh",
 					mesh = "animal_rooster.b3d",
-					textures = {"animal_chicken_chicken_mesh.png"},
+					textures = {"animal_chicken_rooster_mesh.png"},
 					collisionbox = selectionbox_rooster,
 					visual_size= {x=1,y=1,z=1},
 					},
