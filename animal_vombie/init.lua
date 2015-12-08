@@ -1,4 +1,4 @@
-local version = "0.2.1"
+local version = "0.2.2"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -295,7 +295,7 @@ mobf_spawner_register("vombie_spawner_2",vombie_name,
 		{
 			{ type="MAX",distance=1,threshold=0 },
 			{ type="MAX",entityname=vombie_name,
-				distance=100,threshold=2 },
+				distance=50,threshold=2 },
 		},
 
 	light_around =
