@@ -19,6 +19,12 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.4.91 2015.12.12
+-fix crashes in mobf settings
+-fix breed animals not belonging to owner of parents
+-fix some mobs not, or beeing spawned very rare
+-improve rooster model
+
 Changes 2.4.90
 -make mobs stop within sane distance to player on doing melee fight
 
