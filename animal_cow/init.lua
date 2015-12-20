@@ -24,7 +24,7 @@ else
 end
 
 minetest.log("action","MOD: animal_cow mod loading ...")
-local version = "0.3.0"
+local version = "0.3.1"
 
 local cow_groups = {
 						not_in_creative_inventory=1
@@ -33,6 +33,29 @@ local cow_groups = {
 local selectionbox_cow = {-1.5, -1.54, -0.75, 0.8, 0.7, 0.75}
 local selectionbox_steer = {-1.5*1.1, -1.54*1.1, -0.75*1.1, 0.8*1.1, 0.7*1.1, 0.75*1.1}
 local selectionbox_baby_calf = {-0.8, -0.8, -0.5, 0.8, 0.8, 0.5}
+
+local feeding_nodes = {
+    "default:junglegrass",
+    "default:sapling",
+    "default:grass_1",
+    "default:grass_2",
+    "default:grass_3",
+    "default:grass_4",
+    "default:grass_5",
+    "flowers:tulip",
+    "flowers:dandelion_yellow",
+    "flowers:geranium",
+    "flowers:viola",
+    "flowers:dandelion_white",
+    "flowers:rose"
+}
+
+local hunger_config =  {
+      target_nodes = feeding_nodes,
+      range = 15,
+      chance = 0.3,
+      typical_walk_time = 50,
+      }
 
 function cattle_drop()
 	local result = {}
@@ -97,10 +120,10 @@ local cow_prototype = {
 					consumed=true,
 					},
 		--animation testing only
-		patrol = {
-				state = "patrol",
-				cycle_path = true,
-			},
+		--patrol = {
+		--		state = "patrol",
+		--		cycle_path = true,
+		--	},
 		sound = {
 				random = {
 					interval = 60,
@@ -154,7 +177,7 @@ local cow_prototype = {
 				name = "walking",
 				movgen = "probab_mov_gen",
 				typical_state_time = 180,
-				chance = 0.50,
+				chance = 0.40,
 				animation = "walk",
 				},
 				{
@@ -168,14 +191,14 @@ local cow_prototype = {
 				name = "eating",
 				movgen = "none",
 				typical_state_time = 45,
-				chance = 0.25,
+				chance = 0.15,
 				animation = "eat",
 				},
 				{
 				name = "default",
 				movgen = "none",
 				typical_state_time = 45,
-				chance = 0.25,
+				chance = 0.15,
 				animation = "stand",
 				graphics = {
 					sprite_scale={x=4,y=4},
@@ -190,14 +213,15 @@ local cow_prototype = {
 					visual_size= {x=1,y=1,z=1},
 					},
 				},
-				{
-				name = "patrol",
-				movgen = "mgen_path",
-				typical_state_time = 9999,
-				chance = 0.0,
-				animation = "walk",
-				state_mode = "user_def",
-				},
+				-- animation testing
+				--{
+				--name = "patrol",
+				--movgen = "mgen_path",
+				--typical_state_time = 9999,
+				--chance = 0.0,
+				--animation = "walk",
+				--state_mode = "user_def",
+				--},
 			},
 		animation = {
 				walk = {
@@ -213,7 +237,8 @@ local cow_prototype = {
 					start_frame = 81,
 					end_frame   = 169,
 					},
-			}
+			},
+		hunger = hunger_config
 		}
 
 local steer_prototype = {
@@ -300,7 +325,7 @@ local steer_prototype = {
 				name = "walking",
 				movgen = "probab_mov_gen",
 				typical_state_time = 180,
-				chance = 0.50,
+				chance = 0.40,
 				animation = "walk",
 			},
 			{
@@ -314,14 +339,14 @@ local steer_prototype = {
 				name = "eating",
 				movgen = "none",
 				typical_state_time = 45,
-				chance = 0.25,
+				chance = 0.15,
 				animation = "eat",
 			},
 			{
 				name = "default",
 				movgen = "none",
 				typical_state_time = 45,
-				chance = 0.25,
+				chance = 0.15,
 				animation = "stand",
 				graphics = {
 					sprite_scale={x=4,y=4},
@@ -351,7 +376,8 @@ local steer_prototype = {
 					start_frame = 81,
 					end_frame   = 169,
 					},
-			}
+			},
+		hunger = hunger_config
 		}
 
 baby_calf_f_prototype = {
@@ -481,6 +507,7 @@ baby_calf_f_prototype = {
 					},
 				},
 			},
+		hunger = hunger_config
 		}
 
 baby_calf_m_prototype = {
@@ -609,6 +636,7 @@ baby_calf_m_prototype = {
 					},
 				},
 			},
+		hunger = hunger_config
 		}
 
 local cowname   = cow_prototype.modname .. ":"  .. cow_prototype.name
