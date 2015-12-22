@@ -19,6 +19,10 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.4.92 2014.12.22
+-add miner mob
+-make sheep and cattle feed from more flowers
+
 Changes 2.4.91 2015.12.12
 -fix crashes in mobf settings
 -fix breed animals not belonging to owner of parents
