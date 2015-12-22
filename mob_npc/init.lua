@@ -194,7 +194,7 @@ local npc_trader_prototype = {
 							{ "default:torch 33", "default:mese_crystal 2", "default:stone 10"},
 							{ "default:ladder 12", "default:mese 1", "default:cobble 50"},
 							{ "default:paper 12", "default:mese_crystal 2", "default:stone 10"},
-							{ "default:chest_locked 1", "default:mese_crystal 5", "default:cobble 25"},
+							{ "mob_miner:miner 1", "default:mese_crystal 10", nil},
 							{ "mob_archer:archer 1","default:mese_crystal 10",nil},
 							{ "mob_guard:guard 1","default:mese_crystal 10",nil},
 							{ "doors:door_steel 1","default:mese_crystal 3","default:cobble 20"},

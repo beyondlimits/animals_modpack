@@ -17,6 +17,8 @@
 --!path of mod
 local miner_modpath = minetest.get_modpath("mob_miner")
 
+local max_tunnel_size = 5
+
 --include debug trace functions
 dofile (miner_modpath .. "/digging_utils.lua")
 
@@ -52,7 +54,7 @@ local hand_tooldef = {
 
 					
 local miner_activate = function(entity)
-    local mydata = mobf_get_persistent_data(entity)
+    local mydata = entity:get_persistent_data()
 
     if (mydata.control == nil ) then
         mydata.control = {
@@ -73,9 +75,9 @@ local miner_activate = function(entity)
     end
     
     if (mydata.control.digstate == "idle") then
-        mob_set_state(entity, "default")
+        entity:set_state("default")
     elseif (mydata.control.digstate == "digging") then
-        mob_set_state(entity, "digging")
+        entity:set_state("digging")
     end
     
     if mydata.name == nil then
@@ -93,6 +95,25 @@ local miner_activate = function(entity)
     if mydata.inventory.digged == nil then
         mydata.inventory.digged = {}
     end
+    
+    if mydata.digspec == nil or 
+       #mydata.digspec ~= max_tunnel_size then
+        mydata.digspec = {}
+    end
+    
+    for x = 1, max_tunnel_size, 1 do
+        if mydata.digspec[x] == nil or 
+           #mydata.digspec[x] ~= max_tunnel_size then
+            mydata.digspec[x] = {}
+            
+            for y = 1, max_tunnel_size, 1 do
+              mydata.digspec[x][y] = false
+            end
+        end
+    end
+    
+    mydata.digspec[3][1] = true
+    mydata.digspec[3][2] = true
     
     mydata.unique_entity_id = string.gsub(tostring(entity),"table: ","")
     entity.dynamic_data.miner_formspec_data = {}
@@ -145,13 +166,79 @@ local miner_show_formspec = function(playername, entity, data)
       "list[current_player;main;1,7.5;8,1;]" ..
       "field[0.25,7;2,0.5;te_digdepth;Dig depth;1]" ..
       "button_exit[2,6.8;2,0.25;btn_start_digging;" .. S("start digging") .. "]"
-     
-     print("Showing: \"" .. miner_formspec .. "\" as \"" .. formname .. "\" to: " .. playername)
+      
+      for x = 1, max_tunnel_size, 1 do
+          for y = max_tunnel_size, 1, -1 do
+              if ( x == 3 ) and (y == 1) or
+                 ( x == 3 ) and (y == 2) then
+                  --! miners size
+              else
+                  if data.digspec[x][y] then
+                    miner_formspec = miner_formspec .. 
+                      "image_button[" .. ((x*0.825)+4) .. "," .. (6- (y*0.9)) .. ";1,1;" ..
+                      "blank.png;" .. 
+                      "btn_tunnelshape_" .. x .. "x" .. y .. ";;" .. 
+                      "false;false;crack_anylength.png]"
+                  else
+                    miner_formspec = miner_formspec ..
+                      "image_button[" .. ((x*0.825)+4) .. "," .. (6-(y*0.9)) .. ";1,1;" ..
+                      "default_stone.png;" .. 
+                      "btn_tunnelshape_" .. x .. "x" .. y .. ";;" .. 
+                      "false;false;crack_anylength.png]"
+                  end
+              end
+          end
+      end
       
     core.show_formspec(playername, formname, miner_formspec)
 end
 
-local miner_get_nodes_to_dig = function(direction, basepos)
+
+local miner_get_nodes_to_dig = function(direction, basepos, digspec)
+
+    local nodelist = {}
+    
+    local offset = 0;
+    
+    if (direction == "xplus") or (direction == "zplus") then
+      offset = 1
+    elseif (direction == "xminus") or (direction == "zminus") then
+      offset = -1
+    end
+    
+    local horiz_offset = math.floor(#digspec /2)    
+    local xidx = function(addon, direction, digspecsize)
+        if direction == "zminus" or direction == "xplus" then
+          return digspecsize - (addon + horiz_offset)
+        elseif direction == "zplus" or direction == "xminus" then
+          return  addon + horiz_offset +1;
+        end
+    end
+    
+    if (direction == "zplus") or (direction == "zminus") then
+      for yaddon = 0 , #digspec[1], 1  do
+          for xaddon = -horiz_offset , horiz_offset, 1  do
+          
+            if digspec[xidx(xaddon,direction,#digspec)][yaddon +1] then
+                table.insert(nodelist, {x=basepos.x+xaddon, y=basepos.y+yaddon, z=basepos.z+offset})
+            end
+          end
+      end
+    elseif (direction == "xplus") or (direction == "xminus") then
+      for yaddon = 0 , #digspec[1], 1  do
+          for zaddon = -horiz_offset , horiz_offset, 1  do
+            if digspec[xidx(zaddon,direction,#digspec)][yaddon +1] then
+                table.insert(nodelist, {x=basepos.x+offset, y=basepos.y+yaddon, z=basepos.z+zaddon})
+            end
+          end
+      end
+    end
+    
+    return nodelist
+
+end
+
+local miner_get_nodes_to_dig_x = function(direction, basepos)
 
     local nodelist = {}
     
@@ -303,7 +390,7 @@ local miner_add_to_inventory = function(itemname, diged_inventory)
 end
 
 local miner_onstep = function(entity, now, dtime)
-    local mydata = mobf_get_persistent_data(entity)
+    local mydata = entity:get_persistent_data()
     
     if (mydata.control.digstate == "digging") then
         local direction = miner_getdir(entity)
@@ -312,7 +399,7 @@ local miner_onstep = function(entity, now, dtime)
         local non_air_node_found = false
         if (mydata.control.digpos == nil) then
             
-            local todig = miner_get_nodes_to_dig(direction, basepos)
+            local todig = miner_get_nodes_to_dig(direction, basepos, mydata.digspec)
             
             for i, v in ipairs(todig) do
               local nodeat = core.get_node(v)
@@ -369,7 +456,7 @@ local miner_onstep = function(entity, now, dtime)
         if (mydata.control.digdepth <= 0) then
             mydata.control.digstate = "idle"
             print ("Miner: reached requested depth nothing to do setting to idle")
-            mob_set_state(entity, "default")
+            entity:set_state("default")
             return
         end
         
@@ -385,7 +472,7 @@ local miner_onstep = function(entity, now, dtime)
         if (mydata.control.digpos == nil) then
             mydata.control.digstate = "idle"
             print ("Miner: no diggable node found setting to idle")
-            mob_set_state(entity, "default")
+            entity:set_state("default")
             return
         end
         
@@ -422,27 +509,26 @@ local miner_onstep = function(entity, now, dtime)
 end
 
 local miner_rightclick = function(entity, player)
-    local mydata = mobf_get_persistent_data(entity)
+    local mydata = entity:get_persistent_data()
 
     if mydata.control.digstate == "idle" then
-        print ("showing miner control panel")
         miner_show_formspec(player:get_player_name(), entity, mydata )
     elseif mydata.control.digstate == "idle_nothing_to_dig" then
         miner_stepforward(entity)
         mydata.control.digstate = "idle"
     else
         mydata.control.digstate = "idle"
-        mob_set_state(entity, "default")
+        entity:set_state("default")
     end
 end
 
 local miner_rightclick_label = function(entity)
-    local mydata = mobf_get_persistent_data(entity)
+    local mydata = entity:get_persistent_data()
     
     if mydata.control.digstate == "idle" then
       local basepos = entity:getbasepos()
       local direction = miner_getdir(entity)
-      local nodestodig  = miner_get_diggable_nodes(miner_get_nodes_to_dig(direction,basepos))
+      local nodestodig  = miner_get_diggable_nodes(miner_get_nodes_to_dig(direction,basepos, mydata.digspec))
       
       if #nodestodig ~= 0 then
         return S("give orders")
@@ -464,7 +550,7 @@ local miner_formspec_handler = function(player, formname, fields)
         local entity = mobf_global_data_get(storageid)
         
         if entity ~= nil then
-            local mydata = mobf_get_persistent_data(entity)
+            local mydata = entity:get_persistent_data()
             local minerinv = entity.dynamic_data.miner_formspec_data.tools_inventory
             
             local toolinv = minerinv:get_list("tools")
@@ -473,7 +559,6 @@ local miner_formspec_handler = function(player, formname, fields)
             
             for i,v in ipairs (toolinv) do
                 table.insert(mydata.inventory.tools, v:to_table())
-                print("Miner tool " .. i .. ": " .. dump(v:to_table()))
             end
             
             
@@ -493,11 +578,46 @@ local miner_formspec_handler = function(player, formname, fields)
                 mydata.control.digpos = nil
                 mydata.control.digdepth = tonumber(fields["te_digdepth"])
               
-                mob_set_state(entity, "digging")
+                entity:set_state("digging")
+            end
+            
+            local update_spec = false
+            
+            for x = 1, max_tunnel_size, 1 do
+                for y = 1, max_tunnel_size, 1 do
+                    if (fields["btn_tunnelshape_" .. x .. "x" .. y]) then
+                        mydata.digspec[x][y] = not mydata.digspec[x][y]
+                        update_spec = true
+                    end
+                end
+            end
+            
+            
+            if (update_spec) then
+                miner_show_formspec(player:get_player_name(), entity, mydata)
             end
         end
-        print ("miner formspec handler")
     end
+end
+
+local miner_precatch_check = function(entity)
+    
+    local mydata = entity:get_persistent_data()
+    
+    for t1 = 1, #mydata.inventory.tools, 1 do
+        if (mydata.inventory.tools[t1] ~= nil ) then
+            core.chat_send_player(entity:owner(), S(mydata.name .. ": I've still got tools!"))
+            return false
+        end
+    end
+    
+    for t1 = 1, #mydata.inventory.digged, 1 do
+        if (mydata.inventory.digged[t1] ~= nil ) then
+            core.chat_send_player(entity:owner(), S(mydata.name .. ": I've still got some nodes!"))
+            return false
+        end
+    end
+    return true
 end
 
 miner_prototype = {
@@ -548,6 +668,7 @@ miner_prototype = {
 		catching = {
 					tool="animalmaterials:contract",
 					consumed=true,
+					can_be_cought = miner_precatch_check,
 					},
 		states = {
 				{
