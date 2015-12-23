@@ -116,6 +116,10 @@ local miner_activate = function(entity)
     mydata.digspec[3][1] = true
     mydata.digspec[3][2] = true
     
+    if  mydata.control.soundtime == nil then
+        mydata.control.soundtime = 0
+    end
+    
     mydata.unique_entity_id = string.gsub(tostring(entity),"table: ","")
     entity.dynamic_data.miner_formspec_data = {}
 end
@@ -237,36 +241,6 @@ local miner_get_nodes_to_dig = function(direction, basepos, digspec)
     
     return nodelist
 
-end
-
-local miner_get_nodes_to_dig_x = function(direction, basepos)
-
-    local nodelist = {}
-    
-    local offset = 0;
-    
-    if (direction == "xplus") or (direction == "zplus") then
-      offset = 1
-    elseif (direction == "xminus") or (direction == "zminus") then
-      offset = -1
-    end
-    
-
-    if (direction == "zplus") or (direction == "zminus") then
-      for yaddon = 0 , 2, 1  do
-          for xaddon = -1 , 1, 1  do
-            table.insert(nodelist, {x=basepos.x+xaddon, y=basepos.y+yaddon, z=basepos.z+offset})
-          end
-      end
-    elseif (direction == "xplus") or (direction == "xminus") then
-      for yaddon = 0 , 2, 1  do
-          for zaddon = -1 , 1, 1  do
-            table.insert(nodelist, {x=basepos.x+offset, y=basepos.y+yaddon, z=basepos.z+zaddon})
-          end
-      end
-    end
-    
-    return nodelist
 end
 
 local miner_get_diggable_nodes = function(nodelist)
@@ -429,7 +403,7 @@ local miner_update_digpos = function(entity, data)
           if (digtime > 0) then
               data.control.digpos = v
               data.control.digtime = 0
-              if (data.control.soundtime < 0) then
+              if (data.control.soundtime < 0) or (data.control.soundtime == nil) then
                   data.control.soundtime = SOUND_INTERVAL
               end
               data.control.used_tool = used_tool
@@ -440,7 +414,11 @@ local miner_update_digpos = function(entity, data)
               data.control.add_wear_oncomplete = wear
               break
           else
-              print("unable to dig " .. nodeat.name)
+              local description = core.registered_nodes[nodeat.name].description
+              if (description ~= nil) then
+                core.chat_send_player(entity:owner(), data.name .. ": " .. 
+                  S("I don't have a tool to dig ") .. S(description))
+              end
           end
       end
     end
@@ -494,6 +472,8 @@ local miner_onstep = function(entity, now, dtime)
         
         if (not miner_is_dig_safe(mydata.control.digpos)) then
             --! TODO send message to owner
+            core.chat_send_player(entity:owner(), mydata.name .. ": " .. 
+              S("I won't continue to dig here there's something bad behind!"))
             mydata.control.digpos = nil
         end
         
@@ -640,14 +620,16 @@ local miner_precatch_check = function(entity)
     
     for t1 = 1, #mydata.inventory.tools, 1 do
         if (mydata.inventory.tools[t1] ~= nil ) then
-            core.chat_send_player(entity:owner(), S(mydata.name .. ": I've still got tools!"))
+            core.chat_send_player(entity:owner(), mydata.name .. ":" .. 
+                S("I've still got tools!"))
             return false
         end
     end
     
     for t1 = 1, #mydata.inventory.digged, 1 do
         if (mydata.inventory.digged[t1] ~= nil ) then
-            core.chat_send_player(entity:owner(), S(mydata.name .. ": I've still got some nodes!"))
+            core.chat_send_player(entity:owner(), mydata.name .. ": " .. 
+                S("I've still got some nodes!"))
             return false
         end
     end
