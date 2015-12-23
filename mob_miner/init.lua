@@ -515,8 +515,6 @@ local miner_onstep = function(entity, now, dtime)
               { name="default_dig_" .. mydata.control.diggroup, gain=1.0, max_hear_distance=10 }
         
             sound.play(mydata.control.digpos, soundspec )
-             
-            print("Playing: " .. dump(soundspec) .. " at: " .. dump(mydata.control.digpos))
             mydata.control.soundtime = mydata.control.soundtime - SOUND_INTERVAL
         end
     end
