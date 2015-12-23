@@ -10,6 +10,7 @@ function mob_miner_calc_digtime(tool, nodename)
     local candig = false
     local result_time = 7200
     local result_wear = 0
+    local result_group = ""
     local leveldiff = 0
     
     local nodelevel = 0
@@ -36,6 +37,7 @@ function mob_miner_calc_digtime(tool, nodename)
             if result_time == nil or (digtime < result_time) then
                 result_time = digtime
                 result_wear = wear
+                result_group = groupcapname
             end
         else
         end
@@ -45,7 +47,7 @@ function mob_miner_calc_digtime(tool, nodename)
         return -1
     end
     
-    return result_time, result_wear
+    return result_time, result_wear, result_group
 end
 
 function miner_is_dig_safe(pos)

@@ -18,6 +18,7 @@
 local miner_modpath = minetest.get_modpath("mob_miner")
 
 local max_tunnel_size = 5
+local SOUND_INTERVAL = 0.6
 
 --include debug trace functions
 dofile (miner_modpath .. "/digging_utils.lua")
@@ -33,7 +34,7 @@ end
 
 minetest.log("action","MOD: mob_miner mod loading ...")
 
-local version = "0.0.0"
+local version = "0.0.1"
 local miner_groups = {
 						not_in_creative_inventory=1
 					}
@@ -389,62 +390,106 @@ local miner_add_to_inventory = function(itemname, diged_inventory)
     return done
 end
 
+local miner_update_digpos = function(entity, data)
+
+    local basepos = entity:getbasepos()
+    local direction = miner_getdir(entity)
+    local non_air_node_detected = false
+    local digpositions = miner_get_nodes_to_dig(direction, basepos, data.digspec)
+            
+    for i, v in ipairs(digpositions) do
+      local nodeat = core.get_node(v)
+      
+      if (nodeat.name ~= "air") then
+          non_air_node_detected = true;
+          --! use hand time as reference
+          local digtime, wear, group = mob_miner_calc_digtime(hand_tooldef, nodeat.name)
+          local used_tool = ""
+          
+          
+          for i=1, #data.inventory.tools, 1 do
+              if (data.inventory.tools[i] ~= nil) then
+                local toolname = data.inventory.tools[i].name
+                local tooldef = core.registered_tools[toolname]
+            
+                if ( tooldef ~= nil) then
+                    local tooldigtime, toolwear, toolgroup = mob_miner_calc_digtime(tooldef, nodeat.name)
+                    
+                    if (digtime < 0) or 
+                        ((tooldigtime > 0) and (tooldigtime < digtime)) then
+                        used_tool = toolname
+                        digtime = tooldigtime
+                        wear = toolwear
+                        group = toolgroup
+                    end
+                end
+              end
+          end
+          
+          if (digtime > 0) then
+              data.control.digpos = v
+              data.control.digtime = 0
+              if (data.control.soundtime < 0) then
+                  data.control.soundtime = SOUND_INTERVAL
+              end
+              data.control.used_tool = used_tool
+              data.control.diggroup = group
+              
+              print("Using " .. used_tool .. " to dig " .. nodeat.name .. " in " .. digtime .. " seconds group is: " .. group)
+              data.control.timetocomplete = digtime
+              data.control.add_wear_oncomplete = wear
+              break
+          else
+              print("unable to dig " .. nodeat.name)
+          end
+      end
+    end
+
+    return non_air_node_detected
+end
+
+local miner_complete_dig = function(data)
+
+    local nodeat = core.get_node(data.control.digpos)
+    local nodedef = core.registered_nodes[nodeat.name]
+    local tooldef = core.registered_tools[data.control.used_tool]
+          
+    if (miner_add_wear(data.control.used_tool,
+                   data.control.add_wear_oncomplete,
+                   data.inventory.tools)) then
+    
+      core.set_node(data.control.digpos, {name="air"})
+      
+      local toadd = nodeat.name
+      
+      if (nodedef.drop ~= nil) then
+        toadd = nodedef.drop
+      end
+      
+      if (not miner_add_to_inventory(toadd,data.inventory.digged)) then
+          core.add_item(data.control.digpos, toadd)
+      end
+    else
+        print("BUG: Minder didn't find the tool we're supposed to digging with")
+    end
+    data.control.add_wear_on_complete = nil
+    data.control.digpos = nil
+
+end
+
 local miner_onstep = function(entity, now, dtime)
+
     local mydata = entity:get_persistent_data()
     
     if (mydata.control.digstate == "digging") then
-        local direction = miner_getdir(entity)
-        local basepos = entity:getbasepos()
-        
+
         local non_air_node_found = false
         if (mydata.control.digpos == nil) then
+            non_air_node_found = miner_update_digpos(entity, mydata)
             
-            local todig = miner_get_nodes_to_dig(direction, basepos, mydata.digspec)
-            
-            for i, v in ipairs(todig) do
-              local nodeat = core.get_node(v)
-              
-              if (nodeat.name ~= "air") then
-                  non_air_node_found = true;
-                  --! use hand time as reference
-                  local digtime, wear = mob_miner_calc_digtime(hand_tooldef, nodeat.name)
-                  local used_tool = ""
-                  
-                  
-                  for i=1, #mydata.inventory.tools, 1 do
-                      if (mydata.inventory.tools[i] ~= nil) then
-                        local toolname = mydata.inventory.tools[i].name
-                        local tooldef = core.registered_tools[toolname]
-                    
-                        if ( tooldef ~= nil) then
-                            local tooldigtime, toolwear = mob_miner_calc_digtime(tooldef, nodeat.name)
-                            
-                            if (digtime < 0) or 
-                                ((tooldigtime > 0) and (tooldigtime < digtime)) then
-                                used_tool = toolname
-                                digtime = tooldigtime
-                                wear = toolwear
-                            end
-                        end
-                      end
-                  end
-                  
-                  if (digtime > 0) then
-                      mydata.control.digpos = v
-                      mydata.control.digtime = 0
-                      mydata.control.used_tool = used_tool
-                      
-                      print("Using " .. used_tool .. " to dig " .. nodeat.name .. " in " .. digtime .. " seconds")
-                      mydata.control.timetocomplete = digtime
-                      mydata.control.add_wear_oncomplete = wear
-                      break
-                  else
-                      print("unable to dig " .. nodeat.name)
-                  end
-              end
-            end
         else
             mydata.control.digtime = mydata.control.digtime + dtime
+            mydata.control.soundtime = mydata.control.soundtime + dtime
         end
         
         if (not miner_is_dig_safe(mydata.control.digpos)) then
@@ -460,6 +505,7 @@ local miner_onstep = function(entity, now, dtime)
             return
         end
         
+        --! move ahead if we don't have any node left to dig
         if (mydata.control.digpos == nil) and (not non_air_node_found) then
             mydata.control.digdepth = mydata.control.digdepth -1
             
@@ -467,43 +513,31 @@ local miner_onstep = function(entity, now, dtime)
                 return
             end
         end
-        
         --! stop digging if there ain't any node left
         if (mydata.control.digpos == nil) then
             mydata.control.digstate = "idle"
+            mydata.control.soundtime = -1
             print ("Miner: no diggable node found setting to idle")
             entity:set_state("default")
             return
         end
         
+        --! check if dig is completed
         if (mydata.control.digtime ~= nil) and 
             (mydata.control.timetocomplete ~= nil) and
             (mydata.control.digtime > mydata.control.timetocomplete) then
             
-            local nodeat = core.get_node(mydata.control.digpos)
-            local nodedef = core.registered_nodes[nodeat.name]
-            local tooldef = core.registered_tools[mydata.control.used_tool]
-                  
-            if (miner_add_wear(mydata.control.used_tool,
-                           mydata.control.add_wear_oncomplete,
-                           mydata.inventory.tools)) then
-            
-              core.set_node(mydata.control.digpos, {name="air"})
-              
-              local toadd = nodeat.name
-              
-              if (nodedef.drop ~= nil) then
-                toadd = nodedef.drop
-              end
-              
-              if (not miner_add_to_inventory(toadd,mydata.inventory.digged)) then
-                  core.add_item(mydata.control.digpos, toadd)
-              end
-            else
-                print("BUG: Minder didn't find the tool we're supposed to digging with")
-            end
-            mydata.control.add_wear_on_complete = nil
-            mydata.control.digpos = nil
+            miner_complete_dig(mydata)
+        end
+        
+        if ((mydata.control.soundtime >= SOUND_INTERVAL) and (mydata.control.diggroup ~= nil)) then
+            local soundspec = 
+              { name="default_dig_" .. mydata.control.diggroup, gain=1.0, max_hear_distance=10 }
+        
+            sound.play(mydata.control.digpos, soundspec )
+             
+            print("Playing: " .. dump(soundspec) .. " at: " .. dump(mydata.control.digpos))
+            mydata.control.soundtime = mydata.control.soundtime - SOUND_INTERVAL
         end
     end
 end
