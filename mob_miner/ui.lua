@@ -68,13 +68,14 @@ mob_miner.show_formspec = function(playername, entity, data)
     local miner_formspec = "size[10,8.5;]" ..
       "label[1,0;"..S("Miner %s"):format(data.name).."]" ..
       "label[0,1;"..S("Tools:").."]"..
-      "label[5,1;"..S("Tunnel shape:").."]" ..
+      "label[6,1;"..S("Tunnel shape:").."]" ..
       "label[0,2.5;"..S("Minerinventory:").."]"..
       "list[detached:" .. data.unique_entity_id .. ";tools;0,1.5;4,1;]" ..
       "list[detached:" .. data.unique_entity_id .. ";digged;0,3;4,3;]" ..
       "list[current_player;main;1,7.5;8,1;]" ..
-      "field[0.25,7;2,0.5;te_digdepth;Dig depth;" .. digdepth .."]" ..
-      "button_exit[2,6.8;2,0.25;btn_start_digging;" .. S("start digging") .. "]"
+      "field[0.25,7;1,0.5;te_digdepth;Dig depth;" .. digdepth .."]" ..
+      "button_exit[1,6.8;2,0.25;btn_start_digging;" .. S("start digging") .. "]" ..
+      "button_exit[8,6.8;2,0.25;btn_take_all_items;" .. S("take all items") .. "]"
       
       for x = 1, MINER_MAX_TUNNEL_SIZE, 1 do
           for y = MINER_MAX_TUNNEL_SIZE, 1, -1 do
@@ -84,13 +85,13 @@ mob_miner.show_formspec = function(playername, entity, data)
               else
                   if data.digspec[x][y] then
                     miner_formspec = miner_formspec .. 
-                      "image_button[" .. ((x*0.825)+4) .. "," .. (6- (y*0.9)) .. ";1,1;" ..
+                      "image_button[" .. ((x*0.825)+4.85) .. "," .. (6- (y*0.9)) .. ";1,1;" ..
                       "blank.png;" .. 
                       "btn_tunnelshape_" .. x .. "x" .. y .. ";;" .. 
                       "false;false;crack_anylength.png]"
                   else
                     miner_formspec = miner_formspec ..
-                      "image_button[" .. ((x*0.825)+4) .. "," .. (6-(y*0.9)) .. ";1,1;" ..
+                      "image_button[" .. ((x*0.825)+4.85) .. "," .. (6-(y*0.9)) .. ";1,1;" ..
                       "default_stone.png;" .. 
                       "btn_tunnelshape_" .. x .. "x" .. y .. ";;" .. 
                       "false;false;crack_anylength.png]"
@@ -140,7 +141,7 @@ mob_miner.formspec_handler = function(player, formname, fields)
               
                 entity:set_state("digging")
             end
-            
+
             local update_spec = false
             
             for x = 1, MINER_MAX_TUNNEL_SIZE, 1 do
@@ -152,6 +153,32 @@ mob_miner.formspec_handler = function(player, formname, fields)
                 end
             end
             
+            if fields["btn_take_all_items"] ~= nil then
+                local playerinventory = 
+                	core.get_inventory({type="player", name=player:get_player_name()})
+            
+                for t1 = 1, #mydata.inventory.tools, 1 do
+                    if mydata.inventory.tools[t1] ~= nil then
+                    	local toadd = ItemStack(mydata.inventory.tools[t1])
+                        if (playerinventory:room_for_item( "main", toadd)) then
+                        	playerinventory:add_item("main", toadd)
+                        	mydata.inventory.tools[t1] = nil
+                        end
+                    end
+                end
+                
+                for t1 = 1, #mydata.inventory.digged, 1 do
+                    if (mydata.inventory.digged[t1] ~= nil ) then
+                        local toadd = ItemStack(mydata.inventory.digged[t1])
+                        if (playerinventory:room_for_item( "main", toadd)) then
+                        	playerinventory:add_item("main", toadd)
+                        	mydata.inventory.digged[t1] = nil
+                        end
+                        
+                    end
+                end
+                update_spec = false
+            end
             
             if (update_spec) then
                 mob_miner.show_formspec(player:get_player_name(), entity, mydata)
