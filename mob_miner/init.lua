@@ -26,6 +26,7 @@ local version = "0.0.2"
 dofile (miner_modpath .. "/constants.lua")
 dofile (miner_modpath .. "/utils.lua")
 dofile (miner_modpath .. "/ui.lua")
+dofile (miner_modpath .. "/names_m_de.lua")
 
 -- Boilerplate to support localized strings if intllib mod is installed.
 local S
@@ -76,7 +77,8 @@ local miner_activate = function(entity)
     end
     
     if mydata.name == nil then
-        mydata.name = "Nobody"
+        
+        mydata.name = MINER_NAMES[math.random(#MINER_NAMES)]
     end
     
     if mydata.inventory == nil then
