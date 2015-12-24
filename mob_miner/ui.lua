@@ -75,7 +75,8 @@ mob_miner.show_formspec = function(playername, entity, data)
       "list[current_player;main;1,7.5;8,1;]" ..
       "field[0.25,7;1,0.5;te_digdepth;Dig depth;" .. digdepth .."]" ..
       "button_exit[1,6.8;2,0.25;btn_start_digging;" .. S("start digging") .. "]" ..
-      "button_exit[8,6.8;2,0.25;btn_take_all_items;" .. S("take all items") .. "]"
+      "button_exit[8,6.8;2,0.25;btn_take_all_items;" .. S("take all items") .. "]" ..
+      "image[7.1,4.25;1.5,2;mob_miner_miner_item.png]"
       
       for x = 1, MINER_MAX_TUNNEL_SIZE, 1 do
           for y = MINER_MAX_TUNNEL_SIZE, 1, -1 do
@@ -217,7 +218,7 @@ mob_miner.rightclick_control = function(entity, player)
     if mydata.control.digstate == "idle" then
         mob_miner.show_formspec(player:get_player_name(), entity, mydata )
     elseif mydata.control.digstate == "idle_nothing_to_dig" then
-        miner_stepforward(entity)
+        entity:stepforward()
         mydata.control.digstate = "idle"
     else
         mydata.control.digstate = "idle"
