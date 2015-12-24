@@ -212,6 +212,16 @@ mob_miner.rightclick_control_label = function(entity)
     end
 end
 
+mob_miner.rightclick_relocate_label = function(entity)
+    local mydata = entity:get_persistent_data()
+    
+    if mydata.control.digstate == "follow" then
+		return S("stay here")
+    else
+        return S("follow me")
+    end
+end
+
 mob_miner.rightclick_control = function(entity, player)
     local mydata = entity:get_persistent_data()
 
@@ -225,3 +235,22 @@ mob_miner.rightclick_control = function(entity, player)
         entity:set_state("default")
     end
 end
+
+mob_miner.rightclick_relocate = function(entity, player)
+    local mydata = entity:get_persistent_data()
+
+    if mydata.control.digstate == "idle" or
+    	mydata.control.digstate == "idle_nothing_to_dig" then
+    	mydata.control.digstate = "follow"
+		if not entity:set_state("relocate") then
+			print ("Miner: relocate state not specified")
+		end
+		entity.dynamic_data.movement.target = 
+			core.get_player_by_name(entity.dynamic_data.spawning.spawner)
+    elseif mydata.control.digstate == "follow" then
+        entity:set_state("default")
+        mydata.control.digstate = "idle"
+    end
+end
+
+minetest.register_on_player_receive_fields(mob_miner.formspec_handler)

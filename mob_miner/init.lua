@@ -74,6 +74,8 @@ local miner_activate = function(entity)
         entity:set_state("default")
     elseif (mydata.control.digstate == "digging") then
         entity:set_state("digging")
+    elseif (mydata.control.digstate == "follow") then
+    		entity:set_state("relocate")
     end
     
     if mydata.name == nil then
@@ -118,6 +120,7 @@ local miner_activate = function(entity)
     
     mydata.unique_entity_id = string.gsub(tostring(entity),"table: ","")
     entity.dynamic_data.miner_formspec_data = {}
+    entity.dynamic_data.movement.target = core.get_player_by_name(entity.dynamic_data.spawning.spawner)
 end
 
 mob_miner.stepforward  = function(entity)
@@ -406,12 +409,17 @@ miner_prototype = {
 					custom_on_step_handler = miner_onstep,
 					
 					on_rightclick_callbacks = {
-            {
-              handler = mob_miner.rightclick_control,
-              name = "miner_control_rightclick",
-              visiblename = mob_miner.rightclick_control_label
-            }
-          }
+						{
+							handler = mob_miner.rightclick_control,
+							name = "miner_control_rightclick",
+							visiblename = mob_miner.rightclick_control_label
+						},
+						{
+							handler = mob_miner.rightclick_relocate,
+							name = "miner_relocate_rightclick",
+							visiblename = mob_miner.rightclick_relocate_label
+						}
+					}
 				},
 		movement =  {
 					guardspawnpoint = true,
@@ -423,7 +431,7 @@ miner_prototype = {
 					pattern="stop_and_go",
 					canfly=false,
 					follow_speedup=10,
-					max_distance=0.2,
+					max_distance=2,
 					},
 		catching = {
 					tool="animalmaterials:contract",
@@ -446,45 +454,59 @@ miner_prototype = {
 					visual_size= {x=1, y=1},
 					},
 				},
-        {
-        name = "digging",
-        movgen = "none",
-        typical_state_time = 180,
-        chance = 0,
-        animation = "dig",
-        state_mode = "user_def",
-        graphics_3d = {
-          visual = "mesh",
-          mesh = "character.b3d",
-          textures = {"character.png"},
-          collisionbox = {-0.3,-1.0,-0.3, 0.3,0.8,0.3},
-          visual_size= {x=1, y=1},
-          },
-        },
+				{
+					name = "digging",
+					movgen = "none",
+					typical_state_time = 180,
+					chance = 0,
+					animation = "dig",
+					state_mode = "user_def",
+					graphics_3d = {
+						visual = "mesh",
+						mesh = "character.b3d",
+						textures = {"character.png"},
+						collisionbox = {-0.3,-1.0,-0.3, 0.3,0.8,0.3},
+						visual_size= {x=1, y=1},
+					},
+				},
+				{
+					name = "relocate",
+					movgen = "follow_mov_gen",
+					typical_state_time = 60,
+					chance = 0,
+					animation = "stand",
+					graphics_3d = 
+					{
+						visual = "mesh",
+						mesh = "character.b3d",
+						textures =  {"character.png"},
+						collisionbox = {-0.3,-1.0,-0.3, 0.3,0.8,0.3},
+						visual_size= {x=1,y=1,z=1},
+						model_orientation_fix =  math.pi/2
+					},
+				},
 			},
 		animation = {
-		    stand = {
-          start_frame = 0,
-          end_frame   = 80,
-          },
-				walk = {
-					start_frame = 168,
-					end_frame   = 188,
-					basevelocity = 18,
-					},
-        dig = {
-          start_frame = 189,
-          end_frame = 199,
-        },
-        digwalk = {
-          start_frame = 200,
-          end_frame = 220,
-          basevelocity = 18
-        }
+			stand = {
+				start_frame = 0,
+				end_frame   = 80,
 			},
+			walk = {
+				start_frame = 168,
+				end_frame   = 188,
+				basevelocity = 18,
+				},
+			dig = {
+				start_frame = 189,
+				end_frame = 199,
+			},
+			digwalk = {
+				start_frame = 200,
+				end_frame = 220,
+				basevelocity = 18
+			}
+		},
 	}
-	
-minetest.register_on_player_receive_fields(mob_miner.formspec_handler)
 
 minetest.log("action","\tadding mob " .. miner_prototype.name)
 mobf_add_mob(miner_prototype)
