@@ -19,7 +19,12 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
-Changes 2.4.92 2014.12.22
+Changes 2.4.93 2015.12.24
+-polish miner code
+-add support for miner to follow player
+-add a lot of names for miner
+
+Changes 2.4.92 2015.12.22
 -add miner mob
 -make sheep and cattle feed from more flowers
 
