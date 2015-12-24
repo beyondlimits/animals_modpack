@@ -20,7 +20,7 @@ mob_miner = {}
 --!path of mod
 local miner_modpath = minetest.get_modpath("mob_miner")
 
-local version = "0.0.1"
+local version = "0.0.2"
 
 --include debug trace functions
 dofile (miner_modpath .. "/constants.lua")
@@ -245,7 +245,7 @@ mob_miner.update_digpos = function(entity)
               data.control.used_tool = used_tool
               data.control.diggroup = group
               
-              print("Using " .. used_tool .. " to dig " .. nodeat.name .. " in " .. digtime .. " seconds group is: " .. group)
+              --print("Using " .. used_tool .. " to dig " .. nodeat.name .. " in " .. digtime .. " seconds group is: " .. group)
               data.control.timetocomplete = digtime
               data.control.add_wear_oncomplete = wear
               break
@@ -316,7 +316,7 @@ local miner_onstep = function(entity, now, dtime)
         --! stop digging if we reached the requested depth
         if (mydata.control.digdepth <= 0) then
             mydata.control.digstate = "idle"
-            print ("Miner: reached requested depth nothing to do setting to idle")
+            --print ("Miner: reached requested depth nothing to do setting to idle")
             entity:set_state("default")
             return
         end
@@ -333,7 +333,7 @@ local miner_onstep = function(entity, now, dtime)
         if (mydata.control.digpos == nil) then
             mydata.control.digstate = "idle"
             mydata.control.soundtime = -1
-            print ("Miner: no diggable node found setting to idle")
+            --print ("Miner: no diggable node found setting to idle")
             entity:set_state("default")
             return
         end

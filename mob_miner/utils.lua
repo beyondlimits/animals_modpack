@@ -36,7 +36,7 @@ function mob_miner_calc_digtime(tool, nodename)
         nodelevel = nodedef.groups["level"]
     end
     
-    print("Checking node: " .. nodename .. " level=" .. nodelevel)
+    --print("Checking node: " .. nodename .. " level=" .. nodelevel)
     
     for groupcapname, parameters in pairs(tool.tool_capabilities.groupcaps) do
         
@@ -47,10 +47,10 @@ function mob_miner_calc_digtime(tool, nodename)
         
         if parameters.times[rating] ~= nil then
             local leveldiff = parameters.maxlevel - nodelevel
-            print("maxlevel: " .. parameters.maxlevel .. " Level: " .. nodelevel)
+            --print("maxlevel: " .. parameters.maxlevel .. " Level: " .. nodelevel)
             local digtime = parameters.times[rating] / math.max(1, leveldiff)
             local wear = 65535 * (1 / parameters.uses / math.pow(3.0, leveldiff))
-            print("digtime: " .. digtime .. " resulting from: " .. parameters.times[rating] .. " wear: " .. wear)
+            --print("digtime: " .. digtime .. " resulting from: " .. parameters.times[rating] .. " wear: " .. wear)
             candig = true
             if result_time == nil or (digtime < result_time) then
                 result_time = digtime
