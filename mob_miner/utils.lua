@@ -69,7 +69,12 @@ function mob_miner_calc_digtime(tool, nodename)
 end
 
 function miner_is_dig_safe(pos)
-
+	if (core.find_node_near(pos, 1, 
+		{ "default:water_source", "default:water_flowing",
+		  "default:river_water_source", "default:river_water_flowing",
+		  "default:lava_source", "default:lava_flowing"}) ~= nil) then
+		  return false
+	end
     return true
 end
 
