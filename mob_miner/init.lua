@@ -160,23 +160,31 @@ mob_miner.add_wear = function(entity, toolname, wear)
     if (toolname == "") then
         return true
     end
-
-    local done = false
+    
+    local old_count = #inventory
 
     for i = 1, #inventory, 1 do
         if (inventory[i] ~= nil) then
             if (inventory[i].name == toolname) then
                 inventory[i].wear = inventory[i].wear + wear
-                done = true
                 if (inventory[i].wear > 65535) then
-                    inventory[i] = nil
+                	local new_inventory = {}
+                	inventory[i] = nil
+                	
+                	for i=1, old_count, 1 do
+                		if inventory[i] ~= nil then
+                			table.insert(new_inventory, inventory[i])
+                		end
+                	end
+                	
+                	entity:get_persistent_data().inventory.tools = new_inventory
                 end
-                break
+                return true
             end
         end
     end
     
-    return done
+    return false
 end
 
 mob_miner.add_to_inventory = function(entity, itemname)
@@ -311,7 +319,7 @@ local miner_onstep = function(entity, now, dtime)
             mydata.control.soundtime = mydata.control.soundtime + dtime
         end
         
-        if (not miner_is_dig_safe(mydata.control.digpos)) then
+        if mydata.control.digpos ~= nil and not miner_is_dig_safe(mydata.control.digpos) then
             --! TODO send message to owner
             core.chat_send_player(entity:owner(), mydata.name .. ": " .. 
               S("I won't continue to dig here there's something bad behind!"))
