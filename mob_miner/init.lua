@@ -120,7 +120,10 @@ local miner_activate = function(entity)
     
     mydata.unique_entity_id = string.gsub(tostring(entity),"table: ","")
     entity.dynamic_data.miner_formspec_data = {}
-    entity.dynamic_data.movement.target = core.get_player_by_name(entity.dynamic_data.spawning.spawner)
+    
+    if entity.dynamic_data.spawning.spawner ~= nil then
+    	entity.dynamic_data.movement.target = core.get_player_by_name(entity.dynamic_data.spawning.spawner)
+    end
 end
 
 mob_miner.stepforward  = function(entity)
@@ -285,7 +288,7 @@ mob_miner.complete_dig = function(entity)
     if (entity:add_wear(data.control.used_tool,
                    data.control.add_wear_oncomplete)) then
     
-      core.set_node(data.control.digpos, {name="air"})
+      core.dig_node(data.control.digpos)
       
       local toadd = nodeat.name
       
@@ -336,6 +339,18 @@ local miner_onstep = function(entity, now, dtime)
         
         --! move ahead if we don't have any node left to dig
         if (mydata.control.digpos == nil) and (not non_air_node_found) then
+        	if mydata.control.dig_wait_time == nil then
+        		mydata.control.dig_wait_time = 0
+        	end
+        	
+        	mydata.control.dig_wait_time = mydata.control.dig_wait_time + dtime
+        	
+        	if mydata.control.dig_wait_time < 1 then
+        		return
+        	end
+        	
+        	mydata.control.dig_wait_time = 0
+        
             mydata.control.digdepth = mydata.control.digdepth -1
             
             if (entity:stepforward()) then
@@ -431,7 +446,7 @@ miner_prototype = {
 				},
 		movement =  {
 					guardspawnpoint = true,
-					teleportdelay = 60,
+					teleportdelay = 30,
 					min_accel=0.3,
 					max_accel=0.7,
 					max_speed=1.5,
