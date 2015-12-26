@@ -26,6 +26,16 @@ else
 end
 
 
+-------------------------------------------------------------------------------
+-- @function [parent=#mob_miner] show_formspec(playername, entity, data)
+--
+--! @brief show formspec to some player
+--! @memberof mob_miner
+--
+--! @param playername name of player to show to
+--! @param entity showing the formspec
+--! @param data entity specific data
+-------------------------------------------------------------------------------
 mob_miner.show_formspec = function(playername, entity, data)
 
     local storageid = mobf_global_data_store(entity)
@@ -105,6 +115,16 @@ mob_miner.show_formspec = function(playername, entity, data)
 end
 
 
+-------------------------------------------------------------------------------
+-- @function [parent=#mob_miner] formspec_handler(player, formname, fields)
+--
+--! @brief handle events triggered by formspec
+--! @memberof mob_miner
+--
+--! @param player player causing the formspec action
+--! @param formname name of form causing the event
+--! @param fields all fields passed from form
+-------------------------------------------------------------------------------
 mob_miner.formspec_handler = function(player, formname, fields)
     if formname:find("mobf_miner:") == 1 then
         local storageid =  formname:sub(12)
@@ -188,6 +208,15 @@ mob_miner.formspec_handler = function(player, formname, fields)
     end
 end
 
+-------------------------------------------------------------------------------
+-- @function [parent=#mob_miner] rightclick_control_label(entity)
+--
+--! @brief provide label for rightclick contol button
+--! @memberof mob_miner
+--
+--! @param entity entity to show button for
+--! @return label for button
+-------------------------------------------------------------------------------
 mob_miner.rightclick_control_label = function(entity)
     local mydata = entity:get_persistent_data()
     
@@ -207,11 +236,22 @@ mob_miner.rightclick_control_label = function(entity)
       end
     elseif (mydata.control.digstate == "idle_nothing_to_dig") then
         return S("move ahead")
+    elseif (mydata.control.digstate == "follow") then
+    	return S("following you")
     else
-      return S("stop digging")
+      return S("stop digging") .. " (" .. mydata.control.digdepth .. ")"
     end
 end
 
+-------------------------------------------------------------------------------
+-- @function [parent=#mob_miner] rightclick_relocate_label(entity)
+--
+--! @brief provide label for rightclick relocate button
+--! @memberof mob_miner
+--
+--! @param entity entity to show button for
+--! @return label for button
+-------------------------------------------------------------------------------
 mob_miner.rightclick_relocate_label = function(entity)
     local mydata = entity:get_persistent_data()
     
@@ -222,6 +262,15 @@ mob_miner.rightclick_relocate_label = function(entity)
     end
 end
 
+-------------------------------------------------------------------------------
+-- @function [parent=#mob_miner] rightclick_control(entity, player)
+--
+--! @brief handle rightclick of control button
+--! @memberof mob_miner
+--
+--! @param entity being rightclicked
+--! @param player player clicking entity
+-------------------------------------------------------------------------------
 mob_miner.rightclick_control = function(entity, player)
     local mydata = entity:get_persistent_data()
 
@@ -230,12 +279,22 @@ mob_miner.rightclick_control = function(entity, player)
     elseif mydata.control.digstate == "idle_nothing_to_dig" then
         entity:stepforward()
         mydata.control.digstate = "idle"
-    else
+    elseif mydata.control.digstate == "digging" then
         mydata.control.digstate = "idle"
         entity:set_state("default")
     end
 end
 
+
+-------------------------------------------------------------------------------
+-- @function [parent=#mob_miner] rightclick_relocate(entity, player)
+--
+--! @brief handle rightclick of relocate button
+--! @memberof mob_miner
+--
+--! @param entity being rightclicked
+--! @param player player clicking entity
+-------------------------------------------------------------------------------
 mob_miner.rightclick_relocate = function(entity, player)
     local mydata = entity:get_persistent_data()
 
