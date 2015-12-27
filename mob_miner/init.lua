@@ -20,7 +20,7 @@ mob_miner = {}
 --!path of mod
 local miner_modpath = minetest.get_modpath("mob_miner")
 
-local version = "0.1.0"
+local version = "0.1.1"
 
 --include debug trace functions
 dofile (miner_modpath .. "/constants.lua")
@@ -508,7 +508,8 @@ miner_prototype = {
 					movgen = "follow_mov_gen",
 					typical_state_time = 60,
 					chance = 0,
-					animation = "stand",
+					animation_walk = "walk",
+					animation_next_to_target = "stand",
 					graphics_3d = 
 					{
 						visual = "mesh",
