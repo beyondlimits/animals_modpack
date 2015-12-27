@@ -20,13 +20,14 @@ mob_miner = {}
 --!path of mod
 local miner_modpath = minetest.get_modpath("mob_miner")
 
-local version = "0.0.2"
+local version = "0.1.0"
 
 --include debug trace functions
 dofile (miner_modpath .. "/constants.lua")
 dofile (miner_modpath .. "/utils.lua")
 dofile (miner_modpath .. "/ui.lua")
 dofile (miner_modpath .. "/names_m_de.lua")
+dofile (miner_modpath .. "/crack_entity.lua")
 
 -- Boilerplate to support localized strings if intllib mod is installed.
 local S
@@ -120,6 +121,7 @@ local miner_activate = function(entity)
     
     mydata.unique_entity_id = string.gsub(tostring(entity),"table: ","")
     entity.dynamic_data.miner_formspec_data = {}
+    entity.dynamic_data.miner_data = {}
     
     if entity.dynamic_data.spawning.spawner ~= nil then
     	entity.dynamic_data.movement.target = core.get_player_by_name(entity.dynamic_data.spawning.spawner)
@@ -364,6 +366,15 @@ local miner_onstep = function(entity, now, dtime)
             --print ("Miner: no diggable node found setting to idle")
             entity:set_state("default")
             return
+        end
+        
+        if mydata.control.digtime == 0 then
+              local entitypos = vector.round(mydata.control.digpos)
+              print("Adding entity at: " .. dump(mydata.control.digpos) .. " --> " .. dump(entitypos))
+              local added = minetest.add_entity(entitypos, "mob_miner:cracksim")
+              if added ~= nil then
+              	added:get_luaentity().timetotal = (mydata.control.timetocomplete - 0.05)
+              end
         end
         
         --! check if dig is completed
