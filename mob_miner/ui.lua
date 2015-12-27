@@ -217,7 +217,16 @@ end
 --! @param entity entity to show button for
 --! @return label for button
 -------------------------------------------------------------------------------
-mob_miner.rightclick_control_label = function(entity)
+mob_miner.rightclick_control_label = function(entity, player)
+	if not player:is_player() then
+		return "You aren't even human!"
+	end
+	
+	if player:get_player_name() ~= entity.dynamic_data.spawning.spawner then
+		print("Playername: " .. player:get_player_name() .. " spawned by: " .. entity.dynamic_data.spawning.spawner)
+		return "Ask my boss!"
+	end
+
     local mydata = entity:get_persistent_data()
     
     if mydata.control.digstate == "idle" then
@@ -252,7 +261,17 @@ end
 --! @param entity entity to show button for
 --! @return label for button
 -------------------------------------------------------------------------------
-mob_miner.rightclick_relocate_label = function(entity)
+mob_miner.rightclick_relocate_label = function(entity, player)
+
+	if not player:is_player() then
+		return "You aren't even human!"
+	end
+	
+	if player:get_player_name() ~= entity.dynamic_data.spawning.spawner then
+		print("Playername: " .. player:get_player_name() .. " spawned by: " .. entity.dynamic_data.spawning.spawner)
+		return "Ask my boss!"
+	end
+
     local mydata = entity:get_persistent_data()
     
     if mydata.control.digstate == "follow" then
@@ -272,6 +291,15 @@ end
 --! @param player player clicking entity
 -------------------------------------------------------------------------------
 mob_miner.rightclick_control = function(entity, player)
+	if not player:is_player() then
+		return
+	end
+	
+	if player:get_player_name() ~= entity.dynamic_data.spawning.spawner then
+		print("Playername: " .. player:get_player_name() .. " spawned by: " .. entity.dynamic_data.spawning.spawner)
+		return
+	end
+
     local mydata = entity:get_persistent_data()
 
     if mydata.control.digstate == "idle" then
@@ -296,6 +324,15 @@ end
 --! @param player player clicking entity
 -------------------------------------------------------------------------------
 mob_miner.rightclick_relocate = function(entity, player)
+	if not player:is_player() then
+		return
+	end
+	
+	if player:get_player_name() ~= entity.dynamic_data.spawning.spawner then
+		print("Playername: " .. player:get_player_name() .. " spawned by: " .. entity.dynamic_data.spawning.spawner)
+		return
+	end
+
     local mydata = entity:get_persistent_data()
 
     if mydata.control.digstate == "idle" or
