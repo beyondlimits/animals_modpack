@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_bear loading ...")
 
-local version = "0.0.2"
+local version = "0.1.1"
 
 local bear_groups = {
 						not_in_creative_inventory=1
@@ -37,7 +37,7 @@ bear_prototype = {
 
 		generic = {
 					description="Bear",
-					base_health=15,
+					base_health=20,
 					kill_result="animalmaterials:fur 2",
 					armor_groups= {
 						fleshy=90,
@@ -65,15 +65,35 @@ bear_prototype = {
 					sun_sensitive=false,
 					melee = {
 						maxdamage=7,
-						range=2,
+						range=3,
 						speed=1.5,
 						},
 					distance 		= nil,
 					self_destruct 	= nil,
 					},
 		sound = {
-					random = nil,
-					},
+				random = {
+					interval = 90,
+					max_interval_deviation = 20,
+					list = {
+						{
+						name="mob_bear_random",
+						gain = 1,
+						max_hear_distance = 10,
+						},
+					}
+				},
+				hit = {
+					name="mob_bear_hit",
+					gain = 1,
+					max_hear_distance = 5,
+				},
+				melee = {
+					name="mob_bear_melee",
+					gain = 1,
+					max_hear_distance = 5,
+				}
+		},
 		animation = {
 				stand = {
 					start_frame = 0,

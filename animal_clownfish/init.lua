@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: animal_clownfish mod loading ...")
 
-local version = "0.1.1"
+local version = "0.2.0"
 
 local selectionbox_clownfish = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
 

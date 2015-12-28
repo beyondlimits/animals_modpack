@@ -1,4 +1,4 @@
-local version = "0.1.2"
+local version = "0.2.2"
 
 minetest.log("action","MOD: loading animal_vombie ... ")
 
@@ -107,7 +107,7 @@ local vombie_prototype = {
 						daemon=30,
 					},
 					groups = vombie_groups,
-					envid="on_ground_1",
+					envid="simple_air",
 					custom_on_step_handler = vombie_on_step_handler,
 					custom_on_activate_handler = vombie_on_activate_handler,
 					population_density=20,
@@ -145,6 +145,11 @@ local vombie_prototype = {
 								name="animal_vombie_sun_damage",
 								gain = 0.25,
 								max_hear_distance = 7,
+								},
+					hit = {
+								name="animal_vombie_hit",
+								gain = 0.25,
+								max_hear_distance = 5,
 								},
 					},
 		animation = {
@@ -273,8 +278,8 @@ mobf_spawner_register("vombie_spawner_1",vombie_name,
 
 	daytimes =
 	{
-		{ begin = 0.75, stop=0.99 },
-		{ begin = 0.0,  stop=0.25 },
+		{ begin = 0.85, stop=0.99 },
+		{ begin = 0.0,  stop=0.15 },
 	},
 
 	surfaces = { "default:dirt_with_grass", "default:sand", "default:desert_sand"},
@@ -290,7 +295,7 @@ mobf_spawner_register("vombie_spawner_2",vombie_name,
 		{
 			{ type="MAX",distance=1,threshold=0 },
 			{ type="MAX",entityname=vombie_name,
-				distance=100,threshold=2 },
+				distance=50,threshold=2 },
 		},
 
 	light_around =

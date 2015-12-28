@@ -24,7 +24,7 @@ else
 end
 
 minetest.log("action","MOD: animal_dm loading ...")
-local version = "0.1.1"
+local version = "0.2.0"
 
 local dm_groups = {
 					not_in_creative_inventory=1
@@ -73,7 +73,7 @@ local dm_prototype = {
 						speed=1,
 						},
 					distance = {
-						attack="mobf:fireball_entity",
+						attack="animal_resources:fireball_entity",
 						range =15,
 						speed = 1,
 						},
@@ -223,7 +223,7 @@ mobf_spawner_register("dm_spawner_1",dm_name,
 	})
 
 
-minetest.log("action", "adding mob "..dm_prototype.name)
+minetest.log("action", "\tadding mob "..dm_prototype.name)
 if mobf_add_mob(dm_prototype) then
 	dofile (modpath .. "/vault.lua")
 end

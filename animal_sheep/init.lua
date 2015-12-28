@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: animal_sheep mod loading ...")
 
-local version = "0.2.2"
+local version = "0.3.2"
 
 local sheep_groups = {
 						sheerable=1,
@@ -34,7 +34,30 @@ local sheep_groups = {
 					}
 
 local selectionbox_sheep = {-0.65, -0.75, -0.65, 0.65, 0.45, 0.65}
-local selectionbox_lamb = {-0.65*0.6, -0.8*0.6, -0.65*0.6, 0.65*0.6, 0.45*0.6, 0.65*0.65}
+local selectionbox_lamb = {-0.65*0.6, -0.8*0.6, -0.65*0.6,
+                           0.65*0.6, 0.45*0.6, 0.65*0.65 }
+
+local feeding_nodes = {
+    "default:junglegrass",
+    "default:sapling",
+    "default:grass_1",
+    "default:grass_2",
+    "default:grass_3",
+    "default:grass_4",
+    "default:grass_5",
+    "flowers:tulip",
+    "flowers:dandelion_yellow",
+    "flowers:geranium",
+    "flowers:viola",
+    "flowers:dandelion_white"
+}
+
+local hunger_config =  {
+      target_nodes = feeding_nodes,
+      range = 10,
+      chance = 0.3,
+      typical_walk_time = 30,
+      }
 
 local sheep_prototype = {
 		name="sheep",
@@ -81,18 +104,37 @@ local sheep_prototype = {
 					},
 		sound = {
 					random = {
+							interval = 20,
+							max_interval_deviation = 5,
+							list = {
+								{
 								name="Mudchute_sheep_1",
-								min_delta = 30,
-								chance = 0.5,
-								gain = 0.5,
+								gain = 0.4,
 								max_hear_distance = 10,
 								},
+								{
+								name="animal_sheep_random_2",
+								gain = 0.4,
+								max_hear_distance = 10,
+								},
+							}
+					},
 					harvest = {
 								name="animal_sheep_harvest",
 								gain = 0.8,
 								max_hear_distance = 5
-								},
 					},
+					hit = {
+								name="animal_sheep_hit_1",
+								gain = 0.8,
+								max_hear_distance = 5
+					},
+					catch = {
+								name="animal_sheep_catch",
+								gain = 0.8,
+								max_heat_distance = 5
+					},
+		},
 		--animation testing only
 --		patrol = {
 --					state = "patrol",
@@ -144,7 +186,6 @@ local sheep_prototype = {
 					movgen = "none",
 					typical_state_time = 300,
 					chance = 0.10,
-					chance = 0,
 					animation = "sleep",
 				},
 				{
@@ -179,18 +220,7 @@ local sheep_prototype = {
 --				state_mode = "user_def",
 --				},
 			},
-		hunger = {
-			target_nodes = { "default:junglegrass",
-							"default:sapling",
-							"default:grass_1",
-							"default:grass_2",
-							"default:grass_3",
-							"default:grass_4",
-							"default:grass_5"},
-			range = 10,
-			chance = 0.2,
-			typical_walk_time = 30,
-			}
+		hunger = hunger_config,
 		}
 
 local lamb_prototype = {
@@ -233,11 +263,25 @@ local lamb_prototype = {
 					},
 		sound = {
 					random = {
-								name="Mudchute_lamb_1",
-								min_delta = 30,
-								chance = 0.5,
+							interval = 60,
+							max_interval_deviation = 20,
+							list = {
+								{
+								name="animal_sheep_lamb_random_1",
 								gain = 0.4,
 								max_hear_distance = 10,
+								},
+							}
+					},
+					hit = {
+								name="animal_sheep_hit_1",
+								gain = 0.8,
+								max_hear_distance = 3
+								},
+					catch = {
+								name="animal_sheep_catch",
+								gain = 0.8,
+								max_heat_distance = 5
 								},
 					},
 		animation = {
@@ -312,18 +356,7 @@ local lamb_prototype = {
 				animation = "walk",
 				},
 			},
-		hunger = {
-			target_nodes = { "default:junglegrass",
-							"default:sapling",
-							"default:grass_1",
-							"default:grass_2",
-							"default:grass_3",
-							"default:grass_4",
-							"default:grass_5"},
-			range = 10,
-			chance = 0.2,
-			typical_walk_time = 30,
-			}
+		hunger = hunger_config,
 		}
 
 local sheep_naked_prototype = {
@@ -365,13 +398,32 @@ local sheep_naked_prototype = {
 					},
 		sound = {
 					random = {
+							interval = 20,
+							max_interval_deviation = 5,
+							list = {
+								{
 								name="Mudchute_sheep_1",
-								min_delta = 30,
-								chance = 0.5,
-								gain = 0.5,
+								gain = 0.4,
 								max_hear_distance = 10,
 								},
+								{
+								name="animal_sheep_random_2",
+								gain = 0.4,
+								max_hear_distance = 10,
+								},
+							}
 					},
+					hit = {
+								name="animal_sheep_hit_1",
+								gain = 0.8,
+								max_hear_distance = 5
+					},
+					catch = {
+								name="animal_sheep_catch",
+								gain = 0.8,
+								max_heat_distance = 5
+					},
+		},
 		animation = {
 				walk = {
 					start_frame = 0,
@@ -444,18 +496,7 @@ local sheep_naked_prototype = {
 				animation = "walk",
 				},
 			},
-		hunger = {
-			target_nodes = { "default:junglegrass",
-							"default:sapling",
-							"default:grass_1",
-							"default:grass_2",
-							"default:grass_3",
-							"default:grass_4",
-							"default:grass_5"},
-			range = 10,
-			chance = 0.2,
-			typical_walk_time = 30,
-			}
+		hunger = hunger_config
 		}
 
 

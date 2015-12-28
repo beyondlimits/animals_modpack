@@ -24,7 +24,7 @@ else
 end
 
 minetest.log("action","MOD: mob_slime mod loading ...")
-local version = "0.1.0"
+local version = "0.2.1"
 
 local selectionbox_slime_L = {-0.5, -0.4, -0.5,  0.5,0.4,0.5}
 local selectionbox_slime_M = {-0.3, -0.2, -0.3,  0.3,0.2,0.3}
@@ -44,6 +44,11 @@ function mob_slime_bounce(entity)
 
 	if not mobf_is_walkable(node_below) then
 		entity.object:setvelocity( {x=current_velocity.x,y=entity.data.movement.bounce,z=current_velocity.z})
+		sound.play(pos,{
+			name="mob_slime_bounce",
+			gain = 0.5,
+			max_hear_distance = 15,
+		})
 	end
 end
 
@@ -114,7 +119,7 @@ local prototype_mob_slime_L = {
 		base_health=1,
 
 		--! @brief [MANDATORY] environment of mob to be
-		envid="on_ground_1",
+		envid="simple_air",
 
 		--! @brief [OPTIONAL] item description OR function all returning a item description of whats the result of a kill
 		kill_result = nil,
@@ -244,7 +249,7 @@ local prototype_mob_slime_S = {
 		base_health=1,
 
 		--! @brief [MANDATORY] environment of mob to be
-		envid="on_ground_1",
+		envid="simple_air",
 
 		--! @brief [OPTIONAL] item description OR function all returning a item description of whats the result of a kill
 		kill_result = nil,
@@ -357,7 +362,7 @@ local prototype_mob_slime_M = {
 		base_health=1,
 
 		--! @brief [MANDATORY] environment of mob to be
-		envid="on_ground_1",
+		envid="simple_air",
 
 		--! @brief [OPTIONAL] item description OR function all returning a item description of whats the result of a kill
 		kill_result = nil,

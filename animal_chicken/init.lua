@@ -24,7 +24,7 @@ else
 end
 
 minetest.log("action","MOD: animal_chicken mod loading ...")
-local version = "0.1.1"
+local version = "0.2.2"
 
 local chicken_groups = {
 						not_in_creative_inventory=1
@@ -116,17 +116,35 @@ local chicken_prototype = {
 						max_hear_distance = 5,
 						},
 					random = {
-						name= {
-							"animal_chicken_random_chicken_1",
-							"animal_chicken_random_chicken_2",
-							"animal_chicken_random_chicken_3",
-							"animal_chicken_random_chicken_4",
-							"animal_chicken_random_chicken_5",
+						interval = 80,
+						max_interval_deviation = 20,
+						list = {
+							{
+								name = "animal_chicken_random_chicken_1",
+								gain = 1,
+								max_hear_distance = 5,
 							},
-						min_delta = 60,
-						chance = 0.5,
-						gain = 1,
-						max_hear_distance = 5,
+							{
+								name = "animal_chicken_random_chicken_2",
+								gain = 1,
+								max_hear_distance = 5,
+							},
+							{
+								name = "animal_chicken_random_chicken_3",
+								gain = 1,
+								max_hear_distance = 5,
+							},
+							{
+								name = "animal_chicken_random_chicken_4",
+								gain = 1,
+								max_hear_distance = 5,
+							},
+							{
+								name = "animal_chicken_random_chicken_5",
+								gain = 1,
+								max_hear_distance = 5,
+							},
+						}
 					},
 			},
 		animation = {
@@ -213,11 +231,35 @@ local rooster_prototype = {
 					},
 		sound = {
 					random = {
-						name="animal_chicken_random_rooster",
-						min_delta = 1200,
-						chance = 0.5,
-						gain = 1,
-						max_hear_distance = 5,
+						interval = 80,
+						max_interval_deviation = 20,
+						list = {
+							{
+								name = "animal_chicken_random_chicken_1",
+								gain = 1,
+								max_hear_distance = 5,
+							},
+							{
+								name = "animal_chicken_random_chicken_2",
+								gain = 1,
+								max_hear_distance = 5,
+							},
+							{
+								name = "animal_chicken_random_chicken_3",
+								gain = 1,
+								max_hear_distance = 5,
+							},
+							{
+								name = "animal_chicken_random_chicken_4",
+								gain = 1,
+								max_hear_distance = 5,
+							},
+							{
+								name = "animal_chicken_random_chicken_5",
+								gain = 1,
+								max_hear_distance = 5,
+							},
+						}
 					},
 			},
 		animation = {
@@ -239,7 +281,7 @@ local rooster_prototype = {
 				graphics_3d = {
 					visual = "mesh",
 					mesh = "animal_rooster.b3d",
-					textures = {"animal_chicken_chicken_mesh.png"},
+					textures = {"animal_chicken_rooster_mesh.png"},
 					collisionbox = selectionbox_rooster,
 					visual_size= {x=1,y=1,z=1},
 					},

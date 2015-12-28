@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: mob_npc mod loading ...")
 
-local version = "0.1.0"
+local version = "0.2.1"
 local npc_groups = {
 						not_in_creative_inventory=1
 					}
@@ -52,7 +52,7 @@ local npc_prototype = {
 						fleshy=90,
 					},
 					groups = npc_groups,
-					envid="on_ground_1",
+					envid="simple_air",
 					population_density=0,
 				},
 		movement =  {
@@ -116,7 +116,7 @@ local npc_trader_prototype = {
 						fleshy=60,
 					},
 					groups = npc_groups,
-					envid="on_ground_1",
+					envid="simple_air",
 					custom_on_activate_handler=mob_inventory.init_trader_inventory,
 					population_density=0,
 				},
@@ -173,6 +173,13 @@ local npc_trader_prototype = {
 				attention_distance = 7.5,
 				attention_max = 10,
 		},
+		sound = {
+			inventory_open = {
+				name="mob_npc_letstrade",
+				gain = 0.75,
+				max_hear_distance = 5,
+			}
+		},
 		trader_inventory = {
 				goods = {
 							{ "default:mese 1", "default:iron_lump 30",},
@@ -187,7 +194,7 @@ local npc_trader_prototype = {
 							{ "default:torch 33", "default:mese_crystal 2", "default:stone 10"},
 							{ "default:ladder 12", "default:mese 1", "default:cobble 50"},
 							{ "default:paper 12", "default:mese_crystal 2", "default:stone 10"},
-							{ "default:chest_locked 1", "default:mese_crystal 5", "default:cobble 25"},
+							{ "mob_miner:miner 1", "default:mese_crystal 10", nil},
 							{ "mob_archer:archer 1","default:mese_crystal 10",nil},
 							{ "mob_guard:guard 1","default:mese_crystal 10",nil},
 							{ "doors:door_steel 1","default:mese_crystal 3","default:cobble 20"},

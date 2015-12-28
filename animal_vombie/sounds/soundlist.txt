@@ -2,11 +2,11 @@
 random:
 	random_1.ogg
 hit:
-	--missing--
+	animal_vombie_hit.ogg
 die:
 	--missing--
 melee:
-	hit.ogg
+	--missing--
 sun_damage:
 	sun_damage.ogg
 

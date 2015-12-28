@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: animal_gull loading ...")
 
-local version = "0.1.1"
+local version = "0.2.0"
 
 local gull_groups = {
 						not_in_creative_inventory=1

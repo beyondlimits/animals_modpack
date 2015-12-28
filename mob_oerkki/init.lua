@@ -14,7 +14,7 @@
 -- Contact sapier a t gmx net
 -------------------------------------------------------------------------------
 minetest.log("action","MOD: mob_oerkki mod loading ...")
-local version = "0.1.1"
+local version = "0.2.1"
 
 local oerkki_groups = {
 						not_in_creative_inventory=1
@@ -38,11 +38,11 @@ local oerkki_prototype = {
 					base_health=3,
 					kill_result="animalmaterials:meat_toxic 1",
 					armor_groups= {
-						fleshy=15,
+						fleshy=30,
 						deamon=30,
 					},
 					groups = oerkki_groups,
-					envid="on_ground_1",
+					envid="simple_air",
 					population_density=750,
 				},
 		movement = {
