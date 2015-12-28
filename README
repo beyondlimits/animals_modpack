@@ -19,6 +19,12 @@ https://github.com/sapier/animals_modpack/wiki/Frequently-asked-questions
 
 Changelog:
 -------------------------------------------------------------------------------
+Changes 2.5.0
+-Fix crash on spawning miner
+-Add simulation of cracks for miner
+-Show rows left to dig in miner rightclick menu
+-make sure only owner of miner can control it
+-Use different animations for walk and stand in follow movegen
 
 Changes 2.4.94 2015.12.26
 -Add support for miner safe to dig check
