@@ -1,0 +1,8 @@
+# Italian translation for Animals Modpack.
+# Traduzione in Italiano di Animals Modpack.
+# Author/Autor: Emon
+
+Cow = Mucca
+Steer = Manzo
+Baby Calf female = Vitello femmina
+Baby Calf male = Vitello maschio

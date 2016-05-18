@@ -1,0 +1,8 @@
+# Italian translation for Animals Modpack.
+# Traduzione in Italiano di Animals Modpack.
+# Author/Autor: Emon
+
+Chicken = Pollo
+Rooster = Gallo
+Chick - male = Pulcino - maschio
+Chick - female = Pulcino - femmina

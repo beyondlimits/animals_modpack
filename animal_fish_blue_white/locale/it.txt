@@ -1,0 +1,5 @@
+# Italian translation for Animals Modpack.
+# Traduzione in Italiano di Animals Modpack.
+# Author/Autor: Emon
+
+Blue white fish = Pesce bianco e blu
