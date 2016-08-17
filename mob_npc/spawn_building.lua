@@ -58,8 +58,8 @@ blueprint_hut = {
 		{"stairs:slab_wood",{x=0,y=3,z=4},{x=5,y=3,z=4}},
 
 	--front_door
-		{"doors:door_wood_t_1",{x=1,y=2,z=0},{x=1,y=2,z=0}},
-		{"doors:door_wood_b_1",{x=1,y=1,z=0},{x=1,y=1,z=0}},
+		{"doors:hidden",{x=1,y=2,z=0},{x=1,y=2,z=0}},
+		{"doors:door_wood_a",{x=1,y=1,z=0},{x=1,y=1,z=0}},
 
 	--front_window
 		{"default:glass",{x=3,y=2,z=0},{x=4,y=2,z=0}},
@@ -102,8 +102,8 @@ blueprint_normalhouse = {
 		{"default:clay",{x=3,y=7,z=3},{x=5,y=7,z=7}},
 
 	--front_door
-		{"doors:door_wood_t_1",{x=2,y=2,z=0},{x=2,y=2,z=0}},
-		{"doors:door_wood_b_1",{x=2,y=1,z=0},{x=2,y=1,z=0}},
+		{"doors:hidden",{x=2,y=2,z=0},{x=2,y=2,z=0}},
+		{"doors:door_wood_a",{x=2,y=1,z=0},{x=2,y=1,z=0}},
 
 	--windows
 		{"default:glass",{x=4,y=1,z=0},{x=7,y=3,z=0}},
