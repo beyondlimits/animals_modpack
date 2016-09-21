@@ -40,7 +40,7 @@ local big_red_prototype = {
 			member = {
 				"underground",
 				"monsters",
-				"daemonic"
+				"demonic"
 				}
 			},
 
@@ -50,7 +50,7 @@ local big_red_prototype = {
 					kill_result="animalmaterials:meat_toxic 3",
 					armor_groups= {
 						fleshy=10,
-						deamon=20,
+						demon=20,
 					},
 					groups = big_red_groups,
 					envid="simple_air",

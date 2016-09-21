@@ -104,7 +104,7 @@ local vombie_prototype = {
 					kill_result=vombie_drop,
 					armor_groups= {
 						fleshy=95,
-						daemon=30,
+						demon=30,
 					},
 					groups = vombie_groups,
 					envid="simple_air",
