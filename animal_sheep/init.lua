@@ -147,7 +147,7 @@ local sheep_prototype = {
 				walk = {
 					start_frame = 0,
 					end_frame   = 60,
-					basevelocity = 3,
+					basevelocity = 0.25,
 					},
 				stand = {
 					start_frame = 61,
@@ -292,7 +292,7 @@ local lamb_prototype = {
 				walk = {
 					start_frame = 0,
 					end_frame   = 60,
-					basevelocity = 3,
+					basevelocity = 0.25,
 					},
 				stand = {
 					start_frame = 61,
@@ -432,7 +432,7 @@ local sheep_naked_prototype = {
 				walk = {
 					start_frame = 0,
 					end_frame   = 60,
-					basevelocity = 0.3,
+					basevelocity = 0.25,
 					},
 				stand = {
 					start_frame = 61,
