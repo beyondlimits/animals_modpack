@@ -175,8 +175,8 @@ mobf_spawner_register("boombomb_spawner_1",creeper_name,
 
 	daytimes =
 	{
-		{ begin = 0.75, stop=0.99 },
-		{ begin = 0.0,  stop=0.25 },
+		{ begin = 0.9, stop=0.99 },
+		{ begin = 0.0,  stop=0.05 },
 	},
 
 	surfaces = creeper_env.surfaces.good,
