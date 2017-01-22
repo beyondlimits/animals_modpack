@@ -25,7 +25,7 @@ end
 
 minetest.log("action","MOD: mob_npc mod loading ...")
 
-local version = "0.2.1"
+local version = "0.3.0"
 local npc_groups = {
 						not_in_creative_inventory=1
 					}
@@ -33,6 +33,7 @@ local npc_groups = {
 local modpath = minetest.get_modpath("mob_npc")
 
 dofile (modpath .. "/spawn_building.lua")
+dofile (modpath .. "/tutorial_quests.lua")
 
 local npc_prototype = {
 		name="npc",
@@ -97,7 +98,94 @@ local npc_prototype = {
 					},
 			},
 		}
+		
+		
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
+local tutor_init = function(entity)
+	if entity.dynamic_data.quest == nil then
+		entity.dynamic_data.quest = {
+			active_player    = nil,
+			quest_identifier = nil,
+		}
+	end
+end
+
+local tutor_prototype = {
+		name="tutor",
+		modname="mob_npc",
+
+		factions = {
+			member = {
+				"npc",
+				}
+			},
+
+		generic = {
+					description="Your personal tutor",
+					base_health=40,
+					kill_result="",
+					armor_groups= {
+						fleshy=90,
+					},
+					groups = npc_groups,
+					envid="simple_air",
+					population_density=0,
+					custom_on_activate_handler=tutor_init,
+				},
+		movement =  {
+					min_accel=0.3,
+					max_accel=0.7,
+					max_speed=1.5,
+					min_speed=0.01,
+					pattern="stop_and_go",
+					canfly=false,
+					},
+		states = {
+				{
+				name = "default",
+				movgen = "none",
+				typical_state_time = 180,
+				chance = 0.00,
+				animation = "stand",
+				graphics_3d = {
+					visual = "mesh",
+					mesh = "npc_character.b3d",
+					textures = {"mob_npc_tutor.png"},
+					collisionbox = {-0.3,-1.0,-0.3, 0.3,0.8,0.3},
+					visual_size= {x=1, y=1},
+					},
+				},
+			},
+		animation = {
+				walk = {
+					start_frame = 168,
+					end_frame   = 187,
+					},
+				stand = {
+					start_frame = 0,
+					end_frame   = 79,
+					},
+			},
+		quest = {
+			questlist = {
+				"mobf_tutorial_1",
+				"mobf_tutorial_2"
+			}
+		},
+		}
+		
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local npc_trader_prototype = {
 		name="npc_trader",
 		modname="mob_npc",
@@ -238,4 +326,6 @@ minetest.log("action","\tadding mob "..npc_trader_prototype.name)
 mobf_add_mob(npc_trader_prototype)
 minetest.log("action","\tadding mob "..npc_prototype.name)
 mobf_add_mob(npc_prototype)
+minetest.log("action","\tadding mob "..tutor_prototype.name)
+mobf_add_mob(tutor_prototype)
 minetest.log("action","MOD: mob_npc mod                version " .. version .. " loaded")
