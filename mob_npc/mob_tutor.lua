@@ -69,7 +69,8 @@ local tutor_prototype = {
 		quest = {
 			questlist = {
 				"mobf_tutorial_1",
-				"mobf_tutorial_2"
+				"mobf_tutorial_2",
+				"mobf_tutorial_3"
 			}
 		},
 	}
