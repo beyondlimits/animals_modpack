@@ -134,7 +134,7 @@ local mobf_tutorial_3 = {
 				"Craft 3 of them and get back to me with them.",
 		action1 =  { 
 					action_available_fct=nil, 
-					msg="I always wanted to learn catching mobs, I'll be back soon", 
+					msg="Great I always wanted to catch mobs, I'll be back soon", 
 					next_state="wait_for_lasso"
 					},
 		action2 =  { msg="No thank's catching mobs ain't my style of doing things" },
@@ -175,6 +175,46 @@ local mobf_tutorial_3 = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local mobf_tutorial_4 = {
+	quests_required = { "mobf_tutorial_3"},
+	repeatable = false,
+	init_state = {
+		text = "Great lassos indeed.\n\n" ..
+				"Not all mobs can be cought using a lasso but there are quite a few which can.\n" .. 
+				"I'd suggest start catching sheep but of course you can catch cattle or chicken too.\n" ..
+				"If you need more lassos, don't bother to craft\n" ..
+				"Now take your chances and catch at least 10 mobs before I can teach you your next lesson.",
+		action1 =  { 
+					action_available_fct=nil, 
+					msg="Oh boy 10 mobs that's gonna be quite some work", 
+					next_state="wait_for_catching_done"
+					},
+		action2 =  { msg="No thank's I don't wanna catch mobs right now" },
+	},
+	
+	wait_for_catching_done = {
+		text = "it's always a pleasure to see you.\n" ..
+				"Did you manage to catch 10 mobs yet?",
+		
+		action1 = {
+			events_required = {
+				{ type="event_cought", count=10 }
+			},
+			next_state="quest_completed",
+			msg="Yes of course it's been way more easy then I expected."
+			},
+		action2 = {
+			msg="Not yet, I'm still looking for mobs."
+			},
+	}
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 mobf_quest_engine.register_quest("mobf_tutorial_1", mobf_tutorial_1)
 mobf_quest_engine.register_quest("mobf_tutorial_2", mobf_tutorial_2)
 mobf_quest_engine.register_quest("mobf_tutorial_3", mobf_tutorial_3)
+mobf_quest_engine.register_quest("mobf_tutorial_4", mobf_tutorial_4)

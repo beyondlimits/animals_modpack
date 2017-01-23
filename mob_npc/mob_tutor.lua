@@ -70,7 +70,8 @@ local tutor_prototype = {
 			questlist = {
 				"mobf_tutorial_1",
 				"mobf_tutorial_2",
-				"mobf_tutorial_3"
+				"mobf_tutorial_3",
+				"mobf_tutorial_4"
 			}
 		},
 	}
@@ -119,7 +120,7 @@ local on_join = function(player)
 end
 
 -- if personal tutor is requested for player
-if mobf_get_world_setting("mobf_personal_tutor") then
+if mobf_get_world_setting("mobf_personal_tutor") or minetest.is_singleplayer() then
 
 	minetest.log("action", "Enabling personal tutor support.")
 
