@@ -214,7 +214,7 @@ local mobf_tutorial_4 = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-mobf_quest_engine.register_quest("mobf_tutorial_1", mobf_tutorial_1)
-mobf_quest_engine.register_quest("mobf_tutorial_2", mobf_tutorial_2)
-mobf_quest_engine.register_quest("mobf_tutorial_3", mobf_tutorial_3)
-mobf_quest_engine.register_quest("mobf_tutorial_4", mobf_tutorial_4)
+quest_engine.register_quest("mobf_tutorial_1", mobf_tutorial_1)
+quest_engine.register_quest("mobf_tutorial_2", mobf_tutorial_2)
+quest_engine.register_quest("mobf_tutorial_3", mobf_tutorial_3)
+quest_engine.register_quest("mobf_tutorial_4", mobf_tutorial_4)

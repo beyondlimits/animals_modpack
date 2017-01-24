@@ -79,7 +79,7 @@ local tutor_prototype = {
 local spawntutor = function(player)
 	local playername = player:get_player_name()
 	
-	if mobf_contains(playerdata, playername) then
+	if utils.contains(playerdata, playername) then
 		return
 	end
 
@@ -101,7 +101,7 @@ local spawntutor = function(player)
 	tutor_entity.dynamic_data.quest.personal_tutor_for = playername
 	
 	table.insert(playerdata, playername)
-	mobf_write_world_specific_data("mobf_tutor_data", playerdata)
+	utils.write_world_data("mobf_tutor_data", playerdata)
 	
 	--rotate mob to face player
 	local direction = mobf_get_direction(tutorpos, player:getpos())
@@ -126,7 +126,7 @@ if mobf_get_world_setting("mobf_personal_tutor") or minetest.is_singleplayer() t
 
 	core.register_on_joinplayer(on_join)
 	
-	playerdata = mobf_read_world_specific_data("mobf_tutor_data")
+	playerdata = utils.read_world_data("mobf_tutor_data")
 	
 	if playerdata == nil then
 		playerdata = {}

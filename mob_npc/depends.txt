@@ -1,5 +1,7 @@
 default
 mob_environments
+quest_engine
 doors
 mobf
+utils
 intllib?
