@@ -17,6 +17,7 @@
 local mobf_tutorial_1 = {
 	quests_required = {},
 	repeatable = false,
+	title= "Scissors crafting",
 	init_state = {
 		text = "nice to meet you. I'm your tutor. I'm gonna teach you what you can do with mobs" ..
 				" from \"animals modpack\".\n\n" ..
@@ -70,6 +71,7 @@ local mobf_tutorial_1 = {
 local mobf_tutorial_2 = {
 	quests_required = { "mobf_tutorial_1"},
 	repeatable = false,
+	title="Sheep sheering",
 	init_state = {
 		text = "are you ready for your next lesson?\n\n" ..
 				"The next lesson will be about how to sheer sheep.\n" .. 
@@ -126,6 +128,7 @@ local mobf_tutorial_2 = {
 local mobf_tutorial_3 = {
 	quests_required = { "mobf_tutorial_2"},
 	repeatable = false,
+	title="Lasso crafting",
 	init_state = {
 		text = "very good you've learned how to harvest wool from sheep.\n\n" ..
 				"Now it's time for our next lesson.\n" .. 
@@ -178,6 +181,7 @@ local mobf_tutorial_3 = {
 local mobf_tutorial_4 = {
 	quests_required = { "mobf_tutorial_3"},
 	repeatable = false,
+	title="Mob catching",
 	init_state = {
 		text = "Great lassos indeed.\n\n" ..
 				"Not all mobs can be cought using a lasso but there are quite a few which can.\n" .. 
@@ -214,7 +218,60 @@ local mobf_tutorial_4 = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local mobf_tutorial_5 = {
+	quests_required = { "mobf_tutorial_4"},
+	repeatable = false,
+	title="Breeding",
+	init_state = {
+		text = "Now that you know how to catch animals I'm gonna show you how to breed them."..
+				"\nLets start breeding chicks. I suggest building some sort of cage so your chicken don't runn away." ..
+				"\nOnce you've built that cage catch at least a chicken and a rooster and craft a barn as shown to the right." ..
+				"\nPlace the barn within your cage and fill it (punch barn!) using leaves for example." ..
+				"\n\nNow take your time and wait till a chick spawns.\n" ..
+				"To complete this quest breed at least 3 chicks. If you want to do this faster craft more barns.",
+		action1 =  { 
+					action_available_fct=nil, 
+					msg="Great I'm gonna start immediatly", 
+					next_state="wait_for_breeding_done"
+					},
+		action2 =  { msg="No thank's" },
+		reciep = {
+			{ "", "", "" },
+			{ "default:stick", "default:stick", ""},
+			{ "default:wood", "default:wood", ""}
+		}
+	},
+	
+	wait_for_breeding_done = {
+		text = "it's always a pleasure to see you.\n" ..
+				"Did you bree 3 chicks yet?",
+		
+		action1 = {
+			events_required = {
+				{ type="event_breed", mobtype1="animal_chicken:chicken", mobtype2="animal_chicken:rooster", count=3 }, 
+				{ type="event_craft", item="barn:barn_small_empty", count=1 }
+			},
+			next_state="quest_completed",
+			msg="Yes 3 little chicks grew up."
+			},
+		action2 = {
+			msg="Not yet, I'm still working on it."
+			},
+		reciep = {
+			{ "", "", "" },
+			{ "default:stick", "default:stick", ""},
+			{ "default:wood", "default:wood", ""}
+		}
+	}
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 quest_engine.register_quest("mobf_tutorial_1", mobf_tutorial_1)
 quest_engine.register_quest("mobf_tutorial_2", mobf_tutorial_2)
 quest_engine.register_quest("mobf_tutorial_3", mobf_tutorial_3)
 quest_engine.register_quest("mobf_tutorial_4", mobf_tutorial_4)
+quest_engine.register_quest("mobf_tutorial_5", mobf_tutorial_5)

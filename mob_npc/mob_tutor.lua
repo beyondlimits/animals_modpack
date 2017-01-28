@@ -71,7 +71,10 @@ local tutor_prototype = {
 				"mobf_tutorial_1",
 				"mobf_tutorial_2",
 				"mobf_tutorial_3",
-				"mobf_tutorial_4"
+				"mobf_tutorial_4",
+				"mobf_tutorial_5",
+				"mobf_tutorial_6",
+				"mobf_tutorial_7",
 			}
 		},
 	}
