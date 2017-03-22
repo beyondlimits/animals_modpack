@@ -30,7 +30,7 @@ local guard_groups = {
 						not_in_creative_inventory=1
 					}
 
-guard_prototype = {
+local guard_prototype = {
 		name="guard",
 		modname="mob_guard",
 
