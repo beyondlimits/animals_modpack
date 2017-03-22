@@ -16,7 +16,7 @@ end
 function building_spawner.checkdistance(pos,distance)
 
 	for i=1,#building_spawner.spawnpositions,1 do
-		if mobf_calc_distance(pos,building_spawner.spawnpositions[i]) < distance then
+		if vector.distance(pos,building_spawner.spawnpositions[i]) < distance then
 			return false
 		end
 	end
