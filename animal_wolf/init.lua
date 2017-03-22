@@ -177,25 +177,25 @@ tamed_wolf_prototype = {
 					--before placer is known to entity
 					custom_on_place_handler = function(entity, placer, pointed_thing)
 						if placer:is_player(placer) then
-							if entity.dynamic_data ~= nil and
-								entity.dynamic_data.movement ~= nil  then
-								entity.dynamic_data.movement.target = placer
-							else
+							if not entity:set_movement_target(placer, { max_target_distance=2, stop=true }) then
 								print("ANIMAL tamed wolf: unable to set owner maybe wolf has been already deleted")
 							end
 						end
 					end,
 					custom_on_activate_handler = function(entity)
-						print("ANIMAL tamed wolf: custom on activate handler called")
-						if (entity.dynamic_data.spawning.spawner ~= nil) then
-							print("ANIMAL tamed wolf: setting target to: " .. entity.dynamic_data.spawning.spawner )
-							entity.dynamic_data.movement.target = minetest.get_player_by_name(entity.dynamic_data.spawning.spawner)
+						local spawner = entity.dynamic_data.spawning.spawner
+						if spawner ~= nil then
+						
+							local player = minetest.get_player_by_name(spawner)
+							
+							if player ~= nil then
+								entity:set_movement_target(player, { max_target_distance=2, stop=true })
+							end
 						end
 					end,
 					custom_on_step_handler = function(entity,now,dstep)
 						if entity.dynamic_data.spawning.spawner == nil and
 							now - entity.dynamic_data.spawning.original_spawntime > 30 then
-								print("ANIMAL tamed wolf: tamed wolf without owner removing")
 								spawning.remove(entity)
 						end
 					end
@@ -208,7 +208,7 @@ tamed_wolf_prototype = {
 					max_accel=0.9,
 					max_speed=1.5,
 					max_distance=2,
-					follow_speedup=20,
+					follow_speedup=5,
 					},
 		catching = {
 					tool="animalmaterials:net",
