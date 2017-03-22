@@ -2,7 +2,6 @@
 local playerdata = nil
 
 local tutor_init = function(entity)
-	print("Init tutor")
 	if entity.dynamic_data.quest == nil then
 		entity.dynamic_data.quest = {
 			personal_tutor_for = nil,
@@ -75,6 +74,12 @@ local tutor_prototype = {
 				"mobf_tutorial_5",
 				"mobf_tutorial_6",
 				"mobf_tutorial_7",
+				"mobf_tutorial_8",
+				"mobf_tutorial_9",
+				"mobf_tutorial_10",
+				"mobf_tutorial_11",
+				"mobf_tutorial_12",
+				"mobf_tutorial_13",
 			}
 		},
 	}
